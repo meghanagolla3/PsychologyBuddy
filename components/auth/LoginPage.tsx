@@ -1,0 +1,47 @@
+﻿import React from 'react';
+import { useAdminLogin } from '@/src/hooks/auth/useAdminLogin';
+import { LoginForm } from '@/src/components/forms/LoginForm';
+import { PageIllustration } from '@/components/LandingPage/components/PageIllustration';
+
+export default function LoginPage() {
+  const {
+    formData,
+    loading,
+    error,
+    success,
+    handleChange,
+    handleSubmit,
+    handleGoogleSignIn,
+  } = useAdminLogin();
+
+  return (
+    <div className="flex min-h-screen relative">
+      <PageIllustration />
+      
+      {/* Right Side - Form */}
+      <div className="w-full lg:w-1/2 flex items-center justify-center p-4 sm:p-6 lg:p-8 bg-white relative z-10">
+        <div className="w-full max-w-md sm:max-w-lg space-y-6">
+          <div className="text-center">
+            <h1 className="text-[28px] sm:text-[32px] lg:text-[32px] font-bold text-[#2F3D43] mb-2">
+              Admin Login
+            </h1>
+            
+          </div>
+
+          <LoginForm
+            formData={formData}
+            showPassword={false}
+            loading={loading}
+            error={error}
+            success={success}
+            isGoogleLoading={false}
+            onChange={handleChange}
+            onTogglePassword={() => {}} // Not needed for admin login
+            onSubmit={handleSubmit}
+            onGoogleSignIn={handleGoogleSignIn}
+          />
+        </div>
+      </div>
+    </div>
+  );
+}

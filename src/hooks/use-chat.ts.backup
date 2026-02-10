@@ -1,0 +1,678 @@
+import { useState, useEffect, useRef, useCallback } from 'react'
+import { ChatAPI } from '@/src/lib/api'
+import { ConversationAnalyzer } from '@/src/services/conversation-analysis'
+import { AutomaticChatTermination, ChatTerminationResult } from '@/src/services/automatic-chat-termination'
+import { ResponseFormatter, StructuredResponse } from '@/src/lib/ai/response-templates'
+
+export interface Message {
+  id: string
+  sender: "student" | "bot"
+  content: string
+  timestamp: string
+  temp?: boolean
+  type?: 'opening' | 'closing' | 'normal'
+  importSuggestion?: {
+    show: boolean
+    lastTopic?: string
+    lastDate?: string
+  }
+}
+
+export interface ChatState {
+  messages: Message[]
+  input: string
+  isLoading: boolean
+  sessionId: string | null
+}
+
+export interface UseChatOptions {
+  studentId: string
+  mood?: string
+  triggers?: string[]
+  notes?: string
+  onMessage?: (message: Message) => void
+  onError?: (error: Error) => void
+}
+
+export function useChat({
+  studentId,
+  mood,
+  triggers,
+  notes,
+  onMessage,
+  onError,
+}: UseChatOptions) {
+  const [state, setState] = useState<ChatState>({
+    messages: [],
+    input: '',
+    isLoading: false,
+    sessionId: null
+  })
+
+  const chatRef = useRef<HTMLDivElement>(null)
+  const isInitialized = useRef(false)
+  const sessionIdRef = useRef<string | null>(null)
+  const terminationCleanupRef = useRef<(() => void) | null>(null)
+  const isTerminatingRef = useRef(false)
+
+  // Auto scroll when messages update
+  useEffect(() => {
+    chatRef.current?.scrollTo({
+      top: chatRef.current.scrollHeight,
+      behavior: "smooth",
+    });
+  }, [state.messages, handleAutomaticTermination]);
+
+  // Send message with streaming
+  const sendMessage = useCallback(async (message: string) => {
+    if (!sessionIdRef.current || !studentId) return;
+
+    try {
+      const response = await fetch("/api/students/chat/stream", {
+        method: "POST",
+        headers: { 
+          "Content-Type": "application/json",
+          "x-user-id": studentId
+        },
+        body: JSON.stringify({
+          sessionId: sessionIdRef.current,
+          message: message
+        }),
+      });
+
+      const data = await response.json();
+      console.log(`[SendMessage] Response:`, data);
+
+      if (data.success) {
+        // Add message to chat state
+        const newMessage: Message = {
+          id: crypto.randomUUID(),
+          sender: 'student',
+          content: message,
+          timestamp: new Date().toISOString(),
+          type: 'normal'
+        };
+        setState(prev => ({ ...prev, messages: [...prev.messages, newMessage] }));
+
+        // Call onMessage callback
+        onMessage?.(newMessage);
+      } else {
+        console.error(`[SendMessage] Failed to send message:`, data);
+        onError?.(new Error(`Failed to send message: ${data.error}`));
+      }
+    } catch (error) {
+      console.error('Failed to send message:', error);
+      onError?.(error as Error);
+    }
+  }, [studentId, sessionIdRef, onMessage, onError]);
+
+  // Generate summary and end chat
+  const generateSummaryAndEndChat = useCallback(async () => {
+    if (!sessionIdRef.current || !studentId) return;
+
+    console.log(`[AutoTermination] Starting summary generation for session ${sessionIdRef.current}`);
+    console.log(`[AutoTermination] Message count: ${state.messages.length}`);
+
+    try {
+      // Call summary generation API
+      const response = await fetch("/api/students/summary/generate", {
+        method: "POST",
+        headers: { 
+          "Content-Type": "application/json",
+          "x-user-id": studentId
+        },
+        body: JSON.stringify({
+          sessionId: sessionIdRef.current,
+          conversation: state.messages.map((msg: Message) => ({
+            role: msg.sender === "student" ? "user" : "assistant",
+            content: msg.content
+          })),
+        }),
+      });
+
+      console.log(`[AutoTermination] Summary API response status: ${response.status}`);
+
+      const data = await response.json();
+      console.log(`[AutoTermination] Summary API response:`, data);
+
+      if (data.success) {
+        // Store for last-session preview use
+        sessionStorage.setItem("lastSummaryId", data.data.id);
+        console.log(`[AutoTermination] Summary generated successfully, ID: ${data.data.id}`);
+        
+        // Instead of redirecting to summary page, start a new chat session
+        console.log(`[AutoTermination] Starting new chat session after summary generation`);
+        
+        // Clear current session
+        sessionStorage.removeItem("chatSessionId");
+        sessionIdRef.current = null;
+        isInitialized.current = false;
+        isTerminatingRef.current = false;
+        
+        // Reset state for new chat
+        setState({
+          messages: [],
+          input: '',
+          isLoading: false,
+          sessionId: null
+        });
+        
+        // Initialize new chat session
+        await initializeChat();
+        
+      } else {
+        console.error(`[AutoTermination] Summary generation failed:`, data);
+        isTerminatingRef.current = false;
+      }
+    } catch (error) {
+      console.error('Failed to generate summary during automatic termination:', error);
+      isTerminatingRef.current = false;
+    }
+  }, [state.messages, studentId, initializeChat]);
+
+  // Automatic chat termination logic
+  const handleAutomaticTermination = useCallback(async (result: ChatTerminationResult) => {
+    if (isTerminatingRef.current || !sessionIdRef.current) return;
+    
+    isTerminatingRef.current = true;
+    console.log('Automatic chat termination triggered:', result.reason);
+    
+    try {
+      // Add closing message from AI
+      if (result.closingMessage) {
+        console.log(`[AutoTermination] Adding closing message: ${result.closingMessage}`);
+        const closingMessage: Message = {
+          id: `closing_${Date.now()}`,
+          sender: 'bot',
+          content: result.closingMessage,
+          timestamp: new Date().toISOString(),
+          type: 'closing'
+        };
+        
+        setState(prev => ({
+          ...prev,
+          messages: [...prev.messages, closingMessage]
+        }));
+      }
+
+      // Wait a moment for user to read the closing message
+      console.log(`[AutoTermination] Waiting 3 seconds before generating summary...`);
+      await new Promise(resolve => setTimeout(resolve, 3000));
+
+      console.log(`[AutoTermination] Proceeding with summary generation...`);
+      // Generate summary and end chat
+      await generateSummaryAndEndChat();
+      
+    } catch (error) {
+      console.error('Error during automatic termination:', error);
+      isTerminatingRef.current = false;
+    }
+  }, [generateSummaryAndEndChat]);
+
+  // Set up automatic termination monitoring
+  useEffect(() => {
+    const currentSessionId = sessionIdRef.current;
+    const messageCount = state.messages.length;
+    
+    console.log(`[AutoTermination] Setting up monitoring: sessionId=${currentSessionId}, messageCount=${messageCount}`);
+    
+    if (!currentSessionId || messageCount < 10) return; // Production threshold
+
+    // Clean up any existing termination check
+    if (terminationCleanupRef.current) {
+      console.log(`[AutoTermination] Cleaning up previous interval before setting up new one`);
+      terminationCleanupRef.current();
+      terminationCleanupRef.current = null;
+    }
+
+    console.log(`[AutoTermination] Starting termination monitoring for ${messageCount} messages`);
+
+    // Set up new termination check with a function that returns current messages
+    terminationCleanupRef.current = AutomaticChatTermination.setupTerminationCheck(
+      () => state.messages, // Pass a function to get current messages
+      currentSessionId,
+      (result) => {
+        console.log(`[AutoTermination] Termination callback triggered, cleaning up...`);
+        if (terminationCleanupRef.current) {
+          terminationCleanupRef.current();
+          terminationCleanupRef.current = null;
+        }
+        handleAutomaticTermination(result);
+      }
+    );
+
+    console.log(`[AutoTermination] Monitoring setup complete`);
+
+    return () => {
+      if (terminationCleanupRef.current) {
+        console.log(`[AutoTermination] Effect cleanup - cleaning up termination monitoring`);
+        terminationCleanupRef.current();
+        terminationCleanupRef.current = null;
+      }
+    };
+  }, [state.messages, handleAutomaticTermination]);
+
+  // Initialize chat session
+  const initializeChat = useCallback(async (
+    mood?: string, 
+    triggers?: string[], 
+    notes?: string,
+    skipImportSuggestion: boolean = false
+  ) => {
+    if (!studentId) {
+      console.warn('Cannot initialize chat: No student ID provided')
+      return
+    }
+    
+    isInitialized.current = true
+    
+    try {
+      console.log('Initializing chat with:', { studentId, mood, triggers, notes, skipImportSuggestion });
+      
+      // Check for previous conversations
+      console.log('Checking for previous conversations for student:', studentId)
+      console.log('Student ID type:', typeof studentId)
+      console.log('Student ID length:', studentId?.length)
+      
+      const previousSummaries = await ChatAPI.getStudentSummaries(studentId)
+      console.log('Previous summaries API response:', previousSummaries)
+      console.log('Previous summaries type:', typeof previousSummaries)
+      console.log('Previous summaries isArray:', Array.isArray(previousSummaries))
+      
+      const hasPreviousConversations = Array.isArray(previousSummaries) && previousSummaries.length > 0
+      console.log('Has previous conversations:', hasPreviousConversations)
+      console.log('Skip import suggestion:', skipImportSuggestion)
+      
+      const data = await ChatAPI.startChat({
+        studentId,
+        mood: mood && mood.trim() ? mood : undefined,
+        triggers: triggers && triggers.length > 0 ? triggers : undefined,
+        notes: notes && notes.trim() ? notes : undefined,
+        skipImportSuggestion
+      })
+
+      console.log('Chat started successfully:', data);
+
+      // Save sessionId for streaming chat
+      sessionStorage.setItem("chatSessionId", data.sessionId)
+      sessionIdRef.current = data.sessionId
+      setState(prev => ({ ...prev, sessionId: data.sessionId }))
+
+      // Display opening message with import suggestion (only if not skipping)
+      const shouldShowImportSuggestion = hasPreviousConversations && !skipImportSuggestion
+      console.log('Import suggestion logic:', {
+        hasPreviousConversations,
+        skipImportSuggestion,
+        shouldShowImportSuggestion,
+        previousSummariesCount: previousSummaries.length,
+        firstSummary: previousSummaries[0]
+      })
+      
+      console.log('Creating opening message with import suggestion:', {
+        hasPreviousConversations,
+        skipImportSuggestion,
+        shouldShowImportSuggestion,
+        lastTopic: previousSummaries[0]?.mainTopic,
+        lastDate: previousSummaries[0]?.createdAt
+      })
+      
+      const openingMessage: Message = {
+        id: crypto.randomUUID(),
+        sender: "bot",
+        content: data.openingMessage,
+        timestamp: new Date().toLocaleTimeString(),
+        type: 'opening',
+        importSuggestion: shouldShowImportSuggestion ? {
+          show: true,
+          lastTopic: previousSummaries[0]?.mainTopic,
+          lastDate: previousSummaries[0]?.createdAt
+        } : undefined
+      }
+      
+      console.log('Opening message created:', openingMessage)
+
+      setState(prev => ({
+        ...prev,
+        messages: [...prev.messages, openingMessage]
+      }))
+
+      onMessage?.(openingMessage)
+    } catch (error) {
+      const err = error instanceof Error ? error : new Error('Failed to initialize chat')
+      onError?.(err)
+      // Reset flag on error so it can be retried
+      isInitialized.current = false
+    }
+  }, [studentId, onMessage, onError])
+
+  // Send message with streaming
+  const sendMessage = useCallback(async (messageText: string) => {
+    if (!messageText.trim()) {
+      console.log('Cannot send message: empty message');
+      return
+    }
+
+    // If no session ID, try to initialize one first
+    if (!sessionIdRef.current) {
+      console.log('Cannot send message: no session ID, attempting to initialize...');
+      await initializeChat(mood, triggers, notes);
+      return;
+    }
+
+    const userMessage: Message = {
+      id: crypto.randomUUID(),
+      sender: "student",
+      content: messageText,
+      timestamp: new Date().toLocaleTimeString(),
+    }
+
+    // Add user message immediately
+    setState(prev => ({
+      ...prev,
+      messages: [...prev.messages, userMessage],
+      input: '',
+      isLoading: true
+    }))
+
+    onMessage?.(userMessage)
+
+    try {
+      const response = await ChatAPI.sendMessage({
+        message: messageText,
+        studentId,
+        sessionId: sessionIdRef.current,
+      })
+
+      const reader = response.body?.getReader()
+      const decoder = new TextDecoder()
+      let botReply = ""
+
+      while (true) {
+        const chunk = await reader?.read()
+        if (!chunk || chunk.done) break
+
+        botReply += decoder.decode(chunk.value)
+
+        // Update streaming temporary message
+        setState(prev => {
+          const withoutTemp = prev.messages.filter(m => m.id !== "temp-bot")
+          return {
+            ...prev,
+            messages: [
+              ...withoutTemp,
+              {
+                id: "temp-bot",
+                sender: "bot",
+                content: botReply,
+                timestamp: new Date().toLocaleTimeString(),
+                temp: true,
+              },
+            ]
+          }
+        })
+      }
+
+      // Replace temp message with permanent message
+      const finalBotMessage: Message = {
+        id: crypto.randomUUID(),
+        sender: "bot",
+        content: botReply,
+        timestamp: new Date().toLocaleTimeString(),
+        temp: false,
+      }
+      
+      setState(prev => ({
+        ...prev,
+        messages: prev.messages.map(msg =>
+          msg.id === "temp-bot"
+            ? finalBotMessage
+            : msg
+        ),
+        isLoading: false
+      }))
+      
+      // Analyze conversation for potential ending
+      const allMessages = [...state.messages, userMessage, finalBotMessage]
+      const analysis = await ConversationAnalyzer.analyzeConversation(allMessages, sessionIdRef.current!)
+      
+      if (analysis.shouldEnd) {
+        // Generate closing message
+        const closingMessage = await generateClosingMessage(analysis, allMessages)
+        
+        setState(prev => ({
+          ...prev,
+          messages: [...prev.messages, closingMessage]
+        }))
+        
+        // Auto-end session after a delay
+        setTimeout(async () => {
+          // Call endChat directly without depending on it in useCallback
+          if (sessionIdRef.current) {
+            try {
+              await ChatAPI.endSession(sessionIdRef.current)
+              sessionStorage.removeItem("chatSessionId")
+              sessionIdRef.current = null
+              setState(prev => ({ 
+                ...prev, 
+                sessionId: null,
+                messages: [],
+                input: '',
+                isLoading: false 
+              }))
+              isInitialized.current = false
+            } catch (error) {
+              console.error('Error ending chat session:', error)
+            }
+          }
+        }, 3000)
+      }
+
+    } catch (error) {
+      const err = error instanceof Error ? error : new Error('Failed to send message')
+      
+      // If session not found, try to create a new one
+      if (err.message.includes('Chat session not found or inactive')) {
+        console.log('Session not found, creating new session...');
+        sessionStorage.removeItem("chatSessionId");
+        isInitialized.current = false;
+        setState(prev => ({ ...prev, sessionId: null, isLoading: false }));
+        
+        // Try to initialize a new chat session
+        await initializeChat(mood, triggers, notes);
+        return;
+      }
+      
+      // For any other error, also try to recover by creating a new session
+      console.log('Error sending message, attempting recovery:', err.message);
+      sessionStorage.removeItem("chatSessionId");
+      isInitialized.current = false;
+      setState(prev => ({ ...prev, sessionId: null, isLoading: false }));
+      await initializeChat(mood, triggers, notes);
+      
+      // If recovery fails, notify error handler
+      onError?.(err)
+    }
+  }, [studentId, onMessage, onError, initializeChat, mood, triggers, notes])
+  
+  const generateClosingMessage = async (
+    analysis: any,
+    conversationMessages: Message[]
+  ): Promise<Message> => {
+    const structuredResponse: StructuredResponse = {
+      greeting: "I'm glad we had this conversation today.",
+      reflection: "You've shared some important thoughts and feelings, and I can see you've shown great self-awareness and courage throughout our discussion.",
+      support: "Remember to be kind to yourself as you process these insights. You have more strength than you realize.",
+      question: "Take care of yourself, and I'm here whenever you need to talk again."
+    }
+    
+    const closingContent = ResponseFormatter.formatStructuredResponse(structuredResponse)
+    
+    return {
+      id: crypto.randomUUID(),
+      sender: 'bot',
+      content: closingContent,
+      timestamp: new Date().toLocaleTimeString(),
+      type: 'closing'
+    }
+  }
+
+  // Fetch existing messages for a session
+  const fetchExistingMessages = useCallback(async (sessionId: string) => {
+    try {
+      const response = await fetch(`/api/students/chat/messages?sessionId=${sessionId}`)
+      if (response.ok) {
+        const data = await response.json()
+        if (data.success && data.messages) {
+          // Convert API messages to our format
+          const existingMessages: Message[] = data.messages.map((msg: any) => ({
+            id: msg.id,
+            sender: msg.role === 'user' ? 'student' : 'bot',
+            content: msg.content,
+            timestamp: new Date(msg.timestamp).toLocaleTimeString(),
+          }))
+          
+          setState(prev => ({
+            ...prev,
+            messages: existingMessages
+          }))
+          
+          console.log('Loaded', existingMessages.length, 'existing messages')
+          
+          // If no messages exist, this might be a broken session - create a new one
+          if (existingMessages.length === 0) {
+            console.log('No messages found in existing session, creating new session')
+            sessionStorage.removeItem("chatSessionId")
+            isInitialized.current = false
+            initializeChat(mood, triggers, notes)
+          }
+        }
+      } else {
+        console.log('Failed to fetch messages, response status:', response.status);
+        // If we can't fetch messages, assume session is broken and create new one
+        sessionStorage.removeItem("chatSessionId");
+        isInitialized.current = false;
+        initializeChat(mood, triggers, notes);
+      }
+    } catch (error) {
+      console.error('Error fetching existing messages:', error)
+      // If there's an error, create a new session
+      sessionStorage.removeItem("chatSessionId");
+      isInitialized.current = false;
+      initializeChat(mood, triggers, notes);
+    }
+  }, [mood, triggers, notes, initializeChat])
+
+  // End chat session and clean up
+  const endChat = useCallback(async () => {
+    try {
+      const currentSessionId = sessionIdRef.current
+      if (currentSessionId) {
+        console.log('Ending chat session:', currentSessionId)
+        
+        // Generate summary before ending the session
+        if (state.messages.length > 1) { // Only generate summary if there are messages
+          try {
+            console.log('Generating summary for session:', currentSessionId);
+            
+            const summaryData = await ChatAPI.generateSummary(currentSessionId, state.messages);
+            console.log('Summary generated successfully:', summaryData);
+          } catch (summaryError) {
+            console.error('Error generating summary:', summaryError);
+            // Don't fail the endChat process if summary generation fails
+          }
+        }
+        
+        // End the session in database
+        await ChatAPI.endSession(currentSessionId)
+        
+        // Clear session from storage and state
+        sessionStorage.removeItem("chatSessionId")
+        sessionIdRef.current = null
+        setState(prev => ({ 
+          ...prev, 
+          sessionId: null,
+          messages: [],
+          input: '',
+          isLoading: false 
+        }))
+        
+        // Reset initialization flag so new session can be created
+        isInitialized.current = false
+        
+        console.log('Chat session ended and cleaned up')
+      }
+    } catch (error) {
+      console.error('Error ending chat session:', error)
+      throw error
+    }
+  }, [state.messages])
+
+  // Update input
+  const setInput = useCallback((input: string) => {
+    setState(prev => ({ ...prev, input }))
+  }, [])
+
+  // Initialize chat on mount
+  useEffect(() => {
+    // Only initialize once per student session
+    if (isInitialized.current) return
+
+    // Check if user is coming from reflections page with import parameter
+    const urlParams = new URLSearchParams(typeof window !== 'undefined' ? window.location.search : '')
+    const importedText = urlParams.get('import')
+    const isImportingFromReflections = !!importedText && importedText.trim() !== ''
+    
+    console.log('Chat initialization - URL params:', {
+      importedText,
+      isImportingFromReflections,
+      fullUrl: typeof window !== 'undefined' ? window.location.href : 'N/A'
+    })
+    
+    const savedSessionId = sessionStorage.getItem("chatSessionId")
+    console.log('Chat initialization check:', { 
+      isInitialized: isInitialized.current, 
+      savedSessionId, 
+      studentId,
+      hasMoodData: !!(mood || triggers || notes)
+    });
+    
+    // If we have mood data (coming from mood check-in), check if we should continue existing session
+    if (mood || triggers || notes) {
+      // Check if there's an existing active session
+      if (savedSessionId) {
+        // Continue existing session - don't create new one
+        sessionIdRef.current = savedSessionId
+        setState(prev => ({ ...prev, sessionId: savedSessionId }))
+        isInitialized.current = true
+        console.log('Continuing existing chat session:', savedSessionId)
+        // Fetch existing messages for this session
+        fetchExistingMessages(savedSessionId)
+      } else {
+        // Create new session only if no existing one
+        console.log('No existing session, creating new one with mood data');
+        initializeChat(mood, triggers, notes, isImportingFromReflections)
+      }
+    } else if (savedSessionId) {
+      // Continue existing session
+      sessionIdRef.current = savedSessionId
+      setState(prev => ({ ...prev, sessionId: savedSessionId }))
+      isInitialized.current = true
+      console.log('Continuing existing chat session:', savedSessionId)
+      // Fetch existing messages for this session
+      fetchExistingMessages(savedSessionId)
+    } else {
+      // Create new session
+      console.log('No existing session, creating new one');
+      initializeChat(mood, triggers, notes, isImportingFromReflections)
+    }
+  }, [studentId, mood, triggers, notes, fetchExistingMessages, initializeChat]) // Include mood, triggers, notes to trigger when they change
+
+  return {
+    ...state,
+    chatRef,
+    sendMessage,
+    setInput,
+    initializeChat,
+    endChat,
+  }
+}
