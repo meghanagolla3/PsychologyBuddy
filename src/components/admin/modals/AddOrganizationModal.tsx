@@ -40,10 +40,10 @@ export function AddOrganizationModal({ isOpen, onClose, onSuccess }: AddOrganiza
     }
   };
 
-  const isFormValid = () => {
-    const nameValid = formData.name.trim().length > 0;
-    const emailValid = !formData.email || validateEmail(formData.email);
-    return nameValid && emailValid;
+  const isSubmitDisabled = (): boolean => {
+    const nameIsEmpty: boolean = formData.name.trim().length === 0;
+    const emailIsInvalid: boolean = Boolean(formData.email && !validateEmail(formData.email));
+    return Boolean(loading || nameIsEmpty || emailIsInvalid);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -211,7 +211,7 @@ export function AddOrganizationModal({ isOpen, onClose, onSuccess }: AddOrganiza
             </button>
             <button
               type="submit"
-              disabled={loading || !formData.name.trim() || (formData.email && !validateEmail(formData.email))}
+              disabled={isSubmitDisabled()}
               className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? 'Creating...' : 'Create Organization'}

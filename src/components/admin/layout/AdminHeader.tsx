@@ -11,13 +11,16 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
-import { Bell, Settings } from 'lucide-react';
+import { Bell, Settings, Building2 } from 'lucide-react';
 
 interface AdminHeaderProps {
   title: string;
   subtitle?: string;
   showTimeFilter?: boolean;
   showSchoolFilter?: boolean;
+  schoolFilterValue?: string;
+  onSchoolFilterChange?: (value: string) => void;
+  schools?: Array<{ id: string; name: string }>;
   actions?: React.ReactNode;
 }
 
@@ -26,12 +29,17 @@ export function AdminHeader({
   subtitle, 
   showTimeFilter = true, 
   showSchoolFilter = true, 
+  schoolFilterValue,
+  onSchoolFilterChange,
+  schools,
   actions 
 }: AdminHeaderProps) {
   const router = useRouter();
 
+  console.log('AdminHeader props:', { showSchoolFilter, schoolFilterValue, schools: schools?.length });
+
   return (
-    <header className="sticky top-0 z-30 flex flex-col gap-4 border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 px-6 py-4">
+    <header className="sticky top-0 z-30 flex flex-col gap-4 border-b border-border bg-white backdrop-blur supports-[backdrop-filter]:bg-background/60 px-6 py-4">
       <div className="flex items-center justify-between">
         <div className="flex flex-col gap-0.5">
           <h1 className="text-2xl font-semibold tracking-tight text-foreground">{title}</h1>
@@ -40,24 +48,30 @@ export function AdminHeader({
         
         <div className="flex items-center gap-4">
           {showSchoolFilter && (
-            <Select defaultValue="all">
-              <SelectTrigger className="w-40 h-9">
-                <SelectValue placeholder="Select school" />
+            <Select value={schoolFilterValue} onValueChange={onSchoolFilterChange}>
+              <SelectTrigger className="w-44 h-9 bg-white focus:ring-2 focus:ring-[#3c83f6] ">
+                <div className="flex items-center gap-2">
+                  <Building2 className="h-4 w-4 text-[#65758b] text-muted-foreground " />
+                  <SelectValue placeholder="Select School" />
+                </div>
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className='bg-white'>
                 <SelectItem value="all">All Schools</SelectItem>
-                <SelectItem value="school1">School 1</SelectItem>
-                <SelectItem value="school2">School 2</SelectItem>
+                {schools && schools.map((school) => (
+                  <SelectItem key={school.id} value={school.id}>
+                    {school.name}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
           )}
 
           {showTimeFilter && (
             <Select defaultValue="week">
-              <SelectTrigger className="w-32 h-9">
+              <SelectTrigger className="w-32 h-9 bg-white focus:ring-2 focus:ring-[#3c83f6] ">
                 <SelectValue placeholder="Time range" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className='bg-white'>
                 <SelectItem value="today">Today</SelectItem>
                 <SelectItem value="week">This Week</SelectItem>
                 <SelectItem value="month">This Month</SelectItem>

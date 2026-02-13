@@ -4,7 +4,7 @@ import React from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/src/contexts/AuthContext';
 import { usePermissions } from '@/src/hooks/usePermissions';
-import { SettingsSection } from '@/src/components/admin/sections/SettingsSection';
+import SettingsSection from '@/src/components/admin/sections/SettingsSection';
 
 export default function SettingsPage() {
   const { user, loading } = useAuth();
@@ -37,7 +37,7 @@ export default function SettingsPage() {
   }
 
   return (
-    <div className="p-6">
+    <div>
       <SettingsSection />
     </div>
   );

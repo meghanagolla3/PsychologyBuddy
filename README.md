@@ -290,6 +290,394 @@ Key authentication tables:
 - [Authentication System Guide](./docs/psychology-buddy-authentication-guide.md)
 - [Google OAuth Setup](./docs/GOOGLE_OAUTH_SETUP.md)
 - [API Documentation](./docs/AUTHENTICATION_SYSTEM.md)
+- [Music APIs](./docs/MUSIC_APIS.md)
+- [Meditation APIs](./docs/MEDITATION_APIS.md)
+
+## 🧪 Testing the Meditation APIs
+
+### Prerequisites
+
+1. **Start the development server:**
+```bash
+npm run dev
+```
+
+2. **Ensure database is running and schema is updated:**
+```bash
+npx prisma db push
+npx prisma generate
+```
+
+### 🔐 Authentication Setup
+
+The meditation APIs require authentication. You'll need to:
+
+1. **Login as Admin** (for admin endpoints):
+```bash
+# Get admin session
+curl -X POST http://localhost:3000/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email": "admin@example.com", "password": "your-password"}'
+```
+
+2. **Login as Student** (for student endpoints):
+```bash
+# Get student session  
+curl -X POST http://localhost:3000/api/auth/student-login \
+  -H "Content-Type: application/json" \
+  -d '{"studentId": "STUDENT001", "password": "student-password"}'
+```
+
+### 📝 Testing with curl
+
+#### **Admin Operations**
+
+**Create Meditation:**
+```bash
+curl -X POST http://localhost:3000/api/admin/meditation \
+  -H "Content-Type: application/json" \
+  -H "Cookie: session=your-admin-session-cookie" \
+  -d '{
+    "title": "Morning Mindfulness",
+    "description": "A gentle morning meditation to start your day",
+    "thumbnailUrl": "https://example.com/thumbnail.jpg",
+    "format": "AUDIO",
+    "audioUrl": "https://example.com/meditation.mp3",
+    "durationSec": 600,
+    "instructor": "Jane Doe",
+    "type": "GUIDED",
+    "categoryIds": ["category_id_1"],
+    "goalIds": ["goal_id_1"],
+    "status": "PUBLISHED"
+  }'
+```
+
+**Get All Meditations:**
+```bash
+curl -X GET "http://localhost:3000/api/admin/meditation?page=1&limit=10" \
+  -H "Cookie: session=your-admin-session-cookie"
+```
+
+**Get Meditation by ID:**
+```bash
+curl -X GET "http://localhost:3000/api/admin/meditation?id=meditation-id" \
+  -H "Cookie: session=your-admin-session-cookie"
+```
+
+**Update a Meditation:**
+```bash
+curl -X PATCH "http://localhost:3000/api/admin/meditation?id=meditation-id" \
+  -H "Content-Type: application/json" \
+  -H "Cookie: session=your-admin-session-cookie" \
+  -d '{
+    "title": "Updated Morning Mindfulness",
+    "status": "PUBLISHED"
+  }'
+```
+
+**Delete a Meditation:**
+```bash
+curl -X DELETE "http://localhost:3000/api/admin/meditation?id=meditation-id" \
+  -H "Cookie: session=your-admin-session-cookie"
+```
+
+**Get Meditations by Type:**
+```bash
+curl -X GET "http://localhost:3000/api/admin/meditation/type/GUIDED?page=1&limit=10" \
+  -H "Cookie: session=your-admin-session-cookie"
+```
+
+**Get Meditations by Category:**
+```bash
+curl -X GET "http://localhost:3000/api/admin/meditation/category/Mindfulness?page=1&limit=10" \
+  -H "Cookie: session=your-admin-session-cookie"
+```
+
+**Get Meditations by Goal:**
+```bash
+curl -X GET "http://localhost:3000/api/admin/meditation/goal/Stress%20Reduction?page=1&limit=10" \
+  -H "Cookie: session=your-admin-session-cookie"
+```
+
+#### **Admin Categories Management**
+
+**Create Category:**
+```bash
+curl -X POST http://localhost:3000/api/admin/meditation/categories \
+  -H "Content-Type: application/json" \
+  -H "Cookie: session=your-admin-session-cookie" \
+  -d '{
+    "name": "Mindfulness",
+    "description": "Mindfulness meditation practices",
+    "icon": "mindfulness-icon",
+    "color": "#4CAF50",
+    "status": "ACTIVE"
+  }'
+```
+
+**Get Categories:**
+```bash
+curl -X GET "http://localhost:3000/api/admin/meditation/categories?page=1&limit=10" \
+  -H "Cookie: session=your-admin-session-cookie"
+```
+
+**Update Category:**
+```bash
+curl -X PATCH "http://localhost:3000/api/admin/meditation/categories?id=category-id" \
+  -H "Content-Type: application/json" \
+  -H "Cookie: session=your-admin-session-cookie" \
+  -d '{
+    "name": "Updated Mindfulness",
+    "description": "Updated description"
+  }'
+```
+
+**Delete Category:**
+```bash
+curl -X DELETE "http://localhost:3000/api/admin/meditation/categories?id=category-id" \
+  -H "Cookie: session=your-admin-session-cookie"
+```
+
+#### **Admin Goals Management**
+
+**Create Goal:**
+```bash
+curl -X POST http://localhost:3000/api/admin/meditation/goals \
+  -H "Content-Type: application/json" \
+  -H "Cookie: session=your-admin-session-cookie" \
+  -d '{
+    "name": "Stress Reduction",
+    "description": "Reduce stress and anxiety",
+    "icon": "stress-icon",
+    "color": "#2196F3"
+  }'
+```
+
+**Get Goals:**
+```bash
+curl -X GET "http://localhost:3000/api/admin/meditation/goals?page=1&limit=10" \
+  -H "Cookie: session=your-admin-session-cookie"
+```
+
+**Update Goal:**
+```bash
+curl -X PATCH "http://localhost:3000/api/admin/meditation/goals?id=goal-id" \
+  -H "Content-Type: application/json" \
+  -H "Cookie: session=your-admin-session-cookie" \
+  -d '{
+    "name": "Updated Stress Reduction",
+    "description": "Updated description"
+  }'
+```
+
+**Delete Goal:**
+```bash
+curl -X DELETE "http://localhost:3000/api/admin/meditation/goals?id=goal-id" \
+  -H "Cookie: session=your-admin-session-cookie"
+```
+
+#### **Student Operations**
+
+**Get All Published Meditations:**
+```bash
+curl -X GET "http://localhost:3000/api/student/meditation?page=1&limit=10" \
+  -H "Cookie: session=your-student-session-cookie"
+```
+
+**Get Meditation by ID:**
+```bash
+curl -X GET "http://localhost:3000/api/student/meditation?id=meditation-id" \
+  -H "Cookie: session=your-student-session-cookie"
+```
+
+**Get Meditations by Type:**
+```bash
+curl -X GET "http://localhost:3000/api/student/meditation/type/GUIDED?page=1&limit=10" \
+  -H "Cookie: session=your-student-session-cookie"
+```
+
+**Get Meditations by Category:**
+```bash
+curl -X GET "http://localhost:3000/api/student/meditation/category/Mindfulness?page=1&limit=10" \
+  -H "Cookie: session=your-student-session-cookie"
+```
+
+**Get Meditations by Goal:**
+```bash
+curl -X GET "http://localhost:3000/api/student/meditation/goal/Stress%20Reduction?page=1&limit=10" \
+  -H "Cookie: session=your-student-session-cookie"
+```
+
+#### **Student Categories & Goals Access**
+
+**Get Categories (Student):**
+```bash
+curl -X GET "http://localhost:3000/api/student/meditation/categories?page=1&limit=10" \
+  -H "Cookie: session=your-student-session-cookie"
+```
+
+**Get Category by ID (Student):**
+```bash
+curl -X GET "http://localhost:3000/api/student/meditation/categories?id=category-id" \
+  -H "Cookie: session=your-student-session-cookie"
+```
+
+**Get Goals (Student):**
+```bash
+curl -X GET "http://localhost:3000/api/student/meditation/goals?page=1&limit=10" \
+  -H "Cookie: session=your-student-session-cookie"
+```
+
+**Get Goal by ID (Student):**
+```bash
+curl -X GET "http://localhost:3000/api/student/meditation/goals?id=goal-id" \
+  -H "Cookie: session=your-student-session-cookie"
+```
+
+### 🌐 Testing with Postman
+
+**Import the following collection:**
+
+```json
+{
+  "info": {
+    "name": "Meditation APIs",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Admin - Create Meditation",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"title\": \"Morning Mindfulness\",\n  \"description\": \"A gentle morning meditation\",\n  \"format\": \"AUDIO\",\n  \"audioUrl\": \"https://example.com/meditation.mp3\",\n  \"durationSec\": 600,\n  \"instructor\": \"Jane Doe\",\n  \"type\": \"GUIDED\",\n  \"category\": \"Mindfulness\",\n  \"goal\": \"Stress Reduction\",\n  \"status\": \"PUBLISHED\"\n}"
+        },
+        "url": {
+          "raw": "http://localhost:3000/api/admin/meditation",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "3000",
+          "path": ["api", "admin", "meditation"]
+        }
+      }
+    },
+    {
+      "name": "Student - Get Meditations",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "http://localhost:3000/api/student/meditation?page=1&limit=10",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "3000",
+          "path": ["api", "student", "meditation"],
+          "query": [
+            {"key": "page", "value": "1"},
+            {"key": "limit", "value": "10"}
+          ]
+        }
+      }
+    }
+  ]
+}
+```
+
+### 📱 Testing with PowerShell (Windows)
+
+**Create Meditation:**
+```powershell
+Invoke-WebRequest -Uri http://localhost:3000/api/admin/meditation -Method POST -ContentType "application/json" -Body '{
+  "title": "Morning Mindfulness",
+  "description": "A gentle morning meditation to start your day",
+  "format": "AUDIO",
+  "audioUrl": "https://example.com/meditation.mp3",
+  "durationSec": 600,
+  "instructor": "Jane Doe",
+  "type": "GUIDED",
+  "category": "Mindfulness",
+  "goal": "Stress Reduction",
+  "status": "PUBLISHED"
+}' -UseBasicParsing
+```
+
+**Get Meditations (Student):**
+```powershell
+Invoke-WebRequest -Uri "http://localhost:3000/api/student/meditation?page=1&limit=10" -Method GET -UseBasicParsing
+```
+
+### 🔍 Expected Responses
+
+**Success Response (200):**
+```json
+{
+  "success": true,
+  "message": "Meditation created successfully",
+  "data": {
+    "id": "meditation_id",
+    "title": "Morning Mindfulness",
+    "description": "A gentle morning meditation...",
+    "format": "AUDIO",
+    "status": "PUBLISHED",
+    "createdAt": "2024-01-01T00:00:00.000Z"
+  }
+}
+```
+
+**Error Response (401):**
+```json
+{
+  "success": false,
+  "error": {
+    "code": 401,
+    "message": "No session found"
+  }
+}
+```
+
+**Error Response (403):**
+```json
+{
+  "success": false,
+  "error": {
+    "code": 403,
+    "message": "Insufficient permissions"
+  }
+}
+```
+
+### 🧪 Testing Checklist
+
+- [ ] Admin can create meditation
+- [ ] Admin can update meditation
+- [ ] Admin can delete meditation
+- [ ] Admin can list all meditations
+- [ ] Admin can filter by type/category/goal
+- [ ] Student can only see published meditations
+- [ ] Student cannot access draft meditations
+- [ ] Authentication works for both roles
+- [ ] Pagination works correctly
+- [ ] Search functionality works
+- [ ] Error handling works properly
+- [ ] Admin can create/update/delete categories
+- [ ] Admin can create/update/delete goals
+- [ ] Student can access active categories and goals
+- [ ] Category and goal filtering works correctly
+
+### 🐛 Common Issues
+
+1. **401 Unauthorized**: Ensure you're logged in and have a valid session cookie
+2. **403 Forbidden**: Check that you have the correct permissions for the endpoint
+3. **404 Not Found**: Verify the meditation ID exists and is accessible
+4. **500 Server Error**: Check server logs for detailed error information
+
+For more detailed API documentation, see [Meditation APIs](./docs/MEDITATION_APIS.md).
 
 ## 🚀 Deploy on Vercel
 

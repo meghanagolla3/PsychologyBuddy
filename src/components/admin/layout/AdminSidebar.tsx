@@ -71,7 +71,7 @@ export function AdminSidebar() {
       label: "Content Management",
       icon: BookOpen,
       children: [
-        { label: "Psychoeducation Library", href: "/content/library", icon: BookOpen },
+        { label: "Psychoeducation Library", href: "/admin/library", icon: BookOpen },
         { label: "Self-help Tools", href: "/content/tools", icon: Wrench },
       ],
     },

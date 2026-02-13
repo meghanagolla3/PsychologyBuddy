@@ -30,6 +30,15 @@ enum MeditationFormat {
   TEXT
 }
 
+enum BadgeType {
+  STREAK
+  JOURNAL_COUNT
+  ARTICLE_READ
+  MEDITATION_COUNT
+  MUSIC_COUNT
+  MOOD_CHECKIN
+}
+
 // ====================================
 //        USER & AUTH MODELS
 // ====================================
@@ -69,10 +78,16 @@ model User {
   artJournals       ArtJournal[]
   highRiskAlerts    HighRiskAlert[]
 
+  // Badge relations
+  createdBadges    Badge[] @relation("BadgeCreator")
+  userBadges        UserBadge[]
+
   // Creator relations (must be explicitly named)
   articles     Article[]      @relation("UserArticles")
   musicTherapy MusicTherapy[] @relation("UserMusic")
   meditations  Meditation[]   @relation("UserMeditations")
+  instructions MusicListeningInstruction[] @relation("UserInstruction")
+  meditationInstructions MeditationListeningInstruction[] @relation("UserMeditationInstruction")
 
   sessions Session[]
 
@@ -117,6 +132,10 @@ model School {
   classes          Class[]
   users            User[]
   journalingConfig JournalingToolConfig?
+  musicResources   MusicResource[]
+  instructions    MusicListeningInstruction[]
+  meditationResources Meditation[]
+  meditationInstructions MeditationListeningInstruction[]
 
   @@map("Schools")
 }
@@ -314,6 +333,16 @@ model ArtJournal {
   @@map("ArtJournals")
 }
 
+model JournalingPrompt {
+  id        String   @id @default(cuid())
+  text      String
+  moodIds   String[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("JournalingPrompts")
+}
+
 // ====================================
 //         MUSIC THERAPY
 // ====================================
@@ -332,43 +361,6 @@ model MusicTherapy {
   createdAt      DateTime       @default(now())
 
   admin User @relation("UserMusic", fields: [createdBy], references: [id])
-
-  moods      MusicMood[]
-  goals      MusicGoal[]
-  categories MusicCategory[]
-}
-
-model MusicMood {
-  id      String @id @default(cuid())
-  musicId String
-  moodId  String
-
-  music MusicTherapy @relation(fields: [musicId], references: [id], onDelete: Cascade)
-  mood  MoodLabel    @relation(fields: [moodId], references: [id], onDelete: Cascade)
-
-  @@unique([musicId, moodId])
-}
-
-model MusicGoal {
-  id      String @id @default(cuid())
-  musicId String
-  goalId  String
-
-  music MusicTherapy @relation(fields: [musicId], references: [id], onDelete: Cascade)
-  goal  GoalLabel    @relation(fields: [goalId], references: [id], onDelete: Cascade)
-
-  @@unique([musicId, goalId])
-}
-
-model MusicCategory {
-  id         String @id @default(cuid())
-  musicId    String
-  categoryId String
-
-  music    MusicTherapy  @relation(fields: [musicId], references: [id], onDelete: Cascade)
-  category CategoryLabel @relation(fields: [categoryId], references: [id], onDelete: Cascade)
-
-  @@unique([musicId, categoryId])
 }
 
 // ====================================
@@ -383,18 +375,20 @@ model Meditation {
   audioUrl       String?
   videoUrl       String?
   durationSec    Int?
-  category       String?
-  supportedMoods String[]
-  goal           String?
+  instructor     String?
+  type           String   @default("GUIDED") // GUIDED | MUSIC | BREATHING | BODY_SCAN
   status         ResourceStatus   @default(DRAFT)
+  schoolId       String?
   createdBy      String
   createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
 
-  admin User @relation("UserMeditations", fields: [createdBy], references: [id])
-
-  moods      MeditationMood[]
-  goals      MeditationGoal[]
-  categories MeditationCategory[]
+  // Relations
+  school         School? @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  admin          User @relation("UserMeditations", fields: [createdBy], references: [id])
+  moods          MeditationMood[]
+  categories     MeditationMeditationCategory[] @relation("MeditationCategories")
+  goals          MeditationMeditationGoal[] @relation("MeditationGoals")
 }
 
 model MeditationMood {
@@ -408,26 +402,89 @@ model MeditationMood {
   @@unique([meditationId, moodId])
 }
 
-model MeditationGoal {
-  id           String @id @default(cuid())
-  meditationId String
-  goalId       String
+// Meditation Listening Instructions - Step-by-step guidance for students
+model MeditationListeningInstruction {
+  id          String   @id @default(cuid())
+  title       String
+  description String
+  steps       Json      // Array of instruction steps
+  duration    Int?     // Estimated time in minutes
+  difficulty  String   @default("BEGINNER") // BEGINNER | INTERMEDIATE | ADVANCED
+  status      String   @default("DRAFT") // DRAFT | PUBLISHED
+  createdBy   String?
+  schoolId    String?
+  resourceId  String?  // Optional: Link to specific meditation resource
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
-  meditation Meditation @relation(fields: [meditationId], references: [id], onDelete: Cascade)
-  goal       GoalLabel  @relation(fields: [goalId], references: [id], onDelete: Cascade)
+  // Relations
+  creator User? @relation("UserMeditationInstruction", fields: [createdBy], references: [id])
+  school  School? @relation(fields: [schoolId], references: [id], onDelete: Cascade)
 
-  @@unique([meditationId, goalId])
+  @@map("MeditationListeningInstructions")
 }
 
-model MeditationCategory {
-  id           String @id @default(cuid())
-  meditationId String
-  categoryId   String
+// ====================================
+//     MEDITATION JUNCTION TABLES
+// ====================================
 
-  meditation Meditation    @relation(fields: [meditationId], references: [id], onDelete: Cascade)
-  category   CategoryLabel @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+model MeditationMeditationCategory {
+  id             String @id @default(cuid())
+  meditationId   String
+  categoryId     String
+  createdAt      DateTime @default(now())
+
+  meditation   Meditation   @relation("MeditationCategories", fields: [meditationId], references: [id], onDelete: Cascade)
+  category     MeditationCategory @relation("MeditationCategories", fields: [categoryId], references: [id], onDelete: Cascade)
 
   @@unique([meditationId, categoryId])
+  @@map("MeditationMeditationCategories")
+}
+
+model MeditationMeditationGoal {
+  id             String @id @default(cuid())
+  meditationId   String
+  goalId         String
+  createdAt      DateTime @default(now())
+
+  meditation   Meditation   @relation("MeditationGoals", fields: [meditationId], references: [id], onDelete: Cascade)
+  goal         MeditationGoal @relation("MeditationGoals", fields: [goalId], references: [id], onDelete: Cascade)
+
+  @@unique([meditationId, goalId])
+  @@map("MeditationMeditationGoals")
+}
+
+// ====================================
+//     MEDITATION CATEGORIES & GOALS
+// ====================================
+
+model MeditationCategory {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  description String?
+  icon        String?
+  color       String?
+  status      String   @default("ACTIVE") // ACTIVE | INACTIVE
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  meditations MeditationMeditationCategory[] @relation("MeditationCategories")
+
+  @@map("MeditationCategories")
+}
+
+model MeditationGoal {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  description String?
+  icon        String?
+  color       String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  meditations MeditationMeditationGoal[] @relation("MeditationGoals")
+
+  @@map("MeditationGoals")
 }
 
 // ====================================
@@ -440,6 +497,7 @@ model Article {
   author       String
   thumbnailUrl String?
   description  String
+  readTime     Int?           // Read time in minutes
   status       ResourceStatus @default(DRAFT)
   createdBy    String
   createdAt    DateTime       @default(now())
@@ -449,6 +507,15 @@ model Article {
   moods      ArticleMood[]
   goals      ArticleGoal[]
   categories ArticleCategory[]
+  blocks     ArticleBlock[]
+  
+  // New separate block relationships
+  sectionBlocks    SectionBlock[]
+  bulletListBlocks BulletListBlock[]
+  imageBlocks      ImageBlock[]
+  keyTakeawaysBlocks KeyTakeawaysBlock[]
+  reflectionBlocks ReflectionBlock[]
+  linkBlocks       LinkBlock[]
 
   @@map("Articles")
 }
@@ -513,7 +580,7 @@ model ResourceAccess {
 
 model Streak {
   id         String   @id @default(cuid())
-  userId     String
+  userId     String   @unique
   count      Int      @default(0)
   lastActive DateTime @default(now())
 
@@ -542,7 +609,6 @@ model MoodLabel {
   name String @unique
 
   articles   ArticleMood[]
-  music      MusicMood[]
   meditation MeditationMood[]
 
   @@map("MoodLabels")
@@ -553,21 +619,106 @@ model GoalLabel {
   name String @unique
 
   articles   ArticleGoal[]
-  music      MusicGoal[]
-  meditation MeditationGoal[]
 
   @@map("GoalLabels")
 }
 
 model CategoryLabel {
-  id   String @id @default(cuid())
-  name String @unique
+  id     String  @id @default(cuid())
+  name   String  @unique
+  status String  @default("ACTIVE")
 
   articles   ArticleCategory[]
-  music      MusicCategory[]
-  meditation MeditationCategory[]
 
   @@map("CategoryLabels")
+}
+
+model ArticleBlock {
+  id        String @id @default(cuid())
+  articleId String
+  type      String // "section" | "image" | "list" | "takeaways" | "reflection" | "link" | "divider"
+  order     Int
+  content   Json   // { title?, text?, items?, src?, alt?, points?, link?, ... }
+
+  article Article @relation(fields: [articleId], references: [id], onDelete: Cascade)
+
+  @@map("ArticleBlocks")
+}
+
+// Separate block type models for better database structure
+model ImageBlock {
+  id        String @id @default(cuid())
+  articleId String
+  order     Int
+  src        String
+  altText    String?
+  caption    String?
+
+  article Article @relation(fields: [articleId], references: [id], onDelete: Cascade)
+
+  @@map("ImageBlocks")
+}
+
+model KeyTakeawaysBlock {
+  id        String @id @default(cuid())
+  articleId String
+  order     Int
+  title      String?
+  items      String[] // Array of takeaway points
+
+  article Article @relation(fields: [articleId], references: [id], onDelete: Cascade)
+
+  @@map("KeyTakeawaysBlocks")
+}
+
+model ReflectionBlock {
+  id        String @id @default(cuid())
+  articleId String
+  order     Int
+  heading    String
+  content    String
+  prompt     String?
+
+  article Article @relation(fields: [articleId], references: [id], onDelete: Cascade)
+
+  @@map("ReflectionBlocks")
+}
+
+model LinkBlock {
+  id          String @id @default(cuid())
+  articleId   String
+  order       Int
+  title       String
+  url         String
+  description String?
+
+  article Article @relation(fields: [articleId], references: [id], onDelete: Cascade)
+
+  @@map("LinkBlocks")
+}
+
+model SectionBlock {
+  id        String @id @default(cuid())
+  articleId String
+  order     Int
+  title     String
+  content   String
+
+  article Article @relation(fields: [articleId], references: [id], onDelete: Cascade)
+
+  @@map("SectionBlocks")
+}
+
+model BulletListBlock {
+  id        String @id @default(cuid())
+  articleId String
+  order     Int
+  title     String
+  items      String[] // Array of bullet points
+
+  article Article @relation(fields: [articleId], references: [id], onDelete: Cascade)
+
+  @@map("BulletListBlocks")
 }
 
 model Session {
@@ -580,3 +731,89 @@ model Session {
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
+
+model MusicResource {
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  url         String
+  duration    Int?     // in seconds
+  artist      String?
+  album       String?
+  coverImage  String?
+  isPublic    Boolean  @default(true)
+  schoolId    String?
+  status      String   @default("DRAFT") // DRAFT | PUBLISHED
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  school     School? @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  instructions MusicListeningInstruction[]
+
+  @@map("MusicResources")
+}
+
+// Music Listening Instructions - Step-by-step guidance for students
+model MusicListeningInstruction {
+  id          String   @id @default(cuid())
+  title       String
+  description String
+  steps       Json      // Array of instruction steps
+  duration    Int?     // Estimated time in minutes
+  difficulty  String   @default("BEGINNER") // BEGINNER | INTERMEDIATE | ADVANCED
+  status      String   @default("DRAFT") // DRAFT | PUBLISHED
+  createdBy   String?
+  schoolId    String?
+  resourceId  String?  // Optional: Link to specific music resource
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  creator User? @relation("UserInstruction", fields: [createdBy], references: [id])
+  school  School? @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  resource MusicResource? @relation(fields: [resourceId], references: [id])
+
+  @@map("MusicListeningInstructions")
+}
+
+// ====================================
+//         BADGE SYSTEM MODELS
+// ====================================
+
+model Badge {
+  id            String   @id @default(cuid())
+  name          String
+  icon          String   // emoji
+  description   String
+  requirement   String   // human-readable text
+  isActive      Boolean  @default(true)
+  type          BadgeType
+  conditionValue Int?     // e.g. 7 days for streak badges
+  createdBy     String
+  createdAt     DateTime @default(now())
+
+  // Relations
+  admin      User       @relation("BadgeCreator", fields: [createdBy], references: [id])
+  userBadges UserBadge[]
+
+  @@map("Badges")
+}
+
+model UserBadge {
+  id       String   @id @default(cuid())
+  userId   String
+  badgeId  String
+  earnedAt DateTime @default(now())
+
+  // Relations
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  badge Badge @relation(fields: [badgeId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, badgeId])
+  @@map("UserBadges")
+}
+
+// ====================================
+//       PSYCHO-EDUCATION ARTICLES
+// ====================================

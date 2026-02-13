@@ -30,14 +30,40 @@ export function AddAdminModal({ onClose, onSuccess, schools }: AddAdminModalProp
     schoolId: ''
   });
   const [errors, setErrors] = useState<Partial<FormData>>({});
+  const [submitError, setSubmitError] = useState<string>('');
 
   const { user } = useAuth();
+
+  const generateDefaultPassword = () => {
+    const lowercase = 'abcdefghijklmnopqrstuvwxyz';
+    const uppercase = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    const numbers = '0123456789';
+    const allChars = lowercase + uppercase + numbers;
+    
+    let password = '';
+    // Ensure at least one of each required type
+    password += lowercase[Math.floor(Math.random() * lowercase.length)];
+    password += uppercase[Math.floor(Math.random() * uppercase.length)];
+    password += numbers[Math.floor(Math.random() * numbers.length)];
+    
+    // Add remaining characters to reach 8 characters minimum
+    for (let i = 3; i < 8; i++) {
+      password += allChars[Math.floor(Math.random() * allChars.length)];
+    }
+    
+    // Shuffle the password
+    return password.split('').sort(() => Math.random() - 0.5).join('');
+  };
 
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
     // Clear error for this field
     if (errors[field as keyof FormData]) {
       setErrors(prev => ({ ...prev, [field]: '' }));
+    }
+    // Clear submit error when user starts typing
+    if (submitError) {
+      setSubmitError('');
     }
   };
 
@@ -52,6 +78,9 @@ export function AddAdminModal({ onClose, onSuccess, schools }: AddAdminModalProp
     }
     if (!formData.password.trim()) newErrors.password = 'Password is required';
     else if (formData.password.length < 8) newErrors.password = 'Password must be at least 8 characters';
+    else if (!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(formData.password)) {
+      newErrors.password = 'Password must contain uppercase, lowercase, and number';
+    }
     if (formData.role === 'ADMIN' && !formData.schoolId) newErrors.schoolId = 'School is required for ADMIN role';
 
     setErrors(newErrors);
@@ -64,6 +93,8 @@ export function AddAdminModal({ onClose, onSuccess, schools }: AddAdminModalProp
     if (!validateForm()) return;
 
     setLoading(true);
+    setSubmitError('');
+    
     try {
       const response = await fetch('/api/admins', {
         method: 'POST',
@@ -75,18 +106,14 @@ export function AddAdminModal({ onClose, onSuccess, schools }: AddAdminModalProp
       const data = await response.json();
       
       if (data.success) {
-        alert('Admin created successfully!');
         onSuccess();
+        onClose();
       } else {
-        if (data.message?.includes('already exists')) {
-          alert('Email already exists. Please use a different email address.');
-        } else {
-          alert(data.message || 'Failed to create admin');
-        }
+        setSubmitError(data.message || 'Failed to create admin');
       }
     } catch (error) {
       console.error('Error creating admin:', error);
-      alert('Failed to create admin');
+      setSubmitError('Failed to create admin. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -108,6 +135,13 @@ export function AddAdminModal({ onClose, onSuccess, schools }: AddAdminModalProp
             <X className="w-5 h-5" />
           </button>
         </div>
+
+        {/* Error Message */}
+        {submitError && (
+          <div className="mx-6 mt-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+            <p className="text-sm text-red-600">{submitError}</p>
+          </div>
+        )}
 
         {/* Form */}
         <form onSubmit={handleSubmit} className="p-6 space-y-6">
@@ -180,11 +214,12 @@ export function AddAdminModal({ onClose, onSuccess, schools }: AddAdminModalProp
                   className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
                     errors.password ? 'border-red-500' : 'border-gray-300'
                   }`}
-                  placeholder="Enter password (min 8 characters)"
+                  placeholder="Enter password"
                 />
                 {errors.password && (
                   <p className="mt-1 text-sm text-red-600">{errors.password}</p>
                 )}
+                <p className="mt-1 text-xs text-gray-500">Must contain uppercase, lowercase, and number (min 8 chars)</p>
               </div>
 
               <div>
@@ -212,20 +247,15 @@ export function AddAdminModal({ onClose, onSuccess, schools }: AddAdminModalProp
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     School ID *
                   </label>
-                  <select
+                  <input
+                    type="text"
                     value={formData.schoolId}
                     onChange={(e) => handleInputChange('schoolId', e.target.value)}
                     className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
                       errors.schoolId ? 'border-red-500' : 'border-gray-300'
                     }`}
-                  >
-                    <option value="">Select School</option>
-                    {schools.map((school) => (
-                      <option key={school.id} value={school.id}>
-                        {school.name} ({school.id})
-                      </option>
-                    ))}
-                  </select>
+                    placeholder="Enter school ID"
+                  />
                   {errors.schoolId && (
                     <p className="mt-1 text-sm text-red-600">{errors.schoolId}</p>
                   )}

@@ -165,7 +165,13 @@ export class UserService {
         include: {
           _count: {
             select: {
-              users: true,
+              users: {
+                where: {
+                  role: {
+                    name: 'STUDENT'
+                  }
+                }
+              },
               classes: true,
             },
           },
@@ -187,7 +193,13 @@ export class UserService {
         include: {
           _count: {
             select: {
-              users: true,
+              users: {
+                where: {
+                  role: {
+                    name: 'STUDENT'
+                  }
+                }
+              },
               classes: true,
             },
           },

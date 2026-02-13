@@ -1,335 +1,318 @@
 "use client";
 
 import React, { useState } from 'react';
-import { usePermissions } from '@/src/hooks/usePermissions';
-import { Settings, Save, Bell, Shield, Database } from 'lucide-react';
+import { Building2, Bell, Shield, Palette, Database, Key } from "lucide-react";
+import { AdminHeader } from '../layout/AdminHeader';
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Switch } from "@/components/ui/switch";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Separator } from "@/components/ui/separator";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
-export function SettingsSection() {
-  const permissions = usePermissions();
-
-  // State for form values
-  const [formData, setFormData] = useState({
-    general: {
-      platformName: 'Psychology Buddy',
-      supportEmail: 'support@psychologybuddy.com',
-      maintenanceMode: false,
-    },
-    notifications: {
-      emailNotifications: true,
-      pushNotifications: false,
-      weeklyReports: true,
-    },
-    security: {
-      sessionTimeout: '24 hours',
-      passwordMinLength: 8,
-      twoFactorAuth: false,
-    },
-    data: {
-      dataRetention: '2 years',
-      backupFrequency: 'daily',
-      anonymizeData: true,
-    },
-  });
-
-  const handleInputChange = (section: string, field: string, value: any) => {
-    setFormData(prev => ({
-      ...prev,
-      [section]: {
-        ...prev[section as keyof typeof prev],
-        [field]: value,
-      },
-    }));
-  };
-
-  const handleSave = () => {
-    // In real app, this would save to API
-    console.log('Saving settings:', formData);
-    // Show success message or handle errors
-  };
-
-  if (!permissions.canViewSettings) {
-    return (
-      <div className="p-6">
-        <div className="bg-red-50 border border-red-200 rounded-lg p-6">
-          <h3 className="text-lg font-semibold text-red-900">Access Denied</h3>
-          <p className="text-red-700 mt-1">
-            You don't have permission to view settings.
-          </p>
-        </div>
-      </div>
-    );
-  }
-
+export default function SettingsSection() {
   return (
-    <div className="p-6 space-y-6">
-      {/* Header */}
-      <div>
-        <h1 className="text-2xl font-bold text-gray-900">Settings</h1>
-        <p className="text-gray-600">
-          {permissions.isSuperAdmin 
-            ? 'Platform-wide settings and configuration' 
-            : 'School-specific settings'
-          }
-        </p>
+    <div className="flex flex-col min-h-screen">
+      <AdminHeader 
+        title="Settings" 
+        subtitle="Manage platform configuration and preferences"
+        showTimeFilter={false}
+      />
+      
+      <div className="flex-1 overflow-auto p-6 animate-fade-in">
+        <Tabs defaultValue="organization" className="space-y-6">
+          <TabsList className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 w-full lg:w-auto bg-[#edf0f3]">
+            <TabsTrigger value="organization" className="gap-2 data-[state=active]:bg-[#f9fafb] text-[#65758b] hover:text-gray-900 data-[state=active]:text-black">
+              <Building2 className="h-4 w-4" />
+              <span className="hidden sm:inline">Organization</span>
+            </TabsTrigger>
+            <TabsTrigger value="notifications" className="gap-2 data-[state=active]:bg-[#f9fafb] text-[#65758b] hover:text-gray-900 data-[state=active]:text-black">
+              <Bell className="h-4 w-4" />
+              <span className="hidden sm:inline">Notifications</span>
+            </TabsTrigger>
+            <TabsTrigger value="permissions" className="gap-2 data-[state=active]:bg-[#f9fafb] text-[#65758b] hover:text-gray-900 data-[state=active]:text-black">
+              <Shield className="h-4 w-4" />
+              <span className="hidden sm:inline">Permissions</span>
+            </TabsTrigger>
+            <TabsTrigger value="appearance" className="gap-2 data-[state=active]:bg-[#f9fafb] text-[#65758b] hover:text-gray-900 data-[state=active]:text-black">
+              <Palette className="h-4 w-4" />
+              <span className="hidden sm:inline">Appearance</span>
+            </TabsTrigger>
+            <TabsTrigger value="data" className="gap-2 data-[state=active]:bg-[#f9fafb] text-[#65758b] hover:text-gray-900 data-[state=active]:text-black">
+              <Database className="h-4 w-4" />
+              <span className="hidden sm:inline">Data</span>
+            </TabsTrigger>
+            <TabsTrigger value="security" className="gap-2 data-[state=active]:bg-[#f9fafb] text-[#65758b] hover:text-gray-900 data-[state=active]:text-black">
+              <Key className="h-4 w-4" />
+              <span className="hidden sm:inline">Security</span>
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="organization">
+            <Card>
+              <CardHeader>
+                <CardTitle>Organization Profile</CardTitle>
+                <CardDescription>Manage your school's information</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <div className="grid gap-2">
+                    <Label htmlFor="schoolName">School Name</Label>
+                    <Input id="schoolName" defaultValue="Greenfield High School" />
+                  </div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="adminEmail">Admin Email</Label>
+                    <Input id="adminEmail" type="email" defaultValue="admin@greenfield.edu" />
+                  </div>
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="address">Address</Label>
+                  <Textarea id="address" defaultValue="123 Education Lane, Learning City, LC 12345" rows={2} />
+                </div>
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <div className="grid gap-2">
+                    <Label htmlFor="phone">Phone</Label>
+                    <Input id="phone" defaultValue="+1 (555) 123-4567" />
+                  </div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="timezone">Timezone</Label>
+                    <Select defaultValue="est">
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="pst">Pacific Time (PST)</SelectItem>
+                        <SelectItem value="mst">Mountain Time (MST)</SelectItem>
+                        <SelectItem value="cst">Central Time (CST)</SelectItem>
+                        <SelectItem value="est">Eastern Time (EST)</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+                <Separator />
+                <Button>Save Changes</Button>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="notifications">
+            <Card>
+              <CardHeader>
+                <CardTitle>Notification Preferences</CardTitle>
+                <CardDescription>Configure alert and notification settings</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="font-medium">Critical Alerts</p>
+                      <p className="text-sm text-muted-foreground">Receive immediate notifications for critical alerts</p>
+                    </div>
+                    <Switch defaultChecked />
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="font-medium">Daily Digest</p>
+                      <p className="text-sm text-muted-foreground">Receive daily summary of platform activity</p>
+                    </div>
+                    <Switch defaultChecked />
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="font-medium">Weekly Reports</p>
+                      <p className="text-sm text-muted-foreground">Receive weekly analytics reports</p>
+                    </div>
+                    <Switch />
+                  </div>
+                </div>
+                <Separator />
+                <div className="grid gap-2">
+                  <Label>Notification Email</Label>
+                  <Input type="email" defaultValue="alerts@greenfield.edu" />
+                </div>
+                <Button>Save Preferences</Button>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="permissions">
+            <Card>
+              <CardHeader>
+                <CardTitle>Role & Permission Management</CardTitle>
+                <CardDescription>Configure access levels for different user roles</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="space-y-4">
+                  <div className="rounded-lg border p-4">
+                    <div className="flex items-center justify-between mb-4">
+                      <div>
+                        <p className="font-medium">Super Admin</p>
+                        <p className="text-sm text-muted-foreground">Full system access</p>
+                      </div>
+                      <Button variant="outline" size="sm">Edit</Button>
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded">All Permissions</span>
+                    </div>
+                  </div>
+                  
+                  <div className="rounded-lg border p-4">
+                    <div className="flex items-center justify-between mb-4">
+                      <div>
+                        <p className="font-medium">Admin</p>
+                        <p className="text-sm text-muted-foreground">Platform management</p>
+                      </div>
+                      <Button variant="outline" size="sm">Edit</Button>
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      <span className="text-xs bg-muted px-2 py-1 rounded">Content</span>
+                      <span className="text-xs bg-muted px-2 py-1 rounded">Analytics</span>
+                      <span className="text-xs bg-muted px-2 py-1 rounded">Users</span>
+                      <span className="text-xs bg-muted px-2 py-1 rounded">Settings</span>
+                    </div>
+                  </div>
+                </div>
+                <Button>Create New Role</Button>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="appearance">
+            <Card>
+              <CardHeader>
+                <CardTitle>Appearance & Branding</CardTitle>
+                <CardDescription>Customize the look and feel of the platform</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <div className="grid gap-2">
+                    <Label>Primary Color</Label>
+                    <div className="flex gap-2">
+                      <Input type="color" defaultValue="#3b82f6" className="w-12 h-10 p-1" />
+                      <Input defaultValue="#3b82f6" />
+                    </div>
+                  </div>
+                  <div className="grid gap-2">
+                    <Label>Logo</Label>
+                    <Input type="file" accept="image/*" />
+                  </div>
+                </div>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="font-medium">Show School Logo</p>
+                    <p className="text-sm text-muted-foreground">Display logo in navigation</p>
+                  </div>
+                  <Switch defaultChecked />
+                </div>
+                <Button>Save Appearance</Button>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="data">
+            <Card>
+              <CardHeader>
+                <CardTitle>Data & Privacy</CardTitle>
+                <CardDescription>Manage data retention and privacy settings</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="grid gap-2">
+                  <Label>Data Retention Period</Label>
+                  <Select defaultValue="2years">
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="1year">1 Year</SelectItem>
+                      <SelectItem value="2years">2 Years</SelectItem>
+                      <SelectItem value="5years">5 Years</SelectItem>
+                      <SelectItem value="indefinite">Indefinite</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="font-medium">Anonymize Inactive Users</p>
+                    <p className="text-sm text-muted-foreground">Automatically anonymize data for inactive users</p>
+                  </div>
+                  <Switch defaultChecked />
+                </div>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="font-medium">Allow Data Export</p>
+                    <p className="text-sm text-muted-foreground">Allow admins to export student data</p>
+                  </div>
+                  <Switch defaultChecked />
+                </div>
+                <Separator />
+                <div className="flex gap-2">
+                  <Button variant="outline">Export All Data</Button>
+                  <Button variant="destructive">Purge Old Data</Button>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="security">
+            <Card>
+              <CardHeader>
+                <CardTitle>Security Settings</CardTitle>
+                <CardDescription>Configure authentication and security options</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="font-medium">Two-Factor Authentication</p>
+                    <p className="text-sm text-muted-foreground">Require 2FA for all admin accounts</p>
+                  </div>
+                  <Switch defaultChecked />
+                </div>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="font-medium">Session Timeout</p>
+                    <p className="text-sm text-muted-foreground">Auto-logout after inactivity</p>
+                  </div>
+                  <Select defaultValue="30">
+                    <SelectTrigger className="w-32">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="15">15 minutes</SelectItem>
+                      <SelectItem value="30">30 minutes</SelectItem>
+                      <SelectItem value="60">1 hour</SelectItem>
+                      <SelectItem value="120">2 hours</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="font-medium">IP Allowlist</p>
+                    <p className="text-sm text-muted-foreground">Restrict access to specific IP addresses</p>
+                  </div>
+                  <Switch />
+                </div>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="font-medium">Audit Logging</p>
+                    <p className="text-sm text-muted-foreground">Log all admin actions</p>
+                  </div>
+                  <Switch defaultChecked />
+                </div>
+                <Button>Save Security Settings</Button>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
       </div>
-
-      {/* General Settings */}
-      <div className="bg-white rounded-lg shadow p-6">
-        <div className="flex items-center mb-4">
-          <Settings className="w-5 h-5 text-gray-600 mr-2" />
-          <h2 className="text-lg font-semibold text-gray-900">General Settings</h2>
-        </div>
-        
-        <div className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Platform Name
-            </label>
-            <input
-              type="text"
-              value={formData.general.platformName}
-              onChange={(e) => handleInputChange('general', 'platformName', e.target.value)}
-              disabled={!permissions.canManageSettings}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100"
-            />
-          </div>
-          
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Support Email
-            </label>
-            <input
-              type="email"
-              value={formData.general.supportEmail}
-              onChange={(e) => handleInputChange('general', 'supportEmail', e.target.value)}
-              disabled={!permissions.canManageSettings}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100"
-            />
-          </div>
-          
-          <div className="flex items-center space-x-3">
-            <input
-              type="checkbox"
-              id="maintenance"
-              checked={formData.general.maintenanceMode}
-              onChange={(e) => handleInputChange('general', 'maintenanceMode', e.target.checked)}
-              disabled={!permissions.canManageSettings}
-              className="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-2 focus:ring-blue-500"
-            />
-            <label htmlFor="maintenance" className="text-sm text-gray-700">
-              Maintenance Mode
-            </label>
-          </div>
-        </div>
-      </div>
-
-      {/* Notification Settings */}
-      <div className="bg-white rounded-lg shadow p-6">
-        <div className="flex items-center mb-4">
-          <Bell className="w-5 h-5 text-gray-600 mr-2" />
-          <h2 className="text-lg font-semibold text-gray-900">Notification Settings</h2>
-        </div>
-        
-        <div className="space-y-4">
-          <div className="flex items-center space-x-3">
-            <input
-              type="checkbox"
-              id="email-notifications"
-              checked={formData.notifications.emailNotifications}
-              onChange={(e) => handleInputChange('notifications', 'emailNotifications', e.target.checked)}
-              disabled={!permissions.canManageSettings}
-              className="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-2 focus:ring-blue-500"
-            />
-            <label htmlFor="email-notifications" className="text-sm text-gray-700">
-              Email Notifications
-            </label>
-          </div>
-          
-          <div className="flex items-center space-x-3">
-            <input
-              type="checkbox"
-              id="push-notifications"
-              checked={formData.notifications.pushNotifications}
-              onChange={(e) => handleInputChange('notifications', 'pushNotifications', e.target.checked)}
-              disabled={!permissions.canManageSettings}
-              className="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-2 focus:ring-blue-500"
-            />
-            <label htmlFor="push-notifications" className="text-sm text-gray-700">
-              Push Notifications
-            </label>
-          </div>
-          
-          <div className="flex items-center space-x-3">
-            <input
-              type="checkbox"
-              id="weekly-reports"
-              checked={formData.notifications.weeklyReports}
-              onChange={(e) => handleInputChange('notifications', 'weeklyReports', e.target.checked)}
-              disabled={!permissions.canManageSettings}
-              className="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-2 focus:ring-blue-500"
-            />
-            <label htmlFor="weekly-reports" className="text-sm text-gray-700">
-              Weekly Reports
-            </label>
-          </div>
-        </div>
-      </div>
-
-      {/* Security Settings */}
-      <div className="bg-white rounded-lg shadow p-6">
-        <div className="flex items-center mb-4">
-          <Shield className="w-5 h-5 text-gray-600 mr-2" />
-          <h2 className="text-lg font-semibold text-gray-900">Security Settings</h2>
-        </div>
-        
-        <div className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Session Timeout
-            </label>
-            <select
-              value={formData.security.sessionTimeout}
-              onChange={(e) => handleInputChange('security', 'sessionTimeout', e.target.value)}
-              disabled={!permissions.canManageSettings}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100"
-            >
-              <option value="1 hour">1 hour</option>
-              <option value="8 hours">8 hours</option>
-              <option value="24 hours">24 hours</option>
-              <option value="7 days">7 days</option>
-            </select>
-          </div>
-          
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Minimum Password Length
-            </label>
-            <input
-              type="number"
-              value={formData.security.passwordMinLength}
-              onChange={(e) => handleInputChange('security', 'passwordMinLength', parseInt(e.target.value))}
-              disabled={!permissions.canManageSettings}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100"
-            />
-          </div>
-          
-          <div className="flex items-center space-x-3">
-            <input
-              type="checkbox"
-              id="2fa"
-              checked={formData.security.twoFactorAuth}
-              onChange={(e) => handleInputChange('security', 'twoFactorAuth', e.target.checked)}
-              disabled={!permissions.canManageSettings}
-              className="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-2 focus:ring-blue-500"
-            />
-            <label htmlFor="2fa" className="text-sm text-gray-700">
-              Two-Factor Authentication
-            </label>
-          </div>
-        </div>
-      </div>
-
-      {/* Data Management */}
-      <div className="bg-white rounded-lg shadow p-6">
-        <div className="flex items-center mb-4">
-          <Database className="w-5 h-5 text-gray-600 mr-2" />
-          <h2 className="text-lg font-semibold text-gray-900">Data Management</h2>
-        </div>
-        
-        <div className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Data Retention Period
-            </label>
-            <select
-              value={formData.data.dataRetention}
-              onChange={(e) => handleInputChange('data', 'dataRetention', e.target.value)}
-              disabled={!permissions.canManageSettings}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100"
-            >
-              <option value="6 months">6 months</option>
-              <option value="1 year">1 year</option>
-              <option value="2 years">2 years</option>
-              <option value="5 years">5 years</option>
-            </select>
-          </div>
-          
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Backup Frequency
-            </label>
-            <select
-              value={formData.data.backupFrequency}
-              onChange={(e) => handleInputChange('data', 'backupFrequency', e.target.value)}
-              disabled={!permissions.canManageSettings}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100"
-            >
-              <option value="hourly">Hourly</option>
-              <option value="daily">Daily</option>
-              <option value="weekly">Weekly</option>
-              <option value="monthly">Monthly</option>
-            </select>
-          </div>
-          
-          <div className="flex items-center space-x-3">
-            <input
-              type="checkbox"
-              id="anonymize"
-              checked={formData.data.anonymizeData}
-              onChange={(e) => handleInputChange('data', 'anonymizeData', e.target.checked)}
-              disabled={!permissions.canManageSettings}
-              className="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-2 focus:ring-blue-500"
-            />
-            <label htmlFor="anonymize" className="text-sm text-gray-700">
-              Anonymize User Data
-            </label>
-          </div>
-        </div>
-      </div>
-
-      {/* Save Button */}
-      {permissions.canManageSettings && (
-        <div className="flex justify-end">
-          <button 
-            onClick={handleSave}
-            className="flex items-center space-x-2 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-          >
-            <Save className="w-4 h-4" />
-            <span>Save Settings</span>
-          </button>
-        </div>
-      )}
-
-      {/* Role-specific Info */}
-      {permissions.isSuperAdmin && (
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
-          <div className="flex items-start space-x-3">
-            <Settings className="w-6 h-6 text-blue-600 mt-1" />
-            <div>
-              <h3 className="text-lg font-semibold text-blue-900">Platform Settings</h3>
-              <p className="text-blue-700 mt-1">
-                You are configuring platform-wide settings. These changes will affect all organizations 
-                and users across the entire system.
-              </p>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {permissions.isAdmin && (
-        <div className="bg-green-50 border border-green-200 rounded-lg p-6">
-          <div className="flex items-start space-x-3">
-            <Settings className="w-6 h-6 text-green-600 mt-1" />
-            <div>
-              <h3 className="text-lg font-semibold text-green-900">School Settings</h3>
-              <p className="text-green-700 mt-1">
-                You are configuring settings for your school only. Some platform-level settings 
-                are managed by SuperAdmins.
-              </p>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

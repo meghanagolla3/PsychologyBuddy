@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { usePermissions } from '@/src/hooks/usePermissions';
 import { useAuth } from '@/src/contexts/AuthContext';
+import { useSchoolFilter } from '@/src/contexts/SchoolFilterContext';
 import { 
   Users, 
   Plus, 
@@ -51,6 +52,7 @@ interface Student {
 }
 
 export function StudentsManagementSection() {
+  const { selectedSchoolId, setSelectedSchoolId, schools, setSchools, isSuperAdmin } = useSchoolFilter();
   const [students, setStudents] = useState<Student[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -61,10 +63,16 @@ export function StudentsManagementSection() {
   const [showViewModal, setShowViewModal] = useState(false);
   const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
   const [classes, setClasses] = useState<any[]>([]);
-  const [schools, setSchools] = useState<any[]>([]);
   
   const { user } = useAuth();
   const { hasPermission } = usePermissions();
+
+  console.log('StudentsManagementSection - School filter state:', { selectedSchoolId, isSuperAdmin, schoolsCount: schools.length });
+
+  // Add debugging to track when selectedSchoolId changes
+  React.useEffect(() => {
+    console.log('selectedSchoolId changed to:', selectedSchoolId);
+  }, [selectedSchoolId]);
 
   // Permission checks
   const canCreateStudents = hasPermission('users.create');
@@ -74,19 +82,29 @@ export function StudentsManagementSection() {
 
   useEffect(() => {
     if (canViewStudents) {
+      console.log('Main useEffect called - canViewStudents:', canViewStudents);
       fetchStudents();
       fetchClasses();
-      if (user?.role?.name === 'SUPERADMIN') {
+      if (isSuperAdmin) {
         fetchSchools();
       }
     }
-  }, [canViewStudents]);
+  }, [canViewStudents, isSuperAdmin]);
+
+  // Auto-set school ID for regular admins
+  useEffect(() => {
+    if (!isSuperAdmin && user?.school?.id && selectedSchoolId === 'all') {
+      console.log('Auto-setting schoolId for regular admin:', user.school.id);
+      setSelectedSchoolId(user.school.id);
+    }
+  }, [isSuperAdmin, user, selectedSchoolId, setSelectedSchoolId]);
 
   useEffect(() => {
     if (canViewStudents) {
+      console.log('useEffect triggered - fetching students due to filter change');
       fetchStudents();
     }
-  }, [searchTerm, statusFilter, classFilter, canViewStudents]);
+  }, [searchTerm, statusFilter, classFilter, selectedSchoolId, canViewStudents]);
 
   const fetchStudents = async () => {
     try {
@@ -95,13 +113,26 @@ export function StudentsManagementSection() {
       if (searchTerm) params.append('search', searchTerm);
       if (statusFilter !== 'all') params.append('status', statusFilter);
       if (classFilter !== 'all') params.append('classId', classFilter);
+      
+      console.log('School filter condition check:', { selectedSchoolId, isNotAll: selectedSchoolId !== 'all', shouldAdd: selectedSchoolId && selectedSchoolId !== 'all' });
+      
+      if (selectedSchoolId && selectedSchoolId !== 'all') {
+        params.append('schoolId', selectedSchoolId);
+        console.log('Added schoolId to params:', selectedSchoolId);
+      }
+
+      console.log('Fetching students with params:', params.toString());
+      console.log('Selected school ID:', selectedSchoolId);
 
       const response = await fetch(`/api/students?${params.toString()}`, {
         credentials: 'include'
       });
       const data = await response.json();
       
+      console.log('Students API response:', data);
+      
       if (data.success) {
+        console.log('Students fetched:', data.data.length);
         setStudents(data.data);
       }
     } catch (error) {
@@ -132,7 +163,18 @@ export function StudentsManagementSection() {
       });
       const data = await response.json();
       if (data.success) {
-        setSchools(data.data);
+        let schoolsData = data.data;
+        
+        // Map API response to expected interface
+        schoolsData = schoolsData.map((school: any) => ({
+          ...school,
+          location: school.address || 'Unknown Location',
+          studentCount: school._count?.users || 0,
+          alertCount: 0,
+          checkInsToday: 0,
+        }));
+        
+        setSchools(schoolsData); // Set global schools for filter
       }
     } catch (error) {
       console.error('Error fetching schools:', error);
@@ -211,6 +253,10 @@ export function StudentsManagementSection() {
       <AdminHeader 
         title="Student Management" 
         subtitle="View and manage student profiles"
+        showSchoolFilter={isSuperAdmin}
+        schoolFilterValue={selectedSchoolId}
+        onSchoolFilterChange={setSelectedSchoolId}
+        schools={schools}
         showTimeFilter={false}
         actions={canCreateStudents && (
           <button

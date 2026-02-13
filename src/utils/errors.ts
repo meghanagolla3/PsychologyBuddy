@@ -43,6 +43,36 @@ export class AuthError extends AppError {
 export const handleError = (error: unknown) => {
   console.error('API Error:', error);
 
+  // Handle Prisma known request errors
+  if (error && typeof error === 'object' && 'code' in error && 'meta' in error) {
+    const prismaError = error as any;
+    
+    // P2002: Unique constraint failed
+    if (prismaError.code === 'P2002') {
+      const targetField = prismaError.meta?.target?.[0] || 'field';
+      return {
+        success: false,
+        message: `An admin with this ${targetField} already exists`,
+        error: {
+          code: 409,
+          type: 'ConflictError',
+          details: prismaError.meta,
+        },
+      };
+    }
+    
+    // Other Prisma errors
+    return {
+      success: false,
+      message: 'Database operation failed',
+      error: {
+        code: 500,
+        type: 'DatabaseError',
+        details: prismaError.meta,
+      },
+    };
+  }
+
   if (error instanceof AuthError) {
     return {
       success: false,

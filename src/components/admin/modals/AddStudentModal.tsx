@@ -20,11 +20,13 @@ interface FormData {
   grade: string;
   section: string;
   phone: string;
+  schoolId: string;
 }
 
 export function AddStudentModal({ onClose, onSuccess, schools, classes }: AddStudentModalProps) {
   const [loading, setLoading] = useState(false);
   const [submitError, setSubmitError] = useState('');
+  const { user } = useAuth();
   const [formData, setFormData] = useState<FormData>({
     studentId: '',
     firstName: '',
@@ -33,23 +35,47 @@ export function AddStudentModal({ onClose, onSuccess, schools, classes }: AddStu
     email: '',
     grade: '10',
     section: 'A',
-    phone: ''
+    phone: '',
+    schoolId: ''
   });
   const [errors, setErrors] = useState<Partial<FormData>>({});
 
-  const { user } = useAuth();
+  // Set schoolId when user changes (for regular admins)
+  useEffect(() => {
+    if (user?.role?.name !== 'SUPERADMIN' && user?.school?.id) {
+      setFormData(prev => ({ ...prev, schoolId: user.school?.id || '' }));
+    }
+  }, [user]);
+
+  const generateDefaultPassword = () => {
+    const lowercase = 'abcdefghijklmnopqrstuvwxyz';
+    const uppercase = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    const numbers = '0123456789';
+    const allChars = lowercase + uppercase + numbers;
+    
+    let password = '';
+    // Ensure at least one of each required type
+    password += lowercase[Math.floor(Math.random() * lowercase.length)];
+    password += uppercase[Math.floor(Math.random() * uppercase.length)];
+    password += numbers[Math.floor(Math.random() * numbers.length)];
+    
+    // Add remaining characters to reach 8 characters minimum
+    for (let i = 3; i < 8; i++) {
+      password += allChars[Math.floor(Math.random() * allChars.length)];
+    }
+    
+    // Shuffle the password
+    return password.split('').sort(() => Math.random() - 0.5).join('');
+  };
 
   const createOrFindClass = async (grade: string, section: string) => {
     const className = `Class ${grade}-${section}`;
     
-    // Get schoolId from user or use first available school
-    let schoolId = user?.school?.id;
-    if (!schoolId && schools.length > 0) {
-      schoolId = schools[0].id;
-    }
+    // Use schoolId from form instead of user
+    const schoolId = formData.schoolId;
     
     if (!schoolId) {
-      console.error('No schoolId available for class creation');
+      console.error('No schoolId selected for class creation');
       return null;
     }
     
@@ -101,10 +127,14 @@ export function AddStudentModal({ onClose, onSuccess, schools, classes }: AddStu
     const newErrors: Partial<FormData> = {};
 
     if (!formData.studentId.trim()) newErrors.studentId = 'Student ID is required';
+    if (!formData.schoolId.trim()) newErrors.schoolId = 'School selection is required';
     if (!formData.firstName.trim()) newErrors.firstName = 'First name is required';
     if (!formData.lastName.trim()) newErrors.lastName = 'Last name is required';
     if (!formData.password.trim()) newErrors.password = 'Password is required';
     else if (formData.password.length < 8) newErrors.password = 'Password must be at least 8 characters';
+    else if (!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(formData.password)) {
+      newErrors.password = 'Password must contain uppercase, lowercase, and number';
+    }
     if (formData.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
       newErrors.email = 'Invalid email format';
     }
@@ -131,10 +161,11 @@ export function AddStudentModal({ onClose, onSuccess, schools, classes }: AddStu
         return;
       }
       
-      // Update form data with the class ID
+      // Update form data with the class ID and schoolId
       const submitData = {
         ...formData,
-        classId
+        classId,
+        schoolId: formData.schoolId
       };
       
       const response = await fetch('/api/students', {
@@ -189,6 +220,27 @@ export function AddStudentModal({ onClose, onSuccess, schools, classes }: AddStu
           <div>
             <h3 className="text-lg font-medium text-gray-900 mb-4">Student Information</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* School Selection - Only show for super admins */}
+              {user?.role?.name === 'SUPERADMIN' && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    School ID *
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.schoolId}
+                    onChange={(e) => handleInputChange('schoolId', e.target.value)}
+                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                      errors.schoolId ? 'border-red-500' : 'border-gray-300'
+                    }`}
+                    placeholder="Enter school ID"
+                  />
+                  {errors.schoolId && (
+                    <p className="mt-1 text-sm text-red-600">{errors.schoolId}</p>
+                  )}
+                </div>
+              )}
+              
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Student ID *
@@ -254,11 +306,12 @@ export function AddStudentModal({ onClose, onSuccess, schools, classes }: AddStu
                   className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
                     errors.password ? 'border-red-500' : 'border-gray-300'
                   }`}
-                  placeholder="Enter password (min 8 characters)"
+                  placeholder="Password (uppercase, lowercase, number)"
                 />
                 {errors.password && (
                   <p className="mt-1 text-sm text-red-600">{errors.password}</p>
                 )}
+                <p className="mt-1 text-xs text-gray-500">Must contain uppercase, lowercase, and number (min 8 chars)</p>
               </div>
 
               <div>
@@ -296,34 +349,35 @@ export function AddStudentModal({ onClose, onSuccess, schools, classes }: AddStu
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Grade *
                 </label>
-                <select
+                <input
+                  type="text"
                   value={formData.grade}
                   onChange={(e) => handleInputChange('grade', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                >
-                  {[10, 11, 12].map((grade) => (
-                    <option key={grade} value={grade}>
-                      Grade {grade}
-                    </option>
-                  ))}
-                </select>
+                  className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                    errors.grade ? 'border-red-500' : 'border-gray-300'
+                  }`}
+                  placeholder="Enter grade (e.g., 10)"
+                />
+                {errors.grade && (
+                  <p className="mt-1 text-sm text-red-600">{errors.grade}</p>
+                )}
               </div>
-
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Section *
                 </label>
-                <select
+                <input
+                  type="text"
                   value={formData.section}
                   onChange={(e) => handleInputChange('section', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                >
-                  {['A', 'B', 'C', 'D'].map((section) => (
-                    <option key={section} value={section}>
-                      Section {section}
-                    </option>
-                  ))}
-                </select>
+                  className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                    errors.section ? 'border-red-500' : 'border-gray-300'
+                  }`}
+                  placeholder="Enter section (e.g., A)"
+                />
+                {errors.section && (
+                  <p className="mt-1 text-sm text-red-600">{errors.section}</p>
+                )}
               </div>
             </div>
           </div>

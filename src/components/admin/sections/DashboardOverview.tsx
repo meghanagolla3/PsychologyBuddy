@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { usePermissions } from '@/src/hooks/usePermissions';
 import { useAuth } from '@/src/contexts/AuthContext';
+import { useSchoolFilter } from '@/src/contexts/SchoolFilterContext';
 import { 
   Users, 
   School, 
@@ -28,6 +29,7 @@ interface DashboardStats {
 export function DashboardOverview() {
   const { user } = useAuth();
   const permissions = usePermissions();
+  const { selectedSchoolId, setSelectedSchoolId, schools, setSchools, isSuperAdmin } = useSchoolFilter();
   const [stats, setStats] = useState<DashboardStats>({
     totalStudents: 0,
     totalSchools: 0,
@@ -65,8 +67,58 @@ export function DashboardOverview() {
       sessionStorage.removeItem('selectedSchool');
     }
     
-    fetchDashboardStats();
+    fetchSchoolsData();
   }, []);
+
+  useEffect(() => {
+    // Update dashboard when school filter changes
+    updateDashboardStats();
+  }, [selectedSchoolId]);
+
+  const fetchSchoolsData = async () => {
+    try {
+      const response = await fetch('/api/schools', {
+        credentials: 'include'
+      });
+      const data = await response.json();
+      if (data.success) {
+        let schoolsData = data.data;
+        
+        // Map API response to expected interface
+        schoolsData = schoolsData.map((school: any) => ({
+          ...school,
+          location: school.address || 'Unknown Location',
+          studentCount: school._count?.users || 0,
+          alertCount: 0,
+          checkInsToday: 0,
+        }));
+        
+        setSchools(schoolsData);
+      }
+    } catch (error) {
+      console.error('Error fetching schools:', error);
+    }
+  };
+
+  const updateDashboardStats = () => {
+    if (selectedSchoolId === 'all' || !isSuperAdmin) {
+      // Show overall stats
+      fetchDashboardStats();
+    } else {
+      // Show filtered stats for selected school
+      const selectedSchoolData = schools.find(school => school.id === selectedSchoolId);
+      if (selectedSchoolData) {
+        setStats({
+          totalStudents: selectedSchoolData.studentCount || 0,
+          totalSchools: 1,
+          articles: 0, // TODO: Implement per-school articles count
+          activeSessions: 0, // TODO: Implement per-school active sessions
+          checkinsToday: selectedSchoolData.checkInsToday || 0,
+          activeAlerts: selectedSchoolData.alertCount || 0,
+        });
+      }
+    }
+  };
 
   const fetchDashboardStats = async () => {
     try {
@@ -218,11 +270,17 @@ export function DashboardOverview() {
     <div>
       {/* Header */}
       <AdminHeader 
-                  title="Welcome back, Sarah" 
-                  subtitle="Here's what's happening with your students today"
-                />
+        title="Welcome back, Sarah" 
+        subtitle="Here's what's happening with your students today"
+        showSchoolFilter={isSuperAdmin}
+        schoolFilterValue={selectedSchoolId}
+        onSchoolFilterChange={setSelectedSchoolId}
+        schools={schools}
+      />
 
       {/* Stats Grid */}
+    <div className="flex-1 overflow-auto p-6 space-y-6 animate-fade-in">
+
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {statsCards
           .filter((stat: any) => !stat.permission || permissions.hasPermission(stat.permission))
@@ -450,6 +508,7 @@ export function DashboardOverview() {
           </div>
         </div>
       )}
+    </div>
     </div>
   );
 }

@@ -71,4 +71,58 @@ export const AuthRepository = {
         },
       },
     }),
+
+  // Find user by ID
+  findUserById: (userId: string) =>
+    prisma.user.findUnique({
+      where: { id: userId },
+      include: {
+        role: true,
+        school: true,
+        studentProfile: true,
+        adminProfile: true,
+        classRef: true,
+      },
+    }),
+
+  // Check if user has specific permission
+  userHasPermission: async (userId: string, permissionName: string) => {
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      include: {
+        role: {
+          include: {
+            rolePermissions: {
+              include: {
+                permission: true,
+              },
+            },
+          },
+        },
+        adminProfile: {
+          include: {
+            adminPermissions: {
+              include: {
+                permission: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    if (!user) return false;
+
+    // Check role permissions
+    const hasRolePermission = user.role.rolePermissions.some(
+      (rp) => rp.permission.name === permissionName
+    );
+
+    // Check admin-specific permissions (if admin)
+    const hasAdminPermission = user.adminProfile?.adminPermissions.some(
+      (ap) => ap.permission.name === permissionName
+    ) || false;
+
+    return hasRolePermission || hasAdminPermission;
+  },
 };

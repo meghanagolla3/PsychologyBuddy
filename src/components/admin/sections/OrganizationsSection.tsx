@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { usePermissions } from '@/src/hooks/usePermissions';
+import { useSchoolFilter } from '@/src/contexts/SchoolFilterContext';
 import { School, Plus, Edit, Trash2, Search, Users, AlertTriangle, Calendar, CheckCircle, Eye, Building2, CheckCircle2, ChevronLeft, ChevronRight } from 'lucide-react';
 import { AddOrganizationModal } from '@/src/components/admin/modals/AddOrganizationModal';
 import { AdminHeader } from '../layout/AdminHeader';
@@ -43,8 +44,9 @@ interface Metrics {
 
 export function OrganizationsSection() {
   const permissions = usePermissions();
+  const { selectedSchoolId, setSelectedSchoolId, schools, setSchools, isSuperAdmin, setIsSuperAdmin } = useSchoolFilter();
   const [searchTerm, setSearchTerm] = useState('');
-  const [schools, setSchools] = useState<School[]>([]);
+  const [localSchools, setLocalSchools] = useState<School[]>([]);
   const [metrics, setMetrics] = useState<Metrics>({
     totalSchools: 0,
     totalStudents: 0,
@@ -64,10 +66,18 @@ export function OrganizationsSection() {
     // TODO: Navigate to school details
   };
 
-  const filteredSchools = schools.filter(school =>
-    school.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    (school.email && school.email.toLowerCase().includes(searchTerm.toLowerCase()))
-  );
+  const filteredSchools = localSchools.filter(school => {
+    // Apply search filter
+    const matchesSearch = school.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         (school.email && school.email.toLowerCase().includes(searchTerm.toLowerCase()));
+    
+    // Apply school filter for super admin
+    const matchesSchoolFilter = !isSuperAdmin || selectedSchoolId === 'all' || school.id === selectedSchoolId;
+    
+    return matchesSearch && matchesSchoolFilter;
+  });
+
+  console.log('Filtered schools:', filteredSchools.length, 'out of', localSchools.length, 'selectedSchoolId:', selectedSchoolId);
 
   // Pagination calculations
   const totalPages = Math.ceil(filteredSchools.length / itemsPerPage);
@@ -110,7 +120,7 @@ export function OrganizationsSection() {
         schoolsData = schoolsData.map((school: any) => ({
           ...school,
           location: school.address || 'Unknown Location', // Use address as location
-          studentCount: school._count?.users || 0, // Use user count as student count
+          studentCount: school._count?.users || 0, // This now correctly counts only students
           alertCount: 0, // TODO: Get from API when available
           checkInsToday: 0, // TODO: Get from API when available
         }));
@@ -122,7 +132,11 @@ export function OrganizationsSection() {
           );
         }
         
-        setSchools(schoolsData);
+        setLocalSchools(schoolsData);
+        setSchools(schoolsData); // Set global schools for filter
+        setIsSuperAdmin(permissions.isSuperAdmin); // Set global super admin status
+        console.log('Schools data set:', schoolsData.length, 'schools');
+        console.log('Is super admin:', permissions.isSuperAdmin);
         setLoading(false);
       }
     } catch (error) {
@@ -142,13 +156,13 @@ export function OrganizationsSection() {
         
         // If user is ADMIN, adjust metrics to show only their school's data
         if (permissions.isAdmin && permissions.userSchoolId) {
-          const schoolData = schools.find(school => school.id === permissions.userSchoolId);
+          const schoolData = localSchools.find(school => school.id === permissions.userSchoolId);
           if (schoolData) {
             metricsData = {
-              totalSchools: 1,
-              totalStudents: schoolData._count?.users || 0,
-              activeAlerts: 0, // TODO: Implement per-school alerts
-              checkinsToday: 0, // TODO: Implement per-school check-ins
+              totalSchools: localSchools.length,
+              totalStudents: localSchools.reduce((acc, s) => acc + (s.studentCount || 0), 0),
+              activeAlerts: localSchools.reduce((acc, s) => acc + (s.alertCount || 0), 0),
+              checkinsToday: localSchools.reduce((acc, s) => acc + (s.checkInsToday || 0), 0),
             };
           }
         }
@@ -216,6 +230,10 @@ export function OrganizationsSection() {
       <AdminHeader
         title="Organizations"
         subtitle="Manage and monitor all schools in the platform"
+        showSchoolFilter={isSuperAdmin}
+        schoolFilterValue={selectedSchoolId}
+        onSchoolFilterChange={setSelectedSchoolId}
+        schools={schools}
         showTimeFilter={false}
         actions={
           permissions.canManageOrgs && (

@@ -1,5 +1,5 @@
 import { NextRequest } from 'next/server';
-import { AdminController } from '@/src/profiles/admin/admin.controller';
+import { AdminController } from '@/src/components/server/profiles/admin/admin.controller';
 
 // GET /api/admins/[id] - Get admin by ID (SuperAdmin only)
 export const GET = AdminController.getAdminById;
