@@ -111,6 +111,14 @@ export default {
           "0%, 100%": { opacity: "1" },
           "50%": { opacity: "0.7" },
         },
+        "bounce": {
+          "0%, 100%": { transform: "translateY(0)" },
+          "50%": { transform: "translateY(-25%)" },
+        },
+        "pulse-slow": {
+          "0%, 100%": { opacity: "0.3" },
+          "50%": { opacity: "0.4" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
@@ -118,6 +126,10 @@ export default {
         "fade-in": "fade-in 0.3s ease-out",
         "slide-in": "slide-in 0.3s ease-out",
         "pulse-subtle": "pulse-subtle 2s ease-in-out infinite",
+        "bounce_1s": "bounce 1s ease-in-out infinite",
+        "bounce_1.2s": "bounce 1.2s ease-in-out infinite",
+        "bounce_0.8s": "bounce 0.8s ease-in-out infinite",
+        "pulse-slow": "pulse-slow 4s ease-in-out infinite",
       },
       boxShadow: {
         "card": "0 1px 3px 0 rgb(0 0 0 / 0.05), 0 1px 2px -1px rgb(0 0 0 / 0.05)",

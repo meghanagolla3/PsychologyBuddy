@@ -1,5 +1,5 @@
-import { BadgeService } from '../badges/badge.service';
-import { StreakService } from '../streaks/streak.service';
+import { BadgeService } from '../../badges/badge.service';
+import { StreakService } from '../../streaks/streak.service';
 
 export class ActivityService {
   /**

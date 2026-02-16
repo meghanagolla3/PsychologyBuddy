@@ -1,8 +1,8 @@
 'use client'
 
 import { Suspense } from 'react'
-import StudentLayout from "../../../components/StudentDashboard/Layout/StudentLayout";
-import ChatInterface from '../../../components/StudentDashboard/ChatBuddy/ChatInterface';
+import StudentLayout from "../../../src/components/StudentDashboard/Layout/StudentLayout";
+import ChatInterface from '../../../src/components/StudentDashboard/ChatBuddy/ChatInterface';
 
 function ChatPageContent() {
   return (

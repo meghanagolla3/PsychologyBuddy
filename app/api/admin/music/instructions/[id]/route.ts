@@ -1,14 +1,18 @@
-import { NextRequest } from 'next/server';
-import { musicInstructionsAdminController } from '@/src/components/server/content/selfhelptools/music/music-instructions.admin.controller';
+import { NextRequest, NextResponse } from "next/server";
+import {
+  getMusicInstructionById,
+  updateMusicInstruction,
+  deleteMusicInstruction,
+} from "@/src/components/server/content/selfhelptools/music/music.admin.controller";
 
-export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
-  return musicInstructionsAdminController.getInstruction(req);
+export async function GET(request: NextRequest) {
+  return await getMusicInstructionById(request);
 }
 
-export async function PATCH(req: NextRequest, { params }: { params: { id: string } }) {
-  return musicInstructionsAdminController.updateInstruction(req);
+export async function PATCH(request: NextRequest) {
+  return await updateMusicInstruction(request);
 }
 
-export async function DELETE(req: NextRequest, { params }: { params: { id: string } }) {
-  return musicInstructionsAdminController.deleteInstruction(req);
+export async function DELETE(request: NextRequest) {
+  return await deleteMusicInstruction(request);
 }

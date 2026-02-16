@@ -1,5 +1,5 @@
-import StudentLayout from "../../../components/StudentDashboard/Layout/StudentLayout";
-import ReflectionsPage from '../../../components/StudentDashboard/ChatBuddy/ReflectionsPage';
+import StudentLayout from "../../../src/components/StudentDashboard/Layout/StudentLayout";
+import ReflectionsPage from '../../../src/components/StudentDashboard/ChatBuddy/ReflectionsPage';
 
 export default function Reflections() {
   return (

@@ -44,11 +44,12 @@ export class JournalingStudentController {
   }
 
   // DELETE /api/student/journals/writing/:id
-  async deleteWritingJournal(req: NextRequest, { params }: { params: { id: string } }) {
+  async deleteWritingJournal(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
     try {
       const session = await requireRole(req, 'STUDENT');
+      const { id } = await params;
 
-      const data = { id: params.id };
+      const data = { id };
       const parsed = DeleteWritingJournalSchema.parse(data);
 
       const result = await JournalingStudentService.deleteWritingJournal(session.userId, parsed);
@@ -67,13 +68,34 @@ export class JournalingStudentController {
     try {
       const session = await requireRole(req, 'STUDENT');
 
-      const body = await req.json();
-      const parsed = CreateAudioJournalSchema.parse(body);
+      // Handle FormData for audio file uploads
+      const formData = await req.formData();
+      const audioFile = formData.get('audio') as File;
+      const duration = Number(formData.get('duration'));
+      const title = formData.get('title') as string;
+
+      if (!audioFile) {
+        throw new Error('Audio file is required');
+      }
+
+      if (duration <= 0) {
+        throw new Error('Duration must be greater than 0');
+      }
+
+      // Create a temporary object for validation
+      const data = {
+        title: title?.trim() || undefined, // Convert empty string to undefined
+        audioUrl: `temp://${audioFile.name}`, // Temporary URL, will be replaced in service
+        duration
+      };
+
+      const parsed = CreateAudioJournalSchema.parse(data);
 
       const result = await JournalingStudentService.createAudioJournal(
         session.userId,
         session.schoolId,
-        parsed
+        parsed,
+        audioFile
       );
 
       return NextResponse.json(result);
@@ -98,11 +120,12 @@ export class JournalingStudentController {
   }
 
   // DELETE /api/student/journals/audio/:id
-  async deleteAudioJournal(req: NextRequest, { params }: { params: { id: string } }) {
+  async deleteAudioJournal(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
     try {
       const session = await requireRole(req, 'STUDENT');
+      const { id } = await params;
 
-      const data = { id: params.id };
+      const data = { id };
       const parsed = DeleteAudioJournalSchema.parse(data);
 
       const result = await JournalingStudentService.deleteAudioJournal(session.userId, parsed);
@@ -121,13 +144,26 @@ export class JournalingStudentController {
     try {
       const session = await requireRole(req, 'STUDENT');
 
-      const body = await req.json();
-      const parsed = CreateArtJournalSchema.parse(body);
+      // Handle FormData for image file uploads
+      const formData = await req.formData();
+      const imageFile = formData.get('image') as File;
+
+      if (!imageFile) {
+        throw new Error('Image file is required');
+      }
+
+      // Create a temporary object for validation
+      const data = {
+        imageUrl: `temp://${imageFile.name}`, // Temporary URL, will be replaced in service
+      };
+
+      const parsed = CreateArtJournalSchema.parse(data);
 
       const result = await JournalingStudentService.createArtJournal(
         session.userId,
         session.schoolId,
-        parsed
+        parsed,
+        imageFile
       );
 
       return NextResponse.json(result);
@@ -152,11 +188,12 @@ export class JournalingStudentController {
   }
 
   // DELETE /api/student/journals/art/:id
-  async deleteArtJournal(req: NextRequest, { params }: { params: { id: string } }) {
+  async deleteArtJournal(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
     try {
       const session = await requireRole(req, 'STUDENT');
+      const { id } = await params;
 
-      const data = { id: params.id };
+      const data = { id };
       const parsed = DeleteArtJournalSchema.parse(data);
 
       const result = await JournalingStudentService.deleteArtJournal(session.userId, parsed);

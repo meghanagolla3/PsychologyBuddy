@@ -1,36 +1,11 @@
 import { nanoid } from "nanoid";
 
 // ===========================================
-// SESSION STORE (Dev: In-memory, Prod: Replace with Redis)
-// ===========================================
-declare global {
-  var sessionStore: Map<string, any> | undefined;
-}
-
-const sessionStore = global.sessionStore || new Map();
-if (!global.sessionStore) global.sessionStore = sessionStore;
-
-// TTL = 7 days
-const SESSION_TTL = 1000 * 60 * 60 * 24 * 7;
-
-export const SessionUtil = {
-  generateSessionId: () => nanoid(),
-  
-  getExpirationTime: () => {
-    return new Date(Date.now() + SESSION_TTL);
-  },
-  
-  isExpired: (expiresAt: Date) => {
-    return new Date() > expiresAt;
-  }
-};
-
-// ===========================================
 // CLIENT-SIDE SESSION HELPERS
 // ===========================================
 
-// Get session from cookies (client-side)
-export function getClientSession() {
+// Get session ID for API requests (client-side)
+export function getClientSessionId() {
   if (typeof window === 'undefined') return null;
   
   const sessionId = document.cookie
@@ -38,13 +13,27 @@ export function getClientSession() {
     .find(row => row.startsWith('sessionId='))
     ?.split('=')[1];
     
-  return sessionId ? sessionStore.get(sessionId) : null;
+  return sessionId || null;
 }
 
-// Check if user is authenticated (client-side)
+// Get auth headers for API requests
+export function getAuthHeaders(): Record<string, string> {
+  const sessionId = getClientSessionId();
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json'
+  };
+  
+  if (sessionId) {
+    headers['Authorization'] = `Bearer ${sessionId}`;
+  }
+  
+  return headers;
+}
+
+// Check if user is authenticated (client-side) - simplified version
 export function isClientAuthenticated() {
-  const session = getClientSession();
-  return session && !SessionUtil.isExpired(session.expiresAt);
+  const sessionId = getClientSessionId();
+  return !!sessionId;
 }
 
 // ===========================================

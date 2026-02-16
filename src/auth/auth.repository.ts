@@ -1,5 +1,5 @@
 // src/auth/auth.repository.ts
-import prisma from "@/src/prisma";
+import prisma from "../prisma";
 
 export const AuthRepository = {
   // Student login uses studentId (from User table)

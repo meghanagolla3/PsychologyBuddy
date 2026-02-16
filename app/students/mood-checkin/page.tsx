@@ -1,5 +1,5 @@
-import StudentLayout from "../../../components/StudentDashboard/Layout/StudentLayout";
-import MoodSelector from '../../../components/StudentDashboard/MoodCheckIn/MoodCheckin'
+import StudentLayout from "../../../src/components/StudentDashboard/Layout/StudentLayout";
+import MoodSelector from '../../../src/components/StudentDashboard/MoodCheckIn/MoodCheckin'
 
 export default function MoodCheckinPage() {
   return (

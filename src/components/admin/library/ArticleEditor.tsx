@@ -1,5 +1,8 @@
 'use client';
 
+// Add immediate test log
+console.log('🚀 ArticleEditor.tsx file loaded - you should see this immediately');
+
 import { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { 
@@ -19,6 +22,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { getAuthHeaders } from "@/src/utils/session.util";
 
 type BlockType = "section" | "bullet-list" | "image" | "key-takeaways" | "spacer" | "reflection" | "link";
 
@@ -76,14 +80,15 @@ interface ArticleEditorProps {
 }
 
 export default function ArticleEditor({ articleId }: ArticleEditorProps) {
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  
-  // Always log when component renders
-  console.log('🔥 ArticleEditor component rendering with articleId:', articleId);
-  
-  // Debug: Log the received articleId
-  console.log('ArticleEditor received articleId:', articleId);
+  try {
+    // console.log('🔥 ArticleEditor component rendering with articleId:', articleId);
+    // console.log('🔥 Component render count - you should see this on every render');
+    
+    const router = useRouter();
+    const searchParams = useSearchParams();
+    
+    // Debug: Log received articleId
+    console.log('ArticleEditor received articleId:', articleId);
   
   // Article metadata state - ensure these are always strings
   const titleParam = searchParams.get("title");
@@ -115,162 +120,264 @@ export default function ArticleEditor({ articleId }: ArticleEditorProps) {
   const [isLoading, setIsLoading] = useState(true);
 
   // Load article data and blocks
-  useEffect(() => {
-    console.log('🚀 useEffect triggered for articleId:', articleId);
+  const loadArticleData = async () => {
+    // console.log('loadArticleData called for articleId:', articleId);
+    if (!articleId) {
+      // console.log('No articleId, returning early');
+      return;
+    }
     
-    const loadArticleData = async () => {
-      console.log('loadArticleData called for articleId:', articleId);
-      if (!articleId) {
-        console.log('No articleId, returning early');
-        return;
+    try {
+      setIsLoading(true);
+      // console.log('Loading data for articleId:', articleId);
+      
+      // Load article metadata
+      console.log('Making API call to:', `/api/articles/${articleId}`);
+      const articleResponse = await fetch(`/api/articles/${articleId}`, {
+        headers: getAuthHeaders()
+      });
+      // console.log('Article response status:', articleResponse.status);
+      // console.log('Article response headers:', articleResponse.headers);
+      // console.log('Article response ok:', articleResponse.ok);
+      
+      if (articleResponse.ok) {
+        const articleResult = await articleResponse.json();
+        console.log('Article data received:', articleResult);
+        
+        // Extract the actual article data from the response
+        const articleData = articleResult.data || articleResult;
+        console.log('Article data extracted:', articleData);
+        console.log('Available fields:', Object.keys(articleData));
+        
+        // Update article metadata - map API fields to our state
+        if (articleData.title) {
+          // Update the search params or local state with article data
+          const url = new URL(window.location.href);
+          if (articleData.title) url.searchParams.set('title', articleData.title);
+          if (articleData.category) url.searchParams.set('category', articleData.category);
+          if (articleData.description || articleData.subtitle) url.searchParams.set('description', articleData.description || articleData.subtitle);
+          if (articleData.readTime) url.searchParams.set('readTime', articleData.readTime.toString());
+          if (articleData.authorName || articleData.author) url.searchParams.set('author', articleData.authorName || articleData.author);
+          
+          // Always update state with API data, using fallbacks for missing values
+          setArticleTitle(articleData.title || "");
+          
+          if (articleData.category) {
+            console.log('Category data (direct field):', articleData.category, typeof articleData.category);
+            const categoryValue = typeof articleData.category === 'string' 
+              ? articleData.category 
+              : articleData.category?.text || articleData.category?.title || '';
+            setArticleCategory(categoryValue);
+          } else if (articleData.categories && Array.isArray(articleData.categories) && articleData.categories.length > 0) {
+            console.log('Categories data (array):', articleData.categories);
+            console.log('First category object:', articleData.categories[0]);
+            console.log('Category structure:', Object.keys(articleData.categories[0]));
+            
+            // Extract category name from nested category object
+            const categoryValue = articleData.categories[0].category?.name 
+              || articleData.categories[0].name 
+              || articleData.categories[0].title
+              || articleData.categories[0].text
+              || (typeof articleData.categories[0] === 'string' ? articleData.categories[0] : '')
+              || '';
+            console.log('Extracted category value:', categoryValue);
+            setArticleCategory(categoryValue);
+          } else {
+            console.log('No category data found, setting empty string');
+            setArticleCategory("");
+          }
+          
+          // Always set description with fallback
+          const descriptionValue = articleData.description 
+            ? (typeof articleData.description === 'string' ? articleData.description : articleData.description?.text || articleData.description?.title || '')
+            : (articleData.subtitle 
+              ? (typeof articleData.subtitle === 'string' ? articleData.subtitle : articleData.subtitle?.text || articleData.subtitle?.title || '')
+              : "");
+          setIntroText(descriptionValue);
+          
+          // Always set readTime with fallback
+          const readTimeValue = articleData.readTime ? articleData.readTime.toString() : "5";
+          setReadTime(readTimeValue);
+          
+          // Always set author with fallback (handle both authorName and author fields)
+          let authorValue = "";
+          if (articleData.authorName) {
+            authorValue = typeof articleData.authorName === 'string' ? articleData.authorName : articleData.authorName?.text || articleData.authorName?.title || '';
+          } else if (articleData.author) {
+            console.log('Author data:', articleData.author, typeof articleData.author);
+            authorValue = typeof articleData.author === 'string' ? articleData.author : articleData.author?.text || articleData.author?.title || '';
+          }
+          setAuthorName(authorValue);
+          
+          // Always set image with fallback
+          let imageUrl = '';
+          console.log('🔍 Checking for image fields in articleData:', {
+            headerImage: articleData.headerImage,
+            thumbnailUrl: articleData.thumbnailUrl,
+            image: articleData.image,
+            coverImage: articleData.coverImage,
+            allFields: Object.keys(articleData)
+          });
+          
+          if (articleData.headerImage || articleData.thumbnailUrl || articleData.image || articleData.coverImage) {
+            const imageValue = articleData.headerImage || articleData.thumbnailUrl || articleData.image || articleData.coverImage;
+            console.log('Image data:', imageValue, typeof imageValue);
+            // Handle case where image might be an object with url property
+            if (typeof imageValue === 'string') {
+              imageUrl = imageValue;
+            } else if (imageValue && typeof imageValue === 'object' && imageValue.url) {
+              imageUrl = imageValue.url;
+            }
+          }
+          console.log('Final image URL:', imageUrl);
+          setHeaderImage(imageUrl);
+        }
+      } else {
+        console.error('Failed to load article:', articleResponse.status, articleResponse.statusText);
       }
       
+      // Load blocks from all dedicated endpoints
+      console.log('Loading blocks from all endpoints...');
       try {
-        setIsLoading(true);
-        console.log('Loading data for articleId:', articleId);
-        
-        // Load article metadata
-        console.log('Making API call to:', `/api/articles/${articleId}`);
-        const articleResponse = await fetch(`/api/articles/${articleId}`);
-        console.log('Article response status:', articleResponse.status);
-        console.log('Article response headers:', articleResponse.headers);
-        console.log('Article response ok:', articleResponse.ok);
-        
-        if (articleResponse.ok) {
-          const articleResult = await articleResponse.json();
-          console.log('Article data received:', articleResult);
-          
-          // Extract the actual article data from the response
-          const articleData = articleResult.data || articleResult;
-          console.log('Article data extracted:', articleData);
-          console.log('Available fields:', Object.keys(articleData));
-          
-          // Update article metadata - map API fields to our state
-          if (articleData.title) {
-            // Update the search params or local state with article data
-            const url = new URL(window.location.href);
-            if (articleData.title) url.searchParams.set('title', articleData.title);
-            if (articleData.category) url.searchParams.set('category', articleData.category);
-            if (articleData.description || articleData.subtitle) url.searchParams.set('description', articleData.description || articleData.subtitle);
-            if (articleData.readTime) url.searchParams.set('readTime', articleData.readTime.toString());
-            if (articleData.authorName || articleData.author) url.searchParams.set('author', articleData.authorName || articleData.author);
-            
-            // Always update state with API data, using fallbacks for missing values
-            setArticleTitle(articleData.title || "");
-            
-            if (articleData.category) {
-              console.log('Category data:', articleData.category, typeof articleData.category);
-              // Handle case where category might be an object with text/title fields
-              const categoryValue = typeof articleData.category === 'string' 
-                ? articleData.category 
-                : articleData.category?.text || articleData.category?.title || '';
-              setArticleCategory(categoryValue);
-            } else if (articleData.categories && Array.isArray(articleData.categories) && articleData.categories.length > 0) {
-              console.log('Categories data:', articleData.categories);
-              console.log('First category object:', articleData.categories[0]);
-              // Handle case where categories is an array - take the first one
-              const firstCategory = articleData.categories[0];
-              console.log('Category structure:', Object.keys(firstCategory));
-              
-              // Extract category name from the nested category object
-              const categoryValue = firstCategory.category?.name 
-                || firstCategory.name 
-                || firstCategory.category?.title
-                || firstCategory.title
-                || firstCategory.text
-                || (typeof firstCategory === 'string' ? firstCategory : '')
-                || '';
-              console.log('Extracted category value:', categoryValue);
-              setArticleCategory(categoryValue);
-            } else {
-              setArticleCategory("");
-            }
-            
-            // Always set description with fallback
-            const descriptionValue = articleData.description 
-              ? (typeof articleData.description === 'string' ? articleData.description : articleData.description?.text || articleData.description?.title || '')
-              : (articleData.subtitle 
-                ? (typeof articleData.subtitle === 'string' ? articleData.subtitle : articleData.subtitle?.text || articleData.subtitle?.title || '')
-                : "");
-            setIntroText(descriptionValue);
-            
-            // Always set readTime with fallback
-            const readTimeValue = articleData.readTime ? articleData.readTime.toString() : "5";
-            setReadTime(readTimeValue);
-            
-            // Always set author with fallback (handle both authorName and author fields)
-            let authorValue = "";
-            if (articleData.authorName) {
-              authorValue = typeof articleData.authorName === 'string' ? articleData.authorName : articleData.authorName?.text || articleData.authorName?.title || '';
-            } else if (articleData.author) {
-              console.log('Author data:', articleData.author, typeof articleData.author);
-              authorValue = typeof articleData.author === 'string' ? articleData.author : articleData.author?.text || articleData.author?.title || '';
-            }
-            setAuthorName(authorValue);
-            
-            // Always set image with fallback
-            let imageUrl = '';
-            if (articleData.headerImage || articleData.thumbnailUrl || articleData.image || articleData.coverImage) {
-              const imageValue = articleData.headerImage || articleData.thumbnailUrl || articleData.image || articleData.coverImage;
-              console.log('Image data:', imageValue, typeof imageValue);
-              // Handle case where image might be an object with url property
-              if (typeof imageValue === 'string') {
-                imageUrl = imageValue;
-              } else if (imageValue && typeof imageValue === 'object') {
-                imageUrl = (imageValue as any)?.url || (imageValue as any)?.src || '';
-              }
-            }
-            console.log('Final image URL:', imageUrl);
-            setHeaderImage(imageUrl);
-          }
-        } else {
-          console.error('Failed to load article:', articleResponse.status, articleResponse.statusText);
-        }
-        
-        // Load article blocks
-        console.log('Making blocks API call to:', `/api/articles/${articleId}/blocks`);
-        const blocksResponse = await fetch(`/api/articles/${articleId}/blocks`);
-        console.log('Blocks response status:', blocksResponse.status);
-        console.log('Blocks response ok:', blocksResponse.ok);
-        
-        if (blocksResponse.ok) {
-          const blocksData = await blocksResponse.json();
-          console.log('Blocks data received:', blocksData);
-          
-          // Extract the actual blocks array from the response
-          const blocksArray = blocksData.data || blocksData;
-          console.log('Blocks array extracted:', blocksArray);
-          
-          if (blocksArray && blocksArray.length > 0) {
-            setBlocks(blocksArray);
-          } else {
-            console.log('No blocks found for this article');
-          }
-        } else {
-          console.error('Failed to load blocks:', blocksResponse.status, blocksResponse.statusText);
-        }
-      } catch (error) {
-        console.error('Error in loadArticleData:', error);
-        console.error('Error details:', error instanceof Error ? error.message : 'Unknown error', error instanceof Error ? error.stack : 'No stack trace');
-      } finally {
-        setIsLoading(false);
-      }
-    };
+        const [sectionsRes, bulletListsRes, imagesRes, takeawaysRes, reflectionsRes, linksRes] = await Promise.all([
+          fetch(`/api/articles/${articleId}/blocks/sections`, { headers: getAuthHeaders() }),
+          fetch(`/api/articles/${articleId}/blocks/bullet-lists`, { headers: getAuthHeaders() }),
+          fetch(`/api/articles/${articleId}/blocks/images`, { headers: getAuthHeaders() }),
+          fetch(`/api/articles/${articleId}/blocks/key-takeaways`, { headers: getAuthHeaders() }),
+          fetch(`/api/articles/${articleId}/blocks/reflections`, { headers: getAuthHeaders() }),
+          fetch(`/api/articles/${articleId}/blocks/links`, { headers: getAuthHeaders() })
+        ]);
 
-    loadArticleData();
+        const allBlocks = [];
+        
+        // Process sections
+        if (sectionsRes.ok) {
+          const sectionsData = await sectionsRes.json();
+          const sectionsArray = sectionsData.data || sectionsData;
+          console.log('Sections loaded:', sectionsArray.length, sectionsArray);
+          allBlocks.push(...sectionsArray.map((s: SectionBlock) => ({
+            ...s,
+            type: 'section'
+          })));
+        }
+
+        // Process bullet-lists
+        if (bulletListsRes.ok) {
+          const bulletListsData = await bulletListsRes.json();
+          const bulletListsArray = bulletListsData.data || bulletListsData;
+          console.log('Bullet-lists loaded:', bulletListsArray.length, bulletListsArray);
+          allBlocks.push(...bulletListsArray.map((bl: BulletListBlock) => ({
+            ...bl,
+            type: 'bullet-list'
+          })));
+        }
+
+        // Process images
+        if (imagesRes.ok) {
+          const imagesData = await imagesRes.json();
+          const imagesArray = imagesData.data || imagesData;
+          console.log('Images loaded:', imagesArray.length, imagesArray);
+          allBlocks.push(...imagesArray.map((img: Partial<ImageBlock>) => ({
+            ...img,
+            type: 'image'
+          })));
+        }
+
+        // Process key-takeaways
+        if (takeawaysRes.ok) {
+          const takeawaysData = await takeawaysRes.json();
+          const takeawaysArray = takeawaysData.data || takeawaysData;
+          console.log('Key-takeaways loaded:', takeawaysArray.length, takeawaysArray);
+          allBlocks.push(...takeawaysArray.map((kt: any) => ({
+            ...kt,
+            type: 'key-takeaways'
+          })));
+        }
+
+        // Process reflections
+        if (reflectionsRes.ok) {
+          const reflectionsData = await reflectionsRes.json();
+          const reflectionsArray = reflectionsData.data || reflectionsData;
+          console.log('Reflections loaded:', reflectionsArray.length, reflectionsArray);
+          allBlocks.push(...reflectionsArray.map((ref: Partial<ReflectionBlock>) => ({
+            ...ref,
+            type: 'reflection'
+          })));
+        }
+
+        // Process links
+        if (linksRes.ok) {
+          const linksData = await linksRes.json();
+          const linksArray = linksData.data || linksData;
+          console.log('Links loaded:', linksArray.length, linksArray);
+          allBlocks.push(...linksArray.map((link: Partial<LinkBlock>) => ({
+            ...link,
+            type: 'link'
+          })));
+        }
+
+        // Sort all blocks by order
+        allBlocks.sort((a, b) => (a.order || 0) - (b.order || 0));
+        
+        console.log('Total blocks loaded:', allBlocks.length);
+        console.log('Final blocks array:', allBlocks);
+        
+        if (allBlocks.length > 0) {
+          setBlocks(allBlocks);
+        } else {
+          console.log('No blocks found for this article');
+        }
+      } catch (blocksError) {
+        console.error('Error loading blocks:', blocksError);
+      }
+    } catch (error) {
+      console.error('Error in loadArticleData:', error);
+      console.error('Error details:', error instanceof Error ? error.message : 'Unknown error', error instanceof Error ? error.stack : 'No stack trace');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+      // console.log('🚀 useEffect triggered for articleId:', articleId);
+      // console.log('🔍 ArticleId type and value:', typeof articleId, articleId);
+      // console.log('🔍 Window location:', window.location.href);
+    
+    if (!articleId) {
+      // console.log('❌ No articleId, returning early');
+      return;
+    }
+    
+    // Only load data on initial mount, not on every articleId change
+    // This prevents overwriting blocks after save
+    if (blocks.length === 0) {
+      console.log('🔄 First time loading, blocks empty');
+      loadArticleData();
+    }
   }, [articleId]);
+
+  // Monitor headerImage changes for debugging
+  useEffect(() => {
+    console.log('🖼️ headerImage state changed:', {
+      hasValue: !!headerImage,
+      length: headerImage?.length || 0,
+      preview: headerImage?.substring(0, 50) + '...' || 'null'
+    });
+  }, [headerImage]);
 
   const handleHeaderImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    console.log('Header image upload triggered:', file);
+    // console.log('Header image upload triggered:', file);
     if (file) {
-      console.log('File details:', { name: file.name, size: file.size, type: file.type });
+      // console.log('File details:', { name: file.name, size: file.size, type: file.type });
       const reader = new FileReader();
       reader.onloadend = () => {
         const result = reader.result as string;
-        console.log('File read completed, result length:', result.length);
-        console.log('Result preview:', result.substring(0, 100) + '...');
+        // console.log('File read completed, result length:', result.length);
+        // console.log('Result preview:', result.substring(0, 100) + '...');
+        // console.log('🔄 About to setHeaderImage with:', result ? 'data URL (length: ' + result.length + ')' : 'null');
         setHeaderImage(result);
+        // console.log('✅ setHeaderImage called');
       };
       reader.readAsDataURL(file);
     } else {
@@ -324,9 +431,12 @@ export default function ArticleEditor({ articleId }: ArticleEditorProps) {
   };
 
   const updateBlock = <T extends ContentBlock>(id: string, updates: Partial<T>) => {
+    console.log('📝 Updating block:', { id, updates });
     setBlocks(blocks.map(b => {
       if (b.id === id) {
-        return { ...b, ...updates } as ContentBlock;
+        const updatedBlock = { ...b, ...updates };
+        console.log('✅ Block updated:', updatedBlock);
+        return updatedBlock;
       }
       return b;
     }));
@@ -374,33 +484,66 @@ export default function ArticleEditor({ articleId }: ArticleEditorProps) {
   };
 
   const removeBlock = async (blockId: string, blockType: string) => {
-    if (!blockId || blockId.startsWith('temp-')) {
+    console.log('🗑️ Attempting to delete block:', { blockId, blockType });
+    
+    if (!blockId) {
       console.log('Cannot remove block: invalid ID', blockId);
+      return;
+    }
+    
+    // If it's a temporary block, just remove it from the UI
+    if (blockId.startsWith('temp-')) {
+      console.log('Removing temporary block from UI:', blockId);
+      setBlocks(prev => prev.filter(b => b.id !== blockId));
+      if (editingBlockId === blockId) setEditingBlockId(null);
       return;
     }
     
     try {
       let response: Response;
+      let endpoint = '';
       
       switch (blockType) {
-        case "image":
-          response = await fetch(`/api/articles/${articleId}/blocks/images/${blockId}`, {
+        case "section":
+          endpoint = `/api/articles/${articleId}/blocks/sections/${blockId}`;
+          response = await fetch(endpoint, {
             method: 'DELETE',
+            headers: getAuthHeaders()
+          });
+          break;
+        case "bullet-list":
+          endpoint = `/api/articles/${articleId}/blocks/bullet-lists/${blockId}`;
+          response = await fetch(endpoint, {
+            method: 'DELETE',
+            headers: getAuthHeaders()
+          });
+          break;
+        case "image":
+          endpoint = `/api/articles/${articleId}/blocks/images/${blockId}`;
+          response = await fetch(endpoint, {
+            method: 'DELETE',
+            headers: getAuthHeaders()
           });
           break;
         case "key-takeaways":
-          response = await fetch(`/api/articles/${articleId}/blocks/key-takeaways/${blockId}`, {
+          endpoint = `/api/articles/${articleId}/blocks/key-takeaways/${blockId}`;
+          response = await fetch(endpoint, {
             method: 'DELETE',
+            headers: getAuthHeaders()
           });
           break;
         case "reflection":
-          response = await fetch(`/api/articles/${articleId}/blocks/reflections/${blockId}`, {
+          endpoint = `/api/articles/${articleId}/blocks/reflections/${blockId}`;
+          response = await fetch(endpoint, {
             method: 'DELETE',
+            headers: getAuthHeaders()
           });
           break;
         case "link":
-          response = await fetch(`/api/articles/${articleId}/blocks/links/${blockId}`, {
+          endpoint = `/api/articles/${articleId}/blocks/links/${blockId}`;
+          response = await fetch(endpoint, {
             method: 'DELETE',
+            headers: getAuthHeaders()
           });
           break;
         default:
@@ -408,11 +551,15 @@ export default function ArticleEditor({ articleId }: ArticleEditorProps) {
           return;
       }
       
+      console.log('📡 DELETE request to:', endpoint);
+      console.log('📡 Response status:', response.status);
+      
       if (response.ok) {
         console.log(`${blockType} block deleted successfully`);
         setBlocks(prev => prev.filter(b => b.id !== blockId));
-    } else {
-        console.error(`Failed to delete ${blockType} block:`, await response.text());
+      } else {
+        const errorText = await response.text();
+        console.error(`Failed to delete ${blockType} block:`, response.status, errorText);
       }
     } catch (error) {
       console.error('Error deleting block:', error);
@@ -422,6 +569,17 @@ export default function ArticleEditor({ articleId }: ArticleEditorProps) {
   const handleSave = async () => {
     try {
       setIsLoading(true);
+      console.log('🚀 Starting save process...');
+      console.log('📊 Total blocks to save:', blocks.length);
+      console.log('📝 Blocks details:', blocks.map(b => ({ 
+        id: b.id, 
+        type: b.type, 
+        isTemp: b.id.startsWith('temp-'),
+        hasContent: b.type === 'section' ? !!(b as any).content : 
+                   b.type === 'bullet-list' ? !!(b as any).items?.length :
+                   b.type === 'image' ? !!(b as any).src :
+                   true
+      })));
       
       // First, save article metadata (title, category, description, header image, etc.)
       const articleData = {
@@ -430,168 +588,267 @@ export default function ArticleEditor({ articleId }: ArticleEditorProps) {
         description: introText || "",
         readTime: parseInt(readTime) || 5,
         authorName: authorName || "",
-        headerImage: (headerImage && headerImage.trim()) ? headerImage : "",
-        thumbnailUrl: (headerImage && headerImage.trim()) ? headerImage : "", // Ensure this is always a string, never null
+        thumbnailUrl: (headerImage && headerImage.trim()) ? headerImage : "",
       };
       
-      console.log('Saving article metadata:', JSON.stringify(articleData, null, 2));
-      console.log('Header image being saved:', headerImage ? headerImage.substring(0, 100) + '...' : 'null');
-      console.log('Header image length:', headerImage ? headerImage.length : 0);
-      console.log('Article ID:', articleId);
-      
+      console.log('💾 Saving article metadata...');
       const articleResponse = await fetch(`/api/articles/${articleId}`, {
         method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: getAuthHeaders(),
         body: JSON.stringify(articleData),
       });
       
-      console.log('Article update response status:', articleResponse.status);
-      console.log('Article update response headers:', articleResponse.headers);
-      
-      if (articleResponse.ok) {
-        try {
-          for (const block of blocks) {
-          const order = blocks.indexOf(block);
-          let response: Response;
-          
-          switch (block.type) {
-            case "image":
-              const imageData = {
-                src: (block as any).src || "",
-                altText: (block as any).altText || "",
-                caption: (block as any).caption || "",
-                order
-              };
-              
-              if (!block.id || block.id.startsWith('temp-')) {
-                // Create new image block
-                response = await fetch(`/api/articles/${articleId}/blocks/images`, {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify(imageData),
-                });
-              } else {
-                // Update existing image block
-                response = await fetch(`/api/articles/${articleId}/blocks/images/${block.id}`, {
-                  method: 'PUT',
-                  headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify(imageData),
-                });
-              }
-              break;
-              
-            case "key-takeaways":
-              const takeawaysData = {
-                title: (block as any).title || "",
-                items: (block as any).items || [],
-                order
-              };
-              
-              if (!block.id || block.id.startsWith('temp-')) {
-                response = await fetch(`/api/articles/${articleId}/blocks/key-takeaways`, {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify(takeawaysData),
-                });
-              } else {
-                response = await fetch(`/api/articles/${articleId}/blocks/key-takeaways/${block.id}`, {
-                  method: 'PUT',
-                  headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify(takeawaysData),
-                });
-              }
-              break;
-              
-            case "reflection":
-              const reflectionData = {
-                heading: (block as any).heading || "",
-                content: (block as any).content || "",
-                prompt: (block as any).prompt || "",
-                order
-              };
-              
-              if (!block.id || block.id.startsWith('temp-')) {
-                response = await fetch(`/api/articles/${articleId}/blocks/reflections`, {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify(reflectionData),
-                });
-              } else {
-                response = await fetch(`/api/articles/${articleId}/blocks/reflections/${block.id}`, {
-                  method: 'PUT',
-                  headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify(reflectionData),
-                });
-              }
-              break;
-              
-            case "link":
-              const linkData = {
-                title: (block as any).title || "",
-                url: (block as any).url || "",
-                description: (block as any).description || "",
-                order
-              };
-              
-              if (!block.id || block.id.startsWith('temp-')) {
-                response = await fetch(`/api/articles/${articleId}/blocks/links`, {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify(linkData),
-                });
-              } else {
-                response = await fetch(`/api/articles/${articleId}/blocks/links/${block.id}`, {
-                  method: 'PUT',
-                  headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify(linkData),
-                });
-              }
-              break;
-              
-            default:
-              console.log('Block type not handled:', block.type);
-              continue;
-          }
-          
-          if (response) {
-            if (response.ok) {
-              const result = await response.json();
-              console.log(`${block.type} block saved:`, result);
-              
-              // Update block ID in state if it was a temp ID
-              if (block.id && block.id.startsWith('temp-') && result.data?.id) {
-                setBlocks(prev => prev.map(b => b.id === block.id ? { ...b, id: result.data.id } : b));
-              }
-            } else {
-              console.error(`Failed to save ${block.type} block:`, await response.text());
-            }
-          }
-          }
-        } catch (blocksError) {
-          console.error('Error saving blocks:', blocksError);
-        }
-        
-        // Show success confirmation since article metadata (including image) is saved
-        setIsSaveConfirmOpen(true);
-    } else {
+      if (!articleResponse.ok) {
         const errorText = await articleResponse.text();
-        console.log('Article update error response text:', errorText);
-        
         let errorData;
         try {
           errorData = JSON.parse(errorText);
         } catch {
           errorData = { error: errorText || 'Unknown error' };
         }
-        
-        console.error('Article update error:', JSON.stringify(errorData, null, 2));
+        console.error('❌ Failed to save article metadata:', errorData);
         alert(`Failed to save article metadata: ${errorData.error || 'Unknown error'}`);
         return;
       }
+
+      console.log('✅ Article metadata saved successfully');
+
+      // Save all blocks
+      const savePromises = [];
+      const blocksToSave = blocks.filter(block => block.id.startsWith('temp-') || !block.id.startsWith('temp-'));
+      
+      console.log('🔄 Processing blocks for save...', blocksToSave.length);
+
+      for (const block of blocksToSave) {
+        const order = blocks.indexOf(block);
+        let savePromise: Promise<Response>;
+        
+        switch (block.type) {
+          case "section":
+            const sectionData = {
+              title: (block as SectionBlock).title || "",
+              content: (block as SectionBlock).content || "",
+              order
+            };
+            
+            console.log(`📝 Section block data:`, sectionData);
+            console.log(`📝 Section block ID:`, block.id);
+            console.log(`📝 Is new block:`, !block.id || block.id.startsWith('temp-'));
+            
+            if (!block.id || block.id.startsWith('temp-')) {
+              console.log(`📝 Creating new section block: "${sectionData.title}"`);
+              console.log(`📝 API endpoint: /api/articles/${articleId}/blocks/sections`);
+              console.log(`📝 Request data:`, JSON.stringify(sectionData, null, 2));
+              
+              savePromise = fetch(`/api/articles/${articleId}/blocks/sections`, {
+                method: 'POST',
+                headers: getAuthHeaders(),
+                body: JSON.stringify(sectionData),
+              });
+            } else {
+              console.log(`📝 Updating section block: "${sectionData.title}" (${block.id})`);
+              console.log(`📝 API endpoint: /api/articles/${articleId}/blocks/sections/${block.id}`);
+              console.log(`📝 Request data:`, JSON.stringify(sectionData, null, 2));
+              
+              savePromise = fetch(`/api/articles/${articleId}/blocks/sections/${block.id}`, {
+                method: 'PUT',
+                headers: getAuthHeaders(),
+                body: JSON.stringify(sectionData),
+              });
+            }
+            break;
+            
+          case "bullet-list":
+            const bulletListData = {
+              title: (block as any).title || "",
+              items: (block as any).items || [],
+              order
+            };
+            
+            if (!block.id || block.id.startsWith('temp-')) {
+              console.log(`📝 Creating new bullet-list block: "${bulletListData.title}" with ${bulletListData.items.length} items`);
+              savePromise = fetch(`/api/articles/${articleId}/blocks/bullet-lists`, {
+                method: 'POST',
+                headers: getAuthHeaders(),
+                body: JSON.stringify(bulletListData),
+              });
+            } else {
+              console.log(`📝 Updating bullet-list block: "${bulletListData.title}" (${block.id})`);
+              savePromise = fetch(`/api/articles/${articleId}/blocks/bullet-lists/${block.id}`, {
+                method: 'PUT',
+                headers: getAuthHeaders(),
+                body: JSON.stringify(bulletListData),
+              });
+            }
+            break;
+            
+          case "spacer":
+            const spacerData = {
+              type: "divider",
+              content: {},
+              order
+            };
+            
+            if (!block.id || block.id.startsWith('temp-')) {
+              console.log(`📝 Creating new spacer block`);
+              savePromise = fetch(`/api/articles/${articleId}/blocks`, {
+                method: 'POST',
+                headers: getAuthHeaders(),
+                body: JSON.stringify(spacerData),
+              });
+            } else {
+              console.log(`📝 Updating spacer block (${block.id})`);
+              savePromise = fetch(`/api/articles/${articleId}/blocks/${block.id}`, {
+                method: 'PUT',
+                headers: getAuthHeaders(),
+                body: JSON.stringify(spacerData),
+              });
+            }
+            break;
+            
+          case "image":
+            const imageData = {
+              src: (block as any).src || "",
+              altText: (block as any).altText || "",
+              caption: (block as any).caption || "",
+              order
+            };
+            
+            if (!block.id || block.id.startsWith('temp-')) {
+              console.log(`📝 Creating new image block: "${imageData.altText}"`);
+              savePromise = fetch(`/api/articles/${articleId}/blocks/images`, {
+                method: 'POST',
+                headers: getAuthHeaders(),
+                body: JSON.stringify(imageData),
+              });
+            } else {
+              console.log(`📝 Updating image block: "${imageData.altText}" (${block.id})`);
+              savePromise = fetch(`/api/articles/${articleId}/blocks/images/${block.id}`, {
+                method: 'PUT',
+                headers: getAuthHeaders(),
+                body: JSON.stringify(imageData),
+              });
+            }
+            break;
+            
+          case "key-takeaways":
+            const takeawaysData = {
+              title: (block as any).title || "",
+              items: (block as any).items || [],
+              order
+            };
+            
+            if (!block.id || block.id.startsWith('temp-')) {
+              console.log(`📝 Creating new key-takeaways block: "${takeawaysData.title}"`);
+              savePromise = fetch(`/api/articles/${articleId}/blocks/key-takeaways`, {
+                method: 'POST',
+                headers: getAuthHeaders(),
+                body: JSON.stringify(takeawaysData),
+              });
+            } else {
+              console.log(`📝 Updating key-takeaways block: "${takeawaysData.title}" (${block.id})`);
+              savePromise = fetch(`/api/articles/${articleId}/blocks/key-takeaways/${block.id}`, {
+                method: 'PUT',
+                headers: getAuthHeaders(),
+                body: JSON.stringify(takeawaysData),
+              });
+            }
+            break;
+            
+          case "reflection":
+            const reflectionData = {
+              heading: (block as any).heading || "",
+              content: (block as any).content || "",
+              prompt: (block as any).prompt || "",
+              order
+            };
+            
+            if (!block.id || block.id.startsWith('temp-')) {
+              console.log(`📝 Creating new reflection block: "${reflectionData.heading}"`);
+              savePromise = fetch(`/api/articles/${articleId}/blocks/reflections`, {
+                method: 'POST',
+                headers: getAuthHeaders(),
+                body: JSON.stringify(reflectionData),
+              });
+            } else {
+              console.log(`📝 Updating reflection block: "${reflectionData.heading}" (${block.id})`);
+              savePromise = fetch(`/api/articles/${articleId}/blocks/reflections/${block.id}`, {
+                method: 'PUT',
+                headers: getAuthHeaders(),
+                body: JSON.stringify(reflectionData),
+              });
+            }
+            break;
+            
+          case "link":
+            const linkData = {
+              title: (block as any).title || "",
+              url: (block as any).url || "",
+              description: (block as any).description || "",
+              order
+            };
+            
+            if (!block.id || block.id.startsWith('temp-')) {
+              console.log(`📝 Creating new link block: "${linkData.title}"`);
+              savePromise = fetch(`/api/articles/${articleId}/blocks/links`, {
+                method: 'POST',
+                headers: getAuthHeaders(),
+                body: JSON.stringify(linkData),
+              });
+            } else {
+              console.log(`📝 Updating link block: "${linkData.title}" (${block.id})`);
+              savePromise = fetch(`/api/articles/${articleId}/blocks/links/${block.id}`, {
+                method: 'PUT',
+                headers: getAuthHeaders(),
+                body: JSON.stringify(linkData),
+              });
+            }
+            break;
+        }
+        
+        // Add the save promise to the array
+        savePromises.push(
+          savePromise.then(async (response) => {
+            if (response.ok) {
+              const result = await response.json();
+              console.log(`✅ ${block.type} block saved successfully:`, result);
+              
+              // Update block ID if it was a newly created block
+              if (block.id.startsWith('temp-') && result.data?.id) {
+                setBlocks(prev => prev.map(b => b.id === block.id ? { ...b, id: result.data.id } : b));
+              }
+            } else {
+              console.error(`❌ Failed to save ${block.type} block:`, await response.text());
+            }
+          }).catch(error => {
+            console.error(`❌ Error saving ${block.type} block:`, error);
+          })
+        );
+      }
+      
+      console.log(`⏳ Waiting for ${savePromises.length} block saves to complete...`);
+      
+      // Wait for all blocks to save
+      const results = await Promise.allSettled(savePromises);
+      const successful = results.filter(r => r.status === 'fulfilled').length;
+      const failed = results.filter(r => r.status === 'rejected').length;
+      
+      console.log(`📊 Save results: ${successful} successful, ${failed} failed`);
+      
+      if (failed === 0) {
+        console.log('🎉 All blocks saved successfully to database!');
+        // Show success confirmation
+        setIsSaveConfirmOpen(true);
+        
+        // No need to refresh since blocks are already updated in real-time
+        // The setBlocks calls in save promises already updated the state
+      } else {
+        console.error(`❌ ${failed} blocks failed to save`);
+        alert(`${failed} blocks failed to save. Check console for details.`);
+      }
+      
     } catch (error) {
-      console.error('Error saving article:', error);
+      console.error('❌ Error in save process:', error);
       alert('Failed to save article content');
     } finally {
       setIsLoading(false);
@@ -649,7 +906,13 @@ export default function ArticleEditor({ articleId }: ArticleEditorProps) {
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent>
-          <DropdownMenuItem onClick={() => removeBlock(blockId, blockType)} className="text-destructive">
+          <DropdownMenuItem 
+            onClick={() => {
+              console.log('🗑️ Delete button clicked!', { blockId, blockType });
+              removeBlock(blockId, blockType);
+            }} 
+            className="text-destructive"
+          >
             Delete Block
           </DropdownMenuItem>
         </DropdownMenuContent>
@@ -669,7 +932,7 @@ export default function ArticleEditor({ articleId }: ArticleEditorProps) {
             <Button variant="outline" onClick={() => router.push("/admin/library")}>
               Cancel
             </Button>
-            <Button variant="outline" onClick={handlePreview} className="gap-2">
+            <Button variant="outline" onClick={() => router.push(`/admin/library/preview/${articleId}`)} className="gap-2">
               <Eye className="h-4 w-4" />
               Preview
             </Button>
@@ -697,6 +960,12 @@ export default function ArticleEditor({ articleId }: ArticleEditorProps) {
             className="relative group cursor-pointer bg-[#3c83f6] text-white"
             onClick={() => setIsEditingHeader(true)}
           >
+            {/* Debug overlay for header image */}
+            {/* {process.env.NODE_ENV === 'development' && headerImage && (
+              <div className="absolute top-0 left-0 bg-yellow-400 text-black text-xs p-1 z-50">
+                DEBUG: Header Image Set
+              </div>
+            )} */}
             <div 
               className="bg-gradient-to-br from-primary via-primary/90 to-primary/70 text-primary-foreground"
               style={headerImage ? { 
@@ -753,7 +1022,13 @@ export default function ArticleEditor({ articleId }: ArticleEditorProps) {
                   >
                     {headerImage ? (
                       <div className="relative">
-                        <img src={headerImage} alt="Header" className="w-full h-20 object-cover rounded" />
+                        <img 
+                          src={headerImage} 
+                          alt="Header" 
+                          className="w-full h-20 object-cover rounded" 
+                          onLoad={() => console.log('🖼️ Editor thumbnail loaded successfully')}
+                          onError={(e) => console.error('❌ Editor thumbnail failed to load:', e)}
+                        />
                         <Button 
                           variant="secondary" 
                           size="sm" 
@@ -824,16 +1099,16 @@ export default function ArticleEditor({ articleId }: ArticleEditorProps) {
                   {block.type === "section" && (
                     <div className="space-y-3">
                       {editingBlockId === block.id ? (
-                        <div className="space-y-3 p-4 border border-primary/30 rounded-lg bg-muted/30">
+                        <div className="space-y-3 p-4 border border-[#3c83f6] rounded-lg bg-muted/30">
                           <Input 
                             placeholder="Section Title"
-                            value={block.title}
+                            value={block.title || ""}
                             onChange={(e) => updateBlock(block.id, { title: e.target.value })}
-                            className="text-xl font-bold border-none bg-transparent p-0 h-auto text-primary focus-visible:ring-0"
+                            className="text-xl font-bold border-none bg-transparent p-0 h-auto text-[#3c83f6] focus-visible:ring-0"
                           />
                           <Textarea 
                             placeholder="Write paragraph content..."
-                            value={block.content}
+                            value={block.content || ""}
                             onChange={(e) => updateBlock(block.id, { content: e.target.value })}
                             className="border-none bg-transparent p-0 resize-none focus-visible:ring-0"
                             rows={4}
@@ -845,14 +1120,17 @@ export default function ArticleEditor({ articleId }: ArticleEditorProps) {
                       ) : (
                         <div 
                           className="cursor-pointer hover:bg-muted/30 rounded-lg p-2 -m-2 transition-colors"
-                          onClick={() => setEditingBlockId(block.id)}
+                          onClick={() => {
+                            console.log('✏️ Edit section block clicked!', { blockId: block.id, blockType: block.type });
+                            setEditingBlockId(block.id);
+                          }}
                         >
-                          <h2 className="text-2xl font-bold text-primary">
+                          <h2 className="text-2xl font-bold text-[#3c83f6]">
                             {typeof block.title === 'string' 
                               ? block.title 
                               : (block.title as any)?.text || (block.title as any)?.title || "Click to add section title..."}
                           </h2>
-                          <p className="text-foreground/80 leading-relaxed mt-2">
+                          <p className="text-[#0f1729cc] leading-relaxed mt-2">
                             {typeof block.content === 'string' 
                               ? block.content 
                               : (block.content as any)?.text || (block.content as any)?.title || "Click to add content..."}
@@ -869,17 +1147,17 @@ export default function ArticleEditor({ articleId }: ArticleEditorProps) {
                         <div className="space-y-3 p-4 border border-primary/30 rounded-lg bg-muted/30">
                           <Input 
                             placeholder="List Title (optional)"
-                            value={block.title}
+                            value={block.title || ""}
                             onChange={(e) => updateBlock(block.id, { title: e.target.value })}
-                            className="text-xl font-bold border-none bg-transparent p-0 h-auto text-primary focus-visible:ring-0"
+                            className="text-xl font-bold border-none bg-transparent p-0 h-auto text-[#3c83f6] focus-visible:ring-0"
                           />
                           <div className="space-y-2">
                             {block.items.map((item: string, i: number) => (
                               <div key={i} className="flex items-center gap-2">
-                                <span className="w-1.5 h-1.5 rounded-full bg-primary shrink-0" />
+                                <span className="w-1.5 h-1.5 rounded-full bg-[#3c83f6] shrink-0" />
                                 <Input 
                                   placeholder="Bullet point..."
-                                  value={item}
+                                  value={item || ""}
                                   onChange={(e) => updateBulletItem(block.id, i, e.target.value)}
                                   className="flex-1"
                                 />
@@ -907,14 +1185,14 @@ export default function ArticleEditor({ articleId }: ArticleEditorProps) {
                           onClick={() => setEditingBlockId(block.id)}
                         >
                           {block.title && (
-                            <h2 className="text-2xl font-bold text-primary mb-3">
+                            <h2 className="text-2xl font-bold text-[#3c83f6] mb-3">
                               {typeof block.title === 'string' ? block.title : (block.title as any)?.text || (block.title as any)?.title || ''}
                             </h2>
                           )}
                           <ul className="space-y-2 pl-4">
                             {block.items.filter(i => i).map((item, i) => (
                               <li key={i} className="flex items-start gap-3">
-                                <span className="w-1.5 h-1.5 rounded-full bg-primary mt-2 shrink-0" />
+                                <span className="w-1.5 h-1.5 rounded-full bg-[#3c83f6] mt-2 shrink-0" />
                                 <span className="text-foreground/80">{item}</span>
                               </li>
                             ))}
@@ -943,7 +1221,7 @@ export default function ArticleEditor({ articleId }: ArticleEditorProps) {
                                 <Label>Alt Text (optional)</Label>
                                 <Input 
                                   placeholder="Describe this image..."
-                                  value={block.altText}
+                                  value={block.altText || ""}
                                   onChange={(e) => updateBlock(block.id, { altText: e.target.value })}
                                 />
                               </div>
@@ -991,10 +1269,10 @@ export default function ArticleEditor({ articleId }: ArticleEditorProps) {
 
                   {/* Key Takeaways Block */}
                   {block.type === "key-takeaways" && (
-                    <Card className="border-primary/20 bg-primary/5">
+                    <Card className="border-[#cbdefa] bg-[#eff4fa]">
                       <CardContent className="p-6">
                         <div className="flex items-center gap-2 mb-4">
-                          <Star className="h-5 w-5 text-warning fill-warning" />
+                          <Star className="h-5 w-5 text-[#f59f0a] fill-[#f59f0a]" />
                           <h3 className="font-bold text-lg text-foreground">Key Takeaways</h3>
                         </div>
                         
@@ -1002,10 +1280,10 @@ export default function ArticleEditor({ articleId }: ArticleEditorProps) {
                           <div className="space-y-3">
                             {block.items.map((item, i) => (
                               <div key={i} className="flex items-center gap-2">
-                                <CheckCircle2 className="h-5 w-5 text-success shrink-0" />
+                                <CheckCircle2 className="h-5 w-5 text-[#21c45d] shrink-0" />
                                 <Input 
                                   placeholder="Key takeaway..."
-                                  value={item}
+                                  value={item || ""}
                                   onChange={(e) => updateBulletItem(block.id, i, e.target.value)}
                                   className="flex-1"
                                 />
@@ -1035,7 +1313,7 @@ export default function ArticleEditor({ articleId }: ArticleEditorProps) {
                           >
                             {block.items.filter(i => i).map((item, i) => (
                               <li key={i} className="flex items-start gap-3">
-                                <CheckCircle2 className="h-5 w-5 text-success shrink-0 mt-0.5" />
+                                <CheckCircle2 className="h-5 w-5 text-[#21c45d] shrink-0 mt-0.5" />
                                 <span className="text-foreground/80">{item}</span>
                               </li>
                             ))}
@@ -1059,33 +1337,34 @@ export default function ArticleEditor({ articleId }: ArticleEditorProps) {
 
                   {/* Reflection Block */}
                   {block.type === "reflection" && (
-                    <Card className="border-primary/20 bg-gradient-to-br from-primary/5 to-primary/10">
+                    <Card className="border-[#cbdefa] bg-[#eff4fa]">
                       <CardContent className="p-6">
                         <div className="flex items-center gap-2 mb-4">
-                          <Sparkles className="h-5 w-5 text-primary" />
+                          <Sparkles className="h-5 w-5 text-[#3c83f6]" />
                           <h3 className="font-bold text-lg text-foreground">Reflect & Think</h3>
                         </div>
                         
                         {editingBlockId === block.id ? (
                           <div className="space-y-4">
                             <div className="space-y-2">
-                              <Label className="text-sm text-muted-foreground">Reflection Heading (optional)</Label>
+                              <Label className="text-sm text-[#0f1729cc]">Reflection Heading (optional)</Label>
                               <Input 
                                 placeholder="e.g., Take a moment to reflect"
-                                value={block.heading}
+                                value={block.heading || ""}
                                 onChange={(e) => updateBlock(block.id, { heading: e.target.value })}
+                                className="mt-[10px] bg-white"
                               />
                             </div>
-                            <div className="space-y-2">
-                              <Label className="text-sm text-muted-foreground">Reflection Content</Label>
+                            <div>
+                              <Label className="text-sm text-[#0f1729cc]">Reflection Content</Label>
                               <Textarea 
                                 placeholder="Write guidance for learner to internalize key ideas, summarize learnings, or reflect calmly..."
-                                value={block.content}
+                                value={block.content || ""}
                                 onChange={(e) => updateBlock(block.id, { content: e.target.value })}
                                 rows={5}
-                                className="resize-none"
+                                className="resize-none mt-[10px] focus:outline-none focus:ring-2 focus:ring-[#3c83f6] focus:ring-offset-2 mb-[10px] bg-white"
                               />
-                              <p className="text-xs text-muted-foreground">Tip: Bullet points and soft emojis are allowed</p>
+                              <p className="text-xs text-[#0f1729cc]">Tip: Bullet points and soft emojis are allowed</p>
                             </div>
                             <Button variant="ghost" size="sm" onClick={() => setEditingBlockId(null)}>
                               Done Editing
@@ -1119,7 +1398,7 @@ export default function ArticleEditor({ articleId }: ArticleEditorProps) {
                             <Label className="text-sm text-muted-foreground">Link Title</Label>
                             <Input 
                               placeholder="e.g., Learn more about anxiety"
-                              value={block.title}
+                              value={block.title || ""}
                               onChange={(e) => updateBlock(block.id, { title: e.target.value })}
                             />
                           </div>
@@ -1127,7 +1406,7 @@ export default function ArticleEditor({ articleId }: ArticleEditorProps) {
                             <Label className="text-sm text-muted-foreground">URL</Label>
                             <Input 
                               placeholder="https://example.com"
-                              value={block.url}
+                              value={block.url || ""}
                               onChange={(e) => updateBlock(block.id, { url: e.target.value })}
                               type="url"
                             />
@@ -1136,7 +1415,7 @@ export default function ArticleEditor({ articleId }: ArticleEditorProps) {
                             <Label className="text-sm text-muted-foreground">Description (optional)</Label>
                             <Input 
                               placeholder="Brief description of link..."
-                              value={block.description}
+                              value={block.description || ""}
                               onChange={(e) => updateBlock(block.id, { description: e.target.value })}
                             />
                           </div>
@@ -1235,7 +1514,7 @@ export default function ArticleEditor({ articleId }: ArticleEditorProps) {
                   <p className="text-sm text-muted-foreground mb-4">Your feedback helps us improve</p>
                   <div className="flex justify-center gap-2 mb-4">
                     {[1, 2, 3, 4, 5].map((star) => (
-                      <Star key={star} className="h-8 w-8 text-muted-foreground/30" />
+                      <Star key={star} className="h-8 w-8 text-gray-500/30" />
                     ))}
                   </div>
                   <Badge variant="outline" className="text-xs">
@@ -1249,7 +1528,7 @@ export default function ArticleEditor({ articleId }: ArticleEditorProps) {
           {/* ===== COMPLETE LESSON CTA (Fixed) ===== */}
           <div className="bg-background px-6 pb-12">
             <div className="max-w-3xl mx-auto text-center">
-              <Button size="lg" className="min-w-64" disabled>
+              <Button size="lg" className="min-w-64 bg-[#3c83f6] text-white" disabled>
                 Complete Lesson
               </Button>
               <p className="text-xs text-muted-foreground mt-2">
@@ -1282,4 +1561,8 @@ export default function ArticleEditor({ articleId }: ArticleEditorProps) {
       )}
     </div>
   );
+  } catch (error) {
+    console.error('❌ Component error:', error);
+    return <div>Error loading editor: {error instanceof Error ? error.message : 'Unknown error'}</div>;
+  }
 }

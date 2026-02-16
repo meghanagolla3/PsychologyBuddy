@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Plus, Edit, Eye, Trash2, FileText, Upload, Clock, BookOpen, X, Check, ChevronDown, MoreVertical, Search } from 'lucide-react';
+import { Plus, Edit, Eye, Trash2, FileText, Upload, Clock, BookOpen, X, Check, ChevronDown, MoreVertical, Search, CheckCircle2, Edit2 } from 'lucide-react';
 import {
   Table,
   TableBody,
@@ -48,6 +48,7 @@ import { Badge } from '@/components/ui/badge';
 // import { Textarea } from '@/components/ui/textarea';
 import { cn } from '@/lib/utils';
 import { AdminHeader } from '../../admin/layout/AdminHeader';
+import { getAuthHeaders } from '@/src/utils/session.util';
 
 interface Article {
   id: string;
@@ -157,11 +158,17 @@ export function ArticleList() {
   const [articleGoals, setArticleGoals] = useState<string[]>([]);
 
   const fetchArticles = useCallback(async () => {
-    if (loading || !mountedRef.current) return; // Prevent duplicate calls and calls on unmounted component
+    if (!mountedRef.current) return; // Only prevent calls on unmounted component
     
     try {
       const response = await fetch('/api/articles');
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
       const data = await response.json();
+      
       if (data.success && mountedRef.current) {
         setArticles(data.data);
       } else if (!data.success) {
@@ -176,7 +183,7 @@ export function ArticleList() {
         setLoading(false);
       }
     }
-  }, [loading]);
+  }, []);
 
   const fetchLabels = useCallback(async () => {
     if (!mountedRef.current) return;
@@ -288,6 +295,7 @@ export function ArticleList() {
         },
         body: JSON.stringify({
           ...articleForm,
+          thumbnailUrl: articleForm.thumbnail, // Map thumbnail to thumbnailUrl for database
           readTime: parseInt(articleForm.readTime) || null,
           categoryIds: articleForm.category && categories.find(c => c.id === articleForm.category) ? [articleForm.category] : [],
           moodIds: articleForm.supportedMoods.map((moodName) => {
@@ -300,6 +308,9 @@ export function ArticleList() {
           status: articleForm.status.toUpperCase(), // Convert to uppercase for backend
         }),
       });
+
+      console.log('🖼️ Creating article with thumbnailUrl:', articleForm.thumbnail ? articleForm.thumbnail.substring(0, 100) + '...' : 'null');
+      console.log('🖼️ Thumbnail length:', articleForm.thumbnail ? articleForm.thumbnail.length : 0);
 
       const data = await response.json();
 
@@ -335,6 +346,38 @@ export function ArticleList() {
   const handleDelete = (article: Article) => {
     setSelectedArticle(article);
     setIsDeleteOpen(true);
+  };
+
+  const handleToggleStatus = async (article: Article) => {
+    try {
+      const newStatus = article.status === 'PUBLISHED' ? 'DRAFT' : 'PUBLISHED';
+      
+      const response = await fetch(`/api/articles/${article.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          ...getAuthHeaders()
+        },
+        body: JSON.stringify({
+          status: newStatus
+        })
+      });
+
+      if (response.ok) {
+        // Update the local state to reflect the change
+        setArticles(prevArticles => 
+          prevArticles.map(a => 
+            a.id === article.id 
+              ? { ...a, status: newStatus }
+              : a
+          )
+        );
+      } else {
+        console.error('Failed to update article status');
+      }
+    } catch (error) {
+      console.error('Error updating article status:', error);
+    }
   };
 
   const handleDeleteConfirm = async () => {
@@ -514,7 +557,7 @@ export function ArticleList() {
                         }
                       </Badge>
                     </TableCell>
-                    <TableCell className="text-muted-foreground">{article.author}</TableCell>
+                    <TableCell className="text-[#65758b]">{article.author}</TableCell>
                     <TableCell>
                       <Badge 
                         variant="secondary"
@@ -528,10 +571,10 @@ export function ArticleList() {
                         {article.status}
                       </Badge>
                     </TableCell>
-                    <TableCell className="text-right text-muted-foreground">
+                    <TableCell className="text-right text-[#65758b]">
                       {article._count?.categories || 0}
                     </TableCell>
-                    <TableCell className="text-muted-foreground">
+                    <TableCell className="text-[#65758b]">
                       {new Date(article.updatedAt).toLocaleDateString('en-CA', {
                         year: 'numeric',
                         month: '2-digit',
@@ -541,13 +584,13 @@ export function ArticleList() {
                     <TableCell>
                       <DropdownMenu >
                         <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="icon" className="h-8 w-8 focus:ring-2 focus:ring-[#3c83f6] hover:bg-gray-200">
+                          <Button variant="ghost" size="icon" className="h-8 w-8 focus:ring-2 focus:ring-[#3c83f6] hover:bg-gray-400">
                             <MoreVertical className="h-4 w-4  " />
                           </Button>
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className='bg-white '>
+                        <DropdownMenuContent align="end" className='bg-white'>
                           <DropdownMenuItem 
-                            className="gap-2"
+                            className="gap-2 hover:bg-gray-200"
                             onClick={() => {
                               router.push(`/admin/library/preview/${article.id}`);
                             }}
@@ -555,7 +598,7 @@ export function ArticleList() {
                             <Eye className="h-4 w-4" /> Preview
                           </DropdownMenuItem>
                           <DropdownMenuItem 
-                            className="gap-2"
+                            className="gap-2 hover:bg-gray-200"
                             onClick={() => {
                               console.log('Edit Content clicked for article:', article.id, article);
                               router.push(`/admin/library/editor/${article.id}`);
@@ -564,7 +607,23 @@ export function ArticleList() {
                             <Edit className="h-4 w-4" /> Edit Content
                           </DropdownMenuItem>
                           <DropdownMenuItem 
-                            className="gap-2 text-destructive focus:text-destructive"
+                            className="gap-2 hover:bg-gray-200"
+                            onClick={() => handleToggleStatus(article)}
+                          >
+                            {article.status === 'PUBLISHED' ? (
+                              <>
+                                <CheckCircle2 className="h-4 w-4 text-green-600" /> 
+                                <span className="text-green-600">Published</span>
+                              </>
+                            ) : (
+                              <>
+                                <Edit2 className="h-4 w-4 text-gray-600" /> 
+                                <span className="text-gray-600">Publish</span>
+                              </>
+                            )}
+                          </DropdownMenuItem>
+                          <DropdownMenuItem 
+                            className="gap-2 text-red-600 focus:text-destructive hover:bg-gray-200"
                             onClick={() => handleDelete(article)}
                           >
                             <Trash2 className="h-4 w-4" /> Delete

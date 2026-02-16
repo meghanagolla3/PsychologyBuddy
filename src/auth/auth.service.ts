@@ -1,6 +1,6 @@
 import { AuthRepository } from './auth.repository';
 import { PasswordUtil } from '@/src/utils/password.util';
-import { SessionUtil } from '@/src/utils/session.util';
+import { SessionUtil } from '@/src/utils/session-server.util';
 import { ApiResponse } from '@/src/utils/api-response';
 import { AuthError } from '@/src/utils/errors';
 

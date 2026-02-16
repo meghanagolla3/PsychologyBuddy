@@ -1,37 +1,47 @@
-import prisma from '@/src/prisma';
+import { PrismaClient } from '@/src/generated/prisma/client';
+import {
+  CreateMusicResourceInput,
+  UpdateMusicResourceInput,
+  CreateMusicCategoryInput,
+  UpdateMusicCategoryInput,
+  CreateMusicGoalInput,
+  UpdateMusicGoalInput,
+  CreateMusicInstructionInput,
+  UpdateMusicInstructionInput,
+} from "./music.validators";
 
 export class MusicRepository {
-  // Music Resources (MusicResource - new dedicated model)
-  static async createMusicResource(data: {
-    title: string;
-    description?: string;
-    url: string;
-    duration?: number;
-    artist?: string;
-    album?: string;
-    coverImage?: string;
-    isPublic?: boolean;
-    schoolId?: string;
-    status?: string;
-    categoryIds?: string[];
-    goalIds?: string[];
-  }) {
-    const { categoryIds = [], goalIds = [], ...resourceData } = data;
-    
-    return await prisma.musicResource.create({
-      data: {
-        ...resourceData,
-        categories: categoryIds.length > 0 ? {
-          create: categoryIds.map(categoryId => ({
-            categoryId,
-          }))
-        } : undefined,
-        goals: goalIds.length > 0 ? {
-          create: goalIds.map(goalId => ({
-            goalId,
-          }))
-        } : undefined,
-      },
+  constructor(private prisma: PrismaClient) {}
+
+  // ====================================
+  //        MUSIC RESOURCE OPERATIONS
+  // ====================================
+
+  async createMusicResource(data: CreateMusicResourceInput & { schoolId?: string }) {
+    const { categoryIds, goalIds, schoolId, ...resourceData } = data;
+
+    // Only include schoolId if it's a valid UUID (not placeholder)
+    const createData: any = {
+      ...resourceData,
+      categories: categoryIds ? {
+        create: categoryIds.map(categoryId => ({
+          categoryId,
+        })),
+      } : undefined,
+      goals: goalIds ? {
+        create: goalIds.map(goalId => ({
+          goalId,
+        })),
+      } : undefined,
+    };
+
+    // Only add schoolId if it's provided and not a placeholder
+    if (schoolId && schoolId !== "school_id") {
+      createData.schoolId = schoolId;
+    }
+
+    const resource = await this.prisma.musicResource.create({
+      data: createData,
       include: {
         categories: {
           include: {
@@ -46,38 +56,29 @@ export class MusicRepository {
         school: true,
       },
     });
+
+    return resource;
   }
 
-  static async getMusicResource(id: string) {
-    return await prisma.musicResource.findUnique({
-      where: { id },
-      include: {
-        categories: {
-          include: {
-            category: true,
-          },
-        },
-        goals: {
-          include: {
-            goal: true,
-          },
-        },
-        school: true,
-      },
-    });
-  }
-
-  static async getMusicResources(filters: {
+  async getMusicResources(filters: {
     category?: string;
     goal?: string;
     status?: string;
-    page?: number;
-    limit?: number;
+    page: number;
+    limit: number;
+    schoolId?: string;
   }) {
-    const { category, goal, status = 'PUBLISHED', page = 1, limit = 20 } = filters;
+    const { category, goal, status, page, limit, schoolId } = filters;
     const skip = (page - 1) * limit;
 
-    const where: any = { status };
+    const where: any = {
+      ...(status && { status }),
+    };
+
+    // Only add schoolId filter if it's provided and not a placeholder
+    if (schoolId && schoolId !== "school_id") {
+      where.schoolId = schoolId;
+    }
 
     if (category) {
       where.categories = {
@@ -85,7 +86,7 @@ export class MusicRepository {
           category: {
             name: {
               contains: category,
-              mode: 'insensitive',
+              mode: "insensitive" as const,
             },
           },
         },
@@ -98,7 +99,7 @@ export class MusicRepository {
           goal: {
             name: {
               contains: goal,
-              mode: 'insensitive',
+              mode: "insensitive" as const,
             },
           },
         },
@@ -106,7 +107,7 @@ export class MusicRepository {
     }
 
     const [resources, total] = await Promise.all([
-      prisma.musicResource.findMany({
+      this.prisma.musicResource.findMany({
         where,
         include: {
           categories: {
@@ -121,11 +122,13 @@ export class MusicRepository {
           },
           school: true,
         },
-        orderBy: { createdAt: 'desc' },
+        orderBy: {
+          createdAt: "desc",
+        },
         skip,
         take: limit,
       }),
-      prisma.musicResource.count({ where }),
+      this.prisma.musicResource.count({ where }),
     ]);
 
     return {
@@ -139,36 +142,55 @@ export class MusicRepository {
     };
   }
 
-  static async updateMusicResource(id: string, data: Partial<{
-    title: string;
-    description?: string;
-    url: string;
-    duration?: number;
-    artist?: string;
-    album?: string;
-    coverImage?: string;
-    isPublic?: boolean;
-    status?: string;
-    categoryIds?: string[];
-    goalIds?: string[];
-  }>) {
+  async getMusicResourceById(id: string) {
+    return await this.prisma.musicResource.findUnique({
+      where: { id },
+      include: {
+        categories: {
+          include: {
+            category: true,
+          },
+        },
+        goals: {
+          include: {
+            goal: true,
+          },
+        },
+        school: true,
+      },
+    });
+  }
+
+  async updateMusicResource(id: string, data: UpdateMusicResourceInput & { schoolId?: string }) {
     const { categoryIds, goalIds, ...updateData } = data;
-    
-    return await prisma.musicResource.update({
+
+    // Handle category updates
+    if (categoryIds !== undefined) {
+      await this.prisma.MusicResourceCategory.deleteMany({
+        where: { musicResourceId: id },
+      });
+    }
+
+    // Handle goal updates
+    if (goalIds !== undefined) {
+      await this.prisma.musicResourceGoal.deleteMany({
+        where: { musicResourceId: id },
+      });
+    }
+
+    return await this.prisma.musicResource.update({
       where: { id },
       data: {
         ...updateData,
         categories: categoryIds ? {
-          deleteMany: {},
           create: categoryIds.map(categoryId => ({
             categoryId,
-          }))
+          })),
         } : undefined,
         goals: goalIds ? {
-          deleteMany: {},
           create: goalIds.map(goalId => ({
             goalId,
-          }))
+          })),
         } : undefined,
       },
       include: {
@@ -187,76 +209,335 @@ export class MusicRepository {
     });
   }
 
-  static async deleteMusicResource(id: string) {
-    return await prisma.musicResource.delete({
+  async deleteMusicResource(id: string) {
+    return await this.prisma.musicResource.delete({
       where: { id },
     });
   }
 
-  // Categories (MusicCategory - new dedicated model)
-  static async createCategory(name: string, status: string = 'ACTIVE') {
-    return await prisma.musicCategory.create({
-      data: { name, status },
+  // ====================================
+  //        MUSIC CATEGORY OPERATIONS
+  // ====================================
+
+  async createMusicCategory(data: CreateMusicCategoryInput) {
+    return await this.prisma.musicCategory.create({
+      data,
     });
   }
 
-  static async getCategories() {
-    return await prisma.musicCategory.findMany({
-      where: { status: 'ACTIVE' },
-      orderBy: { name: 'asc' },
+  async getMusicCategories(filters: { status?: string } = {}) {
+    const { status } = filters;
+
+    return await this.prisma.musicCategory.findMany({
+      where: {
+        ...(status && { status }),
+      },
+      orderBy: {
+        name: "asc",
+      },
+    });
+  }
+
+  async getMusicCategoryById(id: string) {
+    return await this.prisma.musicCategory.findUnique({
+      where: { id },
       include: {
-        _count: {
-          select: {
-            resources: true,
+        musicResources: {
+          include: {
+            musicResource: true,
           },
         },
       },
     });
   }
 
-  static async updateCategory(id: string, data: { name?: string; status?: string }) {
-    return await prisma.musicCategory.update({
+  async updateMusicCategory(id: string, data: UpdateMusicCategoryInput) {
+    return await this.prisma.musicCategory.update({
       where: { id },
       data,
     });
   }
 
-  static async deleteCategory(id: string) {
-    return await prisma.musicCategory.delete({
+  async deleteMusicCategory(id: string) {
+    return await this.prisma.musicCategory.delete({
       where: { id },
     });
   }
 
-  // Goals (MusicGoal - new dedicated model)
-  static async createGoal(name: string) {
-    return await prisma.musicGoal.create({
-      data: { name },
+  // ====================================
+  //           MUSIC GOAL OPERATIONS
+  // ====================================
+
+  async createMusicGoal(data: CreateMusicGoalInput) {
+    return await this.prisma.musicGoal.create({
+      data,
     });
   }
 
-  static async getGoals() {
-    return await prisma.musicGoal.findMany({
-      orderBy: { name: 'asc' },
+  async getMusicGoals(filters: { status?: string } = {}) {
+    const { status } = filters;
+
+    return await this.prisma.musicGoal.findMany({
+      where: {
+        ...(status && { status }),
+      },
+      orderBy: {
+        name: "asc",
+      },
+    });
+  }
+
+  async getMusicGoalById(id: string) {
+    return await this.prisma.musicGoal.findUnique({
+      where: { id },
       include: {
-        _count: {
-          select: {
-            resources: true,
+        musicResources: {
+          include: {
+            musicResource: true,
           },
         },
       },
     });
   }
 
-  static async updateGoal(id: string, data: { name?: string }) {
-    return await prisma.musicGoal.update({
+  async updateMusicGoal(id: string, data: UpdateMusicGoalInput) {
+    return await this.prisma.musicGoal.update({
       where: { id },
       data,
     });
   }
 
-  static async deleteGoal(id: string) {
-    return await prisma.musicGoal.delete({
+  async deleteMusicGoal(id: string) {
+    return await this.prisma.musicGoal.delete({
       where: { id },
+    });
+  }
+
+  // ====================================
+  //      MUSIC INSTRUCTION OPERATIONS
+  // ====================================
+
+  async createMusicInstruction(data: CreateMusicInstructionInput & { schoolId?: string }) {
+    return await this.prisma.meditationListeningInstruction.create({
+      data,
+      include: {
+        creator: true,
+        school: true,
+      },
+    });
+  }
+
+  async getMusicInstructions(filters: {
+    difficulty?: string;
+    status?: string;
+    page: number;
+    limit: number;
+    schoolId?: string;
+  }) {
+    const { difficulty, status, page, limit, schoolId } = filters;
+    const skip = (page - 1) * limit;
+
+    const where: any = {
+      ...(schoolId && { schoolId }),
+      ...(status && { status }),
+    };
+
+    if (difficulty) {
+      where.difficulty = difficulty;
+    }
+
+    const [instructions, total] = await Promise.all([
+      this.prisma.meditationListeningInstruction.findMany({
+        where,
+        include: {
+          creator: true,
+          school: true,
+        },
+        orderBy: {
+          createdAt: "desc",
+        },
+        skip,
+        take: limit,
+      }),
+      this.prisma.meditationListeningInstruction.count({ where }),
+    ]);
+
+    return {
+      instructions,
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit),
+      },
+    };
+  }
+
+  async getMusicInstructionById(id: string) {
+    return await this.prisma.meditationListeningInstruction.findUnique({
+      where: { id },
+      include: {
+        creator: true,
+        school: true,
+      },
+    });
+  }
+
+  async updateMusicInstruction(id: string, data: UpdateMusicInstructionInput) {
+    return await this.prisma.meditationListeningInstruction.update({
+      where: { id },
+      data,
+      include: {
+        creator: true,
+        school: true,
+      },
+    });
+  }
+
+  async deleteMusicInstruction(id: string) {
+    return await this.prisma.meditationListeningInstruction.delete({
+      where: { id },
+    });
+  }
+
+  async getInstructionsByResource(resourceId: string, filters: {
+    status?: string;
+    page?: number;
+    limit?: number;
+  } = {}) {
+    const { status = "PUBLISHED", page = 1, limit = 20 } = filters;
+    const skip = (page - 1) * limit;
+
+    const where: any = {
+      resourceId,
+      status,
+    };
+
+    const [instructions, total] = await Promise.all([
+      this.prisma.meditationListeningInstruction.findMany({
+        where,
+        include: {
+          creator: true,
+          school: true,
+        },
+        orderBy: {
+          createdAt: "desc",
+        },
+        skip,
+        take: limit,
+      }),
+      this.prisma.meditationListeningInstruction.count({ where }),
+    ]);
+
+    return {
+      instructions,
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit),
+      },
+    };
+  }
+
+  // ====================================
+  //           STUDENT ACCESS METHODS
+  // ====================================
+
+  async getPublishedMusicResources(filters: {
+    category?: string;
+    goal?: string;
+    page: number;
+    limit: number;
+    schoolId?: string;
+  }) {
+    return this.getMusicResources({
+      ...filters,
+      status: "PUBLISHED",
+    });
+  }
+
+  async getPublishedMusicResourceById(id: string) {
+    return await this.prisma.musicResource.findFirst({
+      where: {
+        id,
+        status: "PUBLISHED",
+      },
+      include: {
+        categories: {
+          include: {
+            category: true,
+          },
+        },
+        goals: {
+          include: {
+            goal: true,
+          },
+        },
+        school: true,
+      },
+    });
+  }
+
+  async getFeaturedMusic(limit: number = 10, schoolId?: string) {
+    return await this.prisma.musicResource.findMany({
+      where: {
+        status: "PUBLISHED",
+        ...(schoolId && { schoolId }),
+        isPublic: true,
+      },
+      include: {
+        categories: {
+          include: {
+            category: true,
+          },
+        },
+        goals: {
+          include: {
+            goal: true,
+          },
+        },
+        school: true,
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+      take: limit,
+    });
+  }
+
+  async getPublishedMusicInstructions(filters: {
+    difficulty?: string;
+    page: number;
+    limit: number;
+    schoolId?: string;
+  }) {
+    return this.getMusicInstructions({
+      ...filters,
+      status: "PUBLISHED",
+    });
+  }
+
+  async getPublishedMusicInstructionById(id: string) {
+    return await this.prisma.meditationListeningInstruction.findFirst({
+      where: {
+        id,
+        status: "PUBLISHED",
+      },
+      include: {
+        creator: true,
+        school: true,
+      },
+    });
+  }
+
+  async getPublishedInstructionsByResource(resourceId: string, filters: {
+    page?: number;
+    limit?: number;
+  } = {}) {
+    return this.getInstructionsByResource(resourceId, {
+      ...filters,
+      status: "PUBLISHED",
     });
   }
 }

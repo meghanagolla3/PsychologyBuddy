@@ -1,4 +1,4 @@
-import { prisma } from './prisma';
+import prisma from '@/src/prisma';
 import { AuthError } from '@/src/utils/errors';
 
 export interface CreateBlockData {

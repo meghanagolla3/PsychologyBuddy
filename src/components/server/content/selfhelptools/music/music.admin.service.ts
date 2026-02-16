@@ -1,362 +1,595 @@
-import { MusicRepository } from './music.repository';
-import { AuthRepository } from '@/src/auth/auth.repository';
-import { AuthError } from '@/src/utils/errors';
-import type {
+import { MusicRepository } from "./music.repository";
+import prisma from "@/src/prisma";
+import {
   CreateMusicResourceInput,
   UpdateMusicResourceInput,
-  DeleteMusicResourceInput,
-  CreateCategoryInput,
-  UpdateCategoryInput,
-  DeleteCategoryInput,
-  CreateGoalInput,
-  UpdateGoalInput,
-  DeleteGoalInput,
-} from './music.validators';
+  GetMusicResourcesInput,
+  GetSingleMusicResourceInput,
+  CreateMusicCategoryInput,
+  UpdateMusicCategoryInput,
+  GetMusicCategoriesInput,
+  GetSingleMusicCategoryInput,
+  CreateMusicGoalInput,
+  UpdateMusicGoalInput,
+  GetMusicGoalsInput,
+  GetSingleMusicGoalInput,
+  CreateMusicInstructionInput,
+  UpdateMusicInstructionInput,
+  GetMusicInstructionsInput,
+  GetSingleMusicInstructionInput,
+  GetInstructionsByResourceInput,
+} from "./music.validators";
 
 export class MusicAdminService {
-  // Verify admin scope
-  private static async verifyAdminScope(userId: string) {
-    const admin = await AuthRepository.findUserById(userId);
-    if (!admin || !['ADMIN', 'SUPER_ADMIN'].includes(admin.role.name)) {
-      throw new AuthError('Access denied. Admin role required.', 403);
-    }
-    return admin;
+  private musicRepository: MusicRepository;
+
+  constructor() {
+    this.musicRepository = new MusicRepository(prisma);
   }
 
-  // Music Resource Management
-  static async createMusicResource(userId: string, data: CreateMusicResourceInput) {
+  // ====================================
+  //        MUSIC RESOURCE MANAGEMENT
+  // ====================================
+
+  async createMusicResource(data: CreateMusicResourceInput & { schoolId?: string }) {
     try {
-      const admin = await this.verifyAdminScope(userId);
-
-      const resource = await MusicRepository.createMusicResource({
-        ...data,
-        // createdBy: userId, // This will be handled differently since we're using the new model
-      });
-
+      const resource = await this.musicRepository.createMusicResource(data);
+      
       return {
         success: true,
-        message: 'Music resource created successfully',
+        message: "Music resource created successfully",
         data: resource,
       };
     } catch (error) {
-      console.error('Create music resource error:', {
-        error: error instanceof Error ? error.message : error,
-        stack: error instanceof Error ? error.stack : undefined,
-        userId,
-        data
-      });
-      
-      if (error instanceof AuthError) {
-        throw error;
-      }
-      
-      throw new AuthError('Failed to create music resource', 500);
-    }
-  }
-
-  static async getMusicResource(id: string) {
-    try {
-      const resource = await MusicRepository.getMusicResource(id);
-      
-      if (!resource) {
-        throw new AuthError('Music resource not found', 404);
-      }
-
+      console.error("Error creating music resource:", error);
       return {
-        success: true,
-        message: 'Music resource retrieved successfully',
-        data: resource,
+        success: false,
+        message: "Failed to create music resource",
+        error: error instanceof Error ? error.message : "Unknown error",
       };
-    } catch (error) {
-      console.error('Get music resource error:', error);
-      throw new AuthError('Failed to retrieve music resource', 500);
     }
   }
 
-  static async getMusicResources(filters: {
-    category?: string;
-    mood?: string;
-    goal?: string;
-    status?: 'DRAFT' | 'PUBLISHED';
-    page?: number;
-    limit?: number;
-  }) {
+  async getMusicResources(data: GetMusicResourcesInput & { schoolId?: string }) {
     try {
-      const result = await MusicRepository.getMusicResources(filters);
-
+      const result = await this.musicRepository.getMusicResources(data);
+      
       return {
         success: true,
-        message: 'Music resources retrieved successfully',
+        message: "Music resources retrieved successfully",
         data: result,
       };
     } catch (error) {
-      console.error('Get music resources error:', error);
-      throw new AuthError('Failed to retrieve music resources', 500);
+      console.error("Error getting music resources:", error);
+      return {
+        success: false,
+        message: "Failed to retrieve music resources",
+        error: error instanceof Error ? error.message : "Unknown error",
+      };
     }
   }
 
-  static async updateMusicResource(userId: string, id: string, data: UpdateMusicResourceInput) {
+  async getMusicResourceById(data: GetSingleMusicResourceInput) {
     try {
-      await this.verifyAdminScope(userId);
-
-      // Check if resource exists
-      const existing = await MusicRepository.getMusicResource(id);
-      if (!existing) {
-        throw new AuthError('Music resource not found', 404);
+      const resource = await this.musicRepository.getMusicResourceById(data.id);
+      
+      if (!resource) {
+        return {
+          success: false,
+          message: "Music resource not found",
+        };
       }
-
-      const resource = await MusicRepository.updateMusicResource(id, data);
 
       return {
         success: true,
-        message: 'Music resource updated successfully',
+        message: "Music resource retrieved successfully",
         data: resource,
       };
     } catch (error) {
-      console.error('Update music resource error:', {
-        error: error instanceof Error ? error.message : error,
-        stack: error instanceof Error ? error.stack : undefined,
-        userId,
-        id,
-        data
-      });
-      
-      if (error instanceof AuthError) {
-        throw error;
-      }
-      
-      throw new AuthError('Failed to update music resource', 500);
+      console.error("Error getting music resource:", error);
+      return {
+        success: false,
+        message: "Failed to retrieve music resource",
+        error: error instanceof Error ? error.message : "Unknown error",
+      };
     }
   }
 
-  static async deleteMusicResource(userId: string, id: string) {
+  async updateMusicResource(data: UpdateMusicResourceInput & { id: string; schoolId?: string }) {
     try {
-      await this.verifyAdminScope(userId);
-
-      // Check if resource exists
-      const existing = await MusicRepository.getMusicResource(id);
-      if (!existing) {
-        throw new AuthError('Music resource not found', 404);
+      const existingResource = await this.musicRepository.getMusicResourceById(data.id);
+      
+      if (!existingResource) {
+        return {
+          success: false,
+          message: "Music resource not found",
+        };
       }
 
-      await MusicRepository.deleteMusicResource(id);
-
+      const { id, schoolId, ...updateData } = data;
+      const updatedResource = await this.musicRepository.updateMusicResource(id, { ...updateData, schoolId });
+      
       return {
         success: true,
-        message: 'Music resource deleted successfully',
-        data: null,
+        message: "Music resource updated successfully",
+        data: updatedResource,
       };
     } catch (error) {
-      console.error('Delete music resource error:', {
-        error: error instanceof Error ? error.message : error,
-        stack: error instanceof Error ? error.stack : undefined,
-        userId,
-        id
-      });
-      
-      if (error instanceof AuthError) {
-        throw error;
-      }
-      
-      throw new AuthError('Failed to delete music resource', 500);
+      console.error("Error updating music resource:", error);
+      return {
+        success: false,
+        message: "Failed to update music resource",
+        error: error instanceof Error ? error.message : "Unknown error",
+      };
     }
   }
 
-  // Categories Management
-  static async createCategory(userId: string, data: CreateCategoryInput) {
+  async deleteMusicResource(data: GetSingleMusicResourceInput) {
     try {
-      const admin = await this.verifyAdminScope(userId);
+      const existingResource = await this.musicRepository.getMusicResourceById(data.id);
+      
+      if (!existingResource) {
+        return {
+          success: false,
+          message: "Music resource not found",
+        };
+      }
 
-      const category = await MusicRepository.createCategory(data.name, data.status);
-
+      await this.musicRepository.deleteMusicResource(data.id);
+      
       return {
         success: true,
-        message: 'Category created successfully',
+        message: "Music resource deleted successfully",
+      };
+    } catch (error) {
+      console.error("Error deleting music resource:", error);
+      return {
+        success: false,
+        message: "Failed to delete music resource",
+        error: error instanceof Error ? error.message : "Unknown error",
+      };
+    }
+  }
+
+  // ====================================
+  //        MUSIC CATEGORY MANAGEMENT
+  // ====================================
+
+  async createMusicCategory(data: CreateMusicCategoryInput) {
+    try {
+      const category = await this.musicRepository.createMusicCategory(data);
+      
+      return {
+        success: true,
+        message: "Music category created successfully",
         data: category,
       };
     } catch (error) {
-      console.error('Create category error:', {
-        error: error instanceof Error ? error.message : error,
-        stack: error instanceof Error ? error.stack : undefined,
-        userId,
-        data
-      });
+      console.error("Error creating music category:", error);
       
-      if (error instanceof AuthError) {
-        throw error;
+      if (error instanceof Error && error.message.includes("Unique constraint")) {
+        return {
+          success: false,
+          message: "Category name already exists",
+        };
       }
-      
-      // Preserve the original error message
-      const errorMessage = error instanceof Error ? error.message : 'Failed to create category';
-      throw new AuthError(errorMessage, 500);
+
+      return {
+        success: false,
+        message: "Failed to create music category",
+        error: error instanceof Error ? error.message : "Unknown error",
+      };
     }
   }
 
-  static async getCategories() {
+  async getMusicCategories(data: GetMusicCategoriesInput = {}) {
     try {
-      const categories = await MusicRepository.getCategories();
-
+      const categories = await this.musicRepository.getMusicCategories(data);
+      
       return {
         success: true,
-        message: 'Categories retrieved successfully',
+        message: "Music categories retrieved successfully",
         data: categories,
       };
     } catch (error) {
-      console.error('Get categories error:', error);
-      throw new AuthError('Failed to retrieve categories', 500);
+      console.error("Error getting music categories:", error);
+      return {
+        success: false,
+        message: "Failed to retrieve music categories",
+        error: error instanceof Error ? error.message : "Unknown error",
+      };
     }
   }
 
-  static async updateCategory(userId: string, id: string, data: UpdateCategoryInput) {
+  async getMusicCategoryById(data: GetSingleMusicCategoryInput) {
     try {
-      await this.verifyAdminScope(userId);
-
-      const category = await MusicRepository.updateCategory(id, data);
+      const category = await this.musicRepository.getMusicCategoryById(data.id);
+      
+      if (!category) {
+        return {
+          success: false,
+          message: "Music category not found",
+        };
+      }
 
       return {
         success: true,
-        message: 'Category updated successfully',
+        message: "Music category retrieved successfully",
         data: category,
       };
     } catch (error) {
-      console.error('Update category error:', {
-        error: error instanceof Error ? error.message : error,
-        stack: error instanceof Error ? error.stack : undefined,
-        userId,
-        id,
-        data
-      });
-      
-      if (error instanceof AuthError) {
-        throw error;
-      }
-      
-      throw new AuthError('Failed to update category', 500);
+      console.error("Error getting music category:", error);
+      return {
+        success: false,
+        message: "Failed to retrieve music category",
+        error: error instanceof Error ? error.message : "Unknown error",
+      };
     }
   }
 
-  static async deleteCategory(userId: string, id: string) {
+  async updateMusicCategory(data: UpdateMusicCategoryInput & { id: string }) {
     try {
-      await this.verifyAdminScope(userId);
+      const existingCategory = await this.musicRepository.getMusicCategoryById(data.id);
+      
+      if (!existingCategory) {
+        return {
+          success: false,
+          message: "Music category not found",
+        };
+      }
 
-      await MusicRepository.deleteCategory(id);
-
+      const { id, ...updateData } = data;
+      const updatedCategory = await this.musicRepository.updateMusicCategory(id, updateData);
+      
       return {
         success: true,
-        message: 'Category deleted successfully',
-        data: null,
+        message: "Music category updated successfully",
+        data: updatedCategory,
       };
     } catch (error) {
-      console.error('Delete category error:', {
-        error: error instanceof Error ? error.message : error,
-        stack: error instanceof Error ? error.stack : undefined,
-        userId,
-        id
-      });
+      console.error("Error updating music category:", error);
       
-      if (error instanceof AuthError) {
-        throw error;
+      if (error instanceof Error && error.message.includes("Unique constraint")) {
+        return {
+          success: false,
+          message: "Category name already exists",
+        };
       }
-      
-      throw new AuthError('Failed to delete category', 500);
+
+      return {
+        success: false,
+        message: "Failed to update music category",
+        error: error instanceof Error ? error.message : "Unknown error",
+      };
     }
   }
 
-  // Goal Management
-  static async createGoal(userId: string, data: CreateGoalInput) {
+  async deleteMusicCategory(data: GetSingleMusicCategoryInput) {
     try {
-      await this.verifyAdminScope(userId);
+      const existingCategory = await this.musicRepository.getMusicCategoryById(data.id);
+      
+      if (!existingCategory) {
+        return {
+          success: false,
+          message: "Music category not found",
+        };
+      }
 
-      const goal = await MusicRepository.createGoal(data.name);
+      // Check if category is being used by any music resources
+      if (existingCategory.musicResources.length > 0) {
+        return {
+          success: false,
+          message: "Cannot delete category: it is being used by music resources",
+        };
+      }
 
+      await this.musicRepository.deleteMusicCategory(data.id);
+      
       return {
         success: true,
-        message: 'Goal created successfully',
+        message: "Music category deleted successfully",
+      };
+    } catch (error) {
+      console.error("Error deleting music category:", error);
+      return {
+        success: false,
+        message: "Failed to delete music category",
+        error: error instanceof Error ? error.message : "Unknown error",
+      };
+    }
+  }
+
+  // ====================================
+  //           MUSIC GOAL MANAGEMENT
+  // ====================================
+
+  async createMusicGoal(data: CreateMusicGoalInput) {
+    try {
+      const goal = await this.musicRepository.createMusicGoal(data);
+      
+      return {
+        success: true,
+        message: "Music goal created successfully",
         data: goal,
       };
     } catch (error) {
-      console.error('Create goal error:', {
-        error: error instanceof Error ? error.message : error,
-        stack: error instanceof Error ? error.stack : undefined,
-        userId,
-        data
-      });
+      console.error("Error creating music goal:", error);
       
-      if (error instanceof AuthError) {
-        throw error;
+      if (error instanceof Error && error.message.includes("Unique constraint")) {
+        return {
+          success: false,
+          message: "Goal name already exists",
+        };
       }
-      
-      throw new AuthError('Failed to create goal', 500);
+
+      return {
+        success: false,
+        message: "Failed to create music goal",
+        error: error instanceof Error ? error.message : "Unknown error",
+      };
     }
   }
 
-  static async getGoals() {
+  async getMusicGoals(data: GetMusicGoalsInput = {}) {
     try {
-      const goals = await MusicRepository.getGoals();
-
+      const goals = await this.musicRepository.getMusicGoals(data);
+      
       return {
         success: true,
-        message: 'Goals retrieved successfully',
+        message: "Music goals retrieved successfully",
         data: goals,
       };
     } catch (error) {
-      console.error('Get goals error:', error);
-      throw new AuthError('Failed to retrieve goals', 500);
+      console.error("Error getting music goals:", error);
+      return {
+        success: false,
+        message: "Failed to retrieve music goals",
+        error: error instanceof Error ? error.message : "Unknown error",
+      };
     }
   }
 
-  static async updateGoal(userId: string, id: string, data: UpdateGoalInput) {
+  async getMusicGoalById(data: GetSingleMusicGoalInput) {
     try {
-      await this.verifyAdminScope(userId);
-
-      const goal = await MusicRepository.updateGoal(id, data);
+      const goal = await this.musicRepository.getMusicGoalById(data.id);
+      
+      if (!goal) {
+        return {
+          success: false,
+          message: "Music goal not found",
+        };
+      }
 
       return {
         success: true,
-        message: 'Goal updated successfully',
+        message: "Music goal retrieved successfully",
         data: goal,
       };
     } catch (error) {
-      console.error('Update goal error:', {
-        error: error instanceof Error ? error.message : error,
-        stack: error instanceof Error ? error.stack : undefined,
-        userId,
-        id,
-        data
-      });
-      
-      if (error instanceof AuthError) {
-        throw error;
-      }
-      
-      throw new AuthError('Failed to update goal', 500);
+      console.error("Error getting music goal:", error);
+      return {
+        success: false,
+        message: "Failed to retrieve music goal",
+        error: error instanceof Error ? error.message : "Unknown error",
+      };
     }
   }
 
-  static async deleteGoal(userId: string, id: string) {
+  async updateMusicGoal(data: UpdateMusicGoalInput & { id: string }) {
     try {
-      await this.verifyAdminScope(userId);
+      const existingGoal = await this.musicRepository.getMusicGoalById(data.id);
+      
+      if (!existingGoal) {
+        return {
+          success: false,
+          message: "Music goal not found",
+        };
+      }
 
-      await MusicRepository.deleteGoal(id);
+      const { id, ...updateData } = data;
+      const updatedGoal = await this.musicRepository.updateMusicGoal(id, updateData);
+      
+      return {
+        success: true,
+        message: "Music goal updated successfully",
+        data: updatedGoal,
+      };
+    } catch (error) {
+      console.error("Error updating music goal:", error);
+      
+      if (error instanceof Error && error.message.includes("Unique constraint")) {
+        return {
+          success: false,
+          message: "Goal name already exists",
+        };
+      }
+
+      return {
+        success: false,
+        message: "Failed to update music goal",
+        error: error instanceof Error ? error.message : "Unknown error",
+      };
+    }
+  }
+
+  async deleteMusicGoal(data: GetSingleMusicGoalInput) {
+    try {
+      const existingGoal = await this.musicRepository.getMusicGoalById(data.id);
+      
+      if (!existingGoal) {
+        return {
+          success: false,
+          message: "Music goal not found",
+        };
+      }
+
+      // Check if goal is being used by any music resources
+      if (existingGoal.musicResources.length > 0) {
+        return {
+          success: false,
+          message: "Cannot delete goal: it is being used by music resources",
+        };
+      }
+
+      await this.musicRepository.deleteMusicGoal(data.id);
+      
+      return {
+        success: true,
+        message: "Music goal deleted successfully",
+      };
+    } catch (error) {
+      console.error("Error deleting music goal:", error);
+      return {
+        success: false,
+        message: "Failed to delete music goal",
+        error: error instanceof Error ? error.message : "Unknown error",
+      };
+    }
+  }
+
+  // ====================================
+  //      MUSIC INSTRUCTION MANAGEMENT
+  // ====================================
+
+  async createMusicInstruction(data: CreateMusicInstructionInput & { schoolId?: string }) {
+    try {
+      const instruction = await this.musicRepository.createMusicInstruction(data);
+      
+      return {
+        success: true,
+        message: "Music instruction created successfully",
+        data: instruction,
+      };
+    } catch (error) {
+      console.error("Error creating music instruction:", error);
+      return {
+        success: false,
+        message: "Failed to create music instruction",
+        error: error instanceof Error ? error.message : "Unknown error",
+      };
+    }
+  }
+
+  async getMusicInstructions(data: GetMusicInstructionsInput & { schoolId?: string }) {
+    try {
+      const result = await this.musicRepository.getMusicInstructions(data);
+      
+      return {
+        success: true,
+        message: "Music instructions retrieved successfully",
+        data: result,
+      };
+    } catch (error) {
+      console.error("Error getting music instructions:", error);
+      return {
+        success: false,
+        message: "Failed to retrieve music instructions",
+        error: error instanceof Error ? error.message : "Unknown error",
+      };
+    }
+  }
+
+  async getMusicInstructionById(data: GetSingleMusicInstructionInput) {
+    try {
+      const instruction = await this.musicRepository.getMusicInstructionById(data.id);
+      
+      if (!instruction) {
+        return {
+          success: false,
+          message: "Music instruction not found",
+        };
+      }
 
       return {
         success: true,
-        message: 'Goal deleted successfully',
-        data: null,
+        message: "Music instruction retrieved successfully",
+        data: instruction,
       };
     } catch (error) {
-      console.error('Delete goal error:', {
-        error: error instanceof Error ? error.message : error,
-        stack: error instanceof Error ? error.stack : undefined,
-        userId,
-        id
+      console.error("Error getting music instruction:", error);
+      return {
+        success: false,
+        message: "Failed to retrieve music instruction",
+        error: error instanceof Error ? error.message : "Unknown error",
+      };
+    }
+  }
+
+  async updateMusicInstruction(data: UpdateMusicInstructionInput & { id: string }) {
+    try {
+      const existingInstruction = await this.musicRepository.getMusicInstructionById(data.id);
+      
+      if (!existingInstruction) {
+        return {
+          success: false,
+          message: "Music instruction not found",
+        };
+      }
+
+      const { id, ...updateData } = data;
+      const updatedInstruction = await this.musicRepository.updateMusicInstruction(id, updateData);
+      
+      return {
+        success: true,
+        message: "Music instruction updated successfully",
+        data: updatedInstruction,
+      };
+    } catch (error) {
+      console.error("Error updating music instruction:", error);
+      return {
+        success: false,
+        message: "Failed to update music instruction",
+        error: error instanceof Error ? error.message : "Unknown error",
+      };
+    }
+  }
+
+  async deleteMusicInstruction(data: GetSingleMusicInstructionInput) {
+    try {
+      const existingInstruction = await this.musicRepository.getMusicInstructionById(data.id);
+      
+      if (!existingInstruction) {
+        return {
+          success: false,
+          message: "Music instruction not found",
+        };
+      }
+
+      await this.musicRepository.deleteMusicInstruction(data.id);
+      
+      return {
+        success: true,
+        message: "Music instruction deleted successfully",
+      };
+    } catch (error) {
+      console.error("Error deleting music instruction:", error);
+      return {
+        success: false,
+        message: "Failed to delete music instruction",
+        error: error instanceof Error ? error.message : "Unknown error",
+      };
+    }
+  }
+
+  async getInstructionsByResource(data: GetInstructionsByResourceInput & { page?: number; limit?: number }) {
+    try {
+      const result = await this.musicRepository.getInstructionsByResource(data.resourceId, {
+        page: data.page,
+        limit: data.limit,
       });
       
-      if (error instanceof AuthError) {
-        throw error;
-      }
-      
-      throw new AuthError('Failed to delete goal', 500);
+      return {
+        success: true,
+        message: "Instructions by resource retrieved successfully",
+        data: result,
+      };
+    } catch (error) {
+      console.error("Error getting instructions by resource:", error);
+      return {
+        success: false,
+        message: "Failed to retrieve instructions by resource",
+        error: error instanceof Error ? error.message : "Unknown error",
+      };
     }
   }
 }

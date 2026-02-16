@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState, use } from "react";
-import SummaryModal from "@/components/StudentDashboard/ChatBuddy/SummaryModal";
+import SummaryModal from "@/src/components/StudentDashboard/ChatBuddy/SummaryModal";
 
 interface SummaryPageProps {
   params: Promise<{ sessionId: string }>;

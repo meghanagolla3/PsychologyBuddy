@@ -1,5 +1,5 @@
 import { NextRequest } from 'next/server';
-import { BadgeAdminController } from '@/src/components/server/content/badges/badge.admin.controller';
+import { BadgeAdminController } from '@/src/components/server/badges/badge.admin.controller';
 
 const badgeAdminController = new BadgeAdminController();
 

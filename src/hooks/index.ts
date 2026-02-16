@@ -2,6 +2,7 @@
 export * from './use-chat';
 export * from './use-chat-summary';
 export * from './use-chat-access';
+export * from './useServerAuth';
 export * from './usePermissions';
 export * from './useRole';
 export * from './useUserPermissions';

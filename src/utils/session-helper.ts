@@ -1,5 +1,5 @@
-import { AuthRepository } from '@/src/auth/auth.repository';
-import { AuthError } from '@/src/utils/errors';
+import { AuthRepository } from '../auth/auth.repository';
+import { AuthError } from './errors';
 
 export interface SessionUser {
   userId: string;

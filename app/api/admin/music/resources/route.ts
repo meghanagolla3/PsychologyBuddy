@@ -1,10 +1,13 @@
-import { NextRequest } from 'next/server';
-import { musicAdminController } from '@/src/components/server/content/selfhelptools/music/music.admin.controller';
+import { NextRequest, NextResponse } from "next/server";
+import {
+  createMusicResource,
+  getMusicResources,
+} from "@/src/components/server/content/selfhelptools/music/music.admin.controller";
 
-export async function POST(req: NextRequest) {
-  return musicAdminController.createMusicResource(req);
+export async function GET(request: NextRequest) {
+  return await getMusicResources(request);
 }
 
-export async function GET(req: NextRequest) {
-  return musicAdminController.getMusicResources(req);
+export async function POST(request: NextRequest) {
+  return await createMusicResource(request);
 }

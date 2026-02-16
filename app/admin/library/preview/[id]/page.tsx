@@ -1,5 +1,5 @@
 import { Metadata } from 'next';
-import { ArticlePreview } from '@/src/components/content-management/library/ArticlePreview';
+import  ArticlePreview  from '@/src/components/admin/library/ArticlePreview';
 
 export const metadata: Metadata = {
   title: 'Preview Article - Content Management',
@@ -10,7 +10,7 @@ export default async function PreviewArticlePage({ params }: { params: Promise<{
   const { id } = await params;
   
   return (
-    <div className="container mx-auto py-6">
+    <div className="container mx-auto">
       <ArticlePreview articleId={id} />
     </div>
   );

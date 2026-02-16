@@ -77,6 +77,8 @@ model User {
   audioJournals     AudioJournal[]
   artJournals       ArtJournal[]
   highRiskAlerts    HighRiskAlert[]
+  ratings          Rating[] @relation("UserRatings")
+  savedArticles    SavedArticle[] @relation("UserSaves")
 
   // Badge relations
   createdBadges    Badge[] @relation("BadgeCreator")
@@ -86,7 +88,6 @@ model User {
   articles     Article[]      @relation("UserArticles")
   musicTherapy MusicTherapy[] @relation("UserMusic")
   meditations  Meditation[]   @relation("UserMeditations")
-  instructions MusicListeningInstruction[] @relation("UserInstruction")
   meditationInstructions MeditationListeningInstruction[] @relation("UserMeditationInstruction")
 
   sessions Session[]
@@ -133,7 +134,6 @@ model School {
   users            User[]
   journalingConfig JournalingToolConfig?
   musicResources   MusicResource[]
-  instructions    MusicListeningInstruction[]
   meditationResources Meditation[]
   meditationInstructions MeditationListeningInstruction[]
 
@@ -500,6 +500,8 @@ model Article {
   readTime     Int?           // Read time in minutes
   status       ResourceStatus @default(DRAFT)
   createdBy    String
+  averageRating Float?         // Average rating from all users
+  ratingCount   Int?           // Total number of ratings
   createdAt    DateTime       @default(now())
   updatedAt    DateTime       @updatedAt
 
@@ -508,6 +510,8 @@ model Article {
   goals      ArticleGoal[]
   categories ArticleCategory[]
   blocks     ArticleBlock[]
+  ratings    Rating[] @relation("ArticleRatings")
+  savedArticles SavedArticle[] @relation("ArticleSaves")
   
   // New separate block relationships
   sectionBlocks    SectionBlock[]
@@ -518,6 +522,33 @@ model Article {
   linkBlocks       LinkBlock[]
 
   @@map("Articles")
+}
+
+model Rating {
+  id        String   @id @default(cuid())
+  articleId String
+  score      Int      // 1-5 star rating
+  studentId  String?  // Optional: track which student rated
+  createdAt DateTime @default(now())
+
+  article Article @relation("ArticleRatings", fields: [articleId], references: [id], onDelete: Cascade)
+  student  User?    @relation("UserRatings", fields: [studentId], references: [id])
+
+  @@unique([articleId, studentId]) // One rating per student per article
+  @@map("Ratings")
+}
+
+model SavedArticle {
+  id        String   @id @default(cuid())
+  articleId String
+  studentId  String?  // Optional: track which student saved
+  createdAt DateTime @default(now())
+
+  article Article @relation("ArticleSaves", fields: [articleId], references: [id], onDelete: Cascade)
+  student  User?    @relation("UserSaves", fields: [studentId], references: [id])
+
+  @@unique([articleId, studentId]) // One save per student per article (allows null studentId)
+  @@map("SavedArticles")
 }
 
 model ArticleMood {
@@ -743,38 +774,79 @@ model MusicResource {
   coverImage  String?
   isPublic    Boolean  @default(true)
   schoolId    String?
+  categoryId  String?  // Direct category link for simpler filtering
   status      String   @default("DRAFT") // DRAFT | PUBLISHED
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
   // Relations
   school     School? @relation(fields: [schoolId], references: [id], onDelete: Cascade)
-  instructions MusicListeningInstruction[]
+  category   MusicCategory? @relation("ResourceCategory", fields: [categoryId], references: [id], onDelete: SetNull)
+  categories MusicResourceCategory[] @relation("ResourceCategories")
+  goals      MusicResourceGoal[] @relation("ResourceGoals")
 
   @@map("MusicResources")
 }
 
-// Music Listening Instructions - Step-by-step guidance for students
-model MusicListeningInstruction {
+// ====================================
+//         MUSIC CATEGORIES & GOALS
+// ====================================
+
+model MusicCategory {
   id          String   @id @default(cuid())
-  title       String
-  description String
-  steps       Json      // Array of instruction steps
-  duration    Int?     // Estimated time in minutes
-  difficulty  String   @default("BEGINNER") // BEGINNER | INTERMEDIATE | ADVANCED
-  status      String   @default("DRAFT") // DRAFT | PUBLISHED
-  createdBy   String?
-  schoolId    String?
-  resourceId  String?  // Optional: Link to specific music resource
+  name        String   @unique
+  description String?
+  icon        String?
+  color       String?
+  status      String   @default("ACTIVE") // ACTIVE | INACTIVE
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  // Relations
-  creator User? @relation("UserInstruction", fields: [createdBy], references: [id])
-  school  School? @relation(fields: [schoolId], references: [id], onDelete: Cascade)
-  resource MusicResource? @relation(fields: [resourceId], references: [id])
+  musicResources MusicResourceCategory[] @relation("CategoryResources")
+  resources      MusicResource[] @relation("ResourceCategory")
 
-  @@map("MusicListeningInstructions")
+  @@map("MusicCategories")
+}
+
+model MusicResourceCategory {
+  id             String @id @default(cuid())
+  musicResourceId String
+  categoryId     String
+  createdAt      DateTime @default(now())
+
+  musicResource MusicResource @relation("ResourceCategories", fields: [musicResourceId], references: [id], onDelete: Cascade)
+  category     MusicCategory @relation("CategoryResources", fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@unique([musicResourceId, categoryId])
+  @@map("MusicResourceCategories")
+}
+
+model MusicGoal {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  description String?
+  icon        String?
+  color       String?
+  status      String   @default("ACTIVE") // ACTIVE | INACTIVE
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  musicResources MusicResourceGoal[] @relation("MusicGoals")
+
+  @@map("MusicGoals")
+}
+
+model MusicResourceGoal {
+  id             String @id @default(cuid())
+  musicResourceId String
+  goalId         String
+  createdAt      DateTime @default(now())
+
+  musicResource MusicResource @relation("ResourceGoals", fields: [musicResourceId], references: [id], onDelete: Cascade)
+  goal         MusicGoal    @relation("MusicGoals", fields: [goalId], references: [id], onDelete: Cascade)
+
+  @@unique([musicResourceId, goalId])
+  @@map("MusicResourceGoals")
 }
 
 // ====================================

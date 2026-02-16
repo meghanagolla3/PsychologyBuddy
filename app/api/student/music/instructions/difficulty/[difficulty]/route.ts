@@ -1,6 +1,8 @@
-import { NextRequest } from 'next/server';
-import { musicInstructionsStudentController } from '@/src/components/server/content/selfhelptools/music/music-instructions.student.controller';
+import { NextRequest, NextResponse } from "next/server";
+import {
+  getMusicInstructionsByDifficulty,
+} from "@/src/components/server/content/selfhelptools/music/music.student.controller";
 
-export async function GET(req: NextRequest, { params }: { params: { difficulty: string } }) {
-  return musicInstructionsStudentController.getInstructionsByDifficulty(req);
+export async function GET(request: NextRequest) {
+  return await getMusicInstructionsByDifficulty(request);
 }

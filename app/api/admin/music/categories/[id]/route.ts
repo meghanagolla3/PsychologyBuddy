@@ -1,28 +1,18 @@
-import { NextRequest } from 'next/server';
-import { musicAdminController } from '@/src/components/server/content/selfhelptools/music/music.admin.controller';
+import { NextRequest, NextResponse } from "next/server";
+import {
+  getMusicCategoryById,
+  updateMusicCategory,
+  deleteMusicCategory,
+} from "@/src/components/server/content/selfhelptools/music/music.admin.controller";
 
-export async function PATCH(req: NextRequest, { params }: { params: { id: string } }) {
-  const url = new URL(req.url);
-  url.searchParams.set('id', params.id);
-  
-  const newReq = new Request(url.toString(), {
-    method: req.method,
-    headers: req.headers,
-    body: req.body,
-  });
-
-  return musicAdminController.updateCategory(newReq as NextRequest);
+export async function GET(request: NextRequest) {
+  return await getMusicCategoryById(request);
 }
 
-export async function DELETE(req: NextRequest, { params }: { params: { id: string } }) {
-  const url = new URL(req.url);
-  url.searchParams.set('id', params.id);
-  
-  const newReq = new Request(url.toString(), {
-    method: req.method,
-    headers: req.headers,
-    body: req.body,
-  });
+export async function PATCH(request: NextRequest) {
+  return await updateMusicCategory(request);
+}
 
-  return musicAdminController.deleteCategory(newReq as NextRequest);
+export async function DELETE(request: NextRequest) {
+  return await deleteMusicCategory(request);
 }

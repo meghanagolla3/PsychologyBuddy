@@ -92,7 +92,7 @@ export class JournalingStudentService {
   }
 
   // Audio Journals
-  static async createAudioJournal(userId: string, schoolId: string | null, data: CreateAudioJournalInput) {
+  static async createAudioJournal(userId: string, schoolId: string | null, data: CreateAudioJournalInput, audioFile?: File) {
     try {
       // Validate schoolId
       if (!schoolId) {
@@ -110,10 +110,19 @@ export class JournalingStudentService {
         throw new AuthError(`Audio duration exceeds maximum allowed duration of ${config.maxAudioDuration} seconds`, 400);
       }
 
+      // Handle file upload - convert to base64 for now
+      let audioUrl = data.audioUrl;
+      if (audioFile) {
+        const bytes = await audioFile.arrayBuffer();
+        const buffer = Buffer.from(bytes);
+        const base64 = buffer.toString('base64');
+        audioUrl = `data:${audioFile.type};base64,${base64}`;
+      }
+
       const journal = await JournalingStudentRepository.createAudioJournal(
         userId,
         data.title,
-        data.audioUrl,
+        audioUrl,
         data.duration
       );
 
@@ -178,7 +187,7 @@ export class JournalingStudentService {
   }
 
   // Art Journals
-  static async createArtJournal(userId: string, schoolId: string | null, data: CreateArtJournalInput) {
+  static async createArtJournal(userId: string, schoolId: string | null, data: CreateArtJournalInput, imageFile?: File) {
     try {
       // Validate schoolId
       if (!schoolId) {
@@ -191,7 +200,16 @@ export class JournalingStudentService {
         throw new AuthError('Art journaling is disabled for your school', 403);
       }
 
-      const journal = await JournalingStudentRepository.createArtJournal(userId, data.imageUrl);
+      // Handle file upload - convert to base64 for now
+      let imageUrl = data.imageUrl;
+      if (imageFile) {
+        const bytes = await imageFile.arrayBuffer();
+        const buffer = Buffer.from(bytes);
+        const base64 = buffer.toString('base64');
+        imageUrl = `data:${imageFile.type};base64,${base64}`;
+      }
+
+      const journal = await JournalingStudentRepository.createArtJournal(userId, imageUrl);
 
       return {
         success: true,

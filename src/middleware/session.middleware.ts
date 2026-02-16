@@ -1,4 +1,4 @@
-import { getServerSession } from "@/src/utils/session.util";
+import { getServerSession } from "@/src/utils/session-server.util";
 import { NextResponse } from "next/server";
 
 export async function requireAuth(req: Request) {

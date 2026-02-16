@@ -4,7 +4,7 @@ import React from 'react';
 // import StudentLayout from '@/components/StudentDashboard/Layout/StudentLayout';
 import { Card, CardContent } from '@/components/ui/card';
 import { Flame, Smile, BookOpen, Award } from 'lucide-react';
-import StudentLayout from '@/components/StudentDashboard/Layout/StudentLayout';
+import StudentLayout from '@/src/components/StudentDashboard/Layout/StudentLayout';
 
 export default function DashboardStats() {
   const stats = [
