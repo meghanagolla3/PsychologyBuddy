@@ -22,7 +22,10 @@ export interface CardProps {
   description: string;
   duration: string;
   tracks: string;
-  image: string;
+  image?: string;
+  coverImage?: string;
+  thumbnail?: string;
+  coverArt?: string;
   url: string;
   artist?: string;
   album?: string;

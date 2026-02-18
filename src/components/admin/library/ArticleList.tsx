@@ -161,7 +161,8 @@ export function ArticleList() {
     if (!mountedRef.current) return; // Only prevent calls on unmounted component
     
     try {
-      const response = await fetch('/api/articles');
+      const headers = getAuthHeaders();
+      const response = await fetch('/api/articles', { headers });
       
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -189,10 +190,11 @@ export function ArticleList() {
     if (!mountedRef.current) return;
     
     try {
+      const headers = getAuthHeaders();
       const [categoriesRes, moodsRes, goalsRes] = await Promise.all([
-        fetch('/api/labels/categories'),
-        fetch('/api/labels/moods'),
-        fetch('/api/labels/goals'),
+        fetch('/api/labels/categories', { headers }),
+        fetch('/api/labels/moods', { headers }),
+        fetch('/api/labels/goals', { headers }),
       ]);
 
       const [categoriesData, moodsData, goalsData] = await Promise.all([
@@ -288,9 +290,11 @@ export function ArticleList() {
     
     setLoading(true);
     try {
+      const headers = getAuthHeaders();
       const response = await fetch('/api/articles', {
         method: 'POST',
         headers: {
+          ...headers,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
@@ -352,11 +356,12 @@ export function ArticleList() {
     try {
       const newStatus = article.status === 'PUBLISHED' ? 'DRAFT' : 'PUBLISHED';
       
+      const headers = getAuthHeaders();
       const response = await fetch(`/api/articles/${article.id}`, {
         method: 'PUT',
         headers: {
+          ...headers,
           'Content-Type': 'application/json',
-          ...getAuthHeaders()
         },
         body: JSON.stringify({
           status: newStatus
@@ -384,8 +389,10 @@ export function ArticleList() {
     if (!selectedArticle) return;
 
     try {
+      const headers = getAuthHeaders();
       const response = await fetch(`/api/articles/${selectedArticle.id}`, {
         method: 'DELETE',
+        headers,
       });
 
       const data = await response.json();
@@ -413,9 +420,11 @@ export function ArticleList() {
     setCategoryError(''); // Clear error if validation passes
     
     try {
+      const headers = getAuthHeaders();
       const response = await fetch('/api/labels/categories', {
         method: 'POST',
         headers: {
+          ...headers,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
@@ -531,7 +540,7 @@ export function ArticleList() {
               ) : filteredArticles.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={7} className="text-center py-8">
-                    <div className="text-muted-foreground">
+                    <div className="text-[#94A3B8]">
                       <FileText className="h-8 w-8 mx-auto mb-2" />
                       <p className="text-lg font-medium">No articles found</p>
                       <p className="text-sm">Create your first article to get started</p>
@@ -659,7 +668,7 @@ export function ArticleList() {
         <DialogContent className="sm:max-w-md bg-white">
           <DialogHeader>
             <DialogTitle>Add New Category</DialogTitle>
-            <DialogDescription className='text-gray-500'>
+            <DialogDescription className='text-[#65758b]'>
               Create a new category to organize your resources.
             </DialogDescription>
           </DialogHeader>
@@ -720,7 +729,7 @@ export function ArticleList() {
         <DialogContent className="sm:max-w-lg bg-white max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="text-xl font-semibold">Add New Article</DialogTitle>
-            <DialogDescription className='text-gray-500'>
+            <DialogDescription className='text-[#65758b]'>
               Step 1: Enter article metadata. You'll add content in the next step.
             </DialogDescription>
           </DialogHeader>
@@ -915,9 +924,11 @@ export function ArticleList() {
                               const newMoodName = newMood.trim();
                               try {
                                 // Create mood in database
+                                const headers = getAuthHeaders();
                                 const response = await fetch('/api/labels/moods', {
                                   method: 'POST',
                                   headers: {
+                                    ...headers,
                                     'Content-Type': 'application/json',
                                   },
                                   body: JSON.stringify({
@@ -1002,9 +1013,11 @@ export function ArticleList() {
                               const newGoalName = newGoal.trim();
                               try {
                                 // Create goal in database
+                                const headers = getAuthHeaders();
                                 const response = await fetch('/api/labels/goals', {
                                   method: 'POST',
                                   headers: {
+                                    ...headers,
                                     'Content-Type': 'application/json',
                                   },
                                   body: JSON.stringify({

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { SectionBlockController } from '@/src/components/server/content/library/section-block.controller';
+import { SectionBlockController } from '@/src/server/content/library/section-block.controller';
 
 // PUT /api/articles/[id]/blocks/sections/[blockId] - Update section block (Admin & SuperAdmin)
 export const PUT = SectionBlockController.updateBlock;

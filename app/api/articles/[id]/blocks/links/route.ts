@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { LinkBlockService } from '@/src/components/server/content/library/link-block.service';
+import { LinkBlockService } from '@/src/server/content/library/link-block.service';
 import { withPermission } from '@/src/middleware/permission.middleware';
 import { handleError } from '@/src/utils/errors';
 

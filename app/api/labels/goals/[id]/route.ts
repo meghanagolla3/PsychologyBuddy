@@ -1,5 +1,5 @@
 import { NextRequest } from 'next/server';
-import { GoalController } from '@/src/components/server/content/labels/goals/goal.controller';
+import { GoalController } from '@/src/server/controllers/goal.controller';
 
 // GET /api/goals/[id] - Get goal by ID (Admin & SuperAdmin)
 export const GET = GoalController.getGoalById;

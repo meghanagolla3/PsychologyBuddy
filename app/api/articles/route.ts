@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { LibraryService } from '@/src/components/server/content/library/library.service';
+import { LibraryService } from '@/src/server/content/library/library.service';
 import { getSession } from '@/src/utils/session-helper';
 import { handleError } from '@/src/utils/errors';
-import { CreateArticleSchema } from '@/src/components/server/content/library/library.validators';
+import { CreateArticleSchema } from '@/src/server/content/library/library.validators';
 
 // GET /api/articles - Get all articles (Admin & SuperAdmin)
 export async function GET(req: NextRequest) {

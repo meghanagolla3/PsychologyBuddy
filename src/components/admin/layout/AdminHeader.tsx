@@ -36,8 +36,6 @@ export function AdminHeader({
 }: AdminHeaderProps) {
   const router = useRouter();
 
-  console.log('AdminHeader props:', { showSchoolFilter, schoolFilterValue, schools: schools?.length });
-
   return (
     <header className="sticky top-0 z-30 flex flex-col gap-4 border-b border-border bg-white backdrop-blur supports-[backdrop-filter]:bg-background/60 px-6 py-4">
       <div className="flex items-center justify-between">

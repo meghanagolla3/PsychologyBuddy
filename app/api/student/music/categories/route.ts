@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import {
   getMusicCategories,
-} from "@/src/components/server/content/selfhelptools/music/music.student.controller";
+} from "@/src/server/controllers/music.student.controller";
 
 export async function GET(request: NextRequest) {
   return await getMusicCategories(request);

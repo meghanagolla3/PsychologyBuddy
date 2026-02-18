@@ -3,7 +3,7 @@ import {
   getMusicGoalById,
   updateMusicGoal,
   deleteMusicGoal,
-} from "@/src/components/server/content/selfhelptools/music/music.admin.controller";
+} from "@/src/server/controllers/music.admin.controller";
 
 export async function GET(request: NextRequest) {
   return await getMusicGoalById(request);

@@ -1,5 +1,5 @@
 import { NextRequest } from 'next/server';
-import { journalingAdminController } from '@/src/components/server/content/selfhelptools/journaling/journaling.admin.controller';
+import { journalingAdminController } from '@/src/server/controllers/journaling.admin.controller';
 
 export async function POST(req: NextRequest) {
   return journalingAdminController.createPrompt(req);

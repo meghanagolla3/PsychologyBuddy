@@ -1,5 +1,5 @@
 import { NextRequest } from 'next/server';
-import { AdminController } from '@/src/components/server/profiles/admin/admin.controller';
+import { AdminController } from '@/src/server/profiles/admin/admin.controller';
 
 // POST /api/admins - Create admin (SuperAdmin only)
 export const POST = AdminController.createAdmin;

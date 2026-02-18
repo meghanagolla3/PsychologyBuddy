@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
+import { useRouter } from 'next/navigation';
 import { ChevronLeft, Heart, Play } from 'lucide-react';
 import { toast } from 'sonner';
 import SearchHeader from '@/src/components/StudentDashboard/SelfHelpTools/MusicTherapy/SearchHeader';
@@ -25,6 +26,7 @@ interface MusicResource {
 }
 
 export default function Page() {
+  const router = useRouter();
   const [activeTab, setActiveTab] = useState('Recommended');
   const [musicResources, setMusicResources] = useState<MusicResource[]>([]);
   const [categories, setCategories] = useState<any[]>([]);
@@ -54,6 +56,7 @@ export default function Page() {
   // Fetch categories on component mount
   useEffect(() => {
     fetchCategories();
+    fetchSavedItems();
   }, []);
 
   // Fetch music resources on component mount
@@ -65,6 +68,24 @@ export default function Page() {
   useEffect(() => {
     fetchMusicResources(activeTab);
   }, [activeTab, searchQuery]);
+
+  // Fetch saved music
+  const fetchSavedItems = async () => {
+    try {
+      // For now, use a hardcoded student ID. In a real app, this would come from auth context
+      const studentId = 'student-123'; // Replace with actual student ID from auth
+      const response = await fetch(`/api/student/saved-music?studentId=${studentId}`);
+      const result = await response.json();
+      
+      if (result.success) {
+        const savedIds = new Set(result.data.map((item: { id: string }) => item.id) as string[]);
+        setSavedItems(savedIds);
+        console.log('📚 Loaded saved music items:', savedIds.size);
+      }
+    } catch (error) {
+      console.error('Error fetching saved music items:', error);
+    }
+  };
 
   const fetchCategories = async () => {
     try {
@@ -130,6 +151,9 @@ export default function Page() {
   };
 
   const handleCardClick = (music: MusicResource & { categories?: any[] }) => {
+    console.log('handleCardClick - music data:', music);
+    console.log('handleCardClick - coverImage:', music.coverImage);
+    
     setSelectedCard({
       categories: music.categories || [],
       id: music.id,
@@ -138,25 +162,55 @@ export default function Page() {
       url: music.url,
       duration: formatDuration(music.duration),
       tracks: `${getTrackCount(music)} Tracks`,
-      image: music.coverImage || "https://picsum.photos/seed/music/400/400",
+      coverImage: music.coverImage,
       artist: music.artist,
       album: music.album
     });
+    
+    console.log('handleCardClick - selectedCard data:', {
+      coverImage: music.coverImage,
+      title: music.title
+    });
+    
     setShowPlayer(true);
   };
 
-  const toggleSave = (musicId: string) => {
-    setSavedItems(prev => {
-      const newSet = new Set(prev);
-      if (newSet.has(musicId)) {
-        newSet.delete(musicId);
-        toast.success('Removed from saved items');
+  const toggleSave = async (musicId: string) => {
+    try {
+      const studentId = 'student-123'; // Replace with actual student ID from auth
+      
+      const response = await fetch('/api/student/saved-music', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          musicId,
+          studentId,
+        }),
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        setSavedItems(prev => {
+          const newSet = new Set(prev);
+          if (result.isSaved) {
+            newSet.add(musicId);
+            toast.success('Added to saved items');
+          } else {
+            newSet.delete(musicId);
+            toast.success('Removed from saved items');
+          }
+          return newSet;
+        });
       } else {
-        newSet.add(musicId);
-        toast.success('Added to saved items');
+        toast.error(result.message || 'Failed to save music');
       }
-      return newSet;
-    });
+    } catch (error) {
+      console.error('Error toggling save:', error);
+      toast.error('Failed to save music');
+    }
   };
 
   const formatDuration = (seconds: number) => {
@@ -200,10 +254,15 @@ export default function Page() {
               onSearchChange={handleSearchChange}
             />
             <button
-              onClick={() => {/* Handle show saves */}}
-              className="px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
+              onClick={() => router.push('/students/selfhelptools/music/saved')}
+              className="px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors flex items-center gap-2"
             >
               Show Saves
+              {savedItems.size > 0 && (
+                <span className="bg-white text-blue-500 text-xs font-bold px-2 py-1 rounded-full">
+                  {savedItems.size}
+                </span>
+              )}
             </button>
           </div>
         </div>
@@ -306,8 +365,7 @@ export default function Page() {
       {showPlayer && selectedCard && (
         <PlayerModal
           card={selectedCard}
-          onClose={() => setShowPlayer(false)}
-        />
+          onClose={() => setShowPlayer(false)} categories={[]}        />
       )}
     </div>
   );

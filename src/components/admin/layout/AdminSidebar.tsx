@@ -72,7 +72,7 @@ export function AdminSidebar() {
       icon: BookOpen,
       children: [
         { label: "Psychoeducation Library", href: "/admin/library", icon: BookOpen },
-        { label: "Self-help Tools", href: "/content/tools", icon: Wrench },
+        { label: "Self-help Tools", href: "/admin/selfhelptools", icon: Wrench },
       ],
     },
     {

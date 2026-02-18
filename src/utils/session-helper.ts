@@ -1,4 +1,4 @@
-import { AuthRepository } from '../auth/auth.repository';
+import { AuthRepository } from '../server/repository/auth.repository';
 import { AuthError } from './errors';
 
 export interface SessionUser {

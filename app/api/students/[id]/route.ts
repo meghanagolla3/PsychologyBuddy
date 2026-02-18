@@ -1,5 +1,5 @@
 import { NextRequest } from 'next/server';
-import { StudentController } from '@/src/components/server/profiles/student/student.controller';
+import { StudentController } from '@/src/server/profiles/student/student.controller';
 
 // GET /api/students/[id] - Get student by ID
 export const GET = StudentController.getStudentById;

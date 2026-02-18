@@ -1,7 +1,7 @@
 // src/middlewares/permission.middleware.ts
 
 import { NextRequest, NextResponse } from "next/server";
-import { AuthRepository } from "@/src/auth/auth.repository";
+import { AuthRepository } from "@/src/server/repository/auth.repository";
 import { ROLE_PERMISSIONS, MODULES, ACTIONS } from "@/src/config/permission";
 
 interface PermissionOptions {

@@ -4,18 +4,58 @@ import { Pen, Mic, Palette } from 'lucide-react';
 interface TabProps {
   activeTab: 'writing' | 'audio' | 'art';
   setActiveTab: (tab: 'writing' | 'audio' | 'art') => void;
+  config?: {
+    writingEnabled: boolean;
+    audioEnabled: boolean;
+    artEnabled: boolean;
+  };
 }
 
-export default function JournalTabs({ activeTab, setActiveTab }: TabProps) {
-  const tabs: Array<{
-    id: 'writing' | 'audio' | 'art';
-    label: string;
-    icon: React.ComponentType<any>;
-  }> = [
-    { id: 'writing', label: 'Write Journals', icon: Pen },
-    { id: 'audio', label: 'Audio Journals', icon: Mic },
-    { id: 'art', label: 'Art Journals', icon: Palette },
+export default function JournalTabs({ activeTab, setActiveTab, config }: TabProps) {
+  console.log('=== JOURNAL TABS DEBUG ===');
+  console.log('Config received:', config);
+  
+  const allTabs = [
+    { id: 'writing' as const, label: 'Write Journals', icon: Pen },
+    { id: 'audio' as const, label: 'Audio Journals', icon: Mic },
+    { id: 'art' as const, label: 'Art Journals', icon: Palette },
   ];
+
+  // Filter tabs based on admin configuration
+  const tabs = allTabs.filter(tab => {
+    if (!config) {
+      console.log('No config provided, showing all tabs');
+      return true; // Show all if no config (fallback)
+    }
+    
+    let enabled = false;
+    switch (tab.id) {
+      case 'writing': 
+        enabled = config.writingEnabled;
+        console.log(`Writing tab enabled: ${enabled}`);
+        break;
+      case 'audio': 
+        enabled = config.audioEnabled;
+        console.log(`Audio tab enabled: ${enabled}`);
+        break;
+      case 'art': 
+        enabled = config.artEnabled;
+        console.log(`Art tab enabled: ${enabled}`);
+        break;
+      default: 
+        enabled = true;
+    }
+    return enabled;
+  });
+
+  console.log('Filtered tabs:', tabs);
+  console.log('=== JOURNAL TABS DEBUG END ===');
+
+  // If no tabs are enabled, don't render anything
+  if (tabs.length === 0) {
+    console.log('No tabs enabled, returning null');
+    return null;
+  }
 
   return (
     <div className="bg-white/50 backdrop-blur-sm p-1.5 rounded-full flex items-center justify-between gap-2 shadow-inner border border-white/60 mb-8 max-w-4xl mx-auto">

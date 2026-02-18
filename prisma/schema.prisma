@@ -79,6 +79,7 @@ model User {
   highRiskAlerts    HighRiskAlert[]
   ratings          Rating[] @relation("UserRatings")
   savedArticles    SavedArticle[] @relation("UserSaves")
+  // savedMeditations  SavedMeditation[] @relation("UserMeditationSaves")
 
   // Badge relations
   createdBadges    Badge[] @relation("BadgeCreator")
@@ -89,6 +90,7 @@ model User {
   musicTherapy MusicTherapy[] @relation("UserMusic")
   meditations  Meditation[]   @relation("UserMeditations")
   meditationInstructions MeditationListeningInstruction[] @relation("UserMeditationInstruction")
+  musicInstructions MusicInstruction[] @relation("UserMusicInstruction")
 
   sessions Session[]
 
@@ -136,6 +138,7 @@ model School {
   musicResources   MusicResource[]
   meditationResources Meditation[]
   meditationInstructions MeditationListeningInstruction[]
+  musicInstructions MusicInstruction[]
 
   @@map("Schools")
 }
@@ -382,6 +385,7 @@ model Meditation {
   createdBy      String
   createdAt      DateTime         @default(now())
   updatedAt      DateTime         @updatedAt
+  deletedAt      DateTime?
 
   // Relations
   school         School? @relation(fields: [schoolId], references: [id], onDelete: Cascade)
@@ -389,6 +393,7 @@ model Meditation {
   moods          MeditationMood[]
   categories     MeditationMeditationCategory[] @relation("MeditationCategories")
   goals          MeditationMeditationGoal[] @relation("MeditationGoals")
+  // savedMeditations SavedMeditation[] @relation("MeditationSaves")
 }
 
 model MeditationMood {
@@ -397,9 +402,31 @@ model MeditationMood {
   moodId       String
 
   meditation Meditation @relation(fields: [meditationId], references: [id], onDelete: Cascade)
-  mood       MoodLabel  @relation(fields: [moodId], references: [id], onDelete: Cascade)
+  mood       MoodLabel @relation(fields: [moodId], references: [id], onDelete: Cascade)
 
   @@unique([meditationId, moodId])
+}
+
+// Music Listening Instructions - Step-by-step guidance for students
+model MusicInstruction {
+  id          String   @id @default(cuid())
+  title       String
+  description String
+  steps       Json      // Array of instruction steps
+  duration    Int?     // Estimated time in minutes
+  difficulty  String   @default("BEGINNER") // BEGINNER | INTERMEDIATE | ADVANCED
+  status      String   @default("DRAFT") // DRAFT | PUBLISHED
+  proTip      String?  // Professional tip for learners
+  schoolId    String?
+  createdBy    String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  creator User? @relation("UserMusicInstruction", fields: [createdBy], references: [id])
+  school  School? @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+
+  @@map("MusicInstructions")
 }
 
 // Meditation Listening Instructions - Step-by-step guidance for students
@@ -411,6 +438,7 @@ model MeditationListeningInstruction {
   duration    Int?     // Estimated time in minutes
   difficulty  String   @default("BEGINNER") // BEGINNER | INTERMEDIATE | ADVANCED
   status      String   @default("DRAFT") // DRAFT | PUBLISHED
+  proTip      String?  // Professional tip for learners
   createdBy   String?
   schoolId    String?
   resourceId  String?  // Optional: Link to specific meditation resource
@@ -551,6 +579,26 @@ model SavedArticle {
   @@map("SavedArticles")
 }
 
+model MeditationSave {
+  id           String   @id @default(cuid())
+  meditationId String
+  studentId    String?
+  createdAt    DateTime @default(now())
+
+  @@unique([meditationId, studentId])
+  @@map("MeditationSaves")
+}
+
+model MusicSave {
+  id        String   @id @default(cuid())
+  musicId   String
+  studentId String?
+  createdAt DateTime @default(now())
+
+  @@unique([musicId, studentId])
+  @@map("MusicSaves")
+}
+
 model ArticleMood {
   id        String @id @default(cuid())
   articleId String
@@ -636,18 +684,19 @@ model HighRiskAlert {
 //       TAXONOMY LABEL TABLES
 // ====================================
 model MoodLabel {
-  id   String @id @default(cuid())
-  name String @unique
+  id     String @id @default(cuid())
+  name   String @unique
+  type   String @default("GENERAL") // GENERAL, MEDITATION, MUSIC
 
   articles   ArticleMood[]
   meditation MeditationMood[]
 
-  @@map("MoodLabels")
 }
 
 model GoalLabel {
-  id   String @id @default(cuid())
-  name String @unique
+  id     String  @id @default(cuid())
+  name   String  @unique
+  status String  @default("ACTIVE")
 
   articles   ArticleGoal[]
 
@@ -763,6 +812,34 @@ model Session {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
+model MusicMood {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  description String?
+  icon        String?
+  color       String?
+  status      String   @default("ACTIVE") // ACTIVE | INACTIVE
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  musicResources MusicResourceMood[] @relation("MusicMoods")
+
+  @@map("MusicMoods")
+}
+
+model MusicResourceMood {
+  id             String @id @default(cuid())
+  musicResourceId String
+  moodId         String
+  createdAt      DateTime @default(now())
+
+  musicResource MusicResource @relation("ResourceMoods", fields: [musicResourceId], references: [id], onDelete: Cascade)
+  mood         MusicMood    @relation("MusicMoods", fields: [moodId], references: [id], onDelete: Cascade)
+
+  @@unique([musicResourceId, moodId])
+  @@map("MusicResourceMoods")
+}
+
 model MusicResource {
   id          String   @id @default(cuid())
   title       String
@@ -784,6 +861,7 @@ model MusicResource {
   category   MusicCategory? @relation("ResourceCategory", fields: [categoryId], references: [id], onDelete: SetNull)
   categories MusicResourceCategory[] @relation("ResourceCategories")
   goals      MusicResourceGoal[] @relation("ResourceGoals")
+  moods      MusicResourceMood[] @relation("ResourceMoods")
 
   @@map("MusicResources")
 }
@@ -885,7 +963,3 @@ model UserBadge {
   @@unique([userId, badgeId])
   @@map("UserBadges")
 }
-
-// ====================================
-//       PSYCHO-EDUCATION ARTICLES
-// ====================================

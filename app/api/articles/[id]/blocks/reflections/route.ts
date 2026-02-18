@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { ReflectionBlockService } from '@/src/components/server/content/library/reflection-block.service';
+import { ReflectionBlockService } from '@/src/server/content/library/reflection-block.service';
 import { withPermission } from '@/src/middleware/permission.middleware';
 import { handleError } from '@/src/utils/errors';
 

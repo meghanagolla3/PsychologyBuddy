@@ -83,11 +83,11 @@
 
 @layer base {
   * {
-    border-color: hsl(var(--border));
+    border-color: #E2E8F0;
   }
   body {
-    background-color: hsl(var(--background));
-    color: hsl(var(--foreground));
+    background-color: #F8FAFC;
+    color: #1E293B;
   }
 }
 
@@ -111,7 +111,7 @@
 @layer utilities {
   .scrollbar-thin {
     scrollbar-width: thin;
-    scrollbar-color: hsl(var(--muted)) transparent;
+    scrollbar-color: #E2E8F0 transparent;
   }
 
   .scrollbar-thin::-webkit-scrollbar {
@@ -123,7 +123,7 @@
   }
 
   .scrollbar-thin::-webkit-scrollbar-thumb {
-    background-color: hsl(var(--muted));
+    background-color: #E2E8F0;
     border-radius: 3px;
   }
 }

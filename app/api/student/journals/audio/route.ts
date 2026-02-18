@@ -1,5 +1,5 @@
 import { NextRequest } from 'next/server';
-import { journalingStudentController } from '@/src/components/server/content/selfhelptools/journaling/journaling.student.controller';
+import { journalingStudentController } from '@/src/server/controllers/journaling.student.controller';
 
 export async function POST(req: NextRequest) {
   return journalingStudentController.createAudioJournal(req);

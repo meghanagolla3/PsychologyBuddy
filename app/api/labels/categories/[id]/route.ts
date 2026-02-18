@@ -1,5 +1,5 @@
 import { NextRequest } from 'next/server';
-import { CategoryController } from '@/src/components/server/content/labels/categories/category.controller';
+import { CategoryController } from '@/src/server/controllers/category.controller';
 
 // GET /api/categories/[id] - Get category by ID (Admin & SuperAdmin)
 export const GET = CategoryController.getCategoryById;

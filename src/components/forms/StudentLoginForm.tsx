@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { User, Lock } from 'lucide-react';
 import { RegistrationFormField } from './RegistrationFormField';
-import { AlertMessage } from '@/src/components/ui/AlertMessage';
-import { RingSpinner } from '@/src/components/ui/Spinners';
+import { AlertMessage } from '@/components/ui/AlertMessage';
+import { RingSpinner } from '@/components/ui/Spinners';
 
 interface StudentLoginFormProps {
   formData: {

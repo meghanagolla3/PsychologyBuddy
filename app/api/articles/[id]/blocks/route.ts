@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { ArticleBlockController } from '@/src/components/server/content/library/article-block.controller';
+import { ArticleBlockController } from '@/src/server/content/library/article-block.controller';
 
 // GET /api/articles/[id]/blocks - Get article blocks (Admin & SuperAdmin)
 export const GET = ArticleBlockController.getBlocks;

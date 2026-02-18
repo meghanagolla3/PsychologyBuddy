@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { KeyTakeawaysBlockService } from '@/src/components/server/content/library/key-takeaways-block.service';
+import { KeyTakeawaysBlockService } from '@/src/server/content/library/key-takeaways-block.service';
 import { withPermission } from '@/src/middleware/permission.middleware';
 import { handleError } from '@/src/utils/errors';
 

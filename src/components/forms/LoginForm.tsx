@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { AlertMessage } from '@/src/components/ui/AlertMessage';
+import { AlertMessage } from '@/components/ui/AlertMessage';
 import { RegistrationFormField } from '@/src/components/forms/RegistrationFormField';
 // import { GoogleOAuthButton } from '@/src/components/auth/GoogleOAuthButton';
 import { Mail, Lock } from 'lucide-react';

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { SectionBlockController } from '@/src/components/server/content/library/section-block.controller';
+import { SectionBlockController } from '@/src/server/content/library/section-block.controller';
 
 // GET /api/articles/[id]/blocks/sections - Get section blocks (Admin & SuperAdmin)
 export const GET = SectionBlockController.getBlocks;

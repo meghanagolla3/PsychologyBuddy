@@ -1,16 +1,22 @@
 'use client';
 import * as React from 'react';
 import { useState, useRef, useEffect, MouseEvent, TouchEvent } from 'react';
-import { Lock, ChevronDown, Pen, Eraser, Trash2, Sliders, Link } from 'lucide-react';
+import { Lock, ChevronDown, Pen, Eraser, Trash2, Sliders, Link, Undo, Redo } from 'lucide-react';
 import { ArtJournal } from '@/src/generated/prisma/client';
 import { toast } from 'sonner';
 
 interface DrawingCanvasProps {
   onSave?: (imageDataUrl: string) => void;
   loading?: boolean;
+  config?: {
+    enableUndo?: boolean;
+    enableRedo?: boolean;
+    enableClearCanvas?: boolean;
+    enableColorPalette?: boolean;
+  };
 }
 
-export default function DrawingCanvas({ onSave, loading = false }: DrawingCanvasProps) {
+export default function DrawingCanvas({ onSave, loading = false, config }: DrawingCanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [showColorPicker, setShowColorPicker] = useState(true);
   const [opacity, setOpacity] = useState(100);
@@ -21,6 +27,10 @@ export default function DrawingCanvas({ onSave, loading = false }: DrawingCanvas
   const [artJournals, setArtJournals] = useState<ArtJournal[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  
+  // Undo/Redo functionality
+  const [history, setHistory] = useState<ImageData[]>([]);
+  const [historyStep, setHistoryStep] = useState(-1);
   
 
   const colors = [
@@ -60,6 +70,11 @@ export default function DrawingCanvas({ onSave, loading = false }: DrawingCanvas
     // Set initial canvas background
     ctx.fillStyle = 'white';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
+    
+    // Save initial state to history
+    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    setHistory([imageData]);
+    setHistoryStep(0);
     
     // Fetch art journals on component mount
     fetchArtJournals();
@@ -145,6 +160,9 @@ const fetchArtJournals = async () => {
   };
 
   const stopDrawing = () => {
+    if (isDrawing) {
+      saveToHistory();
+    }
     setIsDrawing(false);
   };
 
@@ -155,9 +173,67 @@ const fetchArtJournals = async () => {
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
+    // Save state before clearing
+    saveToHistory();
+
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.fillStyle = 'white';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
+  };
+
+  // Save current canvas state to history
+  const saveToHistory = () => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    const newHistory = history.slice(0, historyStep + 1);
+    newHistory.push(imageData);
+    
+    // Limit history to 50 states
+    if (newHistory.length > 50) {
+      newHistory.shift();
+    }
+    
+    setHistory(newHistory);
+    setHistoryStep(newHistory.length - 1);
+  };
+
+  // Undo function
+  const undo = () => {
+    if (historyStep <= 0) return;
+    
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    const newStep = historyStep - 1;
+    const imageData = history[newStep];
+    
+    ctx.putImageData(imageData, 0, 0);
+    setHistoryStep(newStep);
+  };
+
+  // Redo function
+  const redo = () => {
+    if (historyStep >= history.length - 1) return;
+    
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    const newStep = historyStep + 1;
+    const imageData = history[newStep];
+    
+    ctx.putImageData(imageData, 0, 0);
+    setHistoryStep(newStep);
   };
 
   const handleSave = () => {
@@ -201,12 +277,14 @@ const fetchArtJournals = async () => {
               style={{ backgroundColor: color }}
             />
           ))}
-          <button 
-            onClick={() => setShowColorPicker(!showColorPicker)}
-            className="w-8 h-8 rounded-full bg-[#1F4B43] flex items-center justify-center text-white hover:opacity-90 transition-opacity"
-          >
-            <ChevronDown className="w-4 h-4" />
-          </button>
+          {config?.enableColorPalette !== false && (
+            <button 
+              onClick={() => setShowColorPicker(!showColorPicker)}
+              className="w-8 h-8 rounded-full bg-[#1F4B43] flex items-center justify-center text-white hover:opacity-90 transition-opacity"
+            >
+              <ChevronDown className="w-4 h-4" />
+            </button>
+          )}
         </div>
 
         <div className="h-8 w-px bg-gray-200"></div>
@@ -254,6 +332,24 @@ const fetchArtJournals = async () => {
       <div className="relative">
         {/* Floating Tools */}
         <div className="absolute top-4 left-4 flex gap-2 z-10">
+          {config?.enableUndo !== false && (
+            <button 
+              onClick={undo}
+              disabled={historyStep <= 0}
+              className={`w-10 h-10 ${historyStep <= 0 ? 'bg-gray-100 text-gray-300' : 'bg-white text-gray-600 border border-gray-100'} rounded-xl flex items-center justify-center shadow-sm hover:bg-gray-50 transition-all disabled:cursor-not-allowed`}
+            >
+              <Undo className="w-5 h-5" />
+            </button>
+          )}
+          {config?.enableRedo !== false && (
+            <button 
+              onClick={redo}
+              disabled={historyStep >= history.length - 1}
+              className={`w-10 h-10 ${historyStep >= history.length - 1 ? 'bg-gray-100 text-gray-300' : 'bg-white text-gray-600 border border-gray-100'} rounded-xl flex items-center justify-center shadow-sm hover:bg-gray-50 transition-all disabled:cursor-not-allowed`}
+            >
+              <Redo className="w-5 h-5" />
+            </button>
+          )}
           <button 
             onClick={() => setCurrentTool('pen')}
             className={`w-10 h-10 ${currentTool === 'pen' ? 'bg-[#2D9CDB]' : 'bg-white text-gray-400 border border-gray-100'} rounded-xl flex items-center justify-center shadow-lg hover:shadow-blue-200 transition-all transform hover:-translate-y-1`}
@@ -266,16 +362,18 @@ const fetchArtJournals = async () => {
           >
             <Eraser className="w-5 h-5" />
           </button>
-          <button 
-            onClick={clearCanvas}
-            className="w-10 h-10 bg-white text-red-400 border border-red-100 rounded-xl flex items-center justify-center shadow-sm hover:bg-red-50 transition-all"
-          >
-            <Trash2 className="w-5 h-5" />
-          </button>
+          {config?.enableClearCanvas !== false && (
+            <button 
+              onClick={clearCanvas}
+              className="w-10 h-10 bg-white text-red-400 border border-red-100 rounded-xl flex items-center justify-center shadow-sm hover:bg-red-50 transition-all"
+            >
+              <Trash2 className="w-5 h-5" />
+            </button>
+          )}
         </div>
 
         {/* Color Picker Modal (Absolute Positioned as per design) */}
-        {showColorPicker && (
+        {showColorPicker && config?.enableColorPalette !== false && (
           <div className="absolute top-16 left-0 z-20 bg-white rounded-2xl shadow-xl border border-gray-100 p-4 w-[320px] animate-in fade-in zoom-in-95 duration-200">
              <div className="flex justify-between items-center mb-3">
                  <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Color Palette</h4>

@@ -10,7 +10,8 @@ import {
   SkipForward, 
   Repeat, 
   Music, 
-  Headphones 
+  Headphones,
+  Loader2 
 } from 'lucide-react';
 
 export const Icons = {
@@ -23,4 +24,5 @@ export const Icons = {
   Repeat,
   Music,
   Headphones,
+  Loader2,
 };

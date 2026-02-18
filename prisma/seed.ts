@@ -182,6 +182,53 @@ async function main() {
     },
   });
 
+  // ------------------------------------------------
+  // 8. Create Default Music Categories
+  // ------------------------------------------------
+  const musicCategories = [
+    { name: "Classical", description: "Classical music for relaxation and focus" },
+    { name: "Nature Sounds", description: "Natural sounds for calming and meditation" },
+    { name: "Ambient", description: "Ambient music for background relaxation" },
+    { name: "Instrumental", description: "Instrumental music without vocals" }
+  ];
+
+  for (const category of musicCategories) {
+    await prisma.musicCategory.upsert({
+      where: { name: category.name },
+      update: {},
+      create: {
+        name: category.name,
+        description: category.description,
+        status: "ACTIVE"
+      }
+    });
+  }
+
+  // ------------------------------------------------
+  // 9. Create Default Music Goals
+  // ------------------------------------------------
+  const musicGoals = [
+    { name: "Stress Relief", description: "Music to help reduce stress and anxiety", icon: "heart", color: "#10B981" },
+    { name: "Focus", description: "Music to improve concentration and focus", icon: "brain", color: "#3B82F6" },
+    { name: "Sleep", description: "Music to aid in better sleep", icon: "moon", color: "#6366F1" },
+    { name: "Energy", description: "Music to boost energy and motivation", icon: "zap", color: "#F59E0B" },
+    { name: "Meditation", description: "Music for meditation and mindfulness", icon: "lotus", color: "#8B5CF6" }
+  ];
+
+  for (const goal of musicGoals) {
+    await prisma.musicGoal.upsert({
+      where: { name: goal.name },
+      update: {},
+      create: {
+        name: goal.name,
+        description: goal.description,
+        icon: goal.icon,
+        color: goal.color,
+        status: "ACTIVE"
+      }
+    });
+  }
+
   console.log("🎉 Seed complete!");
 }
 

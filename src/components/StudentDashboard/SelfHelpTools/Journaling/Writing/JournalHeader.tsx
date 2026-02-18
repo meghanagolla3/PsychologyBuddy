@@ -1,10 +1,9 @@
 'use client';
 
 import React from 'react';
-import { ArrowLeft, Book, ChevronLeft, Mic, Palette } from 'lucide-react';
+import { ArrowLeft, Book } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
-import JournalTabs from '../JournalTabs';
 
 interface JournalHeaderProps {
   activeTab?: 'writing' | 'audio' | 'art';
@@ -42,9 +41,6 @@ export default function JournalHeader({ activeTab = 'writing', onTabChange }: Jo
                    <p className="text-gray-500 text-lg">Do freely in your private space</p>
                 </div>
               </div>
-
-      {/* Tabs */}
-      <JournalTabs activeTab={activeTab} setActiveTab={onTabChange || (() => {})} />
       
     </div>
   );

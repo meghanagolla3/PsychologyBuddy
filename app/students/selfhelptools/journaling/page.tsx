@@ -52,6 +52,81 @@ export default function JournalingPage() {
   const [content, setContent] = useState('');
   const [selectedMood, setSelectedMood] = useState<string | null>(null);
   const [artMood, setArtMood] = useState<string | null>(null);
+  
+  // Admin configuration state
+  const [journalingConfig, setJournalingConfig] = useState<{
+    writingEnabled: boolean;
+    audioEnabled: boolean;
+    artEnabled: boolean;
+    maxAudioDuration?: number;
+    enableUndo?: boolean;
+    enableRedo?: boolean;
+    enableClearCanvas?: boolean;
+  } | null>(null);
+  const [configLoading, setConfigLoading] = useState(true);
+
+  // Load color palette setting from localStorage
+  const loadColorPaletteFromStorage = () => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('artColorPaletteEnabled');
+      return saved !== null ? JSON.parse(saved) : true; // Default to true
+    }
+    return true;
+  };
+
+  // Fetch journaling configuration for student's school
+  const fetchJournalingConfig = async () => {
+    console.log('=== STUDENT CONFIG FETCH START ===');
+    
+    try {
+      const response = await fetch('/api/student/journaling/config', {
+        headers: {
+          "x-user-id": "student", // This will be replaced by actual user ID
+        },
+      });
+      
+      console.log('API Response status:', response.status);
+      const data = await response.json();
+      console.log('API Response data:', data);
+      
+      if (data.success && data.data) {
+        const config = {
+          writingEnabled: data.data.enableWriting || false,
+          audioEnabled: data.data.enableAudio || false,
+          artEnabled: data.data.enableArt || false,
+          maxAudioDuration: data.data.maxAudioDuration,
+          enableUndo: data.data.enableUndo,
+          enableRedo: data.data.enableRedo,
+          enableClearCanvas: data.data.enableClearCanvas,
+          enableColorPalette: loadColorPaletteFromStorage(), // Load from localStorage
+        };
+        
+        console.log('Setting config to:', config);
+        setJournalingConfig(config);
+        
+        // Set default tab to first enabled type
+        if (data.data.enableWriting) {
+          setActiveTab('writing');
+        } else if (data.data.enableAudio) {
+          setActiveTab('audio');
+        } else if (data.data.enableArt) {
+          setActiveTab('art');
+        }
+      } else {
+        console.error('Failed to load journaling configuration:', data);
+      }
+    } catch (error) {
+      console.error('Failed to fetch journaling config:', error);
+    } finally {
+      setConfigLoading(false);
+      console.log('=== STUDENT CONFIG FETCH END ===');
+    }
+  };
+
+  // Load configuration on mount
+  useEffect(() => {
+    fetchJournalingConfig();
+  }, []);
 
   // Fetch journals on component mount and tab change
   useEffect(() => {
@@ -313,151 +388,122 @@ export default function JournalingPage() {
   };
 
   return (
-      <StudentLayout>
-    <div className="min-h-screen bg-[#F3F6F8] p-4 md:p-8">
+    <StudentLayout>
+      <div className="min-h-screen bg-[#F3F6F8] p-4 md:p-8">
       <div className="max-w-7xl mx-auto">
-        <JournalHeader activeTab={activeTab} onTabChange={setActiveTab} />
-        {/* <JournalTabs activeTab={activeTab} setActiveTab={setActiveTab} /> */}
-        
-        <div className="mt-8">
-          {activeTab === 'writing' && (
-            <div>
-              
-            
-              <MoodSelector selectedMood={selectedMood} onMoodSelect={setSelectedMood} />
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-              {/* Main Editor Section */}
-              <div className="lg:col-span-2 space-y-6">
-                
-                <JournalEditor
-                  title={title}
-                  content={content}
-                  onTitleChange={setTitle}
-                  onContentChange={setContent}
-                  onSave={saveJournal}
-                  onClear={() => {
-                    setTitle('');
-                    setContent('');
-                    setSelectedMood(null);
-                  }}
-                  loading={loading}
-                />
-                
+        {configLoading ? (
+          <div className="flex items-center justify-center py-20">
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+              <p className="text-gray-600">Loading journaling configuration...</p>
+            </div>
+          </div>
+        ) : journalingConfig && !journalingConfig.writingEnabled && !journalingConfig.audioEnabled && !journalingConfig.artEnabled ? (
+          <div className="flex items-center justify-center py-20">
+            <div className="text-center">
+              <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <span className="text-2xl">📝</span>
               </div>
-
-              {/* Right Sidebar */}
-              <div className="lg:col-span-1 space-y-6">
-                <WritingPrompts onPromptSelect={handlePromptSelect} />
-                <button 
-                  onClick={viewAllJournals}
-                  className="w-full px-4 py-3 bg-cyan-500 hover:bg-cyan-600 text-white rounded-xl font-medium transition-colors flex items-center justify-center gap-2"
-                >
-                  <BookOpen className="w-5 h-5" />
-                  <span>View All Journals</span>
-                </button>
-              </div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">Journaling Not Available</h3>
+              <p className="text-gray-600">Journaling tools are not currently enabled for your school. Please contact your administrator for more information.</p>
+            </div>
+          </div>
+        ) : (
+          <>
+            <JournalHeader activeTab={activeTab} onTabChange={setActiveTab} />
+            <JournalTabs activeTab={activeTab} setActiveTab={setActiveTab} config={journalingConfig || undefined} />
+            <div className="mt-8">
+              {activeTab === 'writing' ? (
+                <div>
+                  <MoodSelector selectedMood={selectedMood} onMoodSelect={setSelectedMood} />
+                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <div className="lg:col-span-2 space-y-6">
+                      <JournalEditor
+                        title={title}
+                        content={content}
+                        onTitleChange={setTitle}
+                        onContentChange={setContent}
+                        onSave={saveJournal}
+                        onClear={() => {
+                          setTitle('');
+                          setContent('');
+                          setSelectedMood(null);
+                        }}
+                        loading={loading}
+                      />
                     </div>
-            </div>
-          )}
-          
-          {activeTab === 'audio' && (
-            <div className="space-y-8">
-              {/* Audio Recorder Section */}
-              <div className="max-w-2xl mx-auto">
-                <AudioRecorder onRecordingComplete={saveAudioJournal} />
-              </div>
-
-              {/* Audio Journals List */}
-              <div className="max-w-4xl mx-auto">
-                <AudioJournalList 
-                  journals={audioJournals} 
-                  onDelete={deleteAudioJournal}
-                  loading={loading}
-                />
-              </div>
-            </div>
-          )}
-          
-          {activeTab === 'art' && (
-            <div className="min-h-screen bg-[#F3F6F8] font-sans selection:bg-cyan-200 selection:text-cyan-900 pb-20">
-      {/* <Header /> */}
-
-      <main className="max-w-6xl mx-auto px-6 pt-8">
-        {/* Breadcrumb / Back Navigation */}
-        {/* <button className="flex items-center gap-2 text-gray-400 hover:text-gray-600 transition-colors mb-8 text-sm font-medium group">
-          <ChevronLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
-          Back to Self-Help Tool
-        </button>
-
-        {/* Page Title Section */}
-        {/* <div className="flex items-start gap-4 mb-10">
-          <div className="w-16 h-16 bg-[#E3F2FD] rounded-2xl flex items-center justify-center text-blue-500 shadow-sm">
-             <Book className="w-8 h-8 text-[#2D9CDB]" />
-          </div>
-          <div className="pt-1">
-             <h1 className="text-3xl font-extrabold text-gray-800 tracking-tight mb-1">Journaling</h1>
-             <p className="text-gray-500 text-lg">Do freely in your private space</p>
-          </div>
-        </div> */}
-
-        {/* Tabs */}
-        {/* <JournalTabs activeTab={activeTab} setActiveTab={setActiveTab} /> */}
-
-        {/* Mood Selector Section */}
-        <MoodSelector selectedMood={artMood} onMoodSelect={setArtMood} />
-
-        {/* Banner Section */}
-        <div className="bg-[#FFF5EC] border border-[#FFE0B2] rounded-[1.5rem] p-6 mb-8 flex items-center justify-between shadow-sm relative overflow-hidden group">
-           <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-orange-200/20 to-transparent rounded-full -mr-16 -mt-16 pointer-events-none"></div>
-           
-           <h3 className="text-[#E67E22] font-semibold text-lg z-10">Create Waves that Carry your feelings away ?</h3>
-           
-           <button className="bg-[#FFE0B2] hover:bg-[#FFCC80] text-[#E65100] px-6 py-2 rounded-full font-semibold text-sm flex items-center gap-2 transition-all shadow-sm z-10">
-              <Sparkles className="w-4 h-4" />
-              New
-           </button>
-        </div>
-        {artJournals.length > 0 && (
-                  <div className="flex justify-center mt-8 mb-8">
-                    <Link 
-                      href="/students/journaling/art-gallery"
-                      className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white rounded-xl font-medium transition-all shadow-lg hover:shadow-xl hover:-translate-y-1"
-                    >
-                      <span>🎨</span>
-                      <span>View All Art Journals</span>
-                    </Link>
+                    <div className="lg:col-span-1 space-y-6">
+                      <WritingPrompts onPromptSelect={handlePromptSelect} />
+                      <button 
+                        onClick={viewAllJournals}
+                        className="w-full px-4 py-3 bg-cyan-500 hover:bg-cyan-600 text-white rounded-xl font-medium transition-colors flex items-center justify-center gap-2"
+                      >
+                        <BookOpen className="w-5 h-5" />
+                        <span>View All Journals</span>
+                      </button>
+                    </div>
                   </div>
-                )}
-
-        {/* Main Canvas Section */}
-        <DrawingCanvas onSave={saveArtJournal} loading={loading} />
-
-        {/* Save Button */}
-        <div className="flex justify-center mt-10">
-          <button 
-            onClick={() => {
-              const canvas = document.querySelector('canvas');
-              if (canvas) {
-                const imageDataUrl = canvas.toDataURL('image/png');
-                saveArtJournal(imageDataUrl);
-              }
-            }}
-            disabled={loading}
-            className="bg-[#2D9CDB] hover:bg-[#2188C1] disabled:bg-gray-400 text-white px-16 py-4 rounded-2xl font-bold text-lg shadow-lg shadow-blue-400/30 hover:shadow-xl hover:shadow-blue-400/40 hover:-translate-y-1 transition-all duration-300 w-full md:w-auto disabled:cursor-not-allowed"
-          >
-            {loading ? 'Saving...' : 'Save Journal'}
-          </button>
-        </div>
-
-        {/* History Section */}
-        
-
-      </main>
-    </div>
-          )}
-        </div>
+                </div>
+              ) : activeTab === 'audio' ? (
+                <div className="space-y-8">
+                  <div className="max-w-2xl mx-auto">
+                    <AudioRecorder onRecordingComplete={saveAudioJournal} />
+                  </div>
+                  <div className="max-w-4xl mx-auto">
+                    <AudioJournalList 
+                      journals={audioJournals} 
+                      onDelete={deleteAudioJournal}
+                      loading={loading}
+                    />
+                  </div>
+                </div>
+              ) : (
+                <div className="min-h-screen bg-[#F3F6F8] font-sans selection:bg-cyan-200 selection:text-cyan-900 pb-20">
+                  <main className="max-w-6xl mx-auto px-6 pt-8">
+                    <MoodSelector selectedMood={artMood} onMoodSelect={setArtMood} />
+                    <div className="bg-[#FFF5EC] border border-[#FFE0B2] rounded-[1.5rem] p-6 mb-8 flex items-center justify-between shadow-sm relative overflow-hidden group">
+                      <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-orange-200/20 to-transparent rounded-full -mr-16 -mt-16 pointer-events-none"></div>
+                      <h3 className="text-[#E67E22] font-semibold text-lg z-10">Create Waves that Carry your feelings away ?</h3>
+                      <button className="bg-[#FFE0B2] hover:bg-[#FFCC80] text-[#E65100] px-6 py-2 rounded-full font-semibold text-sm flex items-center gap-2 transition-all shadow-sm z-10">
+                        <Sparkles className="w-4 h-4" />
+                        New
+                      </button>
+                    </div>
+                    {artJournals.length > 0 && (
+                      <div className="flex justify-center mt-8 mb-8">
+                        <Link 
+                          href="/students/selfhelptools/journaling/art-gallery"
+                          className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white rounded-xl font-medium transition-all shadow-lg hover:shadow-xl hover:-translate-y-1"
+                        >
+                          <span>🎨</span>
+                          <span>View All Art Journals</span>
+                        </Link>
+                      </div>
+                    )}
+                    <DrawingCanvas onSave={saveArtJournal} loading={loading} config={journalingConfig || undefined} />
+                    <div className="flex justify-center mt-10">
+                      <button 
+                        onClick={() => {
+                          const canvas = document.querySelector('canvas');
+                          if (canvas) {
+                            const imageDataUrl = canvas.toDataURL('image/png');
+                            saveArtJournal(imageDataUrl);
+                          }
+                        }}
+                        disabled={loading}
+                        className="bg-[#2D9CDB] hover:bg-[#2188C1] disabled:bg-gray-400 text-white px-16 py-4 rounded-2xl font-bold text-lg shadow-lg shadow-blue-400/30 hover:shadow-xl hover:shadow-blue-400/40 hover:-translate-y-1 transition-all duration-300 w-full md:w-auto disabled:cursor-not-allowed"
+                      >
+                        {loading ? 'Saving...' : 'Save Journal'}
+                      </button>
+                    </div>
+                  </main>
+                </div>
+              )}
+            </div>
+          </>
+        )}
       </div>
     </div>
-      </StudentLayout>
+  </StudentLayout>
   );
 }

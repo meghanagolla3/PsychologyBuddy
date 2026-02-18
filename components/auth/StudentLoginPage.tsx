@@ -2,7 +2,7 @@ import React from 'react';
 import { useStudentLogin } from '@/src/hooks/auth/useStudentLogin';
 import { StudentLoginForm } from '@/src/components/forms/StudentLoginForm';
 import { PageIllustration } from '@/components/LandingPage/components/PageIllustration';
-import { RingSpinner } from '@/src/components/ui/Spinners';
+import { RingSpinner } from '@/components/ui/Spinners';
 
 export default function StudentLoginPage() {
   const {
