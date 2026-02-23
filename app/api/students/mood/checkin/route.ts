@@ -14,5 +14,5 @@ export const POST = createAPIHandler.post(
       notes
     })
   },
-  { requireAuth: true }
+  { requireAuth: true } // Re-enable authentication - require real user login
 )

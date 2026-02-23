@@ -12,12 +12,14 @@ export const getStudentId = (): string => {
     const sessionId = sessionStorage.getItem('studentId');
     if (sessionId) return sessionId;
     
-    // For development/demo, you can set a default in localStorage
-    // localStorage.setItem('studentId', 'your-actual-student-id');
+    // For development/demo, set a default
+    const defaultStudentId = 'STU001';
+    localStorage.setItem('studentId', defaultStudentId);
+    return defaultStudentId;
   }
   
   // Fallback for development
-  return 'student-123';
+  return 'STU001';
 };
 
 export const getUserId = (): string => {

@@ -79,8 +79,20 @@ export function AddStudentModal({ onClose, onSuccess, schools, classes }: AddStu
       return null;
     }
     
-    // Always create new class as requested
     try {
+      // First, check if class already exists in local classes array
+      const existingClass = classes.find(cls => 
+        cls.schoolId === schoolId && 
+        cls.grade === parseInt(grade) && 
+        cls.section === section
+      );
+      
+      if (existingClass) {
+        console.log('Found existing class in local array:', existingClass);
+        return existingClass.id;
+      }
+      
+      // Try to create/find class via API
       const response = await fetch('/api/classes', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -94,21 +106,23 @@ export function AddStudentModal({ onClose, onSuccess, schools, classes }: AddStu
       });
       
       const data = await response.json();
+      
       if (data.success) {
-        return data.data.id;
-      } else if (data.message?.includes('already exists')) {
-        // If class already exists, find it
-        const existingClass = classes.find(cls => cls.name === className);
-        if (existingClass) {
-          return existingClass.id;
+        console.log('Class operation successful:', data.message);
+        if (data.message === 'Class already exists') {
+          console.log('Using existing class:', data.data);
+        } else {
+          console.log('Created new class:', data.data);
         }
+        return data.data.id;
+      } else {
+        console.error('Failed to create/find class:', data.message);
+        return null;
       }
     } catch (error) {
-      console.error('Error creating class:', error);
+      console.error('Error in createOrFindClass:', error);
       return null;
     }
-    
-    return null;
   };
 
   const handleInputChange = (field: string, value: string) => {

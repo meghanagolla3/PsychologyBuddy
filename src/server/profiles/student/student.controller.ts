@@ -45,8 +45,14 @@ export class StudentController {
       const userSchoolId = user.school?.id || user.schoolId;
       let schoolId;
       if (user.role.name === 'SUPERADMIN') {
-        // Use the schoolId from parameter if provided, otherwise use user's school
-        schoolId = schoolIdParam || userSchoolId || undefined;
+        // For SUPERADMIN: 
+        // - If schoolIdParam is 'all' or not provided, show all schools (undefined)
+        // - If specific schoolIdParam is provided, show that school only
+        if (schoolIdParam === 'all' || !schoolIdParam) {
+          schoolId = undefined; // Show all schools
+        } else {
+          schoolId = schoolIdParam; // Show specific school
+        }
       } else {
         schoolId = userSchoolId; // Must exist for non-SUPERADMIN
       }

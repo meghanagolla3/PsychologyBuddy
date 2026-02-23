@@ -21,11 +21,16 @@ export class MoodService {
    */
   static async createMoodCheckin(checkinData: MoodCheckinData): Promise<any> {
     try {
+      // Require authenticated user - no anonymous access
+      if (!checkinData.studentId) {
+        throw new ValidationError('User authentication required for mood checkin')
+      }
+      
       // Check if student already checked in today
       const existingCheckin = await DatabaseService.checkTodayMoodCheckin(checkinData.studentId)
       
       if (existingCheckin) {
-        throw new ValidationError('Already checked in today')
+        throw new ValidationError('Already checked in today', 'ALREADY_CHECKED_IN', 409)
       }
       
       // Create new mood checkin
@@ -133,7 +138,7 @@ export class MoodService {
       // Verify checkin belongs to student
       const existingCheckin = await DatabaseService.getMoodCheckin(checkinId)
       
-      if (!existingCheckin || existingCheckin.studentId !== studentId) {
+      if (!existingCheckin || existingCheckin.userId !== studentId) {
         throw new ValidationError('Mood checkin not found')
       }
       
@@ -154,7 +159,7 @@ export class MoodService {
       // Verify checkin belongs to student
       const existingCheckin = await DatabaseService.getMoodCheckin(checkinId)
       
-      if (!existingCheckin || existingCheckin.studentId !== studentId) {
+      if (!existingCheckin || existingCheckin.userId !== studentId) {
         throw new ValidationError('Mood checkin not found')
       }
       

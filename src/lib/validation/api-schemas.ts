@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { AuthMiddleware } from '../auth/auth-middleware'
+import { AuthMiddleware } from '../../server/auth/auth-middleware'
 
 // Base schemas 
 const MoodEnum = z.enum(['Happy', 'Okay', 'Sad', 'Anxious', 'Tired'])

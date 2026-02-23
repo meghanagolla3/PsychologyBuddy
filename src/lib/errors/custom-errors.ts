@@ -83,6 +83,13 @@ export class AppError extends Error {
 }
 
 export class ErrorHandler {
+  static logError(error: any, context: string = 'APP'): void {
+    console.error(`[${context}] ${error.name || 'Error'}: ${error.message}`);
+    if (error.stack) {
+      console.error(`Stack: ${error.stack}`);
+    }
+  }
+
   static handle(error: any): { statusCode: number; message: string; code: string } {
     if (error instanceof AppError) {
       return {

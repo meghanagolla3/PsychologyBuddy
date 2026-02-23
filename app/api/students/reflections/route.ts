@@ -16,7 +16,7 @@ export async function GET(req: NextRequest) {
     // Fetch summaries for the student using the new Summary model
     const summaries = await prisma.summary.findMany({
       where: {
-        studentId: studentId,
+        userId: studentId,
       },
       orderBy: {
         createdAt: 'desc',

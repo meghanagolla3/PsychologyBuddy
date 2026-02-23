@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { SummaryService } from '@/src/services/chats/summaryService'
+import { DatabaseService } from '@/src/lib/database/database-service'
 import { z } from 'zod'
 import prisma from '@/src/prisma'
 
@@ -41,13 +42,12 @@ export async function POST(request: NextRequest) {
     }
 
     // Get studentId from the session - we need to extract this from the chat session
-    console.log('Getting studentId from session:', sessionId);
     
     try {
       // First get the chat session to find the studentId
       const chatSession = await prisma.chatSession.findUnique({
         where: { id: sessionId },
-        select: { studentId: true }
+        select: { userId: true }
       });
       
       if (!chatSession) {
@@ -57,18 +57,23 @@ export async function POST(request: NextRequest) {
         );
       }
       
-      const studentId = chatSession.studentId;
-      console.log('Found studentId:', studentId);
+      const studentId = chatSession.userId;
+
+      // Verify session belongs to the student (additional security check)
+      const sessionVerification = await DatabaseService.getChatSession(sessionId, studentId);
+      if (!sessionVerification) {
+        return NextResponse.json(
+          { success: false, error: 'Session access denied' },
+          { status: 403 }
+        );
+      }
 
       // Generate summary
-      console.log('Calling SummaryService.generateSummary...')
       const summary = await SummaryService.generateSummary({
         sessionId,
         conversation,
         studentId
       })
-
-      console.log('Generated summary successfully:', summary)
 
       return NextResponse.json({
         success: true,

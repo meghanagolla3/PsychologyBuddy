@@ -4,16 +4,16 @@ import { nanoid } from "nanoid";
 // SERVER-SIDE SESSION UTILITIES (Server Components only)
 // ===========================================
 
+// TTL = 7 days
+export const SESSION_TTL = 1000 * 60 * 60 * 24 * 7;
+
 // SESSION STORE (Dev: In-memory, Prod: Replace with Redis)
 declare global {
   var sessionStore: Map<string, any> | undefined;
 }
 
-const sessionStore = global.sessionStore || new Map();
+export const sessionStore = global.sessionStore || new Map();
 if (!global.sessionStore) global.sessionStore = sessionStore;
-
-// TTL = 7 days
-const SESSION_TTL = 1000 * 60 * 60 * 24 * 7;
 
 export const SessionUtil = {
   generateSessionId: () => nanoid(),

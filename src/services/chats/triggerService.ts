@@ -260,7 +260,7 @@ export class TriggerService {
       // Verify selection belongs to student
       const existingSelection = await DatabaseService.getTriggerSelection(selectionId)
       
-      if (!existingSelection || existingSelection.studentId !== studentId) {
+      if (!existingSelection || existingSelection.userId !== studentId) {
         throw new ValidationError('Trigger selection not found')
       }
       
@@ -281,7 +281,7 @@ export class TriggerService {
       // Verify selection belongs to student
       const existingSelection = await DatabaseService.getTriggerSelection(selectionId)
       
-      if (!existingSelection || existingSelection.studentId !== studentId) {
+      if (!existingSelection || existingSelection.userId !== studentId) {
         throw new ValidationError('Trigger selection not found')
       }
       

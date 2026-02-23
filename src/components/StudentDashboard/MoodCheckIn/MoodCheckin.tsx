@@ -8,6 +8,7 @@ import { Calendar } from "lucide-react";
 // import { NavigationUtils } from "@/src/utils";
 import { cn } from "@/src/lib/cn";
 import { SearchParamsUtils } from "@/src/lib/ai/search-params";
+import { getAuthHeaders } from "@/src/utils";
 import BackToDashboard from "../Layout/BackToDashboard";
 
 type Mood = "Happy" | "Okay" | "Sad" | "Anxious" | "Tired" | null;
@@ -88,11 +89,16 @@ export default function MoodCheckIn() {
     setError(null);
 
     try {
+      console.log("Submitting mood checkin with data:", {
+        mood: selectedMood,
+        triggers: selectedFactors,
+        notes: notes.trim() || undefined,
+        studentId: 'debug-check' // Debug to see if context.id is available
+      });
+      
       const response = await fetch('/api/students/mood/checkin', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: getAuthHeaders(),
         body: JSON.stringify({
           mood: selectedMood,
           triggers: selectedFactors,
@@ -102,6 +108,7 @@ export default function MoodCheckIn() {
 
       if (!response.ok) {
         const errorData = await response.json();
+        console.error("API Error Response:", errorData);
         throw new Error(errorData.message || 'Failed to submit mood check-in');
       }
 

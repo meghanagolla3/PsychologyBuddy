@@ -431,7 +431,7 @@ export default function ChatInterface({
 
   // Only call chat hooks when user is available - this prevents the "Student ID is required" error
   const chatHookResult = useChat({
-    studentId: user?.id || "",
+    studentId: user?.studentId || user?.id || "",
     mood: mood || accessMood,
     triggers: triggers || accessTriggers,
     notes: notes || accessNotes,
@@ -451,7 +451,7 @@ export default function ChatInterface({
   } = chatHookResult;
 
   // Only call summary hook when user is available
-  const summaryHookResult = useChatSummary({ studentId: user?.id || "" });
+  const summaryHookResult = useChatSummary({ studentId: user?.studentId || user?.id || "" });
   const { lastSummary, importLastSummary } = summaryHookResult;
 
   // Event handlers

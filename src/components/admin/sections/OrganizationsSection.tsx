@@ -177,7 +177,17 @@ export function OrganizationsSection() {
   };
 
   const handleAddOrganization = (newSchool: any) => {
-    setSchools([newSchool, ...schools]);
+    // Add to both local and global schools state
+    const mappedSchool = {
+      ...newSchool,
+      location: newSchool.address || 'Unknown Location',
+      studentCount: newSchool._count?.users || 0,
+      alertCount: 0,
+      checkInsToday: 0,
+    };
+    
+    setLocalSchools([mappedSchool, ...localSchools]);
+    setSchools([mappedSchool, ...schools]);
     setSuccessMessage(`✅ Organization "${newSchool.name}" created successfully!\n\n🎯 **School ID:** ${newSchool.id}\n\n📝 Format: SCH-ABC-TIMESTAMP-CODE\n\nCopy this ID for future reference.`);
     setTimeout(() => setSuccessMessage(''), 12000); // Extended display time for ID explanation
   };
@@ -201,6 +211,8 @@ export function OrganizationsSection() {
       const data = await response.json();
       
       if (data.success) {
+        // Remove from both local and global schools state
+        setLocalSchools(localSchools.filter(s => s.id !== school.id));
         setSchools(schools.filter(s => s.id !== school.id));
         setSuccessMessage(`Organization "${school.name}" deleted successfully`);
         setTimeout(() => setSuccessMessage(''), 5000);
@@ -258,7 +270,7 @@ export function OrganizationsSection() {
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">Total Schools</p>
-                <p className="text-2xl font-semibold">{schools.length}</p>
+                <p className="text-2xl font-semibold">{localSchools.length}</p>
               </div>
             </CardContent>
           </Card>
@@ -269,7 +281,7 @@ export function OrganizationsSection() {
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">Total Students</p>
-                <p className="text-2xl font-semibold">{schools.reduce((acc, s) => acc + (s.studentCount || 0), 0).toLocaleString()}</p>
+                <p className="text-2xl font-semibold">{localSchools.reduce((acc, s) => acc + (s.studentCount || 0), 0).toLocaleString()}</p>
               </div>
             </CardContent>
           </Card>
@@ -280,7 +292,7 @@ export function OrganizationsSection() {
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">Active Alerts</p>
-                <p className="text-2xl font-semibold">{schools.reduce((acc, s) => acc + (s.alertCount || 0), 0)}</p>
+                <p className="text-2xl font-semibold">{localSchools.reduce((acc, s) => acc + (s.alertCount || 0), 0)}</p>
               </div>
             </CardContent>
           </Card>
@@ -291,7 +303,7 @@ export function OrganizationsSection() {
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">Check-ins Today</p>
-                <p className="text-2xl font-semibold">{schools.reduce((acc, s) => acc + (s.checkInsToday || 0), 0).toLocaleString()}</p>
+                <p className="text-2xl font-semibold">{localSchools.reduce((acc, s) => acc + (s.checkInsToday || 0), 0).toLocaleString()}</p>
               </div>
             </CardContent>
           </Card>

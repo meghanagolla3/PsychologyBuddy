@@ -3,6 +3,20 @@ import { UserService } from '@/src/services/user.service';
 import { withPermission } from '@/src/middleware/permission.middleware';
 import { handleError } from '@/src/utils/errors';
 
+// Helper function to find class by grade and section
+async function findClassByGradeSection(schoolId: string, grade: number, section?: string) {
+  try {
+    const classes = await UserService.getClasses(schoolId, { grade, section });
+    if (classes.success && classes.data && classes.data.length > 0) {
+      return classes.data[0]; // Return the first matching class
+    }
+    return null;
+  } catch (error) {
+    console.error('Error finding class by grade/section:', error);
+    return null;
+  }
+}
+
 // POST /api/classes - Create class (Admin only)
 export const POST = withPermission({ 
   module: 'USER_MANAGEMENT', 
@@ -40,6 +54,19 @@ export const POST = withPermission({
       return Response.json(
         { success: false, message: 'School ID is required' },
         { status: 400 }
+      );
+    }
+
+    // Check if class already exists before attempting creation
+    const existingClass = await findClassByGradeSection(schoolId, body.grade, body.section);
+    if (existingClass) {
+      return Response.json(
+        { 
+          success: true, 
+          message: 'Class already exists',
+          data: existingClass 
+        },
+        { status: 200 }
       );
     }
 

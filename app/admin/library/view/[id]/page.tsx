@@ -1,5 +1,5 @@
 import { Metadata } from 'next';
-import { StudentArticleView } from '@/src/components/content-management/library/StudentArticleView';
+import { StudentArticleView } from '@/src/components/admin/library/StudentArticleView';
 
 export const metadata: Metadata = {
   title: 'Article View',

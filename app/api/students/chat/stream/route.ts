@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import prisma from "@/src/prisma";
 import Groq from "groq-sdk";
 import { PSYCHOLOGY_BUDDY_SYSTEM_PROMPT } from "@/src/lib/ai/prompts/system-prompt";
+import { ContentEscalationDetector } from "@/src/services/escalations/content-escalation-detector";
+import { EscalationAlertService } from "@/src/services/escalations/escalation-alert-service";
 
 // Initialize Groq with error handling
 let groq: Groq;
@@ -29,10 +31,22 @@ export async function POST(req: Request) {
     console.log('Chat stream request:', { message, studentId, sessionId });
 
     // Verify that the chat session exists and belongs to the student
+    // First get the user ID from studentId
+    const user = await prisma.user.findUnique({
+      where: { studentId: studentId }
+    });
+    
+    if (!user) {
+      return NextResponse.json(
+        { error: "User not found" },
+        { status: 404 }
+      );
+    }
+
     const session = await prisma.chatSession.findFirst({
       where: {
         id: sessionId,
-        studentId: studentId,
+        userId: user.id,
         isActive: true
       }
     });
@@ -42,7 +56,7 @@ export async function POST(req: Request) {
     if (!session) {
       // Try to find any session for this student to help debug
       const allStudentSessions = await prisma.chatSession.findMany({
-        where: { studentId: studentId },
+        where: { userId: user.id },
         select: { id: true, isActive: true, startedAt: true }
       });
       console.log('All student sessions:', allStudentSessions);
@@ -58,11 +72,72 @@ export async function POST(req: Request) {
     const studentMessage = await prisma.chatMessage.create({
       data: {
         sessionId,
-        senderType: "student",
+        senderType: "STUDENT",
         content: message,
       },
     });
     console.log('Student message saved:', studentMessage.id);
+
+    // Check for escalation indicators in the student's message
+    console.log('[EscalationCheck] Analyzing message for escalation indicators');
+    try {
+      // Get conversation context for better analysis
+      const recentMessages = await prisma.chatMessage.findMany({
+        where: { sessionId },
+        orderBy: { createdAt: 'desc' },
+        take: 5,
+        select: { content: true, senderType: true }
+      });
+
+      const conversationContext = recentMessages
+        .reverse()
+        .slice(0, -1) // Exclude the current message
+        .map(msg => msg.senderType === 'STUDENT' ? msg.content : `Bot: ${msg.content}`);
+
+      // Analyze the message for escalation indicators
+      const detection = await ContentEscalationDetector.analyzeMessage(
+        message,
+        studentId,
+        sessionId,
+        conversationContext
+      );
+
+      console.log('[EscalationCheck] Detection result:', {
+        isEscalation: detection.isEscalation,
+        category: detection.category.type,
+        level: detection.level.level,
+        severity: detection.level.severity,
+        confidence: detection.category.confidence
+      });
+
+      // If this is a valid escalation, create an alert
+      if (ContentEscalationDetector.isValidEscalation(detection)) {
+        console.log('[EscalationCheck] Valid escalation detected, creating alert');
+        
+        try {
+          const alert = await EscalationAlertService.createEscalationAlert(
+            studentId,
+            sessionId,
+            detection,
+            message,
+            studentMessage.createdAt.toISOString()
+          );
+
+          console.log('[EscalationCheck] Alert created successfully:', alert.id);
+          
+          // If immediate action is required, we might want to modify the AI response
+          if (detection.level.requiresImmediateAction) {
+            console.log('[EscalationCheck] Immediate action required - will provide supportive response');
+          }
+        } catch (error) {
+          console.error('[EscalationCheck] Failed to create escalation alert:', error);
+          // Don't fail the chat request if alert creation fails
+        }
+      }
+    } catch (error) {
+      console.error('[EscalationCheck] Error in escalation detection:', error);
+      // Don't fail the chat request if escalation detection fails
+    }
 
     // Try to get AI response with retry logic
     let botReply = "";
@@ -111,7 +186,7 @@ export async function POST(req: Request) {
               const botMessage = await prisma.chatMessage.create({
                 data: {
                   sessionId,
-                  senderType: "bot",
+                  senderType: "BOT",
                   content: rawResponse,
                 },
               });

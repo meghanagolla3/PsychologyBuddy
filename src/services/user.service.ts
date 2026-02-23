@@ -646,6 +646,19 @@ export class UserService {
     schoolId: string;
   }) {
     try {
+      // Check if class with same grade and section already exists in this school
+      const existingClass = await prisma.class.findFirst({
+        where: {
+          schoolId: data.schoolId,
+          grade: data.grade,
+          section: data.section || null,
+        },
+      });
+
+      if (existingClass) {
+        throw new Error('A class with this grade and section already exists in this school');
+      }
+
       const newClass = await prisma.class.create({
         data: {
           name: data.name,
@@ -662,7 +675,11 @@ export class UserService {
       });
 
       return ApiResponse.success(newClass, 'Class created successfully');
-    } catch (error) {
+    } catch (error: any) {
+      // Handle unique constraint violation as fallback
+      if (error.code === 'P2002' && error.meta?.target?.includes('schoolId')) {
+        throw new Error('A class with this grade and section already exists in this school');
+      }
       throw error;
     }
   }
@@ -689,6 +706,26 @@ export class UserService {
         throw AuthError.forbidden('Cannot update class from another school');
       }
 
+      // Check if updating grade/section would create a duplicate
+      if (data.grade !== undefined || data.section !== undefined) {
+        const newGrade = data.grade ?? existingClass.grade;
+        const newSection = data.section ?? existingClass.section;
+
+        // Check if another class with the same grade and section already exists
+        const duplicateClass = await prisma.class.findFirst({
+          where: {
+            schoolId: existingClass.schoolId,
+            grade: newGrade,
+            section: newSection || null,
+            id: { not: classId }, // Exclude the current class
+          },
+        });
+
+        if (duplicateClass) {
+          throw new Error('A class with this grade and section already exists in this school');
+        }
+      }
+
       const updatedClass = await prisma.class.update({
         where: { id: classId },
         data: {
@@ -704,7 +741,11 @@ export class UserService {
       });
 
       return ApiResponse.success(updatedClass, 'Class updated successfully');
-    } catch (error) {
+    } catch (error: any) {
+      // Handle unique constraint violation as fallback
+      if (error.code === 'P2002' && error.meta?.target?.includes('schoolId')) {
+        throw new Error('A class with this grade and section already exists in this school');
+      }
       throw error;
     }
   }

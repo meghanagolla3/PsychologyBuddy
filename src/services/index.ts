@@ -1,6 +1,5 @@
 // Re-export all services for better IDE support
-export { AuthService } from './auth/authService'
-export { EmailService } from './auth/emailService'
+export { AuthService } from '../server/services/auth.service'
 
 // Student services
 export { 
@@ -11,5 +10,4 @@ export {
 } from './chats'
 
 // Service types
-export type { ServiceResponse } from '@/src/types'
-export type { AuthResponse } from '@/src/types'
+export type { ApiResponse } from '@/src/types/api.types'

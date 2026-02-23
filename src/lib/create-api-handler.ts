@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
-import { ErrorHandler, AppError } from '../errors/custom-errors'
-import { AuthMiddleware } from '../auth/auth-middleware'
+import { ErrorHandler, AppError } from './errors/custom-errors'
+import { ValidationError } from './errors/custom-errors'
+import { AuthMiddleware } from '../server/auth/auth-middleware'
 
 export interface APIHandlerConfig {
   requireAuth?: boolean
@@ -135,17 +136,13 @@ class APIHandlerFactory {
   }
 
   private static async authenticate(request: NextRequest, roles?: string[]): Promise<any> {
-    try {
-      const auth = await AuthMiddleware.verifyAuth(request)
-      
-      if (roles && roles.length > 0 && !roles.includes(auth.role)) {
-        throw new AppError('Insufficient permissions', 403)
-      }
-
-      return auth
-    } catch (error) {
-      throw new AppError('Authentication required', 401)
+    const auth = await AuthMiddleware.authenticate(request)
+    
+    if (roles && roles.length > 0 && !roles.includes(auth.role.name)) {
+      throw new AppError('Insufficient permissions', 403)
     }
+
+    return auth
   }
 
   private static handleError(error: Error): NextResponse {
@@ -165,13 +162,23 @@ class APIHandlerFactory {
       )
     }
 
-    if (error instanceof AppError) {
+    if (error instanceof ValidationError) {
       return NextResponse.json(
         {
           success: false,
           message: error.message
         },
         { status: error.statusCode }
+      )
+    }
+
+    if (error instanceof AppError) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: error.message
+        },
+        { status: (error as AppError).statusCode }
       )
     }
 

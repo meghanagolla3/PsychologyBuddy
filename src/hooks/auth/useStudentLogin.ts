@@ -83,8 +83,12 @@ export function useStudentLogin() {
       if (data.success && data.data?.user) {
         setSuccess('Login successful! Redirecting to student portal...');
         
-        // Login user in context
-        login(data.data.user);
+        // Login user in context with required adminProfile (empty for students)
+        const userWithProfile = {
+          ...data.data.user,
+          adminProfile: {} // Students don't have adminProfile but it's required by User interface
+        };
+        login(userWithProfile);
         
         // Redirect to student dashboard
         setTimeout(() => {

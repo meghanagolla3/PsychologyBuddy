@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { authController } from '@/src/server/controllers/auth.controller';
+import { ApiResponse } from '@/src/utils/api-response';
 
 export async function GET(req: NextRequest) {
   return authController.me(req);
@@ -18,7 +19,8 @@ export async function PUT(req: NextRequest) {
     }
 
     // Get current user data
-    const currentUser = await authController.me(req);
+    const currentUserResponse = await authController.me(req);
+    const currentUser = await currentUserResponse.json();
     
     if (!currentUser.success) {
       const errorResponse = ApiResponse.error('User not found', 404);

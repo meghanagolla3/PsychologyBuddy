@@ -31,7 +31,7 @@ export default function ReflectionsPage() {
   const router = useRouter();
   
   // State hooks - must be called before any early returns
-  const [activeTab, setActiveTab] = useState<"related" | "all">("related");
+  const [activeTab, setActiveTab] = useState<"related" | "all">("all");
   const [search, setSearch] = useState("");
   const [reflections, setReflections] = useState<Reflection[]>([]);
   const [filtered, setFiltered] = useState<Reflection[]>([]);
@@ -94,7 +94,6 @@ export default function ReflectionsPage() {
       .slice(0, 3)
       .map(item => item.reflection);
     
-    console.log('Related summaries found:', related.length);
     return related;
   };
 
@@ -132,13 +131,19 @@ export default function ReflectionsPage() {
     if (!user) return;
 
     try {
-      const res = await fetch(`/api/students/summary?studentId=${user.id}`, {
+      // PROPER SOLUTION: Use studentId for session-based access control
+      const studentId = user.studentId || user.id;
+      
+      const res = await fetch(`/api/students/summary?studentId=${studentId}`, {
         cache: "no-store",
       });
 
       const data = await res.json();
+      
       if (data.success) {
         setReflections(data.data);
+      } else {
+        console.log('[ReflectionsPage] API returned success=false');
       }
     } catch (error) {
       console.error("Error fetching reflections:", error);

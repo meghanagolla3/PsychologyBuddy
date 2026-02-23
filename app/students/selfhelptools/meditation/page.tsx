@@ -3,7 +3,16 @@
 import React, { useState, useMemo, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import useSWR from "swr";
-import { ChevronLeft, Heart, Play, Search, Loader2, Music, Clock } from "lucide-react";
+import {
+  ChevronLeft,
+  Heart,
+  Play,
+  Search,
+  Loader2,
+  Music,
+  Clock,
+  PlayIcon,
+} from "lucide-react";
 import { useToast } from "@/src/hooks/use-toast";
 import Image from "next/image";
 
@@ -15,6 +24,7 @@ import { getStudentId } from "@/src/utils/auth";
 import BackToDashboard from "@/src/components/StudentDashboard/Layout/BackToDashboard";
 import SearchHeader from "@/src/components/StudentDashboard/SelfHelpTools/MusicTherapy/SearchHeader";
 import FilterTabs from "@/src/components/StudentDashboard/SelfHelpTools/MusicTherapy/FilterTabs";
+import StudentLayout from "@/src/components/StudentDashboard/Layout/StudentLayout";
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
@@ -115,9 +125,7 @@ export default function MeditationPage() {
     ...(activeCategoryId && { categoryId: activeCategoryId }),
   }).toString();
 
-  const endpoint = debouncedSearch
-    ? `/api/student/meditation/search?${queryParams}`
-    : `/api/student/meditation?${queryParams}`;
+  const endpoint = `/api/student/meditation?${queryParams}`;
 
   const { data: resData, isLoading } = useSWR(endpoint, fetcher, {
     keepPreviousData: true,
@@ -190,18 +198,7 @@ export default function MeditationPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Sticky Header */}
-      <div className="bg-white border-b sticky top-0 z-20">
-        <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
-          <button
-            onClick={() => router.back()}
-            className="flex items-center text-gray-600 hover:text-black"
-          >
-            <ChevronLeft className="w-6 h-6" />
-            <span className="ml-2 font-medium">Back to Tools</span>
-          </button>
-        </div>
-      </div>
+       <StudentLayout>
 
       <div className="container mx-auto px-3 sm:px-2 md:px-6 lg:px-8 py-4 sm:py-5 lg:py-3 max-w-7xl">
         <div className="max-w-7xl my-[2px] sm:my-[10px] mx-[-10px] pt-2 sm:pt-3 lg:pt-5 sm:px-3 lg:px-4">
@@ -209,22 +206,22 @@ export default function MeditationPage() {
         </div>
         <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-4 lg:gap-6">
           <div className="flex mb-[15px] sm:mb-[20px] items-start gap-3 sm:gap-4 w-full sm:w-[510px]">
-            <Image
-              src="/selfhelptools/music/Music.svg"
-              alt="Music Logo"
-              width={63}
-              height={63}
-              className="w-[25px] h-[25px] sm:w-[40px] sm:h-[40px] md:w-[50px] md:h-[50px] lg:w-[63px] lg:h-[63px]"
-            />
+            <Image 
+                                                  src="/Content/Library.svg" 
+                                                  alt="Psychology Buddy Logo" 
+                                                  width={63}
+                                                  height={63}
+                                                  className="w-[25px] h-[25px] sm:w-[40px] sm:h-[40px] md:w-[50px] md:h-[50px] lg:w-[63px] lg:h-[63px]"
+                                                />
             <div className="ml-[3px] sm:ml-[5px] flex-1">
               <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-[32px] font-bold text-slate-900 mb-1 sm:mb-2">
-                Music Therapy
+                Meditation
               </h1>
               <p className="text-[#686D70] text-sm sm:text-base md:text-[16px] font-light hidden xs:block sm:block">
-                Curated playlists designed to support your emotional wellbeing.
+                Find the perfect practice for your needs
               </p>
               <p className="text-[#686D70] text-xs sm:text-sm font-light block xs:hidden sm:hidden">
-                Explore More Music for emotional wellbeing
+                Find the perfect practice for your needs
               </p>
             </div>
           </div>
@@ -284,14 +281,12 @@ export default function MeditationPage() {
             </p>
           </div>
         )}
-      </div>
-
       {/* Meditation Instructions Section */}
       {(() => {
         console.log("Checking instructions:", instructions);
         if (instructions && instructions.title) {
           return (
-            <div className="mb-6 mt-8">
+            <div className="mb-10 mt-5">
               <InstructionsDisplay
                 title={instructions.title}
                 points={instructions.points}
@@ -303,11 +298,14 @@ export default function MeditationPage() {
         }
         return null;
       })()}
+      </div>
+
 
       {/* Modal - Passing allResources allows the modal to build the playlist */}
       {showPlayer && selectedCard && (
         <PlayerModal card={selectedCard} onClose={() => setShowPlayer(false)} />
       )}
+      </StudentLayout>
     </div>
   );
 }
@@ -329,11 +327,11 @@ function MeditationCardItem({ meditation, isSaved, onSave, onClick }: any) {
           alt={meditation.title}
           className="w-full h-full object-cover opacity-90 rounded-tl-[13px] rounded-tr-[14px]"
         />
-        <div className="absolute inset-0 bg-black/10 group-hover:bg-black/30 transition-colors flex items-center justify-center">
+        {/* <div className="absolute inset-0 bg-black/10 group-hover:bg-black/30 transition-colors flex items-center justify-center">
           <div className="w-12 h-12 bg-white/90 rounded-full flex items-center justify-center scale-90 group-hover:scale-100 transition-all shadow-lg">
             <Play className="w-5 h-5 text-blue-600 fill-current ml-1" />
           </div>
-        </div>
+        </div> */}
       </div>
 
       <div className="p-4">
@@ -342,7 +340,10 @@ function MeditationCardItem({ meditation, isSaved, onSave, onClick }: any) {
             {meditation.title}
           </h3>
           <button
-            onClick={onSave}
+            onClick={(e) => {
+              e.stopPropagation();
+              onSave();
+            }}
             className={`p-2 rounded-full w-[36px] h-[35px] border border-[#D4D4D4] ${isSaved ? "bg-red-50 text-red-500" : "bg-gray-50 text-[#666666]"}`}
           >
             <Heart
@@ -351,12 +352,12 @@ function MeditationCardItem({ meditation, isSaved, onSave, onClick }: any) {
           </button>
         </div>
         <p className="text-sm text-gray-600 mb-2">
-          {meditation.artist || "Therapeutic Artist"}
+          {meditation.description || "Therapeutic Artist"}
         </p>
         <div className="flex items-center gap-2 mb-2">
           <Clock className="w-[14px] h-[14px] -mr-1 text-[#686D70]"></Clock>
           <span className="text-[13px] text-[#686D70] -mb-0.5 -ml-0.5 rounded">
-            {Math.floor(meditation.duration / 60)} mins
+            {durationMin} mins
           </span>
           {meditation.category && (
             <span className="text-[10px] font-bold bg-gray-100 text-gray-600 px-2 py-1 rounded">
@@ -365,22 +366,20 @@ function MeditationCardItem({ meditation, isSaved, onSave, onClick }: any) {
           )}
         </div>
 
-        <div className="flex items-center justify-between mt-4 pt-4 border-t border-gray-50">
-          <span className="text-[10px] font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded tracking-wider uppercase">
-            {durationMin} MINS
-          </span>
+        <div className="flex mt-10 items-center justify-between">
           <button
             onClick={(e) => {
-              e.stopPropagation(); // Prevents opening the modal when clicking favorite
-              onSave();
+              e.stopPropagation();
+              onClick();
             }}
-            className={`p-2 rounded-full transition-colors ${
-              isSaved
-                ? "text-red-500 bg-red-50"
-                : "text-gray-400 hover:bg-gray-100 hover:text-red-400"
-            }`}
+            className="group w-[348px] h-[52px] border-2 border-[#1C76DC] bg-white 
+                       group-hover:bg-[#1C76DC] rounded-full ml-2 flex items-center 
+                       justify-center transition-colors"
           >
-            <Heart className={`w-5 h-5 ${isSaved ? "fill-current" : ""}`} />
+            <PlayIcon className="w-[16px] h-[17px] text-[#1C76DC] group-hover:text-white transition-colors" />
+            <span className="text-[#1C76DC] group-hover:text-white ml-2 transition-colors font-medium text-[16px]">
+              Play
+            </span>
           </button>
         </div>
       </div>

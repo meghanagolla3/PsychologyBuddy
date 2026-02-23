@@ -22,6 +22,16 @@ import { EditStudentModal } from '../modals/EditStudentModal';
 import { ViewStudentModal } from '../modals/ViewStudentModal';
 import { AdminHeader } from '../layout/AdminHeader';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Label } from '@/components/ui/label';
+import { MoreVertical, Archive } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 interface Student {
   id: string;
@@ -82,9 +92,23 @@ export function StudentsManagementSection() {
   const canUpdateStudents = hasPermission('users.update');
   const canDeleteStudents = hasPermission('users.delete');
 
+  const statusStyles = {
+    ACTIVE: { bg: 'bg-[#10B981]/10', text: 'text-[#10B981]', label: 'Active' },
+    INACTIVE: { bg: 'bg-[#6B7280]/10', text: 'text-[#64748B]', label: 'Inactive' },
+    SUSPENDED: { bg: 'bg-[#EF4444]/10', text: 'text-[#EF4444]', label: 'Suspended' }
+  };
+
   useEffect(() => {
     if (canViewStudents) {
       console.log('Main useEffect called - canViewStudents:', canViewStudents);
+      
+      // For super admins, ensure we start with 'all' schools
+      if (isSuperAdmin && selectedSchoolId !== 'all') {
+        console.log('Super admin detected but selectedSchoolId is not "all", resetting to "all"');
+        setSelectedSchoolId('all');
+        return; // Don't fetch yet, wait for the state update
+      }
+      
       fetchStudents();
       fetchClasses();
       if (isSuperAdmin) {
@@ -93,11 +117,25 @@ export function StudentsManagementSection() {
     }
   }, [canViewStudents, isSuperAdmin]);
 
-  // Auto-set school ID for regular admins
+  // Auto-set school ID for regular admins ONLY
   useEffect(() => {
+    console.log('School ID auto-set check:', { 
+      isSuperAdmin, 
+      userSchoolId: user?.school?.id, 
+      currentSelectedSchoolId: selectedSchoolId,
+      userRole: user?.role?.name 
+    });
+    
+    // Only set school ID for regular admins, NOT for super admins
     if (!isSuperAdmin && user?.school?.id && selectedSchoolId === 'all') {
       console.log('Auto-setting schoolId for regular admin:', user.school.id);
       setSelectedSchoolId(user.school.id);
+    } else if (isSuperAdmin && selectedSchoolId !== 'all') {
+      // If super admin has a specific school selected (not 'all'), keep it as is
+      console.log('Super admin has specific school selected:', selectedSchoolId);
+    } else if (isSuperAdmin && selectedSchoolId === 'all') {
+      // Ensure super admin stays on 'all' 
+      console.log('Super admin is on all schools');
     }
   }, [isSuperAdmin, user, selectedSchoolId, setSelectedSchoolId]);
 
@@ -111,7 +149,17 @@ export function StudentsManagementSection() {
   const fetchStudents = async () => {
     try {
       setLoading(true);
+      
+      console.log('fetchStudents called with state:', { 
+        selectedSchoolId, 
+        isSuperAdmin, 
+        userSchoolId: user?.school?.id,
+        userRole: user?.role?.name 
+      });
+      
       const params = new URLSearchParams();
+      
+      // Always add search and status filters
       if (searchTerm) params.append('search', searchTerm);
       if (statusFilter !== 'all') params.append('status', statusFilter);
       if (classFilter !== 'all') params.append('classId', classFilter);
@@ -121,6 +169,8 @@ export function StudentsManagementSection() {
       if (selectedSchoolId && selectedSchoolId !== 'all') {
         params.append('schoolId', selectedSchoolId);
         console.log('Added schoolId to params:', selectedSchoolId);
+      } else {
+        console.log('NOT adding schoolId to params - selectedSchoolId is:', selectedSchoolId);
       }
 
       console.log('Fetching students with params:', params.toString());
@@ -218,19 +268,19 @@ export function StudentsManagementSection() {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'ACTIVE': return 'text-green-600 bg-green-50';
-      case 'INACTIVE': return 'text-gray-600 bg-gray-50';
-      case 'SUSPENDED': return 'text-red-600 bg-red-50';
-      default: return 'text-gray-600 bg-gray-50';
+      case 'ACTIVE': return 'text-[#10B981] bg-[#10B981]/10';
+      case 'INACTIVE': return 'text-[#6B7280] bg-[#6B7280]/10';
+      case 'SUSPENDED': return 'text-[#EF4444] bg-[#EF4444]/10';
+      default: return 'text-[#6B7280] bg-[#6B7280]/10';
     }
   };
 
   const getRiskColor = (riskLevel?: string) => {
     switch (riskLevel) {
-      case 'HIGH': return 'text-red-600';
-      case 'MEDIUM': return 'text-yellow-600';
-      case 'LOW': return 'text-green-600';
-      default: return 'text-gray-600';
+      case 'HIGH': return 'text-[#EF4444]';
+      case 'MEDIUM': return 'text-[#F59E0B]';
+      case 'LOW': return 'text-[#10B981]';
+      default: return 'text-[#6B7280]';
     }
   };
 
@@ -242,16 +292,16 @@ export function StudentsManagementSection() {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="text-center">
-          <Users className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-          <h3 className="text-lg font-medium text-gray-900 mb-2">Access Denied</h3>
-          <p className="text-gray-600">You don't have permission to view students.</p>
+          <Users className="w-12 h-12 text-[#9CA3AF] mx-auto mb-4" />
+          <h3 className="text-lg font-medium text-[#111827] mb-2">Access Denied</h3>
+          <p className="text-[#6B7280]">You don't have permission to view students.</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div>
+    <div className="">
       <AdminHeader 
         title="Student Management" 
         subtitle="View and manage student profiles"
@@ -261,13 +311,13 @@ export function StudentsManagementSection() {
         schools={schools}
         showTimeFilter={false}
         actions={canCreateStudents && (
-          <button
+          <Button
             onClick={handleAddStudent}
-            className="flex items-center space-x-2 px-4 py-2 bg-[#3c83f6] text-white rounded-lg hover:bg-blue-700 transition-colors"
+            className="gap-2"
           >
             <Plus className="w-4 h-4" />
             <span>Add Student</span>
-          </button>
+          </Button>
         )}
       />
       {/* Header */}
@@ -288,189 +338,141 @@ export function StudentsManagementSection() {
       </div> */}
 
       {/* Filters and Search */}
-      <div className="flex flex-col sm:flex-row gap-4 mb-6">
-        <div className="flex-1">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
-            <input
-              type="text"
-              placeholder="Search by name, email, or student ID..."
+      <div className="flex-1 overflow-auto p-6 space-y-6 animate-fade-in">
+        <div className="flex flex-col sm:flex-row gap-4">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#64748B]" />
+            <Input 
+              placeholder="Search students..." 
+              className="pl-9"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
           </div>
+          <Select value={statusFilter} onValueChange={setStatusFilter}>
+            <SelectTrigger className="w-40">
+              <Filter className="h-4 w-4 mr-2" />
+              <SelectValue placeholder="Status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Status</SelectItem>
+              <SelectItem value="ACTIVE">Active</SelectItem>
+              <SelectItem value="INACTIVE">Inactive</SelectItem>
+              <SelectItem value="SUSPENDED">Suspended</SelectItem>
+            </SelectContent>
+          </Select>
+          <Select value={classFilter} onValueChange={setClassFilter}>
+            <SelectTrigger className="w-36">
+              <SelectValue placeholder="Class" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Classes</SelectItem>
+              {classes.map((cls) => (
+                <SelectItem key={cls.id} value={cls.id}>{cls.name}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
-        
-        <select
-          value={statusFilter}
-          onChange={(e) => setStatusFilter(e.target.value)}
-          className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-        >
-          <option value="all">All Status</option>
-          <option value="ACTIVE">Active</option>
-          <option value="INACTIVE">Inactive</option>
-          <option value="SUSPENDED">Suspended</option>
-        </select>
-
-        <select
-          value={classFilter}
-          onChange={(e) => setClassFilter(e.target.value)}
-          className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-        >
-          <option value="all">All Classes</option>
-          {classes.map((cls) => (
-            <option key={cls.id} value={cls.id}>
-              {cls.name}
-            </option>
-          ))}
-        </select>
       </div>
 
       {/* Students Table */}
-      <div className="bg-white rounded-lg shadow overflow-hidden">
-        {loading ? (
-          <div className="flex items-center justify-center h-64">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-          </div>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Student
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Class
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Status
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Last Check-in
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Avg Mood
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Sessions
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Risk Level
-                  </th>
-                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Actions
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {students.length === 0 ? (
-                  <tr>
-                    <td colSpan={8} className="px-6 py-12 text-center text-gray-500">
-                      No students found
-                    </td>
-                  </tr>
-                ) : (
-                  students.map((student) => (
-                    <tr key={student.id} className="hover:bg-gray-50">
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="flex items-center">
-                          <Avatar className="h-10 w-10">
-                            <AvatarImage 
-                              src={student.studentProfile?.profileImage || ''} 
-                              alt={`${student.firstName} ${student.lastName}`}
-                            />
-                            <AvatarFallback className="bg-blue-100 text-blue-600">
-                              {getInitials(student.firstName, student.lastName)}
-                            </AvatarFallback>
-                          </Avatar>
-                          <div className="ml-4">
-                            <div className="text-sm font-medium text-gray-900">
-                              {student.firstName} {student.lastName}
-                            </div>
-                            <div className="text-sm text-gray-500">{student.email}</div>
-                            <div className="text-xs text-gray-400">{student.studentId}</div>
-                          </div>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        {student.classRef?.name || '-'}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(student.status)}`}>
-                          {student.status}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        {student.studentProfile?.lastMoodCheckin ? (
-                          <div className="flex items-center text-gray-600">
-                            <Calendar className="w-4 h-4 mr-1" />
-                            {new Date(student.studentProfile.lastMoodCheckin).toLocaleDateString()}
-                          </div>
-                        ) : (
-                          <span className="text-gray-400">Never</span>
+      <div className="rounded-xl ml-6 mr-6 border border-[#D1D5DB] bg-[#FFFFFF] overflow-hidden">
+        <Table>
+          <TableHeader>
+            <TableRow className="bg-[#E2E8F0]/50">
+              <TableHead>Student</TableHead>
+              <TableHead>Class</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead>Last Check-in</TableHead>
+              <TableHead className="text-center">Avg Mood</TableHead>
+              <TableHead className="text-center">Sessions</TableHead>
+              <TableHead className="w-12"></TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {students.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={7} className="text-center text-[#64748B] py-12">
+                  No students found
+                </TableCell>
+              </TableRow>
+            ) : (
+              students.map((student) => (
+                <TableRow key={student.id} className="hover:bg-[#E2E8F0]/30">
+                  <TableCell>
+                    <div className="flex items-center gap-3">
+                      <Avatar className="h-9 w-9">
+                        <AvatarImage 
+                          src={student.studentProfile?.profileImage || ''} 
+                          alt={`${student.firstName} ${student.lastName}`}
+                        />
+                        <AvatarFallback className="bg-[#3B82F6]/10 text-[#3B82F6] text-sm">
+                          {getInitials(student.firstName, student.lastName)}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div>
+                        <p className="font-medium text-[#1E293B]">{student.firstName} {student.lastName}</p>
+                        <p className="text-xs text-[#64748B]">{student.email}</p>
+                        <p className="text-xs text-[#64748B]">{student.studentId}</p>
+                      </div>
+                    </div>
+                  </TableCell>
+                  <TableCell className="text-[#64748B]">{student.classRef?.name || '-'}</TableCell>
+                  <TableCell>
+                    <Badge 
+                      variant="secondary"
+                      className={cn("text-xs", statusStyles[student.status].bg, statusStyles[student.status].text)}
+                    >
+                      {statusStyles[student.status].label}
+                    </Badge>
+                  </TableCell>
+                  <TableCell className="text-[#64748B]">
+                    {student.studentProfile?.lastMoodCheckin ? (
+                      new Date(student.studentProfile.lastMoodCheckin).toLocaleDateString()
+                    ) : (
+                      'Never'
+                    )}
+                  </TableCell>
+                  <TableCell className="text-center">
+                    <span className={cn(
+                      "font-medium",
+                      (student.studentProfile?.averageMood ?? 0) >= 3.5 ? "text-[#10B981]" : 
+                      (student.studentProfile?.averageMood ?? 0) >= 2.5 ? "text-[#F59E0B]" : "text-[#EF4444]"
+                    )}>
+                      {student.studentProfile?.averageMood?.toFixed(1) || '-'}
+                    </span>
+                  </TableCell>
+                  <TableCell className="text-center text-[#64748B]">{student._count?.chatSessions || 0}</TableCell>
+                  <TableCell>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" size="icon" className="h-8 w-8">
+                          <MoreVertical className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuItem className="gap-2" onClick={() => handleViewStudent(student)}>
+                          <Eye className="h-4 w-4" /> View Profile
+                        </DropdownMenuItem>
+                        {canUpdateStudents && (
+                          <DropdownMenuItem className="gap-2" onClick={() => handleEditStudent(student)}>
+                            <Edit className="h-4 w-4" /> Edit
+                          </DropdownMenuItem>
                         )}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        {student.studentProfile?.averageMood ? (
-                          <div className="flex items-center">
-                            <TrendingUp className="w-4 h-4 mr-1 text-green-500" />
-                            {student.studentProfile.averageMood.toFixed(1)}
-                          </div>
-                        ) : (
-                          <span className="text-gray-400">-</span>
+                        <DropdownMenuSeparator />
+                        {canDeleteStudents && (
+                          <DropdownMenuItem className="gap-2 text-[#EF4444] focus:text-[#EF4444]">
+                            <Archive className="h-4 w-4" /> Archive
+                          </DropdownMenuItem>
                         )}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        {student._count?.chatSessions || 0}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        {student.studentProfile?.riskLevel ? (
-                          <div className={`flex items-center ${getRiskColor(student.studentProfile.riskLevel)}`}>
-                            <AlertTriangle className="w-4 h-4 mr-1" />
-                            <span className="text-sm font-medium">{student.studentProfile.riskLevel}</span>
-                          </div>
-                        ) : (
-                          <span className="text-gray-400">-</span>
-                        )}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                        <div className="flex items-center justify-end space-x-2">
-                          <button
-                            onClick={() => handleViewStudent(student)}
-                            className="text-blue-600 hover:text-blue-900 p-1 rounded"
-                            title="View Details"
-                          >
-                            <Eye className="w-4 h-4" />
-                          </button>
-                          {canUpdateStudents && (
-                            <button
-                              onClick={() => handleEditStudent(student)}
-                              className="text-green-600 hover:text-green-900 p-1 rounded"
-                              title="Edit Student"
-                            >
-                              <Edit className="w-4 h-4" />
-                            </button>
-                          )}
-                          {canDeleteStudents && (
-                            <button
-                              onClick={() => handleDeleteStudent(student.id)}
-                              className="text-red-600 hover:text-red-900 p-1 rounded"
-                              title="Deactivate Student"
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </button>
-                          )}
-                        </div>
-                      </td>
-                    </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
-          </div>
-        )}
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
+          </TableBody>
+        </Table>
       </div>
 
       {/* Add Student Modal */}

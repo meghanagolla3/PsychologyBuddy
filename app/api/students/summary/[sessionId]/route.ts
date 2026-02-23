@@ -23,7 +23,7 @@ export async function GET(
     // Get the session to find the studentId (no auth required for now)
     const session = await prisma.chatSession.findUnique({
       where: { id: sessionId },
-      select: { studentId: true }
+      select: { userId: true }
     });
     
     if (!session) {
@@ -33,10 +33,10 @@ export async function GET(
       )
     }
     
-    console.log('Found session for student:', session.studentId);
+    console.log('Found session for student:', session.userId);
 
     // Get summary for the session
-    const summary = await SummaryService.getSessionSummary(sessionId, session.studentId)
+    const summary = await SummaryService.getSessionSummary(sessionId, session.userId)
 
     if (!summary) {
       return NextResponse.json(

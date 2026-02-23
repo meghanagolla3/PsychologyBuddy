@@ -22,13 +22,16 @@ model User {
   createdAt              DateTime                         @default(now())
   updatedAt              DateTime                         @updatedAt
   emailVerified          Boolean                          @default(false)
+  adminNotifications     AdminNotification[]
   adminProfile           AdminProfile?
   artJournals            ArtJournal[]
+  completions            ArticleCompletion[]              @relation("UserCompletions")
   articles               Article[]                        @relation("UserArticles")
   audioJournals          AudioJournal[]
   createdBadges          Badge[]                          @relation("BadgeCreator")
   chatSessions           ChatSession[]
   dailyLogins            DailyLogin[]
+  escalationAlerts       EscalationAlert[]
   highRiskAlerts         HighRiskAlert[]
   meditations            Meditation[]                     @relation("UserMeditations")
   meditationInstructions MeditationListeningInstruction[] @relation("UserMeditationInstruction")
@@ -44,11 +47,10 @@ model User {
   summaries              Summary[]
   triggerSelections      TriggerSelection[]
   userBadges             UserBadge[]
-  writingJournals        WritingJournal[]
-  completions            ArticleCompletion[]               @relation("UserCompletions")
   classRef               Class?                           @relation(fields: [classId], references: [id])
   role                   Role                             @relation(fields: [roleId], references: [id])
   school                 School?                          @relation(fields: [schoolId], references: [id])
+  writingJournals        WritingJournal[]
 
   @@map("Users")
 }
@@ -426,11 +428,12 @@ model Article {
   createdBy          String
   averageRating      Float?
   ratingCount        Int?
-  views              Int                 @default(0)
   createdAt          DateTime            @default(now())
   updatedAt          DateTime            @updatedAt
+  views              Int                 @default(0)
   blocks             ArticleBlock[]
   categories         ArticleCategory[]
+  completions        ArticleCompletion[] @relation("ArticleCompletions")
   goals              ArticleGoal[]
   moods              ArticleMood[]
   admin              User                @relation("UserArticles", fields: [createdBy], references: [id])
@@ -442,7 +445,6 @@ model Article {
   reflectionBlocks   ReflectionBlock[]
   savedArticles      SavedArticle[]      @relation("ArticleSaves")
   sectionBlocks      SectionBlock[]
-  completions        ArticleCompletion[] @relation("ArticleCompletions")
 
   @@map("Articles")
 }
@@ -573,6 +575,52 @@ model HighRiskAlert {
   user      User     @relation(fields: [userId], references: [id])
 
   @@map("HighRiskAlerts")
+}
+
+model EscalationAlert {
+  id                      String              @id @default(cuid())
+  studentId               String
+  studentName             String
+  studentClass            String?
+  sessionId               String
+  category                String
+  level                   String
+  severity                Float
+  confidence              Float
+  detectedPhrases         String[]
+  context                 String?
+  recommendation          String?
+  description             String
+  detectionMethod         String
+  messageContent          String
+  messageTimestamp        String
+  requiresImmediateAction Boolean             @default(false)
+  status                  String              @default("open")
+  priority                String              @default("medium")
+  assignedTo              String?
+  notes                   String?
+  createdAt               DateTime            @default(now())
+  updatedAt               DateTime            @updatedAt
+  adminNotifications      AdminNotification[]
+  user                    User                @relation(fields: [studentId], references: [id])
+
+  @@map("EscalationAlerts")
+}
+
+model AdminNotification {
+  id        String           @id @default(cuid())
+  userId    String
+  alertId   String?
+  type      String
+  message   String
+  severity  String
+  read      Boolean          @default(false)
+  createdAt DateTime         @default(now())
+  readAt    DateTime?
+  alert     EscalationAlert? @relation(fields: [alertId], references: [id])
+  user      User             @relation(fields: [userId], references: [id])
+
+  @@map("AdminNotifications")
 }
 
 model MoodLabel {
@@ -806,7 +854,7 @@ model Badge {
   conditionValue Int?
   createdBy      String
   createdAt      DateTime    @default(now())
-  schoolId       String?     // School ID for badge filtering
+  schoolId       String?
   admin          User        @relation("BadgeCreator", fields: [createdBy], references: [id])
   userBadges     UserBadge[]
 

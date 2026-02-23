@@ -95,7 +95,7 @@ export function AdminSidebar() {
     {
       label: "Escalation & Alerts",
       icon: AlertTriangle,
-      href: "/alerts",
+      href: "/admin/alerts",
       permission: 'escalations.view',
       badge: 25,
     },

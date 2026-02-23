@@ -33,7 +33,8 @@ export function ManagePermissionsModal({ admin, onClose, onSuccess }: ManagePerm
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    setSelectedPermissions(admin.role.permissions || []);
+    const permissions = admin.role.rolePermissions?.map(rp => rp.permission.name) || [];
+    setSelectedPermissions(permissions);
   }, [admin]);
 
   const handlePermissionToggle = (permissionId: string) => {

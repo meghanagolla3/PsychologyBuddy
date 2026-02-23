@@ -25,12 +25,13 @@ export class StudentService {
         throw AuthError.conflict('Student with this ID already exists');
       }
 
-      // Check if student email already exists (if provided)
-      if (data.email) {
-        const existingEmail = await StudentRepository.findStudentByEmail(data.email);
-        if (existingEmail) {
-          throw AuthError.conflict('Student with this email already exists');
-        }
+      // Check if student email already exists (both provided and generated)
+      const emailToCheck = data.email || `${studentId.toLowerCase()}@school.local`;
+      const existingEmail = await prisma.user.findUnique({
+        where: { email: emailToCheck }
+      });
+      if (existingEmail) {
+        throw AuthError.conflict('Student with this email already exists');
       }
 
       // Get student role
@@ -61,7 +62,11 @@ export class StudentService {
       const { password: _, ...studentWithoutPassword } = student;
 
       return ApiResponse.success(studentWithoutPassword, 'Student created successfully');
-    } catch (error) {
+    } catch (error: any) {
+      // Handle unique constraint violation as fallback
+      if (error.code === 'P2002' && error.meta?.target?.includes('email')) {
+        throw new Error('A user with this email already exists');
+      }
       throw error;
     }
   }

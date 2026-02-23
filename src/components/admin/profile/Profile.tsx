@@ -23,15 +23,6 @@ interface AdminProfile extends Admin {
       };
     }[];
   };
-  role?: {
-    id: string;
-    name: string;
-    rolePermissions?: {
-      permission: {
-        name: string;
-      };
-    }[];
-  };
 }
 
 export default function Profile() {

@@ -3,6 +3,7 @@ import { GoalService } from '../services/goal.service';
 import { withPermission } from '@/src/middleware/permission.middleware';
 import { handleError } from '@/src/utils/errors';
 import { CreateGoalSchema, UpdateGoalSchema } from '../validators/goal.validators';
+import { AuthenticationError } from '@/src/lib/errors/custom-errors';
 
 export class GoalController {
   // GET /api/labels/goals - Get all goals (Admin & SuperAdmin)
@@ -32,7 +33,7 @@ export class GoalController {
         console.log('Received goal data:', body);
       } catch (parseError) {
         console.error('JSON parse error:', parseError);
-        throw new AuthError('Invalid JSON in request body', 400);
+        throw new AuthenticationError('Invalid JSON in request body', 'INVALID_JSON', 400);
       }
 
       const validatedData = CreateGoalSchema.parse(body);

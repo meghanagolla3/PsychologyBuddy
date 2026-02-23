@@ -30,7 +30,7 @@ export async function POST(req: Request) {
     const session = await prisma.chatSession.findFirst({
       where: {
         id: sessionId,
-        studentId: studentId,
+        userId: studentId,
       },
       include: {
         messages: {
@@ -54,7 +54,7 @@ export async function POST(req: Request) {
       let allStudentSessions: any[] = [];
       try {
         allStudentSessions = await prisma.chatSession.findMany({
-          where: { studentId: studentId },
+          where: { userId: studentId },
           select: { id: true, isActive: true, startedAt: true }
         });
       } catch (e) {

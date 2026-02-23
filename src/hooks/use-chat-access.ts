@@ -3,6 +3,7 @@ import { useSearchParams } from 'next/navigation'
 import { useRouter } from 'next/navigation'
 import { SearchParamsUtils, NavigationUtils } from '@/src/utils'
 import { useAuth } from '@/src/contexts/AuthContext'
+import { getAuthHeaders } from '@/src/utils/session.util'
 
 export interface UseChatAccessReturn {
   canAccessChat: boolean
@@ -37,11 +38,13 @@ export function useChatAccess(): UseChatAccessReturn {
       }
 
       try {
-        // Check if user has already checked in today (optional info)
-        const response = await fetch(`/api/students/mood/checkin/today?studentId=${user.id}`)
+        // Check if user has already checked in today (using authenticated context)
+        const response = await fetch(`/api/students/mood/checkin/today`, {
+          headers: getAuthHeaders()
+        })
         const data = await response.json()
         
-        const hasTodayCheckin = data.success && data.data
+        const hasTodayCheckin = data.hasCheckin
         setHasCheckedInToday(hasTodayCheckin)
 
         // NEW LOGIC: Always allow chat access after login

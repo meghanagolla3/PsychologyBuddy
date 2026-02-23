@@ -1,8 +1,11 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
+import { useRouter } from 'next/navigation'
 import { ChatAPI } from '../lib/ai/chat-api'
 import { ConversationAnalyzer } from '../services/conversation-analysis'
 import { AutomaticChatTermination, ChatTerminationResult } from '../services/chats/automatic-chat-termination'
 import { ResponseFormatter, StructuredResponse } from '../lib/ai/response-templates'
+import { ContentEscalationDetector } from '../services/escalations/content-escalation-detector'
+import { EscalationAlertService } from '../services/escalations/escalation-alert-service'
 
 export interface Message {
   id: string
@@ -24,6 +27,14 @@ export interface ChatState {
   isLoading: boolean
   sessionId: string | null
   sessionStartTime: number | null
+  escalationAlert?: {
+    id: string
+    category: string
+    level: string
+    severity: number
+    requiresImmediateAction: boolean
+    recommendation: string
+  }
 }
 
 export interface UseChatOptions {
@@ -33,6 +44,7 @@ export interface UseChatOptions {
   notes?: string
   onMessage?: (message: Message) => void
   onError?: (error: Error) => void
+  onEscalation?: (escalation: ChatState['escalationAlert']) => void
   importData?: { mainTopic?: string; sessionId?: string }
 }
 
@@ -43,9 +55,10 @@ export function useChat({
   notes,
   onMessage,
   onError,
+  onEscalation,
   importData,
 }: UseChatOptions) {
-  console.log(`[AutoTermination] useChat hook initialized! studentId=${studentId}`);
+  const router = useRouter();
   
   const [state, setState] = useState<ChatState>({
     messages: [],
@@ -236,6 +249,14 @@ export function useChat({
       // Generate summary and end chat
       await generateSummaryAndEndChat();
       
+      // Wait a moment after summary generation to ensure it's stored before redirecting
+      console.log(`[AutoTermination] Waiting 2 seconds after summary generation...`);
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      
+      // Redirect to reflections page to show the new summary
+      console.log(`[AutoTermination] Redirecting to reflections page...`);
+      router.push('/students/reflections');
+      
     } catch (error) {
       console.error('Error during automatic termination:', error);
       isTerminatingRef.current = false;
@@ -362,6 +383,84 @@ export function useChat({
 
     onMessage?.(userMessage)
 
+    // Check for escalation indicators in the student's message
+    console.log('[EscalationCheck] Analyzing message for escalation indicators');
+    try {
+      // Get conversation context for better analysis
+      const conversationContext = state.messages
+        .slice(-5) // Last 5 messages for context
+        .map(msg => msg.content);
+
+      // Analyze the message for escalation indicators
+      const detection = await ContentEscalationDetector.analyzeMessage(
+        messageText,
+        studentId,
+        sessionIdRef.current || 'unknown',
+        conversationContext
+      );
+
+      console.log('[EscalationCheck] Detection result:', {
+        isEscalation: detection.isEscalation,
+        category: detection.category.type,
+        level: detection.level.level,
+        severity: detection.level.severity,
+        confidence: detection.category.confidence
+      });
+
+      // If this is a valid escalation, create an alert and update state
+      if (ContentEscalationDetector.isValidEscalation(detection)) {
+        console.log('[EscalationCheck] Valid escalation detected, creating alert');
+        
+        try {
+          // Create alert through API (this will be handled by the chat stream route too)
+          const response = await fetch('/api/students/escalations', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'x-user-id': studentId
+            },
+            body: JSON.stringify({
+              message: messageText,
+              studentId,
+              sessionId: sessionIdRef.current
+            })
+          });
+
+          if (response.ok) {
+            const alertData = await response.json();
+            console.log('[EscalationCheck] Alert created successfully:', alertData.alert?.id);
+            
+            if (alertData.escalationDetected && alertData.alert) {
+              const escalationAlert = {
+                id: alertData.alert.id,
+                category: alertData.alert.category,
+                level: alertData.alert.level,
+                severity: alertData.alert.severity,
+                requiresImmediateAction: alertData.alert.requiresImmediateAction,
+                recommendation: alertData.alert.recommendation
+              };
+
+              // Update state with escalation alert
+              setState(prev => ({ ...prev, escalationAlert: escalationAlert }));
+              
+              // Call escalation callback
+              onEscalation?.(escalationAlert);
+              
+              console.log('[EscalationCheck] Escalation alert set in state and callback triggered');
+            }
+          } else {
+            console.error('[EscalationCheck] Failed to create escalation alert:', response.status);
+          }
+        } catch (error) {
+          console.error('[EscalationCheck] Error creating escalation alert:', error);
+          // Don't fail the chat request if alert creation fails
+        }
+      }
+    } catch (error) {
+      console.error('[EscalationCheck] Error in escalation detection:', error);
+      // Don't fail the chat request if escalation detection fails
+    }
+
     try {
       // Validate required fields before sending request
       if (!sessionIdRef.current) {
@@ -459,7 +558,7 @@ export function useChat({
     } finally {
       setState(prev => ({ ...prev, isLoading: false }))
     }
-  }, [studentId, sessionIdRef, mood, triggers, notes, onMessage, onError, importData])
+  }, [studentId, sessionIdRef, mood, triggers, notes, onMessage, onError, onEscalation, importData, state.messages])
 
   // End chat session and clean up
   const endChat = useCallback(async () => {

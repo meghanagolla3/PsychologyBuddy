@@ -24,6 +24,7 @@ interface AdminLoginResponse {
         id: string;
         name: string;
       };
+      adminProfile?: any;
     };
   };
 }
@@ -79,8 +80,12 @@ export function useAdminLogin() {
       if (data.success && data.data?.user) {
         setSuccess('Login successful! Redirecting...');
         
-        // Login user in context
-        login(data.data.user);
+        // Login user in context with required adminProfile
+        const userWithProfile = {
+          ...data.data.user,
+          adminProfile: data.data.user.adminProfile || {}
+        };
+        login(userWithProfile);
         
         // Redirect based on role
         const userRole = data.data.user.role.name;

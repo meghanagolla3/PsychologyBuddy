@@ -33,7 +33,7 @@ export async function GET(req: NextRequest) {
     const formattedMessages = messages.map(msg => ({
       id: msg.id,
       content: msg.content,
-      role: msg.senderType === 'student' ? 'user' : 'assistant',
+      role: msg.senderType === 'STUDENT' ? 'user' : 'assistant',
       timestamp: msg.createdAt.toISOString(),
     }));
 

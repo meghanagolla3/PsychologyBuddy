@@ -86,6 +86,12 @@ export function SchoolFilterProvider({ children }: { children: ReactNode }) {
               
               setSchools(schoolsList);
               console.log('Schools set:', schoolsList);
+              
+              // For super admins, ensure selectedSchoolId is 'all' if not already set to a specific school
+              if (isSuper && selectedSchoolId === 'all') {
+                console.log('Super admin detected, keeping selectedSchoolId as "all"');
+                setSelectedSchoolId('all');
+              }
             } else {
               console.error('Schools API error:', schoolsData);
             }

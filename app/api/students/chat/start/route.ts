@@ -21,20 +21,32 @@ export async function POST(req: Request) {
     }
 
     // Check if student exists first, create if not (for development)
-    let student = await prisma.student.findUnique({
-      where: { id: studentId }
+    let student = await prisma.user.findUnique({
+      where: { studentId: studentId }
     });
 
     if (!student) {
+      // Get the STUDENT role
+      const studentRole = await prisma.role.findUnique({
+        where: { name: "STUDENT" }
+      });
+
+      if (!studentRole) {
+        return NextResponse.json(
+          { success: false, message: "Student role not found" },
+          { status: 500 }
+        );
+      }
+
       // Create a development student if none exists
-      student = await prisma.student.create({
+      student = await prisma.user.create({
         data: {
-          id: studentId,
           studentId: studentId,
           firstName: "Test",
           lastName: "Student",
           email: `${studentId}@test.com`,
           password: "dev_password", // In production, this should be hashed
+          roleId: studentRole.id,
         }
       });
       console.log(`Created development student: ${studentId}`);
@@ -42,7 +54,7 @@ export async function POST(req: Request) {
 
     // Check for previous conversations
     const previousSummaries = await prisma.summary.findMany({
-      where: { studentId },
+      where: { userId: student.id },
       orderBy: { createdAt: 'desc' },
       take: 1
     });
@@ -54,9 +66,9 @@ export async function POST(req: Request) {
     const session = await prisma.chatSession.create({
       data: {
         id: `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-        studentId,
+        userId: student.id,
         mood: mood || null,
-        trigger: triggers?.length ? triggers.join(", ") : null,
+        triggers: triggers?.length ? triggers.join(", ") : null,
       },
     });
 
@@ -126,7 +138,7 @@ export async function POST(req: Request) {
     await prisma.chatMessage.create({
       data: {
         sessionId: session.id,
-        senderType: "bot",
+        senderType: "BOT",
         content: openingMessage,
       },
     });
