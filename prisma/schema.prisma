@@ -56,11 +56,13 @@ model User {
 }
 
 model StudentProfile {
-  id           String  @id @default(uuid())
-  userId       String  @unique
-  profileImage String?
-  status       String  @default("ACTIVE")
-  user         User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id               String  @id @default(uuid())
+  userId           String  @unique
+  profileImage     String?
+  dateOfBirth      DateTime?
+  emergencyContact Json?
+  status           String  @default("ACTIVE")
+  user             User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("StudentProfiles")
 }
@@ -562,6 +564,7 @@ model Streak {
   id         String   @id @default(uuid())
   userId     String   @unique
   count      Int      @default(0)
+  bestStreak Int      @default(0)
   lastActive DateTime @default(now())
   user       User     @relation(fields: [userId], references: [id])
 

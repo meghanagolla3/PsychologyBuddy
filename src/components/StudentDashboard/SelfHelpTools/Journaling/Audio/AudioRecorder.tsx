@@ -189,7 +189,7 @@ export default function AudioRecorder({ onRecordingComplete }: AudioRecorderProp
         <div className="flex items-center justify-between mb-6 sm:mb-8">
           <div className="flex items-center gap-3">
             <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-xl flex items-center justify-center">
-              <img src="/journaling/Mic.svg" alt="Editor" className="w-[35px] h-[35px] sm:w-[63px] sm:h-[63px]" />
+              <img src="/selfhelptools/journaling/Mic.svg" alt="Editor" className="w-[35px] h-[35px] sm:w-[63px] sm:h-[63px]" />
             </div>
             <div className='-ml-2 sm:ml-2'>
               <h3 className="font-bold text-[#2F3D43] text-[14px] sm:text-[24px]">Today's Entry</h3>

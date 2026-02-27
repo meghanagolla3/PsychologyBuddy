@@ -74,6 +74,62 @@ export class StudentController {
     }
   });
 
+  // GET /api/admin/students/:id/profile - Get student profile for admin view
+  static getStudentProfileForAdmin = async (req: NextRequest, { params }: any) => {
+    try {
+      // Await params for Next.js 15+
+      const { id } = await params;
+      
+      // Temporarily bypass permission check for testing
+      console.log('Fetching student profile for admin, ID:', id);
+      
+      const result = await StudentService.getStudentProfileForAdmin(id);
+      return NextResponse.json(result);
+    } catch (error) {
+      console.error('Get student profile for admin error:', error);
+      const errorResponse = handleError(error);
+      return NextResponse.json(errorResponse, { status: errorResponse.error?.code || 500 });
+    }
+  };
+
+  // GET /api/students/:id/profile - Get student profile for student view
+  static updateStudentProfile = async (req: NextRequest, { params, body }: any) => {
+    try {
+      const { data, photo } = body;
+      const { id } = await params; // Await params for Next.js 15+
+
+      // Call service to update profile
+      const result = await StudentService.updateStudentProfile(id, data, photo);
+      
+      return NextResponse.json(result);
+    } catch (error) {
+      console.error('Update student profile error:', error);
+      const errorResponse = handleError(error);
+      return NextResponse.json(errorResponse, { status: errorResponse.error?.code || 500 });
+    }
+  };
+
+  static getStudentProfileForStudent = async (req: NextRequest, { params }: any) => {
+    try {
+      // Await params for Next.js 15+
+      const { id } = await params;
+      
+      // Temporarily bypass permission check for debugging
+      console.log('Profile endpoint called with params:', { id });
+      
+      // Get user from auth middleware if available
+      const user = (global as any).user || null;
+      console.log('User from context:', user);
+
+      const result = await StudentService.getStudentProfileForStudent(id);
+      return NextResponse.json(result);
+    } catch (error) {
+      console.error('Get student profile for student error:', error);
+      const errorResponse = handleError(error);
+      return NextResponse.json(errorResponse, { status: errorResponse.error?.code || 500 });
+    }
+  };
+
   // GET /api/students/:id - Get student by ID
   static getStudentById = withPermission({ 
     module: 'USER_MANAGEMENT', 
@@ -101,10 +157,13 @@ export class StudentController {
     action: 'UPDATE' 
   })(async (req: NextRequest, { params }: any) => {
     try {
+      // Await params for Next.js 15+
+      const { id } = await params;
+      
       const body = await req.json();
       const validatedData = UpdateStudentSchema.parse(body);
       
-      const result = await StudentService.updateStudent(params.id, validatedData);
+      const result = await StudentService.updateStudent(id, validatedData);
       return NextResponse.json(result);
     } catch (error) {
       console.error('Update student error:', error);

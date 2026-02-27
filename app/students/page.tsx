@@ -1,116 +1,53 @@
-'use client'
-import React from 'react';
-import Link from 'next/link';
-import { Card, CardContent } from '@/components/ui/card';
-import { Flame, Smile, BookOpen, Award, Trophy } from 'lucide-react';
-import StudentLayout from '@/src/components/StudentDashboard/Layout/StudentLayout';
+import BadgeProgress from "@/src/components/StudentDashboard/Dashboard/BadgeProgress";
+import CurrentStreak from "@/src/components/StudentDashboard/Dashboard/CurrentStreak";
+import DailyMotivation from "@/src/components/StudentDashboard/Dashboard/DailyMotivation";
+import EmotionalPatterns from "@/src/components/StudentDashboard/Dashboard/EmotionalPatterns";
+import ExerciseCard from "@/src/components/StudentDashboard/Dashboard/ExerciseCard";
+import ExploreSpace from "@/src/components/StudentDashboard/Dashboard/ExploreSpace";
+import HeaderGreeting from "@/src/components/StudentDashboard/Dashboard/HeaderGreeting";
+import StatsCards from "@/src/components/StudentDashboard/Dashboard/StatsCards";
+import WeeklyMoodTrends from "@/src/components/StudentDashboard/Dashboard/WeeklyMoodTrends";
+import RecentActivity from "@/src/components/StudentDashboard/Dashboard/RecentActivity";
+import StudentLayout from "@/src/components/StudentDashboard/Layout/StudentLayout";
 
-export default function DashboardStats() {
-  const stats = [
-    {
-      icon: Flame,
-      value: '07',
-      label: 'Days',
-      subtitle: 'Current Streaks',
-      bgColor: 'bg-orange-50',
-      iconColor: 'text-orange-500',
-      iconBgColor: 'bg-orange-100'
-    },
-    {
-      icon: Smile,
-      value: '42',
-      label: 'Total',
-      subtitle: 'Check-ins',
-      bgColor: 'bg-purple-50',
-      iconColor: 'text-purple-500',
-      iconBgColor: 'bg-purple-100'
-    },
-    {
-      icon: BookOpen,
-      value: '15',
-      label: 'Accessed',
-      subtitle: 'Resources Used',
-      bgColor: 'bg-green-50',
-      iconColor: 'text-green-500',
-      iconBgColor: 'bg-green-100'
-    },
-    {
-      icon: Award,
-      value: '08',
-      label: 'Unlocked',
-      subtitle: 'Badges Earned',
-      bgColor: 'bg-blue-50',
-      iconColor: 'text-blue-500',
-      iconBgColor: 'bg-blue-100'
-    }
-  ];
-
+export default function DashboardPage() {
   return (
     <StudentLayout>
-    <div className="w-full max-w-7xl mx-auto p-6 space-y-6">
-      {/* Header */}
-      <div>
-        <h1 className="text-3xl font-semibold text-gray-800 flex items-center gap-2">
-          Hi Ananya 👋
-        </h1>
-        <p className="text-gray-500 mt-1">How are you feeling today?</p>
+      <div className="flex justify-center w-full">
+        <div className="p-6 space-y-6 w-full max-w-[1212px]">
+
+          {/* Greeting */}
+          <HeaderGreeting />
+
+          {/* Stats Row */}
+          <StatsCards />
+
+          {/* Explore Section */}
+          <ExploreSpace />
+
+          {/* GRID LAYOUT STARTS */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
+
+            {/* Left Column */}
+            <div className="space-y-6">
+              <DailyMotivation />
+              <BadgeProgress />
+              <CurrentStreak />
+              <EmotionalPatterns />
+            </div>
+
+            {/* Right Column */}
+            <div className="space-y-6">
+              <WeeklyMoodTrends />
+              <ExerciseCard />
+              <RecentActivity />
+            </div>
+
+          </div>
+          {/* GRID END */}
+
+        </div>
       </div>
-
-      {/* Stats Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {stats.map((stat, index) => (
-          <Card 
-            key={index} 
-            className={`${stat.bgColor} border-none shadow-sm hover:shadow-md transition-shadow duration-200`}
-          >
-            <CardContent className="p-6 space-y-4">
-              {/* Icon */}
-              <div className={`${stat.iconBgColor} w-10 h-10 rounded-lg flex items-center justify-center`}>
-                <stat.icon className={`w-5 h-5 ${stat.iconColor}`} />
-              </div>
-
-              {/* Value and Label */}
-              <div>
-                <div className="text-4xl font-bold text-gray-800">
-                  {stat.value}
-                </div>
-                <div className="text-sm font-medium text-gray-700 mt-1">
-                  {stat.label}
-                </div>
-                <div className="text-sm text-gray-500 mt-0.5">
-                  {stat.subtitle}
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-        
-        {/* Badges Card */}
-        <Link href="/students/badges">
-          <Card className="bg-gradient-to-br from-purple-50 to-blue-50 border-none shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer">
-            <CardContent className="p-6 space-y-4">
-              {/* Icon */}
-              <div className="bg-purple-100 w-10 h-10 rounded-lg flex items-center justify-center">
-                <Trophy className="w-5 h-5 text-purple-500" />
-              </div>
-
-              {/* Value and Label */}
-              <div>
-                <div className="text-lg font-bold text-gray-800">
-                  View All
-                </div>
-                <div className="text-sm font-medium text-gray-700 mt-1">
-                  Badges & Streaks
-                </div>
-                <div className="text-sm text-purple-600 mt-0.5">
-                  Track your progress →
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </Link>
-      </div>
-    </div>
     </StudentLayout>
   );
 }

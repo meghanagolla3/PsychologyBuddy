@@ -22,6 +22,12 @@ interface User {
     grade: number;
     section: string;
   };
+  studentProfile?: {
+    id?: string;
+    profileImage?: string;
+    dateOfBirth?: Date;
+    emergencyContact?: any;
+  };
 }
 
 interface AuthContextType {

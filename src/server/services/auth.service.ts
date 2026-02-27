@@ -3,6 +3,7 @@ import { PasswordUtil } from '@/src/utils/password.util';
 import { SessionUtil } from '@/src/utils/session-server.util';
 import { ApiResponse } from '@/src/utils/api-response';
 import { AuthError } from '@/src/utils/errors';
+import { StreakService } from '../services/streak.service';
 
 export class AuthService {
   // Student login
@@ -31,6 +32,14 @@ export class AuthService {
       const expiresAt = SessionUtil.getExpirationTime();
       
       await AuthRepository.createSession(sessionId, student.id, student.roleId, expiresAt);
+
+      // Update user's streak for login activity
+      try {
+        await StreakService.updateStreak(student.id);
+      } catch (streakError) {
+        // Log streak update error but don't fail login
+        console.error('Failed to update streak after login:', streakError);
+      }
 
       // Return user data without password
       const { password: _, ...userWithoutPassword } = student;

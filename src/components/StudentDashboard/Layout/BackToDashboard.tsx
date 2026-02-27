@@ -14,7 +14,7 @@ export default function BackToDashboard({ className = "" }: BackToDashboardProps
 
   return (
     <button
-      onClick={() => router.push('/dashboard/student')}
+      onClick={() => router.push('/students')}
       className={`flex items-center gap-2 text-[#73829A] hover:text-[#1a9bcc] transition-colors p-2 ${className}`}
     >
       <ArrowLeft className="w-4 h-5" />

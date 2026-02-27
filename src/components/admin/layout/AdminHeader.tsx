@@ -224,7 +224,7 @@ export function AdminHeader({
           </DropdownMenu>
 
           <button
-            onClick={() => router.push('/admin/profile')}
+            onClick={() => router.push('/admin/profile/admin')}
             className="rounded-full ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
           >
             <Avatar className="h-9 w-9 cursor-pointer hover:ring-2 hover:ring-primary/20 transition-all">

@@ -4,6 +4,7 @@ import React from 'react';
 import { ArrowLeft, Book, BookOpen, Paintbrush, PenBox, Pencil, PencilLine, PenLine } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
+import BackToDashboard from '../../../Layout/BackToDashboard';
 
 interface JournalHeaderProps {
   activeTab?: 'writing' | 'audio' | 'art';
@@ -16,28 +17,29 @@ export default function JournalHeader({ activeTab = 'writing', onTabChange, view
   const router = useRouter();
   
   const handleBack = () => {
-    router.push('/students');
+    router.push('/students/selfhelptools');
   };
+  
 
   return (
     <div className="space-y-4 sm:space-y-6 lg:space-y-8">
       {/* Breadcrumb */}
-      <button 
-        onClick={handleBack}
-        className="flex items-center gap-2 text-slate-400 hover:text-blue-600 transition-colors group"
-      >
-        <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
-        <span className="text-xs sm:text-sm font-medium">Back to Self-Help Tool</span>
-      </button>
+      <button
+            onClick={handleBack}
+            className={`flex items-center gap-2 text-[#73829A] hover:text-[#1a9bcc] transition-colors p-2`}
+          >
+            <ArrowLeft className="w-4 h-5" />
+            <span className="text-[13px] sm:text-[16px]">Back to Dashboard</span>
+          </button>
 
       {/* Header Content */}
       
       
               {/* Page Title Section */}
-              <div className="flex items-start justify-between gap-3 sm:gap-4 mb-6 sm:mb-10">
+              <div className="flex items-start justify-between gap-3 sm:gap-4 mb-6 mt-5 sm:mb-10">
                 <div className="flex items-start gap-3 sm:gap-4">
                   <div className="w-12 h-12 sm:w-16 sm:h-16 bg-[#E3F2FD] rounded-2xl flex items-center justify-center text-blue-500 shadow-sm">
-              <img src="/journaling/Header.svg" alt="Editor" className="w-[45px] h-[45px] sm:w-[63px] sm:h-[63px]" />
+              <img src="/selfhelptools/journaling/Header.svg" alt="Editor" className="w-[45px] h-[45px] sm:w-[63px] sm:h-[63px]" />
                   </div>
                   <div className="pt-1">
                      <h1 className="text-[16px] sm:text-3xl font-extrabold text-gray-800 tracking-tight mb-1">Journaling</h1>

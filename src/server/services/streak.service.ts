@@ -21,6 +21,7 @@ export class StreakService {
           data: {
             userId,
             count: 1,
+            bestStreak: 1,
             lastActive: today,
           },
         });
@@ -37,6 +38,7 @@ export class StreakService {
       const daysDiff = this.getDaysDifference(lastActive, today);
 
       let newCount = existingStreak.count;
+      let newBestStreak = existingStreak.bestStreak || 0;
 
       switch (daysDiff) {
         case 0:
@@ -45,17 +47,24 @@ export class StreakService {
         case 1:
           // Yesterday - increment streak
           newCount++;
+          if (newCount > newBestStreak) {
+            newBestStreak = newCount;
+          }
           break;
         default:
           // More than 1 day gap - reset to 1
           newCount = 1;
+          if (newCount > newBestStreak) {
+            newBestStreak = newCount;
+          }
           break;
       }
-
+      
       const updatedStreak = await prisma.streak.update({
         where: { userId },
         data: {
           count: newCount,
+          bestStreak: newBestStreak,
           lastActive: today,
         },
       });

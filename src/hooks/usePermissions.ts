@@ -2,7 +2,6 @@ import { useAuth } from '@/src/contexts/AuthContext';
 import { ROLE_PERMISSIONS } from '@/src/config/permission';
 
 export function usePermissions() {
-  console.log('usePermissions hook called');
   const { user } = useAuth();
   
   if (!user) {
@@ -28,12 +27,12 @@ export function usePermissions() {
   const userRole = user.role.name;
   const rolePermissions = ROLE_PERMISSIONS[userRole as keyof typeof ROLE_PERMISSIONS] || [];
   
-  // For ADMIN users, use individual admin permissions as feature enablement
+  // For ADMIN users, use individual admin permissions as additional features
   let userPermissions = [...rolePermissions];
   if (userRole === 'ADMIN' && user.adminProfile?.adminPermissions) {
     const adminPermissions = user.adminProfile.adminPermissions.map((ap: any) => ap.permission?.name).filter(Boolean);
-    // Use individual permissions as enabled features, not restrictions
-    userPermissions = adminPermissions.length > 0 ? adminPermissions : rolePermissions;
+    // Add individual permissions to role permissions
+    userPermissions = [...new Set([...rolePermissions, ...adminPermissions])];
   } else if (userRole === 'ADMIN') {
     console.log('ADMIN user - no individual permissions found, using role permissions');
   }
@@ -63,9 +62,9 @@ export function usePermissions() {
     canDeleteUsers: hasPermission('users.delete'),
     canViewUsers: hasPermission('users.view'),
     
-    // Student Management (for admins)
-    canManageStudents: hasPermission('users.create') && userRole === 'ADMIN',
-    canViewStudents: hasPermission('users.view') && userRole === 'ADMIN',
+    // Student Management (for admins and superadmins)
+    canManageStudents: hasPermission('users.create') && (userRole === 'ADMIN' || userRole === 'SUPERADMIN'),
+    canViewStudents: hasPermission('users.view') && (userRole === 'ADMIN' || userRole === 'SUPERADMIN'),
     
     // Organization permissions (SuperAdmin only)
     canManageOrgs: hasPermission('organizations.create'),

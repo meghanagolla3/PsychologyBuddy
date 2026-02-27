@@ -4,6 +4,7 @@ import { CreateWritingJournalSchema, DeleteWritingJournalSchema, CreateAudioJour
 import { ApiResponse } from '@/src/utils/api-response';
 import { handleError } from '@/src/utils/errors';
 import { getSession, requireRole } from '@/src/utils/session-helper';
+import { StreakService } from '../services/streak.service';
 
 export class JournalingStudentController {
   // GET /api/student/journaling/config
@@ -48,6 +49,13 @@ export class JournalingStudentController {
         session.schoolId,
         parsed
       );
+
+      // Update user's streak for journal activity
+      try {
+        await StreakService.updateStreak(session.userId);
+      } catch (streakError) {
+        console.error('Failed to update streak after writing journal:', streakError);
+      }
 
       return NextResponse.json(result);
     } catch (err) {
@@ -125,6 +133,13 @@ export class JournalingStudentController {
         audioFile
       );
 
+      // Update user's streak for journal activity
+      try {
+        await StreakService.updateStreak(session.userId);
+      } catch (streakError) {
+        console.error('Failed to update streak after audio journal:', streakError);
+      }
+
       return NextResponse.json(result);
     } catch (err) {
       const errorResponse = handleError(err);
@@ -192,6 +207,13 @@ export class JournalingStudentController {
         parsed,
         imageFile
       );
+
+      // Update user's streak for journal activity
+      try {
+        await StreakService.updateStreak(session.userId);
+      } catch (streakError) {
+        console.error('Failed to update streak after art journal:', streakError);
+      }
 
       return NextResponse.json(result);
     } catch (err) {

@@ -44,7 +44,7 @@ export default function JournalEditor({
         <div className="flex items-center justify-between gap-2 sm:gap-3 mb-2 sm:mb-4">
           <div className="flex items-center gap-2 sm:gap-3">
             <div className="p-2 sm:p-2.5 rounded-xl">
-              <img src="/journaling/Editor.svg" alt="Editor" className="w-[45px] h-[45px] sm:w-[63px] sm:h-[63px]" />
+              <img src="/selfhelptools/journaling/Editor.svg" alt="Editor" className="w-[45px] h-[45px] sm:w-[63px] sm:h-[63px]" />
             </div>
             <div>
               <h3 className="font-bold text-[#2F3D43] text-sm sm:text-[24px]">Today's Entry</h3>

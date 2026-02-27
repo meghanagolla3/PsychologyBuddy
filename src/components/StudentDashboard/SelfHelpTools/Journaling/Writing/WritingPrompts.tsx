@@ -74,7 +74,7 @@ export default function WritingPrompts({ onPromptSelect }: WritingPromptsProps) 
     <div className="bg-white rounded-[16px] p-4 sm:p-6 lg:p-8 border border-slate-100 w-full sm:w-auto shadow-sm h-auto sm:h-[655px] flex flex-col -mt-2.5">
       <div className="flex items-center gap-2 sm:gap-3 mb-2">
         <div className="p-0.5 sm:-p-2 rounded-xl">
-<img src="/journaling/Prompt.svg" alt="Editor" className="w-[45px] h-[45px] sm:w-[63px] sm:h-[63px]" />        </div>
+<img src="/selfhelptools/journaling/Prompt.svg" alt="Editor" className="w-[45px] h-[45px] sm:w-[63px] sm:h-[63px]" />        </div>
         <h3 className="font-bold text-slate-900 text-base sm:text-[24px]">Writing Prompts</h3>
       </div>
       <p className="text-slate-500 text-[12px] sm:text-[16px] mb-4 sm:mb-6 pl-8 sm:pl-12">

@@ -1,10 +1,3 @@
-/**
- * Date utility functions
- */
-
-/**
- * Format a date to relative time (e.g., "today", "yesterday", "2 days ago", "3 weeks ago")
- */
 export function formatRelativeTime(date: Date | string): string {
   const inputDate = typeof date === 'string' ? new Date(date) : date;
   const now = new Date();

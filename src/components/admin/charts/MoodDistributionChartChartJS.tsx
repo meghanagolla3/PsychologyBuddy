@@ -55,16 +55,28 @@ export function MoodDistributionChart({
 
   const hasValid = cleaned.length > 0 && cleaned.some((d) => d.value > 0);
 
-  const fallback: MoodData[] = [
-    { name: "Happy", value: 35, color: "#10b981", count: 12 },
-    { name: "Okay", value: 25, color: "#3b82f6", count: 8 },
-    { name: "Sad", value: 15, color: "#8b5cf6", count: 5 },
-    { name: "Anxious", value: 15, color: "#f59e0b", count: 5 },
-    { name: "Tired", value: 10, color: "#ef4444", count: 3 }
-  ];
+  // Only show chart if there's valid mood data
+  if (!hasValid) {
+    return (
+      <div className="rounded-xl border border-border bg-[#fffff] p-5">
+        <div className="mb-4">
+          <h3 className="text-base font-semibold text-foreground">Mood Distribution</h3>
+          <p className="text-sm text-[#666666]">
+            Today's emotional breakdown
+          </p>
+        </div>
+        <div className="flex items-center justify-center h-71 text-center">
+          <div className="text-[#666666]">
+            <p className="text-sm">No mood check-ins available</p>
+            <p className="text-xs mt-1">Check back later for mood distribution data</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
-  const chartData = hasValid ? cleaned : fallback;
-  const currentDominant = hasValid && dominantMood ? dominantMood : chartData[0];
+  const chartData = cleaned;
+  const currentDominant = dominantMood || chartData[0];
 
   const options = {
     responsive: true,

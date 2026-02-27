@@ -12,6 +12,7 @@ import {
   Music,
   Clock,
   PlayIcon,
+  ArrowLeft,
 } from "lucide-react";
 import { useToast } from "@/src/hooks/use-toast";
 import Image from "next/image";
@@ -202,8 +203,13 @@ export default function MeditationPage() {
 
       <div className="container mx-auto px-3 sm:px-2 md:px-6 lg:px-8 py-4 sm:py-5 lg:py-3 max-w-7xl">
         <div className="max-w-7xl my-[2px] sm:my-[10px] mx-[-10px] pt-2 sm:pt-3 lg:pt-5 sm:px-3 lg:px-4">
-          <BackToDashboard />
-        </div>
+<button
+            onClick={()=>{router.push('/students/selfhelptools')}}
+            className={`flex items-center gap-2 text-[#73829A] hover:text-[#1a9bcc] transition-colors p-2`}
+          >
+            <ArrowLeft className="w-4 h-5" />
+            <span className="text-[13px] sm:text-[16px]">Back to SelfHelpTools</span>
+          </button>         </div>
         <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-4 lg:gap-6">
           <div className="flex mb-[15px] sm:mb-[20px] items-start gap-3 sm:gap-4 w-full sm:w-[510px]">
             <Image 

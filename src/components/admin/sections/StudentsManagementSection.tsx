@@ -31,7 +31,6 @@ import { formatRelativeTime } from "@/src/utils/date.util";
 
 import { AddStudentModal } from "../modals/AddStudentModal";
 import { EditStudentModal } from "../modals/EditStudentModal";
-import { ViewStudentModal } from "../modals/ViewStudentModal";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -199,8 +198,8 @@ const StudentRow = React.memo(function StudentRow({
 export default function StudentsPage() {
   const router = useRouter();
   const { selectedSchoolId, setSelectedSchoolId, schools, isSuperAdmin } = useSchoolFilter();
-  const { user } = useAuth();
   const permissions = usePermissions();
+
 
   // ----------------------------
   // Filters (With Debounce)
@@ -262,29 +261,18 @@ export default function StudentsPage() {
   const [showView, setShowView] = useState(false);
   const [currentStudent, setCurrentStudent] = useState<Student | null>(null);
 
-  const handleArchive = (student: Student) => {
-    // TODO: Implement archive functionality
-    console.log('Archive student', student);
+  const handleAddStudent = () => {
+    setShowAdd(true);
   };
+
+  function handleArchive(s: Student): void {
+    throw new Error("Function not implemented.");
+  }
 
   return (
     <div className="flex flex-col min-h-screen">
 
-      <AdminHeader
-        title="Students"
-        subtitle="Manage student profiles"
-        showSchoolFilter={isSuperAdmin}
-        schools={schools}
-        schoolFilterValue={selectedSchoolId}
-        onSchoolFilterChange={setSelectedSchoolId}
-        actions={
-          permissions.canManageStudents && (
-            <Button onClick={() => setShowAdd(true)}>
-              <Plus className="w-4 h-4 mr-2" /> Add Student
-            </Button>
-          )
-        }
-      />
+      <AdminHeader title="Student Management" subtitle="View and manage student profiles" showSchoolFilter={isSuperAdmin} schoolFilterValue={selectedSchoolId} onSchoolFilterChange={setSelectedSchoolId} schools={schools} showTimeFilter={false} actions={permissions.canManageStudents && ( <Button onClick={handleAddStudent} className="gap-2" > <Plus className="w-4 h-4" /> <span>Add Student</span> </Button> )} />
 
       <div className="p-6">
 
@@ -365,8 +353,7 @@ export default function StudentsPage() {
                   key={student.id}
                   student={student}
                   onView={(s: Student) => {
-                    setCurrentStudent(s);
-                    setShowView(true);
+                    router.push(`/admin/profile/student?id=${s.id}`);
                   }}
                   onEdit={(s: Student) => {
                     setCurrentStudent(s);
@@ -412,9 +399,6 @@ export default function StudentsPage() {
           onSuccess={() => setShowEdit(false)} schools={[]} classes={[]}        />
       )}
 
-      {showView && currentStudent && (
-        <ViewStudentModal student={currentStudent} onClose={() => setShowView(false)} />
-      )}
     </div>
   );
 }

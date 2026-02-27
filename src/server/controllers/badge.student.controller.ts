@@ -75,6 +75,7 @@ export class BadgeStudentController {
         data: streak || {
           count: 0,
           lastActive: new Date(),
+          bestStreak: 0,
         },
       });
     } catch (err) {
