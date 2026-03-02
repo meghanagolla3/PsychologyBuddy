@@ -81,7 +81,7 @@ export function AdminSidebar() {
     {
       label: "Analytics & Reports",
       icon: BarChart3,
-      href: "/analytics",
+      href: "/admin/analytics",
       permission: 'analytics.view',
     },
     {
@@ -97,7 +97,7 @@ export function AdminSidebar() {
       icon: AlertTriangle,
       href: "/admin/alerts",
       permission: 'escalations.view',
-      badge: 25,
+      // badge: 25,
     },
     {
       label: "Badges & Streaks",
@@ -105,12 +105,12 @@ export function AdminSidebar() {
       href: "/admin/badges-streaks",
       permission: 'badges.view',
     },
-    {
-      label: "Profile",
-      icon: User,
-      href: "/admin/profile",
-      permission: 'settings.view',
-    },
+    // {
+    //   label: "Profile",
+    //   icon: User,
+    //   href: "/admin/profile",
+    //   permission: 'settings.view',
+    // },
     {
       label: "Settings",
       icon: Settings,

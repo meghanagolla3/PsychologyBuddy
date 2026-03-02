@@ -13,7 +13,8 @@ import {
   Lightbulb,
   Dumbbell,
   Music,
-  Heart
+  Heart,
+  RefreshCw
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -75,17 +76,17 @@ interface EscalationAlert {
 }
 
 const priorityStyles = {
-  low: { bg: "bg-green-100/10", text: "text-green-600", border: "border-green-600/30", label: "Low" },
-  medium: { bg: "bg-yellow-100/10", text: "text-yellow-600", border: "border-yellow-600/30", label: "Medium" },
-  high: { bg: "bg-orange-100/10", text: "text-orange-600", border: "border-orange-600/30", label: "High" },
-  critical: { bg: "bg-red-100/10", text: "text-red-600", border: "border-red-600/30", label: "Critical" },
+  low: { bg: "bg-green-400/10", text: "text-green-600", border: "border-green-600/30", label: "Low" },
+  medium: { bg: "bg-yellow-400/10", text: "text-yellow-600", border: "border-yellow-600/30", label: "Medium" },
+  high: { bg: "bg-orange-400/10", text: "text-orange-600", border: "border-orange-600/30", label: "High" },
+  critical: { bg: "bg-red-400/10", text: "text-red-600", border: "border-red-600/30", label: "Critical" },
 };
 
 const statusStyles = {
-  open: { bg: "bg-yellow-100/10", text: "text-yellow-600", label: "Open" },
-  resolved: { bg: "bg-green-100/10", text: "text-green-600", label: "Resolved" },
-  reviewed: { bg: "bg-blue-100/10", text: "text-blue-600", label: "Reviewed" },
-  false_positive: { bg: "bg-gray-100/10", text: "text-gray-600", label: "False Positive" },
+  open: { bg: "bg-yellow-400/10", text: "text-yellow-600", label: "Open" },
+  resolved: { bg: "bg-green-400/10", text: "text-green-600", label: "Resolved" },
+  reviewed: { bg: "bg-blue-400/10", text: "text-blue-600", label: "Reviewed" },
+  false_positive: { bg: "bg-gray-400/10", text: "text-gray-600", label: "False Positive" },
 };
 
 const resourceIcons = {
@@ -201,12 +202,12 @@ function AlertDetailModal({ alert, isOpen, onClose, onUpdateStatus }: AlertDetai
         <DialogContent className="max-w-lg p-0 overflow-hidden rounded-2xl border-0 gap-0 max-h-[90vh] flex flex-col">
           {/* Gradient Header - Sticky */}
           <div className="bg-gradient-to-r from-violet-100 via-purple-50 to-blue-100 px-6 py-5 relative flex-shrink-0">
-            <button 
+            {/* <button 
               onClick={onClose}
               className="absolute top-4 right-4 h-8 w-8 rounded-full bg-white/80 flex items-center justify-center hover:bg-white transition-colors z-10"
             >
               <X className="h-4 w-4 text-muted-foreground" />
-            </button>
+            </button> */}
             
             <Badge 
               variant="secondary" 
@@ -219,11 +220,11 @@ function AlertDetailModal({ alert, isOpen, onClose, onUpdateStatus }: AlertDetai
               {statusStyles[alert.status as keyof typeof statusStyles]?.label}
             </Badge>
             
-            <DialogTitle className="text-xl font-semibold text-foreground mb-2">
+            <DialogTitle className="text-xl font-semibold text-[#1E293B] mb-2">
               Alert Details
             </DialogTitle>
             
-            <div className="flex items-center gap-4 text-sm text-muted-foreground">
+            <div className="flex items-center gap-4 text-sm text-[#64748B]">
               <div className="flex items-center gap-1.5">
                 <Calendar className="h-4 w-4" />
                 <span>{dateTime.date}</span>
@@ -233,7 +234,7 @@ function AlertDetailModal({ alert, isOpen, onClose, onUpdateStatus }: AlertDetai
                 <span>{dateTime.time}</span>
               </div>
               <div className="flex items-center gap-1.5">
-                <span className="h-1.5 w-1.5 rounded-full bg-muted-foreground" />
+                <span className="h-1.5 w-1.5 rounded-full bg-[#64748B]" />
                 <span>{alert.detectionMethod}</span>
               </div>
             </div>
@@ -244,13 +245,13 @@ function AlertDetailModal({ alert, isOpen, onClose, onUpdateStatus }: AlertDetai
             {/* Student Info */}
             <div className="flex items-center gap-3">
               <Avatar className="h-10 w-10">
-                <AvatarFallback className="bg-primary/10 text-primary text-sm">
+                <AvatarFallback className="bg-[#3B82F6]/10 text-[#3B82F6] text-sm">
                   {alert.studentName.split(" ").map(n => n[0]).join("")}
                 </AvatarFallback>
               </Avatar>
               <div>
-                <p className="font-medium text-foreground">{alert.studentName}</p>
-                <p className="text-sm text-muted-foreground">Class {alert.studentClass}</p>
+                <p className="font-medium text-[#1E293B]">{alert.studentName}</p>
+                <p className="text-sm text-[#64748B]"> {alert.studentClass}</p>
               </div>
               <Badge 
                 variant="outline" 
@@ -267,31 +268,31 @@ function AlertDetailModal({ alert, isOpen, onClose, onUpdateStatus }: AlertDetai
 
             {/* Alert Summary */}
             <div>
-              <p className="text-sm font-medium text-muted-foreground mb-2">Alert Summary</p>
-              <div className="rounded-lg bg-muted/30 p-4">
-                <p className="text-sm text-foreground leading-relaxed">{alert.description}</p>
+              <p className="text-sm font-medium text-[#64748B] mb-2">Alert Summary</p>
+              <div className="rounded-lg bg-[#E2E8F0]/30 p-4">
+                <p className="text-sm text-[#1E293B] leading-relaxed">{alert.description}</p>
               </div>
             </div>
 
             {/* Detection Details */}
             <div>
-              <p className="text-sm font-medium text-muted-foreground mb-2">Detection Details</p>
+              <p className="text-sm font-medium text-[#64748B] mb-2">Detection Details</p>
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-muted-foreground">Category:</span>
+                  <span className="text-xs text-[#64748B]">Category:</span>
                   <span className="text-sm font-medium">{alert.category.replace('_', ' ').toUpperCase()}</span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-muted-foreground">Severity:</span>
+                  <span className="text-xs text-[#64748B]">Severity:</span>
                   <span className="text-sm font-medium">{alert.severity}/10</span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-sm text-muted-foreground">Confidence:</span>
+                  <span className="text-xs text-[#64748B]">Confidence:</span>
                   <span className="text-sm font-medium">{Math.round(alert.confidence * 100)}%</span>
                 </div>
                 {alert.detectedPhrases.length > 0 && (
                   <div>
-                    <span className="text-sm text-muted-foreground">Detected Phrases:</span>
+                    <span className="text-sm text-[#64748B]">Detected Phrases:</span>
                     <div className="flex flex-wrap gap-1 mt-1">
                       {alert.detectedPhrases.map((phrase, i) => (
                         <Badge key={i} variant="outline" className="text-xs">
@@ -306,9 +307,9 @@ function AlertDetailModal({ alert, isOpen, onClose, onUpdateStatus }: AlertDetai
 
             {/* Original Message */}
             <div>
-              <p className="text-sm font-medium text-muted-foreground mb-2">Original Message</p>
-              <div className="rounded-lg bg-muted/30 p-4">
-                <p className="text-sm text-foreground italic">"{alert.messageContent}"</p>
+              <p className="text-sm font-medium text-[#64748B] mb-2">Original Message</p>
+              <div className="rounded-lg bg-[#E2E8F0]/30 p-4">
+                <p className="text-sm text-[#1E293B] italic">"{alert.messageContent}"</p>
               </div>
             </div>
 
@@ -317,7 +318,7 @@ function AlertDetailModal({ alert, isOpen, onClose, onUpdateStatus }: AlertDetai
               <div className="space-y-4 pt-2 border-t border-border">
                 {/* Resolution Notes */}
                 <div>
-                  <Label className="text-sm font-medium text-muted-foreground mb-2 block">
+                  <Label className="text-sm font-medium text-[#64748B] mb-2 block">
                     Resolution Notes <span className="text-destructive">*</span>
                   </Label>
                   <Textarea
@@ -330,7 +331,7 @@ function AlertDetailModal({ alert, isOpen, onClose, onUpdateStatus }: AlertDetai
 
                 {/* Recommended Resources */}
                 <div className="space-y-3">
-                  <Label className="text-sm font-medium text-muted-foreground block">
+                  <Label className="text-sm font-medium text-[#64748B] block">
                     Recommended Resources (optional)
                   </Label>
                   
@@ -377,8 +378,8 @@ function AlertDetailModal({ alert, isOpen, onClose, onUpdateStatus }: AlertDetai
                                 className={cn(
                                   "flex items-center justify-between px-3 py-2 text-sm cursor-pointer transition-colors",
                                   isAlreadySelected 
-                                    ? "bg-muted/50 text-muted-foreground" 
-                                    : "hover:bg-muted/30"
+                                    ? "bg-[#E2E8F0]/50 text-[#64748B]" 
+                                    : "hover:bg-[#E2E8F0]/30"
                                 )}
                                 onClick={() => {
                                   if (!isAlreadySelected) {
@@ -393,7 +394,7 @@ function AlertDetailModal({ alert, isOpen, onClose, onUpdateStatus }: AlertDetai
                                 }}
                               >
                                 <span>{resource.name}</span>
-                                <span className="text-xs text-muted-foreground">{resource.duration}</span>
+                                <span className="text-xs text-[#64748B]">{resource.duration}</span>
                               </div>
                             );
                           })}
@@ -404,7 +405,7 @@ function AlertDetailModal({ alert, isOpen, onClose, onUpdateStatus }: AlertDetai
                   {/* Selected Resources Display */}
                   {selectedResources.length > 0 && (
                     <div className="space-y-2">
-                      <p className="text-xs text-muted-foreground">Selected resources:</p>
+                      <p className="text-xs text-[#64748B]">Selected resources:</p>
                       <div className="space-y-1">
                         {selectedResources.map((resource) => (
                           <div
@@ -413,7 +414,7 @@ function AlertDetailModal({ alert, isOpen, onClose, onUpdateStatus }: AlertDetai
                           >
                             <div className="flex-1 min-w-0">
                               <p className="text-sm font-medium text-foreground truncate">{resource.name}</p>
-                              <p className="text-xs text-muted-foreground">{resource.type} • {resource.duration}</p>
+                              <p className="text-xs text-[#64748B]">{resource.type} • {resource.duration}</p>
                             </div>
                             <Button
                               variant="ghost"
@@ -492,6 +493,7 @@ export function EscalationDashboardNew() {
   const [userProfile, setUserProfile] = useState<any>(null)
   const [schools, setSchools] = useState<Array<{ id: string; name: string }>>([])
   const [selectedSchool, setSelectedSchool] = useState('all')
+  const [isMonitoring, setIsMonitoring] = useState(false)
 
   // Fetch user profile and schools
   useEffect(() => {
@@ -503,20 +505,14 @@ export function EscalationDashboardNew() {
       const profileResponse = await fetch('/api/admin/profile')
       const profileResult = await profileResponse.json()
       
-      console.log('[EscalationDashboard] Profile API response:', profileResult);
-      
       if (profileResult.success) {
         setUserProfile(profileResult.data)
-        
-        console.log('[EscalationDashboard] User role:', profileResult.data.role);
-        console.log('[EscalationDashboard] User schoolId:', profileResult.data.schoolId);
         
         // If not super admin, set school filter to their school
         if (profileResult.data.role?.name !== 'SUPERADMIN' && profileResult.data.schoolId) {
           setSelectedSchool(profileResult.data.schoolId)
-          console.log('[EscalationDashboard] Set school filter for non-super admin:', profileResult.data.schoolId);
         } else {
-          console.log('[EscalationDashboard] Keeping school filter as "all" for super admin');
+          setSelectedSchool('all')
         }
         
         // Fetch schools if super admin
@@ -554,20 +550,10 @@ export function EscalationDashboardNew() {
         limit: '100'
       })
       
-      // Debug user role and school filtering
-      console.log('[EscalationDashboard] User profile:', userProfile);
-      console.log('[EscalationDashboard] Selected school:', selectedSchool);
-      console.log('[EscalationDashboard] Is super admin:', userProfile?.role?.name === 'SUPERADMIN');
-      
       // Add school filter if not super admin or if specific school is selected
       if (selectedSchool !== 'all') {
         params.append('schoolId', selectedSchool)
-        console.log('[EscalationDashboard] Applied school filter:', selectedSchool);
-      } else {
-        console.log('[EscalationDashboard] No school filter applied (showing all schools)');
       }
-
-      console.log('[EscalationDashboard] API params:', params.toString());
 
       const response = await fetch(`/api/students/escalations?${params.toString()}`)
       if (!response.ok) {
@@ -575,8 +561,6 @@ export function EscalationDashboardNew() {
       }
       
       const data = await response.json()
-      console.log('[EscalationDashboard] API Response:', data)
-      console.log('[EscalationDashboard] Raw alerts count:', data.alerts ? data.alerts.length : 'undefined')
       
       // Filter by search term and priority
       const filteredAlerts = data.alerts.filter((alert: EscalationAlert) => {
@@ -590,25 +574,8 @@ export function EscalationDashboardNew() {
         
         const matchesPriority = priorityFilter === 'all' || alert.priority === priorityFilter
         
-        // Log each alert that gets filtered out
-        if (!matchesSearch || !matchesPriority) {
-          console.log('[EscalationDashboard] Alert filtered out:', {
-            id: alert.id,
-            studentName: alert.studentName,
-            priority: alert.priority,
-            matchesSearch,
-            matchesPriority,
-            searchTerm,
-            priorityFilter
-          });
-        }
-        
         return matchesSearch && matchesPriority
       })
-
-      console.log('[EscalationDashboard] Filtered alerts count:', filteredAlerts.length)
-      console.log('[EscalationDashboard] Search term:', searchTerm)
-      console.log('[EscalationDashboard] Priority filter:', priorityFilter)
 
       setAlerts(filteredAlerts)
 
@@ -672,14 +639,53 @@ export function EscalationDashboardNew() {
     setSelectedAlert(null)
   }
 
+  // Run behavioral monitoring
+  const runBehavioralMonitoring = async () => {
+    try {
+      setIsMonitoring(true)
+      
+      const response = await fetch('/api/admin/behavioral-monitoring', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        }
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to run behavioral monitoring')
+      }
+
+      const result = await response.json()
+
+      toast({
+        title: "Behavioral Monitoring Completed",
+        description: result.message,
+      })
+
+      // Refresh alerts to show any new behavioral escalations
+      await fetchAlerts()
+
+    } catch (error) {
+      console.error('[EscalationDashboard] Error running behavioral monitoring:', error)
+      toast({
+        title: "Monitoring Failed",
+        description: "Failed to run behavioral monitoring. Please try again.",
+        variant: "destructive",
+      })
+    } finally {
+      setIsMonitoring(false)
+    }
+  }
+
   // Get unique classes from alerts
   const uniqueClasses = Array.from(new Set(alerts.map(a => a.studentClass).filter((cls): cls is string => Boolean(cls)))).sort();
 
   // Calculate stats
   const openCount = alerts.filter(a => a.status === 'open').length;
   const highCount = alerts.filter(a => a.priority === 'high' && a.status !== 'resolved').length;
-  const criticalCount = alerts.filter(a => a.priority === 'critical' && a.status !== 'resolved').length;
-
+  const criticalCount = alerts.filter(a => a.priority === 'resolved' && a.status !== 'resolved').length;
+  const resolvedCount = alerts.filter(a => a.status === 'resolved').length;
+  
   const getTimeAgo = (timestamp: string) => {
     const now = new Date();
     const alertTime = new Date(timestamp);
@@ -732,23 +738,23 @@ export function EscalationDashboardNew() {
         {/* Stats */}
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
           <div className="rounded-xl border border-border bg-card p-4">
-            <p className="text-sm text-muted-foreground">Open</p>
-            <p className="text-2xl font-semibold text-yellow-600">{openCount}</p>
+            <p className="text-sm text-[#64748B]">Open</p>
+            <p className="text-2xl font-semibold text-[#F59E0B]">{openCount}</p>
           </div>
           <div className="rounded-xl border border-border bg-card p-4">
-            <p className="text-sm text-muted-foreground">High Priority</p>
-            <p className="text-2xl font-semibold text-orange-600">{highCount}</p>
+          <p className="text-sm text-[#64748B]">High Priority</p>
+            <p className="text-2xl font-semibold text-[#EF4444]">{highCount}</p>
           </div>
           <div className="rounded-xl border border-border bg-card p-4">
-            <p className="text-sm text-muted-foreground">Critical</p>
-            <p className="text-2xl font-semibold text-red-600">{criticalCount}</p>
+            <p className="text-sm text-[#64748B]">Resolved</p>
+            <p className="text-2xl font-semibold text-[#10B981]">{resolvedCount}</p>
           </div>
         </div>
 
         {/* Filters */}
         <div className="flex flex-col sm:flex-row gap-4">
           <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#64748B]" />
             <Input 
               placeholder="Search by student name..." 
               className="pl-9"
@@ -776,24 +782,40 @@ export function EscalationDashboardNew() {
               <SelectItem value="all">All Status</SelectItem>
               <SelectItem value="open">Open</SelectItem>
               <SelectItem value="resolved">Resolved</SelectItem>
-              <SelectItem value="reviewed">Reviewed</SelectItem>
-              <SelectItem value="false_positive">False Positive</SelectItem>
+              {/* <SelectItem value="reviewed">Reviewed</SelectItem>
+              <SelectItem value="false_positive">False Positive</SelectItem> */}
             </SelectContent>
           </Select>
+          {/* <Button 
+            variant="outline" 
+            onClick={runBehavioralMonitoring}
+            disabled={isMonitoring}
+            className="gap-2"
+          >
+            <RefreshCw className={`h-4 w-4 ${isMonitoring ? 'animate-spin' : ''}`} />
+            {isMonitoring ? "Monitoring..." : "Run Behavioral Check"}
+          </Button> */}
         </div>
 
         {/* Alert List */}
         <div className="space-y-3">
-          {alerts.map((alert) => (
-            <div 
-              key={alert.id}
-              onClick={() => openAlertDetail(alert)}
-              className={cn(
-                "flex items-center justify-between rounded-xl border bg-card p-4 cursor-pointer transition-all hover:shadow-md",
-                alert.priority === "critical" && "border-red-600/30 bg-red-50",
-                alert.priority === "high" && "border-orange-600/30 bg-orange-50"
-              )}
-            >
+          {alerts.length === 0 ? (
+            <div className="text-center py-8 text-gray-500">
+              No alerts found
+            </div>
+          ) : (
+            alerts.map((alert, index) => {
+              return (
+                <div 
+                  key={alert.id}
+                  onClick={() => openAlertDetail(alert)}
+                  className={cn(
+                    "flex items-center justify-between rounded-xl border bg-card p-4 cursor-pointer transition-all hover:shadow-md",
+                    alert.priority === "critical" && "border-red-600/30 bg-red-50",
+                    alert.priority === "high" && "border-orange-600/30 bg-orange-50",
+                    
+                  )}
+                >
               <div className="flex items-center gap-4">
                 <div className={cn(
                   "flex h-10 w-10 items-center justify-center rounded-lg",
@@ -804,15 +826,15 @@ export function EscalationDashboardNew() {
                 <div>
                   <div className="flex items-center gap-2">
                     <p className="font-medium text-foreground">{alert.studentName}</p>
-                    <span className="text-xs text-muted-foreground">Class {alert.studentClass}</span>
+                    <span className="text-xs text-[#64748B]"> {alert.studentClass}</span>
                   </div>
-                  <p className="text-sm text-muted-foreground line-clamp-1">{alert.description}</p>
+                  <p className="text-sm text-[#64748B] line-clamp-1">{alert.description}</p>
                 </div>
               </div>
 
               <div className="flex items-center gap-4">
                 <div className="hidden md:flex flex-col items-end gap-1">
-                  <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                  <div className="flex items-center gap-1 text-xs text-[#64748B]">
                     <Clock className="h-3 w-3" />
                     {getTimeAgo(alert.createdAt)}
                   </div>
@@ -836,7 +858,9 @@ export function EscalationDashboardNew() {
                 <ChevronRight className="h-5 w-5 text-muted-foreground" />
               </div>
             </div>
-          ))}
+              );
+            })
+          )}
         </div>
       </div>
 

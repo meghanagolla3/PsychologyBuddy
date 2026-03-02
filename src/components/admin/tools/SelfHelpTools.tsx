@@ -16,6 +16,7 @@ export default function SelfHelpTools() {
   const [activeTab, setActiveTab] = useState("journaling");
   const [searchQuery, setSearchQuery] = useState("");
   
+  
   // School filter state with localStorage persistence
   const [schools, setSchools] = useState<Array<{ id: string; name: string }>>([]);
   const [selectedSchool, setSelectedSchool] = useState<string>(() => {
@@ -110,29 +111,25 @@ export default function SelfHelpTools() {
       });
       const data = await response.json();
       
-      if (data.success && data.data) {
+      // Handle both direct array response and wrapped response formats
+      if (Array.isArray(data)) {
+        setSchools(data);
+      } else if (data.success && data.data) {
         setSchools(data.data);
       } else {
-        console.warn('Schools API returned non-success response:', data);
-        // Fallback to mock data for testing
-        setSchools([
-          { id: 'school-1', name: 'Demo Elementary School' },
-          { id: 'school-2', name: 'Demo High School' },
-          { id: 'school-3', name: 'Demo University' }
-        ]);
+        console.error('Schools API returned unexpected response format:', data);
+        toast({ 
+          title: "Error", 
+          description: "Failed to load schools data", 
+          variant: "destructive"
+        });
       }
     } catch (error) {
       console.error('Failed to fetch schools:', error);
-      // Fallback to mock data for testing
-      setSchools([
-        { id: 'school-1', name: 'Demo Elementary School' },
-        { id: 'school-2', name: 'Demo High School' },
-        { id: 'school-3', name: 'Demo University' }
-      ]);
       toast({ 
-        title: "Warning", 
-        description: "Using demo data. Schools API failed.", 
-        variant: "default"
+        title: "Error", 
+        description: "Failed to fetch schools. Please check your connection.", 
+        variant: "destructive"
       });
     } finally {
       setIsLoadingSchools(false);
@@ -183,17 +180,15 @@ export default function SelfHelpTools() {
 
   return (
     <div className="flex flex-col min-h-screen">
-      <AdminHeader 
-        title="Self-help Tools" 
-        subtitle="Manage interactive wellness tools for learners"
-        showTimeFilter={false}
-        showSchoolFilter={showSchoolFilter}
-        schoolFilterValue={selectedSchool}
-        onSchoolFilterChange={setSelectedSchool}
-        schools={schools}
-        actions={renderActions()}
-      />
       
+      <AdminHeader
+              title="Self-help Tools" 
+        subtitle="Manage interactive wellness tools for learners"
+              showSchoolFilter={isSuperAdmin}
+              schoolFilterValue={selectedSchool}
+              onSchoolFilterChange={setSelectedSchool}
+              schools={schools}
+            />
       <div className="flex-1 overflow-auto p-6 space-y-6 animate-fade-in">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
           <TabsList className="grid w-full max-w-md grid-cols-3">
@@ -235,6 +230,9 @@ export default function SelfHelpTools() {
               setIsAddMusicTrackOpen={setIsAddMusicTrackOpen}
               isAddMusicCategoryOpen={isAddMusicCategoryOpen}
               setIsAddMusicCategoryOpen={setIsAddMusicCategoryOpen}
+              selectedSchool={selectedSchool}
+              isSuperAdmin={isSuperAdmin}
+              schools={schools}
             />
           </TabsContent>
 
@@ -247,6 +245,9 @@ export default function SelfHelpTools() {
               setIsAddMeditationOpen={setIsAddMeditationOpen}
               isAddMeditationCategoryModalOpen={isAddMeditationCategoryModalOpen}
               setIsAddMeditationCategoryModalOpen={setIsAddMeditationCategoryModalOpen}
+              selectedSchool={selectedSchool}
+              isSuperAdmin={isSuperAdmin}
+              schools={schools}
             />
           </TabsContent>
         </Tabs>

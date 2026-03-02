@@ -5,7 +5,7 @@ export interface EscalationLevel {
 }
 
 export interface EscalationCategory {
-  type: 'self_harm' | 'violence' | 'abuse' | 'substance_abuse' | 'mental_health_crisis' | 'behavioral_concern' | 'other'
+  type: 'self_harm' | 'violence' | 'abuse' | 'substance_abuse' | 'mental_health_crisis' | 'behavioral_concern' | 'check_in_missed' | 'mood_trend_decline' | 'other'
   confidence: number // 0-1 scale
 }
 
@@ -40,7 +40,8 @@ export class ContentEscalationDetector {
       keywords: [
         'kill myself', 'want to die', 'end my life', 'suicide', 'suicidal',
         'hurt myself', 'self harm', 'cut myself', 'end it all', 'better off dead',
-        'no reason to live', 'want to disappear', 'take my own life'
+        'no reason to live', 'want to disappear', 'take my own life', 'kill',
+        'die', 'death', 'dead', 'suicidal thoughts', 'want to end it'
       ],
       weight: 10,
       immediateAction: true
@@ -48,7 +49,9 @@ export class ContentEscalationDetector {
     violence: {
       keywords: [
         'kill someone', 'hurt someone', 'want to kill', 'violence', 'weapon',
-        'revenge', 'payback', 'make them pay', 'harm others', 'attack someone'
+        'revenge', 'payback', 'make them pay', 'harm others', 'attack someone',
+        'hurt', 'kill', 'attack', 'violent', 'revenge', 'weapon', 'fight',
+        'harming', 'killing', 'attacking'
       ],
       weight: 9,
       immediateAction: true
@@ -56,7 +59,9 @@ export class ContentEscalationDetector {
     abuse: {
       keywords: [
         'abuse', 'molest', 'rape', 'assault', 'harassment', 'bullying',
-        'someone hurts me', 'being abused', 'unsafe at home', 'someone touches me'
+        'someone hurts me', 'being abused', 'unsafe at home', 'someone touches me',
+        'hit me', 'hurts me', 'abused', 'molested', 'raped', 'assaulted',
+        'harassed', 'bullied', 'unsafe', 'touches me', 'hit', 'hurt'
       ],
       weight: 8,
       immediateAction: true
@@ -64,7 +69,8 @@ export class ContentEscalationDetector {
     substance_abuse: {
       keywords: [
         'addiction', 'overdose', 'drugs', 'alcohol', 'substance abuse',
-        'can\'t stop using', 'addicted to', 'withdrawal', 'using too much'
+        'can\'t stop using', 'addicted to', 'withdrawal', 'using too much',
+        'drinking', 'drugs', 'overdose', 'addicted', 'addiction', 'using'
       ],
       weight: 6,
       immediateAction: false
@@ -72,15 +78,17 @@ export class ContentEscalationDetector {
     mental_health_crisis: {
       keywords: [
         'breakdown', 'crisis', 'emergency', 'can\'t cope', 'losing control',
-        'mental breakdown', 'psychotic', 'hallucination', 'delusional'
+        'mental breakdown', 'psychotic', 'hallucination', 'delusional',
+        'losing control', 'can\'t cope', 'breakdown', 'crisis', 'emergency'
       ],
       weight: 7,
-      immediateAction: true
+      immediateAction: false
     },
     behavioral_concern: {
       keywords: [
         'out of control', 'can\'t control myself', 'losing it', 'angry all the time',
-        'rage', 'violent thoughts', 'hate everyone', 'want to scream'
+        'rage', 'violent thoughts', 'hate everyone', 'want to scream',
+        'angry', 'rage', 'hate', 'scream', 'out of control'
       ],
       weight: 5,
       immediateAction: false
@@ -109,6 +117,7 @@ export class ContentEscalationDetector {
     conversationContext?: string[]
   ): Promise<EscalationDetection> {
     const normalizedMessage = message.toLowerCase().trim()
+    console.log(`[ContentEscalation] Analyzing message: "${message}"`)
     
     // Initialize detection result
     const detection: EscalationDetection = {
@@ -161,8 +170,19 @@ export class ContentEscalationDetector {
     const matches: string[] = []
     
     for (const keyword of keywords) {
+      // Check for exact match first
       if (message.includes(keyword)) {
         matches.push(keyword)
+      } else {
+        // Check for partial matches for multi-word keywords
+        const keywordWords = keyword.split(' ')
+        if (keywordWords.length > 1) {
+          // Check if all words are present in any order
+          const allWordsPresent = keywordWords.every(word => message.includes(word))
+          if (allWordsPresent) {
+            matches.push(keyword)
+          }
+        }
       }
     }
     
@@ -177,7 +197,8 @@ export class ContentEscalationDetector {
     matches: string[],
     allKeywords: string[]
   ): number {
-    let confidence = matches.length / allKeywords.length
+    // Base confidence: higher if more keywords match
+    let confidence = Math.min(matches.length * 0.3, 0.8); // Each match adds 30% confidence, max 80%
     
     // Boost confidence if contextual enhancers are present
     const hasEnhancers = this.CONTEXTUAL_ENHANCERS.some(enhancer => 
@@ -195,6 +216,11 @@ export class ContentEscalationDetector {
       confidence *= 0.6
     }
     
+    // Ensure minimum confidence for direct matches
+    if (matches.length > 0) {
+      confidence = Math.max(confidence, 0.4) // Minimum 40% confidence for any match
+    }
+    
     return Math.min(confidence, 1.0)
   }
 
@@ -209,14 +235,75 @@ export class ContentEscalationDetector {
     let severity = confidence * categoryWeight
     
     // Increase severity for explicit plans or immediate intent
-    const immediateIndicators = ['going to', 'planning to', 'ready to', 'tonight', 'today']
+    const immediateIndicators = ['going to', 'planning to', 'ready to', 'tonight', 'today', 'right now']
     const hasImmediateIntent = immediateIndicators.some(indicator => 
       message.toLowerCase().includes(indicator)
     )
     
     if (hasImmediateIntent) {
-      severity = Math.min(severity * 1.3, 10)
+      severity = Math.min(severity * 1.5, 10)
     }
+    
+    // Context-based severity adjustments
+    const normalizedMessage = message.toLowerCase().trim()
+    
+    // Self-harm context - highest severity
+    if (normalizedMessage.includes('kill myself') || 
+        normalizedMessage.includes('end my life') || 
+        normalizedMessage.includes('suicide')) {
+      severity = Math.max(severity, 9.0)
+    }
+    else if (normalizedMessage.includes('hurt myself') || 
+             normalizedMessage.includes('want to die')) {
+      severity = Math.max(severity, 8.0)
+    }
+    
+    // Violence context - high severity
+    else if (normalizedMessage.includes('hurt someone') || 
+             normalizedMessage.includes('kill someone') ||
+             normalizedMessage.includes('want to kill')) {
+      severity = Math.max(severity, 8.5)
+    }
+    else if (normalizedMessage.includes('hurt people') && 
+             normalizedMessage.includes('thoughts')) {
+      severity = Math.max(severity, 7.0)
+    }
+    
+    // Abuse context - high severity  
+    else if (normalizedMessage.includes('hit me') || 
+             normalizedMessage.includes('abuse') ||
+             normalizedMessage.includes('beats me')) {
+      severity = Math.max(severity, 6.5)
+    }
+    
+    // Substance abuse context - medium severity
+    else if (normalizedMessage.includes('drinking too much') || 
+             normalizedMessage.includes('addicted to') ||
+             normalizedMessage.includes('every day')) {
+      severity = Math.max(severity, 5.0)
+    }
+    else if (normalizedMessage.includes('drinking') && 
+             normalizedMessage.includes('lately')) {
+      severity = Math.max(severity, 4.0)
+    }
+    
+    // Mental health context - medium to low severity
+    else if (normalizedMessage.includes('losing control') || 
+             normalizedMessage.includes('hearing voices')) {
+      severity = Math.max(severity, 5.5)
+    }
+    else if (normalizedMessage.includes('mental breakdown') || 
+             normalizedMessage.includes('psychotic') ||
+             normalizedMessage.includes('hallucination')) {
+      severity = Math.max(severity, 6.5)
+    }
+    else if (normalizedMessage.includes('angry all the time') || 
+             normalizedMessage.includes('feeling sad')) {
+      severity = Math.max(severity, 3.5)
+    }
+    
+    // Ensure minimum severity for detected escalations
+    severity = Math.max(severity, 3.0) // Minimum severity of 3 for any detected escalation
     
     return Math.round(severity * 10) / 10 // Round to 1 decimal place
   }
@@ -228,30 +315,22 @@ export class ContentEscalationDetector {
     severity: number,
     requiresImmediateAction: boolean
   ): EscalationLevel {
+    let level: EscalationLevel['level'];
+    
     if (severity >= 8 || requiresImmediateAction) {
-      return {
-        level: 'critical',
-        severity,
-        requiresImmediateAction: true
-      }
+      level = 'critical';
     } else if (severity >= 6) {
-      return {
-        level: 'high',
-        severity,
-        requiresImmediateAction: true
-      }
+      level = 'high';
     } else if (severity >= 4) {
-      return {
-        level: 'medium',
-        severity,
-        requiresImmediateAction: false
-      }
+      level = 'medium';
     } else {
-      return {
-        level: 'low',
-        severity,
-        requiresImmediateAction: false
-      }
+      level = 'low';
+    }
+    
+    return {
+      level,
+      severity,
+      requiresImmediateAction: level === 'critical' || requiresImmediateAction
     }
   }
 
@@ -312,6 +391,18 @@ export class ContentEscalationDetector {
         medium: 'Monitor behavior and refer to counselor if needed',
         low: 'Document and monitor for escalation'
       },
+      check_in_missed: {
+        critical: 'IMMEDIATE CONTACT REQUIRED - Student has missed multiple check-ins, contact parents/guardians immediately',
+        high: 'URGENT - Student has missed several check-ins, contact parents and schedule wellness check',
+        medium: 'Student has missed some check-ins, send reminder and monitor',
+        low: 'Student missed a check-in, send automated reminder'
+      },
+      mood_trend_decline: {
+        critical: 'IMMEDIATE INTERVENTION REQUIRED - Significant mood decline detected, contact counselor and parents',
+        high: 'URGENT - Clear mood decline pattern, schedule counseling session',
+        medium: 'Mood decline detected, monitor closely and consider wellness check-in',
+        low: 'Slight mood trend decline, continue monitoring'
+      },
       other: {
         critical: 'IMMEDIATE INTERVENTION REQUIRED - Contact emergency services and administration',
         high: 'URGENT - Immediate counselor notification required',
@@ -327,17 +418,32 @@ export class ContentEscalationDetector {
    * Validates if a message should trigger escalation
    */
   static isValidEscalation(detection: EscalationDetection): boolean {
-    // Always allow critical escalations regardless of confidence
-    if (detection.level.level === 'critical') {
-      return detection.isEscalation
+    // If it's not detected as an escalation, don't proceed
+    if (!detection.isEscalation) {
+      return false
     }
     
-    // For non-critical, use normal thresholds
-    return (
-      detection.isEscalation &&
-      detection.category.confidence > 0.3 &&
-      (detection.level.severity >= 5 || detection.level.severity >= 0.5)
-    )
+    // Different thresholds for different levels
+    switch (detection.level.level) {
+      case 'critical':
+        // Critical escalations always pass (highest priority)
+        return detection.category.confidence >= 0.2
+        
+      case 'high':
+        // High escalations need moderate confidence
+        return detection.category.confidence >= 0.25
+        
+      case 'medium':
+        // Medium escalations need reasonable confidence
+        return detection.category.confidence >= 0.3
+        
+      case 'low':
+        // Low escalations need higher confidence to avoid false positives
+        return detection.category.confidence >= 0.4
+        
+      default:
+        return false
+    }
   }
 
   /**

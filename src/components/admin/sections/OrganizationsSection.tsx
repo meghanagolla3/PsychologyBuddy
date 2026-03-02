@@ -18,7 +18,7 @@ import { AdminHeader } from "@/src/components/admin/layout/AdminHeader";
 import { useSchoolFilter } from "@/src/contexts/SchoolFilterContext";
 import { usePermissions } from "@/src/hooks/usePermissions";
 
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -273,11 +273,14 @@ export default function OrganizationsPage() {
 
         {/* Organizations Table */}
         <Card>
+          <CardHeader>
+            <CardTitle>All Schools</CardTitle>
+          </CardHeader>
           <CardContent>
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>School</TableHead>
+                  <TableHead>School Name</TableHead>
                   <TableHead>School ID</TableHead>
                   <TableHead>Location</TableHead>
                   <TableHead className="text-center">Students</TableHead>
@@ -307,16 +310,16 @@ export default function OrganizationsPage() {
                     <TableRow key={school.id}>
                       <TableCell>
                         <div className="flex items-center gap-2">
-                          <Building2 className="h-4 w-4 text-muted-foreground" />
+                          <Building2 className="h-4 w-4 text-[#64748B]" />
                           {school.name}
                         </div>
                       </TableCell>
 
-                      <TableCell className="font-mono text-sm text-muted-foreground">
+                      <TableCell className="font-mono text-sm text-[#64748B]">
                         {school.id}
                       </TableCell>
 
-                      <TableCell className="text-muted-foreground">
+                      <TableCell className="text-[#64748B]">
                         {school.location || "N/A"}
                       </TableCell>
 
@@ -326,7 +329,7 @@ export default function OrganizationsPage() {
 
                       <TableCell className="text-center">
                         {school.alertCount > 0 ? (
-                          <Badge variant="destructive">
+                        <Badge variant="destructive">
                             {school.alertCount}
                           </Badge>
                         ) : (

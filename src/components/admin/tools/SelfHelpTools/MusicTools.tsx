@@ -47,6 +47,9 @@ interface MusicToolsProps {
   setIsAddMusicTrackOpen?: (open: boolean) => void;
   isAddMusicCategoryOpen?: boolean;
   setIsAddMusicCategoryOpen?: (open: boolean) => void;
+  selectedSchool?: string;
+  isSuperAdmin?: boolean;
+  schools?: Array<{ id: string; name: string }>;
 }
 
 export default function MusicTools({ 
@@ -55,7 +58,10 @@ export default function MusicTools({
   isAddMusicTrackOpen = false, 
   setIsAddMusicTrackOpen,
   isAddMusicCategoryOpen = false, 
-  setIsAddMusicCategoryOpen 
+  setIsAddMusicCategoryOpen,
+  selectedSchool,
+  isSuperAdmin,
+  schools
 }: MusicToolsProps) {
   const { toast } = useToast();
   const { user } = useAuth(); // Add auth context
@@ -209,7 +215,11 @@ export default function MusicTools({
 
   const fetchMusicResources = async () => {
     try {
-      const response = await fetch('/api/admin/music/resources?page=1&limit=20');
+      const url = selectedSchool && selectedSchool !== 'all' 
+        ? `/api/admin/music/resources?page=1&limit=20&schoolId=${selectedSchool}`
+        : '/api/admin/music/resources?page=1&limit=20';
+      
+      const response = await fetch(url);
       const data: PaginatedResponse<MusicResource> = await response.json();
       if (data.success && data.data?.resources) {
         setMusicResources(data.data.resources);
@@ -561,7 +571,7 @@ export default function MusicTools({
     return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
   };
 
-  // Load data on component mount
+  // Load data on component mount and when school filter changes
   useEffect(() => {
     const loadData = async () => {
       setIsLoading(true);
@@ -575,7 +585,7 @@ export default function MusicTools({
       setIsLoading(false);
     };
     loadData();
-  }, []);
+  }, [selectedSchool]);
 
   // Utility functions
   const parseDurationToMinutes = (duration: string): number => {

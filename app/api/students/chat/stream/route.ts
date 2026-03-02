@@ -115,6 +115,14 @@ export async function POST(req: Request) {
       // If this is a valid escalation, create an alert
       if (ContentEscalationDetector.isValidEscalation(detection)) {
         console.log('[EscalationCheck] Valid escalation detected, checking for existing alerts');
+        console.log('[EscalationCheck] Detection details:', {
+          isEscalation: detection.isEscalation,
+          category: detection.category.type,
+          level: detection.level.level,
+          severity: detection.level.severity,
+          confidence: detection.category.confidence,
+          detectedPhrases: detection.detectedPhrases
+        });
         
         try {
           // Check if an alert already exists for this student with the same message content
@@ -138,6 +146,7 @@ export async function POST(req: Request) {
               createdAt: existingAlert.createdAt
             });
           } else {
+            console.log('[EscalationCheck] Creating new escalation alert...');
             const alert = await EscalationAlertService.createEscalationAlert(
               studentId,
               sessionId,
@@ -147,6 +156,7 @@ export async function POST(req: Request) {
             );
 
             console.log('[EscalationCheck] Alert created successfully:', alert.id);
+            console.log('[EscalationCheck] Alert should now appear in admin notifications');
           }
           
           // If immediate action is required, we might want to modify the AI response

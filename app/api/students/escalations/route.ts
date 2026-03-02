@@ -111,42 +111,64 @@ export async function POST(req: Request) {
 
 export async function GET(req: Request) {
   try {
+    console.log('[EscalationAPI] Fetching escalation alerts...');
+    
     const { searchParams } = new URL(req.url);
-    const status = searchParams.get('status');
+    const status = searchParams.get('status') || 'all';
     const limit = parseInt(searchParams.get('limit') || '50');
     const offset = parseInt(searchParams.get('offset') || '0');
     const schoolId = searchParams.get('schoolId');
+    const priority = searchParams.get('priority');
 
-    console.log('[EscalationAPI] Fetching escalation alerts:', { status, limit, offset, schoolId });
+    console.log('[EscalationAPI] Query params:', { status, limit, offset, schoolId, priority });
 
     // Build where clause
-    const whereClause: any = {};
-    if (status && status !== 'all') {
+    let whereClause: any = {};
+
+    if (status !== 'all') {
       whereClause.status = status;
     }
-    
-    // Add school filtering if provided
+
+    if (priority && priority !== 'all') {
+      whereClause.priority = priority;
+    }
+
+    // Add school filter if provided
     if (schoolId && schoolId !== 'all') {
       whereClause.user = {
         schoolId: schoolId
       };
     }
 
-    console.log('[EscalationAPI] Final where clause:', JSON.stringify(whereClause, null, 2));
+    console.log('[EscalationAPI] Where clause:', JSON.stringify(whereClause, null, 2));
 
-    // Get alerts from database
+    // Get total count for pagination
+    const totalCount = await prisma.escalationAlert.count({
+      where: whereClause
+    });
+
+    console.log('[EscalationAPI] Total alerts count:', totalCount);
+
+    // Fetch alerts with pagination
     const alerts = await prisma.escalationAlert.findMany({
       where: whereClause,
       orderBy: { createdAt: 'desc' },
-      take: limit,
       skip: offset,
+      take: limit,
       include: {
         user: {
           select: {
-            studentId: true,
+            id: true,
             firstName: true,
             lastName: true,
-            email: true
+            email: true,
+            schoolId: true,
+            school: {
+              select: {
+                id: true,
+                name: true
+              }
+            }
           }
         }
       }
@@ -154,11 +176,6 @@ export async function GET(req: Request) {
 
     console.log('[EscalationAPI] Found alerts:', alerts.length);
     console.log('[EscalationAPI] Alert IDs:', alerts.map(a => a.id));
-
-    // Get total count for pagination
-    const totalCount = await prisma.escalationAlert.count({
-      where: whereClause
-    });
 
     // Format alerts for response
     const formattedAlerts = alerts.map((alert: any) => ({
@@ -175,6 +192,8 @@ export async function GET(req: Request) {
       detectedPhrases: alert.detectedPhrases,
       context: alert.context,
       recommendation: alert.recommendation,
+      description: alert.description,
+      detectionMethod: alert.detectionMethod,
       messageContent: alert.messageContent,
       messageTimestamp: alert.messageTimestamp,
       requiresImmediateAction: alert.requiresImmediateAction,
@@ -185,6 +204,9 @@ export async function GET(req: Request) {
       createdAt: alert.createdAt.toISOString(),
       updatedAt: alert.updatedAt.toISOString()
     }));
+
+    console.log('[EscalationAPI] Formatted alerts count:', formattedAlerts.length);
+    console.log('[EscalationAPI] Sample alert:', formattedAlerts[0] || 'No alerts');
 
     return NextResponse.json({
       success: true,
@@ -288,6 +310,8 @@ export async function PATCH(req: Request) {
         detectedPhrases: updatedAlert.detectedPhrases,
         context: updatedAlert.context,
         recommendation: updatedAlert.recommendation,
+        description: updatedAlert.description,
+        detectionMethod: updatedAlert.detectionMethod,
         messageContent: updatedAlert.messageContent,
         messageTimestamp: updatedAlert.messageTimestamp,
         requiresImmediateAction: updatedAlert.requiresImmediateAction,

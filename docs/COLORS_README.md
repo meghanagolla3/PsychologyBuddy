@@ -6,13 +6,13 @@ This document contains all the hex color codes used in this project.
 
 ### Background & Foreground
 - **Background**: `#F8FAFC` (Light gray background)
-- **Foreground**: `#1E293B` (Dark text)
+- **Foreground**: `#1E293B` (Dark text) 
 
 ### Main Colors
 - **Primary**: `#3B82F6` (Blue)
 - **Primary Foreground**: `#FFFFFF` (White)
 
-### Secondary Colors
+### Secondary Colors 
 - **Secondary**: `#F1F5F9` (Light gray)
 - **Secondary Foreground**: `#1E293B` (Dark text)
 

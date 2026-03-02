@@ -73,6 +73,9 @@ interface MeditationToolsProps {
   setIsAddMeditationOpen?: (open: boolean) => void;
   isAddMeditationCategoryModalOpen?: boolean;
   setIsAddMeditationCategoryModalOpen?: (open: boolean) => void;
+  selectedSchool?: string;
+  isSuperAdmin?: boolean;
+  schools?: Array<{ id: string; name: string }>;
 }
 
 export default function MeditationTools({
@@ -82,6 +85,9 @@ export default function MeditationTools({
   setIsAddMeditationOpen,
   isAddMeditationCategoryModalOpen = false,
   setIsAddMeditationCategoryModalOpen,
+  selectedSchool,
+  isSuperAdmin,
+  schools
 }: MeditationToolsProps) {
   // Get auth context
   const { user } = useAuth();
@@ -251,9 +257,11 @@ export default function MeditationTools({
   const fetchMeditationResources = async () => {
     try {
       console.log("Fetching meditation resources...");
-      const response = await fetch(
-        "/api/admin/meditation/resources?page=1&limit=20",
-      );
+      const url = selectedSchool && selectedSchool !== 'all' 
+        ? `/api/admin/meditation/resources?page=1&limit=20&schoolId=${selectedSchool}`
+        : "/api/admin/meditation/resources?page=1&limit=20";
+      
+      const response = await fetch(url);
       const data: ApiResponse<any> = await response.json();
       console.log("Meditation resources response:", data);
       if (data.success && data.data) {
@@ -748,7 +756,7 @@ export default function MeditationTools({
     }
   };
 
-  // Load data on component mount
+  // Load data on component mount and when school filter changes
   useEffect(() => {
     const loadData = async () => {
       setIsLoading(true);
@@ -762,7 +770,7 @@ export default function MeditationTools({
       setIsLoading(false);
     };
     loadData();
-  }, []);
+  }, [selectedSchool]);
 
   // Handler functions
 

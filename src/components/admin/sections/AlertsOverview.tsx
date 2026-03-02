@@ -16,10 +16,10 @@ interface Alert {
 }
 
 const priorityStyles = {
-  low: { bg: "bg-success/10", text: "text-success", border: "border-success/30" },
-  medium: { bg: "bg-warning/10", text: "text-warning", border: "border-warning/30" },
-  high: { bg: "bg-destructive/10", text: "text-destructive", border: "border-destructive/30" },
-  critical: { bg: "bg-destructive/20", text: "text-destructive", border: "border-destructive/50" },
+  low: { bg: "bg-[#10B981]/10", text: "text-[#10B981]", border: "border-[#10B981]/30" },
+  medium: { bg: "bg-[#F59E0B]/10", text: "text-[#F59E0B]", border: "border-[#F59E0B]/30" },
+  high: { bg: "bg-[#EF4444]/10", text: "text-[#EF4444]", border: "border-[#EF4444]/30" },
+  critical: { bg: "bg-[#EF4444]/20", text: "text-[#EF4444]", border: "border-[#EF4444]/50" },
 };
 
 export function AlertsOverview() {
@@ -102,15 +102,15 @@ export function AlertsOverview() {
   };
 
   return (
-    <div className="rounded-xl border border-destructive/20 bg-card">
+    <div className="rounded-xl border border-[#EF4444]/20 bg-card">
       <div className="flex items-center justify-between p-5 border-b border-border">
         <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-destructive/10">
-            <AlertTriangle className="h-5 w-5 text-destructive" />
+          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-[#EF4444]/10">
+            <AlertTriangle className="h-5 w-5 text-[#EF4444]" />
           </div>
           <div>
-            <h3 className="text-base font-semibold text-foreground">Active Alerts</h3>
-            <p className="text-sm text-muted-foreground">{alerts.length} requiring attention</p>
+            <h3 className="text-base font-semibold text-[#1E293B]">Active Alerts</h3>
+            <p className="text-sm text-[#94A3B8]">{alerts.length} requiring attention</p>
           </div>
         </div>
         <Button 
@@ -124,11 +124,11 @@ export function AlertsOverview() {
       
       <div className="divide-y divide-border">
         {loading && alerts.length === 0 ? (
-          <div className="p-8 text-center text-muted-foreground">
+          <div className="p-8 text-center text-[#94A3B8]">
             Loading alerts...
           </div>
         ) : alerts.length === 0 ? (
-          <div className="p-8 text-center text-muted-foreground">
+          <div className="p-8 text-center text-[#94A3B8]">
             No active alerts.
           </div>
         ) : (
@@ -136,22 +136,22 @@ export function AlertsOverview() {
             <div 
               key={alert.id} 
               className={cn(
-                "flex items-center justify-between p-4 hover:bg-muted/30 transition-colors",
-                alert.priority === "critical" && "bg-destructive/5"
+                "flex items-center justify-between p-4 hover:bg-[#E2E8F0]/30 transition-colors",
+                alert.priority === "critical" && "bg-[#EF4444]/5"
               )}
             >
               <div className="flex items-center gap-3">
-                <div className="flex h-9 w-9 items-center justify-center rounded-full bg-muted">
-                  <User className="h-4 w-4 text-muted-foreground" />
+                <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#E2E8F0]">
+                  <User className="h-4 w-4 text-[#94A3B8]" />
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-foreground">{alert.studentName}</p>
-                  <p className="text-xs text-muted-foreground">Class {alert.className} • {alert.time}</p>
+                  <p className="text-sm font-medium text-[#1E293B]">{alert.studentName}</p>
+                  <p className="text-xs text-[#94A3B8]">{alert.className} • {alert.time}</p>
                 </div>
               </div>
               
               <div className="flex items-center gap-3">
-                <span className="hidden sm:inline text-xs text-muted-foreground max-w-40 truncate">
+                <span className="hidden sm:inline text-xs text-[#94A3B8] max-w-40 truncate">
                   {alert.reason}
                 </span>
                 <Badge 

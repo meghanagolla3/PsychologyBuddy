@@ -686,7 +686,7 @@ toast({ title: "Error", description: getErrorMessage(data.error) || "Failed to c
       <Card>
         <CardHeader>
           <CardTitle className="text-base flex items-center gap-2">
-            <BookOpen className="h-5 w-5 text-primary" />
+            <BookOpen className="h-5 w-5 text-[#3B82F6]" />
             Journaling Types
           </CardTitle>
           <CardDescription>Enable or disable journaling modes for students</CardDescription>
@@ -695,8 +695,8 @@ toast({ title: "Error", description: getErrorMessage(data.error) || "Failed to c
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="flex items-center justify-between p-4 rounded-lg border border-border">
               <div className="flex items-center gap-3">
-                <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                  <PenTool className="h-5 w-5 text-primary" />
+                <div className="h-10 w-10 rounded-lg bg-[#3B82F6]/10 flex items-center justify-center">
+                  <PenTool className="h-5 w-5 text-[#3B82F6]" />
                 </div>
                 <div>
                   <p className="font-medium text-sm">Writing</p>
@@ -711,8 +711,8 @@ toast({ title: "Error", description: getErrorMessage(data.error) || "Failed to c
 
             <div className="flex items-center justify-between p-4 rounded-lg border border-border">
               <div className="flex items-center gap-3">
-                <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                  <Mic className="h-5 w-5 text-primary" />
+                <div className="h-10 w-10 rounded-lg bg-[#3B82F6]/10 flex items-center justify-center">
+                  <Mic className="h-5 w-5 text-[#3B82F6]" />
                 </div>
                 <div>
                   <p className="font-medium text-sm">Audio</p>
@@ -727,12 +727,12 @@ toast({ title: "Error", description: getErrorMessage(data.error) || "Failed to c
 
             <div className="flex items-center justify-between p-4 rounded-lg border border-border">
               <div className="flex items-center gap-3">
-                <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                  <Palette className="h-5 w-5 text-primary" />
+                <div className="h-10 w-10 rounded-lg bg-[#3B82F6]/10 flex items-center justify-center">
+                  <Palette className="h-5 w-5 text-[#3B82F6]" />
                 </div>
                 <div>
                   <p className="font-medium text-sm">Art-Based</p>
-                  <p className="text-xs text-muted-foreground">Drawing & visual art</p>
+                  <p className="text-xs text-[#64748B]">Drawing & visual art</p>
                 </div>
               </div>
               <Switch 
@@ -749,7 +749,7 @@ toast({ title: "Error", description: getErrorMessage(data.error) || "Failed to c
         <Card>
           <CardHeader>
             <CardTitle className="text-base flex items-center gap-2">
-              <Mic className="h-5 w-5 text-primary" />
+              <Mic className="h-5 w-5 text-[#3B82F6]" />
               Audio Journaling Settings
             </CardTitle>
             <CardDescription>Configure audio recording parameters (content is never accessible to admins)</CardDescription>
@@ -758,7 +758,7 @@ toast({ title: "Error", description: getErrorMessage(data.error) || "Failed to c
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">
                 <Label className="flex items-center gap-2">
-                  <Clock className="h-4 w-4 text-muted-foreground" />
+                  <Clock className="h-4 w-4 text-[#64748B]" />
                   Maximum Recording Duration
                 </Label>
                 <Select 
@@ -776,12 +776,12 @@ toast({ title: "Error", description: getErrorMessage(data.error) || "Failed to c
                     <SelectItem value="600">10:00 (10 minutes)</SelectItem>
                   </SelectContent>
                 </Select>
-                <p className="text-xs text-muted-foreground">Maximum length for each audio recording</p>
+                <p className="text-xs text-[#64748B]">Maximum length for each audio recording</p>
               </div>
 
               <div className="space-y-2">
                 <Label className="flex items-center gap-2">
-                  <Trash className="h-4 w-4 text-muted-foreground" />
+                  <Trash className="h-4 w-4 text-[#64748B]" />
                   Auto-Delete Behavior
                 </Label>
                 <Select 
@@ -811,7 +811,7 @@ toast({ title: "Error", description: getErrorMessage(data.error) || "Failed to c
         <Card>
           <CardHeader>
             <CardTitle className="text-base flex items-center gap-2">
-              <Palette className="h-5 w-5 text-primary" />
+              <Palette className="h-5 w-5 text-[#3B82F6]" />
               Art Journaling Settings
             </CardTitle>
             <CardDescription>Configure canvas tools for art journaling (drawings are never visible to admins)</CardDescription>
@@ -822,7 +822,7 @@ toast({ title: "Error", description: getErrorMessage(data.error) || "Failed to c
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div className="flex items-center justify-between p-3 rounded-lg border border-border">
                   <div className="flex items-center gap-2">
-                    <Undo className="h-4 w-4 text-muted-foreground" />
+                    <Undo className="h-4 w-4 text-[#64748B]" />
                     <span className="text-sm">Undo / Redo</span>
                   </div>
                   <Switch 
@@ -834,7 +834,7 @@ toast({ title: "Error", description: getErrorMessage(data.error) || "Failed to c
                 </div>
                 <div className="flex items-center justify-between p-3 rounded-lg border border-border">
                   <div className="flex items-center gap-2">
-                    <Palette className="h-4 w-4 text-muted-foreground" />
+                    <Palette className="h-4 w-4 text-[#64748B]" />
                     <span className="text-sm">Color Palette</span>
                   </div>
                   <Switch 
@@ -846,7 +846,7 @@ toast({ title: "Error", description: getErrorMessage(data.error) || "Failed to c
                 </div>
                 <div className="flex items-center justify-between p-3 rounded-lg border border-border">
                   <div className="flex items-center gap-2">
-                    <Trash2 className="h-4 w-4 text-muted-foreground" />
+                    <Trash2 className="h-4 w-4 text-[#64748B]" />
                     <span className="text-sm">Clear Canvas</span>
                   </div>
                   <Switch 
@@ -876,7 +876,7 @@ toast({ title: "Error", description: getErrorMessage(data.error) || "Failed to c
         </div>
         {/* Search */}
         <div className="relative max-w-md">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#64748B]" />
           <Input 
             placeholder="Search prompts..."
             className="pl-9"

@@ -1,4 +1,5 @@
 import { EscalationDetection, EscalationAlert } from './content-escalation-detector'
+import { BehavioralEscalationDetector } from './behavioral-escalation-detector'
 import prisma from '../../prisma'
 
 export interface NotificationChannel {
@@ -87,6 +88,8 @@ export class EscalationAlertService {
       substance_abuse: 'Substance abuse concerns detected in conversation',
       mental_health_crisis: 'Mental health crisis indicators detected in conversation',
       behavioral_concern: 'Behavioral concerns detected in conversation',
+      check_in_missed: 'Student has missed scheduled check-ins',
+      mood_trend_decline: 'Declining mood trend detected in recent check-ins',
       other: 'Concerning content detected in conversation'
     };
 
@@ -97,6 +100,148 @@ export class EscalationAlertService {
     }
     
     return baseDescription;
+  }
+
+  /**
+   * Generates trigger source based on detection category and method
+   */
+  private static generateTriggerSource(detection: EscalationDetection): string {
+    // Map different detection categories to trigger source names as shown in images
+    const triggerSourceMap = {
+      self_harm: 'Pattern Detection',
+      violence: 'Pattern Detection', 
+      abuse: 'Pattern Detection',
+      substance_abuse: 'AI Analysis',
+      mental_health_crisis: 'AI Analysis',
+      behavioral_concern: 'AI Analysis',
+      check_in_missed: 'Check-in Monitor',
+      mood_trend_decline: 'Mood Analysis',
+      other: 'AI Analysis'
+    };
+
+    return triggerSourceMap[detection.category.type] || 'AI Analysis';
+  }
+
+  /**
+   * Creates and processes a behavioral escalation alert (check-in or mood trend)
+   */
+  static async createBehavioralEscalationAlert(
+    studentId: string,
+    detection: EscalationDetection
+  ): Promise<EscalationAlert> {
+    try {
+      console.log(`[EscalationAlert] Creating behavioral alert for student ${studentId}, type: ${detection.category.type}`)
+      
+      // Resolve the user ID from the studentId
+      const user = await prisma.user.findUnique({
+        where: { studentId: studentId },
+        select: { id: true, firstName: true, lastName: true }
+      });
+
+      if (!user) {
+        throw new Error(`User not found for studentId: ${studentId}`);
+      }
+
+      const userId = user.id;
+      const studentName = `${user.firstName} ${user.lastName}`;
+
+      console.log(`[EscalationAlert] Resolved user ID: ${userId} for studentId: ${studentId}`);
+      
+      // Create alert record in database
+      const alert = await prisma.escalationAlert.create({
+        data: {
+          studentId: userId, // Use the resolved user ID
+          sessionId: 'behavioral-monitoring', // Special session ID for behavioral alerts
+          studentName: studentName, // Use the resolved name
+          studentClass: await this.getStudentClass(studentId), // Get student class using the original studentId
+          category: detection.category.type,
+          level: detection.level.level,
+          severity: detection.level.severity,
+          confidence: detection.category.confidence,
+          detectedPhrases: detection.detectedPhrases,
+          context: detection.context,
+          recommendation: detection.recommendation,
+          description: this.generateAlertDescription(detection),
+          detectionMethod: this.generateTriggerSource(detection),
+          messageContent: detection.context, // Use context as message content for behavioral alerts
+          messageTimestamp: detection.timestamp,
+          requiresImmediateAction: detection.level.requiresImmediateAction,
+          status: 'open',
+          priority: detection.level.level,
+        }
+      })
+
+      console.log(`[EscalationAlert] Behavioral alert created with ID: ${alert.id}`)
+
+      // Send notifications to appropriate staff
+      await this.sendNotifications(alert.id, detection.level.level, detection.level.requiresImmediateAction)
+
+      // Create admin notifications
+      await this.createAdminNotifications(alert.id, detection)
+
+      return {
+        id: alert.id,
+        studentId,
+        sessionId: 'behavioral-monitoring',
+        detection,
+        messageContent: detection.context,
+        messageTimestamp: detection.timestamp,
+        status: 'pending',
+        createdAt: alert.createdAt.toISOString(),
+        updatedAt: alert.updatedAt.toISOString()
+      }
+    } catch (error) {
+      console.error('[EscalationAlert] Failed to create behavioral escalation alert:', error)
+      throw new Error('Failed to create behavioral escalation alert')
+    }
+  }
+
+  /**
+   * Runs behavioral checks for all students and creates alerts if needed
+   */
+  static async runBehavioralMonitoringForAllStudents(): Promise<void> {
+    try {
+      console.log('[EscalationAlert] Starting behavioral monitoring for all students');
+
+      // Get all active students
+      const students = await prisma.user.findMany({
+        where: {
+          role: {
+            name: 'STUDENT'
+          }
+        },
+        select: {
+          studentId: true,
+          firstName: true,
+          lastName: true
+        }
+      });
+
+      console.log(`[EscalationAlert] Checking ${students.length} students for behavioral escalations`);
+
+      let totalAlertsCreated = 0;
+
+      for (const student of students) {
+        try {
+          // Run behavioral checks for this student
+          const escalations = await BehavioralEscalationDetector.runBehavioralChecks(student.studentId!);
+
+          // Create alerts for any detected escalations
+          for (const escalation of escalations) {
+            await this.createBehavioralEscalationAlert(student.studentId!, escalation);
+            totalAlertsCreated++;
+          }
+
+        } catch (error) {
+          console.error(`[EscalationAlert] Error checking student ${student.studentId}:`, error);
+        }
+      }
+
+      console.log(`[EscalationAlert] Behavioral monitoring completed. Created ${totalAlertsCreated} alerts.`);
+
+    } catch (error) {
+      console.error('[EscalationAlert] Error in behavioral monitoring:', error);
+    }
   }
 
   /**
@@ -142,7 +287,7 @@ export class EscalationAlertService {
           context: detection.context,
           recommendation: detection.recommendation,
           description: this.generateAlertDescription(detection),
-          detectionMethod: 'AI Analysis',
+          detectionMethod: this.generateTriggerSource(detection),
           messageContent,
           messageTimestamp,
           requiresImmediateAction: detection.level.requiresImmediateAction,
@@ -380,6 +525,8 @@ export class EscalationAlertService {
       substance_abuse: 'Substance abuse concerns',
       mental_health_crisis: 'Mental health crisis',
       behavioral_concern: 'Behavioral concerns',
+      check_in_missed: 'Missed check-ins',
+      mood_trend_decline: 'Mood decline trend',
       other: 'Concerning content'
     }
 
@@ -475,38 +622,81 @@ export class EscalationAlertService {
    */
   static async createAdminNotifications(alertId: string, detection: EscalationDetection) {
     try {
-      // Only create notifications for critical and high priority escalations
+      // Create notifications for all escalation levels
+      console.log(`[EscalationAlert] Creating admin notification for ${detection.level.level} escalation`);
+      
+      // Get staff members based on escalation level
+      let staffRoles = ['ADMIN', 'COUNSELOR'];
+      
+      // Include teachers for critical and high escalations
       if (detection.level.level === 'critical' || detection.level.level === 'high') {
-        console.log(`[EscalationAlert] Creating admin notification for ${detection.level.level} escalation`);
-        
-        // Get real admin users who should be notified
-        const adminUsers = await prisma.user.findMany({
-          where: {
-            role: {
-              name: {
-                in: ['ADMIN', 'COUNSELOR', 'TEACHER']
-              }
+        staffRoles.push('TEACHER');
+      }
+      
+      const staffUsers = await prisma.user.findMany({
+        where: {
+          role: {
+            name: {
+              in: staffRoles
             }
           }
-        });
-
-        const notificationMessage = `🚨 ${detection.level.level.toUpperCase()} ESCALATION: ${detection.category.type.replace('_', ' ').toUpperCase()}`;
-
-        for (const admin of adminUsers) {
-          await prisma.adminNotification.create({
-            data: {
-              userId: admin.id,
-              alertId: alertId,
-              type: 'escalation',
-              message: notificationMessage,
-              severity: detection.level.level,
-              read: false
+        },
+        select: {
+          id: true,
+          firstName: true,
+          lastName: true,
+          email: true,
+          role: {
+            select: {
+              name: true
             }
-          });
+          }
         }
+      });
 
-        console.log(`[EscalationAlert] Created ${adminUsers.length} admin notifications for alert ${alertId}`);
+      console.log(`[EscalationAlert] Found ${staffUsers.length} staff members:`, staffRoles);
+      
+      if (staffUsers.length === 0) {
+        console.log('[EscalationAlert] WARNING: No staff users found! Notifications cannot be created.');
+        console.log('[EscalationAlert] Available roles in system:');
+        
+        // Check what roles actually exist
+        const allRoles = await prisma.role.findMany({
+          select: { name: true }
+        });
+        console.log('[EscalationAlert] Available roles:', allRoles.map(r => r.name));
+        
+        // Check all users
+        const allUsers = await prisma.user.findMany({
+          select: { 
+            firstName: true, 
+            lastName: true, 
+            role: { select: { name: true } } 
+          }
+        });
+        console.log('[EscalationAlert] All users:', allUsers.map(u => `${u.firstName} ${u.lastName} (${u.role?.name || 'No role'})`));
+        
+        return; // Exit early if no staff users
       }
+
+      const notificationMessage = `🚨 ${detection.level.level.toUpperCase()} ESCALATION: ${detection.category.type.replace('_', ' ').toUpperCase()}`;
+
+      for (const staff of staffUsers) {
+        console.log(`[EscalationAlert] Creating notification for staff ${staff.id} (${staff.role?.name})`);
+        
+        await prisma.adminNotification.create({
+          data: {
+            userId: staff.id,
+            alertId: alertId,
+            type: 'escalation',
+            message: notificationMessage,
+            severity: detection.level.level,
+            read: false
+          }
+        });
+      }
+
+      console.log(`[EscalationAlert] Created ${staffUsers.length} admin notifications for ${detection.level.level} alert ${alertId}`);
     } catch (error) {
       console.error('[EscalationAlert] Error creating admin notifications:', error);
     }

@@ -100,11 +100,11 @@ const iconMap = {
 };
 
 const styleMap = {
-  alert: "bg-destructive/10 text-destructive",
-  session: "bg-info/10 text-info",
-  badge: "bg-warning/10 text-warning",
-  checkin: "bg-success/10 text-success",
-  content: "bg-primary/10 text-primary",
+  alert: "bg-[#EF4444]/10 text-[#EF4444]",
+  session: "bg-[#3B82F6]/10 text-[#3B82F6]",
+  badge: "bg-[#F59E0B]/10 text-[#F59E0B]",
+  checkin: "bg-[#10B981]/10 text-[#10B981]",
+  content: "bg-[#3B82F6]/10 text-[#3B82F6]",
 };
 
 // ------------------------------
@@ -116,7 +116,7 @@ const ActivityRow = memo(({ activity }: { activity: Activity }) => {
   return (
     <div
       className={cn(
-        "flex items-start gap-3 p-4 transition-colors hover:bg-muted/30",
+        "flex items-start gap-3 p-4 transition-colors hover:bg-[#E2E8F0]/30",
         activity.isImportant && "bg-destructive/5"
       )}
     >
@@ -166,9 +166,9 @@ export function RecentActivity() {
   const activities = data?.pages.flatMap((page) => page.activities) ?? [];
 
   return (
-    <div className="rounded-xl border border-border bg-card">
+    <div className="rounded-xl border border-[#E2E8F0] bg-[#ffffff]]">
       {/* Header */}
-      <div className="flex items-center justify-between p-5 border-b border-border">
+      <div className="flex items-center justify-between p-5 border-b border-[#E2E8F0]">
         <div>
           <h3 className="text-base font-semibold text-foreground">Recent Activity</h3>
           <p className="text-sm text-muted-foreground">Latest system events</p>

@@ -22,14 +22,15 @@ function ClassHeatmap({ classData }: ClassHeatmapProps) {
 
   return (
     <div className="rounded-xl border border-border bg-card p-5">
-      <h3 className="text-base font-semibold mb-4">Class-wise Wellness Heatmap</h3>
+      <h3 className="text-base font-semibold ">Class-wise Wellness Heatmap</h3>
+      <p className="text-sm text-[#64748B] mb-4">Click a class to view student details</p>
 
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
         {classData.map((cls) => (
           <button
             key={cls.className}
             onClick={() => router.push(`/admin/users/students?class=${cls.className}`)}
-            className={`rounded-lg p-4 border ${
+            className={`rounded-lg p-7 border ${
               cls.alertCount > 0 ? "border-red-500" : "border-green-500"
             }`}
           >
