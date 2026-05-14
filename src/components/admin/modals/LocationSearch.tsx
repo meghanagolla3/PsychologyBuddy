@@ -36,27 +36,20 @@ export function LocationSearch({ schoolId, onLocationSelect, placeholder = "Sear
     const fetchLocations = async () => {
       setLoading(true);
       
-      // Debug: Check if schoolId is valid
-      console.log('Fetching locations for schoolId:', schoolId);
-      
       if (!schoolId) {
-        console.log('No schoolId provided, skipping fetch');
         setLocations([]);
         setLoading(false);
         return;
       }
       
       try {
-        const response = await fetch(`/api/schools/locations?schoolId=${schoolId}`, {
+        const response = await fetch(`/api/admin/schools/locations?schoolId=${schoolId}`, {
           credentials: 'include',
         });
 
-        console.log('Location search response:', response.status, response.statusText);
-
         if (response.ok) {
           const data = await response.json();
-          console.log('Location search data:', data);
-          const fetchedLocations = data.data || [];
+          const fetchedLocations = data || []; // Admin API returns locations array directly
           setLocations(fetchedLocations);
           
           // If we have an initialLocationId, set the selected location
@@ -67,12 +60,9 @@ export function LocationSearch({ schoolId, onLocationSelect, placeholder = "Sear
             }
           }
         } else {
-          const errorData = await response.text();
-          console.error('Failed to fetch locations:', response.status, errorData);
           setLocations([]);
         }
       } catch (error) {
-        console.error('Error fetching locations:', error);
         setLocations([]);
       } finally {
         setLoading(false);

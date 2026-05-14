@@ -13,30 +13,27 @@ export const CreateStudentSchema = z.object({
   schoolId: z.string().min(1, 'School selection is required'),
   locationId: z.string().min(1, 'Location is required'),
   phone: z.string().regex(/^\d{10}$/, 'Phone must be exactly 10 digits'),
-  dateOfBirth: z.string().min(1, 'Date of birth is required'),
   status: z.enum(['ACTIVE', 'INACTIVE', 'SUSPENDED']).default('ACTIVE'),
-  emergencyContact: z.object({
-    name: z.string().min(3, 'Emergency contact name must be at least 3 characters'),
-    phone: z.string().regex(/^\d{10}$/, 'Emergency contact phone must be exactly 10 digits'),
-    relationship: z.string().min(2, 'Relationship must be at least 2 characters'),
-  }),
+  parent: z.object({
+    firstName: z.string().min(2, 'Parent first name must be at least 2 characters'),
+    lastName: z.string().min(2, 'Parent last name must be at least 2 characters'),
+    email: z.string().email('Valid parent email required'),
+    phone: z.string().regex(/^\d{10}$/, 'Parent phone must be exactly 10 digits'),
+    password: z.string().optional(),
+  }).optional(),
 });
 
 // Student update validator (Admin only)
 export const UpdateStudentSchema = z.object({
+  studentId: z.string().min(3, 'Student ID must be at least 3 characters').optional(),
   firstName: z.string().min(2, 'First name must be at least 2 characters').optional(),
   lastName: z.string().min(2, 'Last name must be at least 2 characters').optional(),
   email: z.string().email('Valid email required').optional(),
   phone: z.string().optional(),
   classId: z.string().optional(),
   schoolId: z.string().optional(),
+  locationId: z.string().optional(),
   status: z.enum(['ACTIVE', 'INACTIVE', 'SUSPENDED']).optional(),
-  dateOfBirth: z.string().optional(),
-  emergencyContact: z.object({
-    name: z.string().optional(),
-    phone: z.string().optional(),
-    relationship: z.string().optional(),
-  }).optional(),
 });
 
 // Student self-update validator (Student only - limited fields)

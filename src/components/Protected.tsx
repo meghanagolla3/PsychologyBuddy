@@ -1,6 +1,7 @@
 import { useUserPermissions } from "@/src/hooks/useUserPermissions";
 import { useRole } from "@/src/hooks/useRole";
 import { MODULES, ACTIONS } from "@/src/config/permission";
+import { useAuth } from "@/src/contexts/AuthContext";
 
 interface ProtectedProps {
   children: React.ReactNode;
@@ -20,21 +21,30 @@ export function Protected({
   requireAuth = true,
 }: ProtectedProps) {
   const { loading: permsLoading, can } = useUserPermissions();
-  const { loading: roleLoading, isSuperAdmin, isAdmin, isSchoolSuperAdmin, isStudent } = useRole();
+  const { loading: roleLoading, isSuperAdmin, isAdmin, isSchoolSuperAdmin, isStudent, isParent } = useRole();
+  const { user, loading: authLoading } = useAuth();
 
   // Show loading state
-  if (permsLoading || roleLoading) {
+  if (permsLoading || roleLoading || authLoading) {
     return <div className="p-4 text-center">Loading...</div>;
   }
 
   // Check authentication requirement
-  if (requireAuth && (!isSuperAdmin && !isAdmin && !isSchoolSuperAdmin && !isStudent)) {
+  if (requireAuth && (!isSuperAdmin && !isAdmin && !isSchoolSuperAdmin && !isStudent && !isParent && !user)) {
     return fallback;
   }
 
   // Check role-based access
   if (role && role.length > 0) {
-    const userRole = isSuperAdmin ? 'SUPERADMIN' : isAdmin ? 'ADMIN' : isSchoolSuperAdmin ? 'SCHOOL_SUPERADMIN' : isStudent ? 'STUDENT' : null;
+    let userRole = null;
+    if (isSuperAdmin) userRole = 'SUPERADMIN';
+    else if (isAdmin) userRole = 'ADMIN';
+    else if (isSchoolSuperAdmin) userRole = 'SCHOOL_SUPERADMIN';
+    else if (isStudent) userRole = 'STUDENT';
+    else if (isParent) userRole = 'PARENT';
+    else if (user?.role?.name === 'COUNSELOR') userRole = 'COUNSELOR';
+    else if (user?.role?.name) userRole = user.role.name;
+    
     if (!userRole || !role.includes(userRole)) {
       return fallback;
     }
@@ -71,6 +81,14 @@ export function AdminOnly({ children, fallback }: { children: React.ReactNode; f
 export function StudentOnly({ children, fallback }: { children: React.ReactNode; fallback?: React.ReactNode }) {
   return (
     <Protected role={["STUDENT"]} fallback={fallback}>
+      {children}
+    </Protected>
+  );
+}
+
+export function ParentOnly({ children, fallback }: { children: React.ReactNode; fallback?: React.ReactNode }) {
+  return (
+    <Protected role={["PARENT"]} fallback={fallback}>
       {children}
     </Protected>
   );

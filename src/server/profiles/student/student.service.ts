@@ -52,14 +52,17 @@ export class StudentService {
       // Use provided schoolId from parameter
       const finalSchoolId = schoolId;
 
-      // Always auto-generate unique student ID for guaranteed uniqueness
-      const generatedStudentId = await StudentRepository.generateUniqueStudentId(finalSchoolId, data.classId || '');
+      // Require student ID to be provided
+      const studentIdToUse = data.studentId;
+      
+      if (!studentIdToUse) {
+        throw new Error('Student ID is required');
+      }
 
       // Comprehensive validation: Double-check uniqueness with character-by-character comparison
-      const existingStudent = await StudentRepository.findStudentByStudentId(generatedStudentId);
+      const existingStudent = await StudentRepository.findStudentByStudentId(studentIdToUse);
       if (existingStudent) {
-        console.error(`Critical error: Generated student ID ${generatedStudentId} already exists!`);
-        throw new Error(`System error: Student ID collision detected. Please try again.`);
+        throw new Error(`Student ID ${studentIdToUse} already exists`);
       }
 
       // Additional validation: Ensure no case-insensitive duplicates
@@ -79,20 +82,28 @@ export class StudentService {
 
       // Character-by-character exact comparison
       const hasExactMatch = allStudents.some(student => 
-        student.studentId === generatedStudentId
+        student.studentId === studentIdToUse
       );
 
       if (hasExactMatch) {
-        console.error(`Critical error: Exact character match found for generated student ID: ${generatedStudentId}`);
-        throw new Error(`System error: Student ID collision detected. Please try again.`);
+        throw new Error(`Student ID ${studentIdToUse} already exists`);
       }
 
-      // Check if student email already exists (both provided and generated)
-      const emailToCheck = data.email || `${generatedStudentId.toLowerCase()}@school.local`;
+      // Get student role
+      const studentRole = await prisma.role.findUnique({
+        where: { name: 'STUDENT' },
+      });
+
+      if (!studentRole) {
+        throw new Error('Student role not found');
+      }
+
+      // Check if student email already exists (only check against other students)
+      const emailToCheck = data.email || `${studentIdToUse.toLowerCase()}@school.local`;
       const existingEmail = await prisma.user.findUnique({
         where: { email: emailToCheck }
       });
-      if (existingEmail) {
+      if (existingEmail && existingEmail.roleId === studentRole.id) {
         throw AuthError.conflict('Student with this email already exists');
       }
 
@@ -106,13 +117,32 @@ export class StudentService {
         }
       }
 
-      // Get student role
-      const studentRole = await prisma.role.findUnique({
-        where: { name: 'STUDENT' },
-      });
-
-      if (!studentRole) {
-        throw new Error('Student role not found');
+      // Validate parent data if provided
+      let parentRoleId: string | undefined;
+      let parentPassword: string | undefined;
+      if (data.parent) {
+        const existingParentEmail = await prisma.user.findUnique({
+          where: { email: data.parent.email },
+        });
+        if (existingParentEmail) {
+          throw AuthError.conflict('Parent with this email already exists');
+        }
+        if (data.parent.phone) {
+          const existingParentPhone = await prisma.user.findFirst({
+            where: { phone: data.parent.phone },
+          });
+          if (existingParentPhone) {
+            throw AuthError.conflict('Parent with this phone number already exists');
+          }
+        }
+        const parentRole = await prisma.role.findUnique({
+          where: { name: 'PARENT' },
+        });
+        if (!parentRole) {
+          throw new Error('PARENT role not found');
+        }
+        parentRoleId = parentRole.id;
+        parentPassword = data.parent.password || `Parent@${Date.now()}`;
       }
 
       // Generate password if not provided
@@ -121,14 +151,14 @@ export class StudentService {
       // Hash password
       const hashedPassword = await PasswordUtil.hash(password);
 
-      // Create student with profile
+      // Create student with profile and optionally parent
       const student = await StudentRepository.createStudent({
         ...data,
-        studentId: generatedStudentId,
+        studentId: studentIdToUse,
         password: hashedPassword,
         roleId: studentRole.id,
         schoolId: finalSchoolId,
-      });
+      }, parentRoleId, parentPassword);
 
       // Remove password from response
       const { password: _, ...studentWithoutPassword } = student;
@@ -520,12 +550,8 @@ export class StudentService {
         }
       });
 
-      // Update StudentProfile with dateOfBirth and emergencyContact
+      // Update StudentProfile with emergencyContact
       const profileUpdateData: any = {};
-      
-      if (data.dateOfBirth) {
-        profileUpdateData.dateOfBirth = new Date(data.dateOfBirth);
-      }
       
       if (data.emergencyContact?.phone) {
         profileUpdateData.emergencyContact = data.emergencyContact;
@@ -811,7 +837,6 @@ export class StudentService {
           fullName: `${student.firstName} ${student.lastName}`,
           email: student.email,
           phone: student.phone,
-          dateOfBirth: student.studentProfile?.dateOfBirth || null,
           grade: student.classRef ? `${student.classRef.grade}th Grade` : 'Not Assigned',
           status: student.studentProfile?.status || 'ACTIVE',
           profileImage: student.studentProfile?.profileImage || null,
@@ -847,6 +872,21 @@ export class StudentService {
   }
 
   // Helper method to calculate time ago
+  // Get students with active escalation alerts
+  static async getStudentsWithAlerts(user: any) {
+    try {
+      // Get students with active escalation alerts
+      const studentsWithAlerts = await StudentRepository.getStudentsWithAlerts(user);
+
+      return ApiResponse.success({
+        students: studentsWithAlerts,
+        total: studentsWithAlerts.length
+      }, 'Students with alerts retrieved successfully');
+    } catch (error) {
+      throw error;
+    }
+  }
+
   private static getTimeAgo(date: Date): string {
     const now = new Date();
     const diffInMs = now.getTime() - date.getTime();

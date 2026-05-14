@@ -23,21 +23,13 @@
 // --------------------------------------------------
 
 export const ACTIONS = {
-
   VIEW: "view",
-
   CREATE: "create",
-
   UPDATE: "update",
-
   DELETE: "delete",
-
-  RESPOND: "respond",
-
-  ASSIGN: "assign",
-
   MANAGE: "manage",
-
+  RESPOND: "respond",
+  ASSIGN: "assign",
 } as const;
 
 
@@ -86,11 +78,15 @@ export const MODULES = {
 
   SETTINGS: "settings",
 
-
+  COUNSELOR_MANAGEMENT: "counselor.management",
 
   ACCESS_CONTROL: "access.control",
 
   CHAT_MONITOR: "chat.monitor",
+
+  COUNSELING_SESSIONS: "counseling.sessions",
+
+  CHALLENGES: "challenges",
 
 } as const;
 
@@ -146,11 +142,15 @@ export const MODULE_PERMISSIONS: Record<AppModule, PermissionAction[]> = {
 
   [MODULES.SETTINGS]: ["view", "update"],
 
-
+  [MODULES.COUNSELOR_MANAGEMENT]: ["view", "create", "update", "delete", "assign"],
 
   [MODULES.ACCESS_CONTROL]: ["manage"],
 
   [MODULES.CHAT_MONITOR]: ["view"],
+
+  [MODULES.COUNSELING_SESSIONS]: ["view", "create", "update", "delete", "respond", "manage"],
+
+  [MODULES.CHALLENGES]: ["view", "create", "update", "delete"],
 
 };
 
@@ -240,6 +240,23 @@ export const ROLE_PERMISSIONS = {
 
     "settings.view",
     "settings.update",
+
+    "counselor.management.view",
+    "counselor.management.create",
+    "counselor.management.update",
+    "counselor.management.delete",
+    "counselor.management.assign",
+
+    "counseling.sessions.view",
+    "counseling.sessions.create",
+    "counseling.sessions.update",
+    "counseling.sessions.delete",
+    "counseling.sessions.respond",
+    "counseling.sessions.manage",
+    "challenges.view",
+    "challenges.create",
+    "challenges.update",
+    "challenges.delete",
   ],
 
 
@@ -320,15 +337,59 @@ export const ROLE_PERMISSIONS = {
 
     "settings.update",
 
+    "counselor.management.view",
+    "counselor.management.create",
+    "counselor.management.update",
+    "counselor.management.assign",
+
+    "counseling.sessions.view",
+    "counseling.sessions.create",
+    "counseling.sessions.respond",
+    "challenges.view",
+    "challenges.create",
+    "challenges.update",
+
   ],
 
 
+
+  COUNSELOR: [
+    "dashboard.view",
+    "escalations.view",
+    "escalations.respond",
+    "badges.view",
+    "counseling.sessions.view",
+    "counseling.sessions.create",
+    "counseling.sessions.update",
+    "counseling.sessions.respond",
+    "challenges.view",
+    "challenges.create",
+    "challenges.update",
+  ],
+
+  PARENT: [
+    "dashboard.view",
+    "activity.view",
+    "psycho.education.view",
+    "selfhelp.view",
+    "selfhelp.journaling.view",
+    "selfhelp.music.view",
+    "selfhelp.meditation.view",
+    "badges.view",
+    "escalations.view",
+    "analytics.view",
+    "users.view",
+    "counseling.sessions.view",
+    "counseling.sessions.create",
+  ],
 
   STUDENT: [
 
     "dashboard.view",
 
     "activity.view",
+
+    "counseling.sessions.view",
 
 
 
@@ -343,6 +404,8 @@ export const ROLE_PERMISSIONS = {
     "selfhelp.music.view",
 
     "selfhelp.meditation.view",
+
+    "challenges.view",
 
 
 

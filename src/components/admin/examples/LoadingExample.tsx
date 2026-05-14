@@ -247,17 +247,17 @@ export default function LoadingExample() {
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 <div className="text-center space-y-2">
                   <h4 className="font-medium">Ring Spinner</h4>
-                  <AdminLoader type="ring" size="md" message="Ring loading..." />
+                  <AdminLoader message="Ring loading..." />
                 </div>
 
                 <div className="text-center space-y-2">
                   <h4 className="font-medium">Dots Spinner</h4>
-                  <AdminLoader type="dots" message="Dots loading..." />
+                  <AdminLoader message="Dots loading..." />
                 </div>
 
                 <div className="text-center space-y-2">
                   <h4 className="font-medium">Classic Spinner</h4>
-                  <AdminLoader type="classic" size="lg" message="Classic loading..." />
+                  <AdminLoader message="Classic loading..." />
                 </div>
               </div>
 

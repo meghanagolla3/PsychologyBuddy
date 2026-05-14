@@ -408,12 +408,12 @@ export default function OrganizationsPage() {
                   <TableHead>School Name</TableHead>
                   {/* <TableHead>School ID</TableHead> */}
                   {/* <TableHead>Location</TableHead> */}
-                  <TableHead className="text-center">Locations</TableHead>
                   <TableHead className="text-center">Students</TableHead>
                   <TableHead className="text-center">Alerts</TableHead>
                   <TableHead className="text-center">
                     Check-ins Today
                   </TableHead>
+                  <TableHead className="text-center">Locations</TableHead>
                   <TableHead className="text-center">Actions</TableHead>
                 </TableRow>
               </TableHeader>

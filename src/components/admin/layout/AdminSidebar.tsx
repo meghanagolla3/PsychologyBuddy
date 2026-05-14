@@ -18,11 +18,14 @@ import {
   ChevronDown,
   ChevronRight,
   Menu,
+  Heart,
   X,
   LogOut,
   Building2,
   User,
   ChevronUp,
+  Calendar,
+  Target,
 } from 'lucide-react';
 import Link from 'next/link';
 import { Badge } from '@/components/ui/badge';
@@ -34,14 +37,20 @@ function cn(...classes: (string | undefined | null | false)[]): string {
   return classes.filter(Boolean).join(' ');
 }
 
+function NavIcon({ icon: Icon, className }: { icon?: React.ElementType; className?: string }) {
+  if (!Icon) return null;
+  return <Icon className={className} />;
+}
+
 interface NavItem {
   label: string;
-  icon: React.ElementType;
+  icon?: React.ElementType;
   href?: string;
   badge?: number;
   permission?: string;
   role?: string[];
   children?: { label: string; href: string; icon: React.ElementType; permission?: string; role?: string[] }[];
+  type?: 'item' | 'section';
 }
 
 interface AdminProfile {
@@ -141,25 +150,47 @@ export function AdminSidebar() {
       ],
     },
     {
-      label: "Analytics & Reports",
-      icon: BarChart3,
-      href: "/admin/analytics",
-      permission: 'analytics.view',
-    },
-    {
       label: "User Management",
       icon: Users,
       children: [
-        { label: "Students", href: "/admin/users/students", icon: Users, permission: 'users.view', role: ['ADMIN','SUPERADMIN','SCHOOL_SUPERADMIN'] },
+        { label: "Students", href: "/admin/users/students", icon: Users, permission: 'users.view', role: ['ADMIN','SUPERADMIN','SCHOOL_SUPERADMIN','PARENT'] },
+        { label: "Counselors", href: "/admin/users/counselors", icon: Heart, permission: 'counselor.management.view', role: ['ADMIN','SUPERADMIN','SCHOOL_SUPERADMIN'] },
+        { label: "Parents", href: "/admin/users/parents", icon: User, permission: 'users.view', role: ['ADMIN','SUPERADMIN','SCHOOL_SUPERADMIN'] },
         { label: "Admins", href: "/admin/users/admins", icon: Shield, permission: 'users.view', role: ['SUPERADMIN','SCHOOL_SUPERADMIN'] },
       ],
+    },
+    {
+      label: "STUDENT SUPPORT",
+      type: 'section',
+    },
+    {
+      label: "Sessions",
+      icon: Heart,
+      href: "/admin/sessions",
+      permission: 'counselor.management.view',
+    },
+    {
+      label: "Parent Meetings",
+      icon: Calendar,
+      href: "/admin/parent-meetings",
+      permission: 'users.view',
     },
     {
       label: "Escalation & Alerts",
       icon: AlertTriangle,
       href: "/admin/alerts",
       permission: 'escalations.view',
-      // badge: 25,
+      badge: 3,
+    },
+    {
+      label: "ENGAGEMENT",
+      type: 'section',
+    },
+    {
+      label: "Challenges",
+      icon: Target,
+      href: "/admin/challenges",
+      permission: 'badges.view',
     },
     {
       label: "Badges & Streaks",
@@ -167,12 +198,6 @@ export function AdminSidebar() {
       href: "/admin/badges-streaks",
       permission: 'badges.view',
     },
-    // {
-    //   label: "Profile",
-    //   icon: User,
-    //   href: "/admin/profile",
-    //   permission: 'settings.view',
-    // },
   ];
 
   // Filter navigation items based on permissions
@@ -259,7 +284,11 @@ export function AdminSidebar() {
         <ul className="space-y-1">
           {visibleNavItems.map((item) => (
             <li key={item.label}>
-              {item.children ? (
+              {item.type === 'section' ? (
+                <div className="px-3 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                  {item.label}
+                </div>
+              ) : item.children ? (
                 <div>
                   <button
                     onClick={() => toggleExpanded(item.label)}
@@ -271,7 +300,7 @@ export function AdminSidebar() {
                     )}
                   >
                     <div className="flex items-center gap-3">
-                      <item.icon className="h-4 w-4" />
+                      <NavIcon icon={item.icon} className="h-4 w-4" />
                       <span>{item.label}</span>
                     </div>
                     {expandedItems.includes(item.label) ? (
@@ -294,7 +323,7 @@ export function AdminSidebar() {
                                 : "text-[#65758b] hover:bg-gray-100 hover:text-gray-900"
                             )}
                           >
-                            <child.icon className="h-4 w-4" />
+                            <NavIcon icon={child.icon} className="h-4 w-4" />
                             <span>{child.label}</span>
                           </Link>
                         </li>
@@ -314,7 +343,7 @@ export function AdminSidebar() {
                   )}
                 >
                   <div className="flex items-center gap-3">
-                    <item.icon className="h-4 w-4" />
+                    <NavIcon icon={item.icon} className="h-4 w-4" />
                     <span>{item.label}</span>
                   </div>
                   {item.badge && (

@@ -36,8 +36,13 @@ export class EscalationAlertService {
    */
   private static async getStudentName(studentId: string): Promise<string> {
     try {
-      const user = await prisma.user.findUnique({
-        where: { studentId },
+      const user = await prisma.user.findFirst({
+        where: {
+          OR: [
+            { id: studentId },
+            { studentId: studentId }
+          ]
+        },
         select: { firstName: true, lastName: true }
       });
       
@@ -53,8 +58,13 @@ export class EscalationAlertService {
    */
   private static async getStudentClass(studentId: string): Promise<string | null> {
     try {
-      const user = await prisma.user.findUnique({
-        where: { studentId },
+      const user = await prisma.user.findFirst({
+        where: {
+          OR: [
+            { id: studentId },
+            { studentId: studentId }
+          ]
+        },
         select: { 
           classRef: {
             select: { 
@@ -247,9 +257,14 @@ Generate the summary:`;
     try {
       console.log(`[EscalationAlert] Creating behavioral alert for student ${studentId}, type: ${detection.category.type}`)
       
-      // Resolve the user ID from the studentId
-      const user = await prisma.user.findUnique({
-        where: { studentId: studentId },
+      // Resolve the user ID from the studentId (could be UUID or custom studentId)
+      const user = await prisma.user.findFirst({
+        where: {
+          OR: [
+            { id: studentId },
+            { studentId: studentId }
+          ]
+        },
         select: { id: true, firstName: true, lastName: true }
       });
 
@@ -364,21 +379,330 @@ Generate the summary:`;
   }
 
   /**
-   * Creates and processes an escalation alert
+   * 🟨 STEP 4: Define Alert Behavior - Handle alerts intelligently
+   */
+  static async handleAlertIntelligently(
+    studentId: string,
+    detection: EscalationDetection,
+    messageContent: string,
+    messageTimestamp: string,
+    counselorId?: string
+  ): Promise<{ alert: EscalationAlert; sessionCreated: boolean; sessionId: string }> {
+    try {
+      // Get student's school info
+      const user = await prisma.user.findFirst({
+        where: {
+          OR: [
+            { id: studentId },
+            { studentId: studentId }
+          ]
+        },
+        select: { id: true, firstName: true, lastName: true, schoolId: true }
+      });
+
+      if (!user) {
+        throw new Error(`User not found for studentId: ${studentId}`);
+      }
+
+      // Check student's current session status
+      const activeSession = await prisma.counselingSession.findFirst({
+        where: {
+          studentId: user.id,
+          status: { in: ['SCHEDULED', 'IN_PROGRESS'] },
+          schoolId: user.schoolId || undefined
+        },
+        orderBy: { scheduledAt: 'asc' }
+      });
+
+      const completedSession = await prisma.counselingSession.findFirst({
+        where: {
+          studentId: user.id,
+          status: 'COMPLETED',
+          schoolId: user.schoolId || undefined
+        },
+        orderBy: { endedAt: 'desc' }
+      });
+
+      let sessionId: string;
+      let sessionCreated = false;
+
+      if (activeSession) {
+        // Case B: Session already active → Do NOT create new session, attach alert to existing session
+        sessionId = activeSession.id;
+
+        // If session is SCHEDULED, automatically start it when alert is created
+        if (activeSession.status === 'SCHEDULED') {
+          try {
+            const { CounselingService } = await import('../../server/counseling/counseling.service');
+            const service = new CounselingService();
+            const schoolId = user.schoolId || activeSession.schoolId || '';
+            if (schoolId) {
+              await service.startSession(sessionId, schoolId, counselorId || 'system');
+              console.log(`[AlertBehavior] Automatically started scheduled session ${sessionId} due to new alert`);
+            }
+          } catch (error) {
+            console.error(`[AlertBehavior] Failed to start session ${sessionId}:`, error);
+            // Don't fail the alert creation if session start fails
+          }
+        }
+
+        console.log(`[AlertBehavior] Case B: Attaching alert to active session ${sessionId}`);
+      } else if (completedSession) {
+        // Case C: Session completed → Create new FOLLOW-UP session
+        const counselingService = (await import('../../server/counseling/counseling.service')).CounselingService;
+        const service = new counselingService();
+        
+        // Create follow-up session for tomorrow at same time
+        const tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        tomorrow.setHours(10, 0, 0, 0); // 10 AM tomorrow
+
+        const newSession = await service.createSession(
+          counselorId || 'system', // Use provided counselor or fallback
+          user.schoolId || "",
+          {
+            studentId: user.id,
+            date: tomorrow.toISOString().split('T')[0],
+            time: '10:00',
+            sessionType: 'FOLLOW_UP' as any
+          }
+        );
+
+        sessionId = newSession.id;
+        sessionCreated = true;
+        console.log(`[AlertBehavior] Case C: Created new follow-up session ${sessionId}`);
+      } else {
+        // Case A: No active session → Create a new session (intake or follow-up)
+        const { CounselingService } = await import('../../server/counseling/counseling.service');
+        const service = new CounselingService();
+        
+        // Check if student has any prior intake session
+        const hasIntakeSession = await prisma.counselingSession.findFirst({
+          where: {
+            studentId: user.id,
+            sessionType: 'INTAKE',
+            schoolId: user.schoolId || undefined
+          }
+        });
+
+        // Determine session type based on student's history
+        const sessionType = hasIntakeSession ? 'FOLLOW_UP' : 'INTAKE';
+        
+        // Create session for tomorrow at 10 AM
+        const tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        tomorrow.setHours(10, 0, 0, 0);
+
+        const newSession = await service.createSession(
+          counselorId || 'system',
+          user.schoolId || "",
+          {
+            studentId: user.id,
+            date: tomorrow.toISOString().split('T')[0],
+            time: '10:00',
+            sessionType: sessionType as any
+          }
+        );
+
+        sessionId = newSession.id;
+        sessionCreated = true;
+        console.log(`[AlertBehavior] Case A: Created new ${sessionType} session ${sessionId}`);
+      }
+
+      // Create the escalation alert
+      const alert = await this.createEscalationAlert(
+        studentId,
+        sessionId,
+        detection,
+        messageContent,
+        messageTimestamp
+      );
+
+      return { alert, sessionCreated, sessionId };
+
+    } catch (error) {
+      console.error('[AlertBehavior] Failed to handle alert intelligently:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Updates session status in CounselorAssignment when session is started
+   */
+  static async updateSessionStatusOnSessionStart(sessionId: string): Promise<void> {
+    try {
+      const session = await prisma.counselingSession.findUnique({
+        where: { id: sessionId },
+        select: { studentId: true, counselorId: true }
+      });
+
+      if (session) {
+        await prisma.counselorAssignment.updateMany({
+          where: {
+            studentId: session.studentId,
+            counselorId: session.counselorId
+          },
+          data: {
+            sessionStatus: 'IN_PROGRESS'
+          }
+        });
+
+        console.log(`[EscalationAlert] Updated session status to IN_PROGRESS for student ${session.studentId}, counselor ${session.counselorId}`);
+      }
+    } catch (error) {
+      console.error('[EscalationAlert] Failed to update session status on session start:', error);
+    }
+  }
+
+  /**
+   * Updates alert status when session addressing it is completed
+   */
+  static async updateAlertStatusOnSessionCompletion(sessionId: string): Promise<void> {
+    try {
+      const alerts = await prisma.escalationAlert.findMany({
+        where: {
+          sessionId: sessionId,
+          status: { in: ['open', 'reviewed', 'UNDER_REVIEW'] }
+        }
+      });
+
+      if (alerts.length > 0) {
+        await prisma.escalationAlert.updateMany({
+          where: {
+            sessionId: sessionId,
+            status: { in: ['open', 'reviewed', 'UNDER_REVIEW'] }
+          },
+          data: {
+            status: 'resolved',
+            notes: 'Session completed - alert addressed'
+          }
+        });
+
+        console.log(`[EscalationAlert] Updated ${alerts.length} alerts to resolved for session ${sessionId}`);
+      }
+
+      // Update session status in CounselorAssignment table
+      const session = await prisma.counselingSession.findUnique({
+        where: { id: sessionId },
+        select: { studentId: true, counselorId: true }
+      });
+
+      if (session) {
+        await prisma.counselorAssignment.updateMany({
+          where: {
+            studentId: session.studentId,
+            counselorId: session.counselorId
+          },
+          data: {
+            sessionStatus: 'COMPLETED'
+          }
+        });
+
+        console.log(`[EscalationAlert] Updated session status to COMPLETED for student ${session.studentId}, counselor ${session.counselorId}`);
+      }
+    } catch (error) {
+      console.error('[EscalationAlert] Failed to update alert status on session completion:', error);
+    }
+  }
+
+  /**
+   * Gets alert history for a student to track risk over time
+   */
+  static async getStudentAlertHistory(studentId: string, schoolId: string, limit: number = 10) {
+    try {
+      const alerts = await prisma.escalationAlert.findMany({
+        where: {
+          studentId,
+          user: {
+            schoolId: schoolId
+          }
+        },
+        include: {
+          counselingSession: {
+            select: {
+              id: true,
+              sessionType: true,
+              status: true,
+              scheduledAt: true,
+              startedAt: true,
+              endedAt: true,
+              counselor: {
+                select: {
+                  id: true,
+                  firstName: true,
+                  lastName: true
+                }
+              }
+            }
+          }
+        },
+        orderBy: { createdAt: 'desc' },
+        take: limit
+      });
+
+      return alerts.map(alert => ({
+        ...alert,
+        riskLevel: alert.level,
+        requiresImmediateAction: alert.requiresImmediateAction,
+        sessionContext: alert.counselingSession ? {
+          type: alert.counselingSession.sessionType,
+          status: alert.counselingSession.status,
+          counselor: `${alert.counselingSession.counselor.firstName} ${alert.counselingSession.counselor.lastName}`,
+          duration: alert.counselingSession.startedAt && alert.counselingSession.endedAt 
+            ? Math.round((alert.counselingSession.endedAt.getTime() - alert.counselingSession.startedAt.getTime()) / 60000)
+            : null
+        } : null
+      }));
+    } catch (error) {
+      console.error('[EscalationAlert] Failed to get student alert history:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Checks if multiple alerts occurred within a short timeframe for grouping
+   */
+  private async shouldGroupAlerts(studentId: string, schoolId: string, timeWindowMinutes: number = 30): Promise<boolean> {
+    const timeWindow = new Date(Date.now() - timeWindowMinutes * 60 * 1000);
+    
+    const recentAlerts = await prisma.escalationAlert.count({
+      where: {
+        studentId,
+        user: {
+          schoolId: schoolId
+        },
+        createdAt: {
+          gte: timeWindow
+        },
+        status: 'open'
+      }
+    });
+
+    return recentAlerts > 0;
+  }
+
+  /**
+   * Creates and processes an escalation alert with enhanced session mapping
    */
   static async createEscalationAlert(
     studentId: string,
     sessionId: string,
     detection: EscalationDetection,
     messageContent: string,
-    messageTimestamp: string
+    messageTimestamp: string,
+    priority?: string
   ): Promise<EscalationAlert> {
     try {
       console.log(`[EscalationAlert] Creating alert for student ${studentId}, session ${sessionId}`)
       
-      // Resolve the user ID from the studentId
-      const user = await prisma.user.findUnique({
-        where: { studentId: studentId },
+      // Resolve the user ID from the studentId (could be the UUID or the custom studentId field)
+      const user = await prisma.user.findFirst({
+        where: {
+          OR: [
+            { id: studentId },
+            { studentId: studentId }
+          ]
+        },
         select: { id: true, firstName: true, lastName: true }
       });
 
@@ -390,7 +714,27 @@ Generate the summary:`;
       const studentName = `${user.firstName} ${user.lastName}`;
 
       console.log(`[EscalationAlert] Resolved user ID: ${userId} for studentId: ${studentId}`);
-      
+
+      // Check if student has had any completed sessions and get the most recent counselor's ID
+      const latestCompletedSession = await prisma.counselingSession.findFirst({
+        where: {
+          studentId: userId,
+          status: 'COMPLETED'
+        },
+        orderBy: { endedAt: 'desc' },
+        take: 1
+      });
+
+      console.log(`[EscalationAlert] Latest completed session for student ${studentId}:`, latestCompletedSession);
+
+      let assignedCounselorId: string | undefined;
+      if (latestCompletedSession && latestCompletedSession.counselorId) {
+        assignedCounselorId = latestCompletedSession.counselorId;
+        console.log(`[EscalationAlert] Student ${studentId} has completed sessions, will assign to previous counselor ${assignedCounselorId}`);
+      } else {
+        console.log(`[EscalationAlert] Student ${studentId} has no completed sessions, skipping auto-assignment`);
+      }
+
       // Create alert record in database
       const alert = await prisma.escalationAlert.create({
         data: {
@@ -412,11 +756,37 @@ Generate the summary:`;
           requiresImmediateAction: detection.level.requiresImmediateAction,
           status: 'open',
           priority: detection.level.level,
+          assignedTo: assignedCounselorId,
         }
-      })
+      });
 
-      console.log(`[EscalationAlert] Alert created with ID: ${alert.id}`)
+      // Link the counseling session back to this escalation alert
+      if (sessionId) {
+        try {
+          await prisma.counselingSession.update({
+            where: { id: sessionId },
+            data: {
+              escalationId: alert.id,
+            },
+          });
+        } catch (linkError) {
+          // Don't throw error - alert creation is more important
+        }
+      }
 
+      // Create counselor assignment with escalation alert ID if we have a previous counselor
+      if (assignedCounselorId) {
+        try {
+          const { CounselorService } = await import('../../server/profiles/counselor/counselor.service');
+          console.log(`[EscalationAlert] Auto-assigning student ${studentId} to counselor ${assignedCounselorId} with alert ${alert.id}`);
+          const result = await CounselorService.assignStudents(assignedCounselorId, [userId], 'system', undefined, alert.id);
+          console.log(`[EscalationAlert] Auto-assignment successful:`, result);
+        } catch (error) {
+          console.error(`[EscalationAlert] Auto-assignment failed for student ${studentId}:`, error);
+          // Don't fail the alert creation if assignment fails
+        }
+      }
+      
       // Send notifications to appropriate staff
       await this.sendNotifications(alert.id, detection.level.level, detection.level.requiresImmediateAction)
 
@@ -524,7 +894,7 @@ Generate the summary:`;
     const whereClause: any = {
       role: {
         name: {
-          in: ['ADMIN', 'COUNSELOR']
+          in: ['SCHOOL_SUPERADMIN', 'ADMIN', 'COUNSELOR']
         }
       }
     }
@@ -754,7 +1124,7 @@ Generate the summary:`;
       console.log(`[EscalationAlert] Creating admin notification for ${detection.level.level} escalation`);
       
       // Get staff members based on escalation level
-      let staffRoles = ['ADMIN', 'COUNSELOR'];
+      let staffRoles = ['SCHOOL_SUPERADMIN', 'ADMIN', 'COUNSELOR'];
       
       // Include teachers for critical and high escalations
       if (detection.level.level === 'critical' || detection.level.level === 'high') {

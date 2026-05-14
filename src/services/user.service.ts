@@ -24,7 +24,7 @@ export class UserService {
             classRef: { select: { name: true, grade: true, section: true } },
           },
         });
-      } else if (userRole === 'ADMIN') {
+      } else if (userRole === 'ADMIN' || userRole === 'PARENT') {
         user = await prisma.user.findUnique({
           where: { id: userId },
           include: {
@@ -61,6 +61,7 @@ export class UserService {
       const allowedFields = {
         STUDENT: ['firstName', 'lastName', 'phone'],
         ADMIN: ['firstName', 'lastName', 'phone', 'department'],
+        PARENT: ['firstName', 'lastName', 'phone', 'department'],
         SUPERADMIN: ['firstName', 'lastName', 'phone'],
       };
 
@@ -345,9 +346,6 @@ export class UserService {
     try {
       const schools = await prisma.school.findMany({
         include: {
-          locations: {
-            select: { id: true }
-          },
           _count: {
             select: {
               users: {
@@ -358,7 +356,6 @@ export class UserService {
                 }
               },
               classes: true,
-              locations: true,
             },
           },
         },
@@ -419,7 +416,6 @@ export class UserService {
           return {
             ...school,
             studentCount: school._count.users,
-            locationsCount: school._count.locations,
             alertCount,
             checkInsToday
           };
@@ -1341,6 +1337,64 @@ export class UserService {
     } catch (error) {
       console.error('Create school section error:', error);
       return ApiResponse.error('Failed to create school section');
+    }
+  }
+
+  // Get locations for a specific school
+  static async getSchoolLocations(schoolId: string) {
+    try {
+      // Fetch locations for this school
+      const locations = await prisma.schoolLocation.findMany({
+        where: { 
+          schoolId: schoolId
+        },
+        select: {
+          id: true,
+          name: true
+        },
+        orderBy: { name: 'asc' }
+      });
+
+      return ApiResponse.success(locations, 'School locations fetched successfully');
+    } catch (error) {
+      console.error('Get school locations error:', error);
+      return ApiResponse.error('Failed to fetch school locations');
+    }
+  }
+
+  // Create a new location for a school
+  static async createSchoolLocation(schoolId: string, name: string) {
+    try {
+      // Check if location already exists for this school
+      const existingLocation = await prisma.schoolLocation.findFirst({
+        where: {
+          schoolId: schoolId,
+          name: name,
+        }
+      });
+
+      if (existingLocation) {
+        return ApiResponse.error('Location already exists for this school');
+      }
+
+      // Create the new location
+      const newLocation = await prisma.schoolLocation.create({
+        data: {
+          name: name,
+          schoolId: schoolId,
+        },
+        select: {
+          id: true,
+          name: true,
+          schoolId: true,
+          createdAt: true,
+        }
+      });
+
+      return ApiResponse.success(newLocation, 'School location created successfully');
+    } catch (error) {
+      console.error('Create school location error:', error);
+      return ApiResponse.error('Failed to create school location');
     }
   }
 }

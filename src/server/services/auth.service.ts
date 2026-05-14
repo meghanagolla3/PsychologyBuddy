@@ -160,24 +160,24 @@ export class AuthService {
         }
       }
 
-      // Check user status for admins
-      if (session.user.role?.name && ['ADMIN', 'SCHOOL_SUPERADMIN', 'SUPERADMIN'].includes(session.user.role.name)) {
+      // Check user status for admins, counselors, and parents
+      if (session.user.role?.name && ['ADMIN', 'SCHOOL_SUPERADMIN', 'SUPERADMIN', 'COUNSELOR', 'PARENT'].includes(session.user.role.name)) {
         const adminStatus = session.user.status || 'ACTIVE';
         if (adminStatus === 'INACTIVE') {
-          // Clean up session for inactive admin
+          // Clean up session for inactive user
           await AuthRepository.deleteSession(sessionId);
           throw AuthError.forbidden('Your account is inactive. Please contact your school administrator.');
         }
         
         if (adminStatus === 'SUSPENDED') {
-          // Clean up session for suspended admin
+          // Clean up session for suspended user
           await AuthRepository.deleteSession(sessionId);
           throw AuthError.forbidden('Your account is suspended. Please contact your school administrator.');
         }
       }
 
       // Return user data without password
-      const { password, _, ...userWithoutPassword } = session.user;
+      const { password: _, ...userWithoutPassword } = session.user;
       
       return ApiResponse.success({
         user: userWithoutPassword,

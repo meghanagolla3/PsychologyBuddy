@@ -1376,7 +1376,7 @@ export default function MusicTools({
                                   });
                                   const result = await response.json();
                                   if (result.success) {
-                                    setMusicMoods(prev => [...prev, newMood.trim()]); 
+                                    setMusicMoods(prev => [...prev, result.data]); 
                                     toast({ title: "Music Mood Added" }); 
                                     setNewMood(""); 
                                   } else {
@@ -1429,7 +1429,7 @@ export default function MusicTools({
                                   });
                                   const result = await response.json();
                                   if (result.success) {
-                                    setMusicGoals(prev => [...prev, newGoal.trim()]); 
+                                    setMusicGoals(prev => [...prev, result.data]); 
                                     toast({ title: "Goal Added" }); 
                                     setNewGoal(""); 
                                   } else {
@@ -1707,7 +1707,7 @@ export default function MusicTools({
                                   });
                                   const result = await response.json();
                                   if (result.success) {
-                                    setMusicMoods(prev => [...prev, newMood.trim()]); 
+                                    setMusicMoods(prev => [...prev, result.data]); 
                                     toast({ title: "Music Mood Added" }); 
                                     setNewMood(""); 
                                   } else {
@@ -1760,7 +1760,7 @@ export default function MusicTools({
                                   });
                                   const result = await response.json();
                                   if (result.success) {
-                                    setMusicGoals(prev => [...prev, newGoal.trim()]); 
+                                    setMusicGoals(prev => [...prev, result.data]); 
                                     toast({ title: "Goal Added" }); 
                                     setNewGoal(""); 
                                   } else {

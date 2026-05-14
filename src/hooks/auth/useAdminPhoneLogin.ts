@@ -154,12 +154,26 @@ export function useAdminPhoneLogin() {
         
         // Redirect based on role
         const userRole = data.data.user.role.name;
-        
+
         setTimeout(() => {
-          if (userRole === 'SCHOOL_SUPERADMIN' || userRole === 'SCHOOL_ADMIN' || userRole === 'ADMIN' || userRole === 'COUNSELOR' || userRole === 'TEACHER') {
-            router.push('/admin');
-          } else {
-            router.push('/admin'); // Fallback
+          switch (userRole) {
+            case 'PARENT':
+              router.push('/parent');
+              break;
+            case 'COUNSELOR':
+              router.push('/counselor');
+              break;
+            case 'STUDENT':
+              router.push('/students');
+              break;
+            case 'SCHOOL_SUPERADMIN':
+            case 'SCHOOL_ADMIN':
+            case 'ADMIN':
+            case 'TEACHER':
+              router.push('/admin');
+              break;
+            default:
+              router.push('/admin'); // Fallback
           }
         }, 1500);
       } else {

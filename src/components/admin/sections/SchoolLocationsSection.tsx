@@ -77,7 +77,7 @@ interface SchoolLocation {
 interface School {
   id: string;
   name: string;
-  locations: SchoolLocation[];
+  schoolLocations: SchoolLocation[];
 }
 
 export default function SchoolLocationsSection() {
@@ -606,7 +606,7 @@ export default function SchoolLocationsSection() {
                   }}
                   inputMode="numeric"
                   pattern="[0-9]*"
-                  maxLength={10}
+                  maxLength={6}
                   placeholder="Enter postal code (numbers only)"
                 />
               </div>

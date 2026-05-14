@@ -117,29 +117,54 @@ export function useChat({
     try {
       console.log('Initializing chat with:', { studentId, mood, triggers, notes, skipImportSuggestion, importData });
       
-      // Create a temporary session ID for the opening message
-      // The actual session will only be created when student sends first message
-      const tempSessionId = `temp_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
-      sessionIdRef.current = tempSessionId
-      setState(prev => ({ ...prev, sessionId: tempSessionId }))
-      
-      // Generate simple opening message
-      let openingMessageContent = "Hello! I'm here to listen and support you. How are you feeling today?"
-      
-      if (importData && importData.mainTopic) {
-        openingMessageContent = `Welcome back! I see we were discussing ${importData.mainTopic} before. How would you like to continue our conversation?`
+      // Call the chat start API to create a real session
+      const response = await fetch('/api/students/chat/start', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-user-id': studentId
+        },
+        body: JSON.stringify({
+          studentId,
+          mood,
+          triggers,
+          notes,
+          skipImportSuggestion,
+          importData
+        })
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}))
+        throw new Error(`Failed to start chat: ${response.status} - ${errorData.message || 'Unknown error'}`)
       }
 
-      // Display opening message
+      const data = await response.json()
+      
+      if (!data.success) {
+        throw new Error(data.message || 'Failed to initialize chat session')
+      }
+
+      // Set the real session ID from the API response
+      sessionIdRef.current = data.sessionId
+      setState(prev => ({ 
+        ...prev, 
+        sessionId: data.sessionId,
+        sessionStartTime: Date.now()
+      }))
+      
+      console.log('Chat session created successfully:', data.sessionId)
+
+      // Display the opening message from the API
       const openingMessage: Message = {
         id: crypto.randomUUID(),
         sender: 'bot',
-        content: openingMessageContent,
+        content: data.openingMessage || "Hello! I'm here to listen and support you. How are you feeling today?",
         timestamp: new Date().toISOString(),
         type: 'opening'
       }
       
-      console.log('Opening message created locally:', openingMessage)
+      console.log('Opening message from API:', openingMessage)
 
       setState(prev => ({
         ...prev,
@@ -150,11 +175,12 @@ export function useChat({
 
     } catch (error) {
       const err = error instanceof Error ? error : new Error('Failed to initialize chat')
+      console.error('Chat initialization error:', err)
       onError?.(err)
       // Reset flag on error so it can be retried
       isInitialized.current = false
     }
-  }, [studentId, onMessage, onError, importData])
+  }, [studentId, onMessage, onError])
 
   // Generate summary and end chat
   const generateSummaryAndEndChat = useCallback(async () => {
@@ -200,8 +226,9 @@ export function useChat({
         // Instead of redirecting to summary page, start a new chat session
         console.log(`[AutoTermination] Starting new chat session after summary generation`);
         
-        // Clear current session
-        sessionStorage.removeItem("chatSessionId");
+        // Clear current session for this student
+        const studentSessionKey = `chatSessionId_${studentId}`
+        sessionStorage.removeItem(studentSessionKey);
         sessionIdRef.current = null;
         sessionStartTimeRef.current = null;
         isInitialized.current = false;
@@ -378,8 +405,9 @@ export function useChat({
           console.log('Session start time set:', new Date(sessionStartTimeRef.current).toISOString())
         }
         
-        // Save the real session ID
-        sessionStorage.setItem("chatSessionId", data.sessionId)
+        // Save the real session ID for this specific student
+        const studentSessionKey = `chatSessionId_${studentId}`
+        sessionStorage.setItem(studentSessionKey, data.sessionId)
         
       } catch (error) {
         console.error('Failed to create chat session:', error)
@@ -492,11 +520,40 @@ export function useChat({
         // Try to create a new session if none exists
         if (!isInitialized.current && studentId) {
           console.log('[SendMessage] No session found, creating new session...')
-          const tempSessionId = `temp_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
-          sessionIdRef.current = tempSessionId
-          setState(prev => ({ ...prev, sessionId: tempSessionId }))
+          
+          // Call the chat start API to create a real session
+          const response = await fetch('/api/students/chat/start', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'x-user-id': studentId
+            },
+            body: JSON.stringify({
+              studentId,
+              skipImportSuggestion: true // Skip import when creating emergency session
+            })
+          })
+
+          if (!response.ok) {
+            const errorData = await response.json().catch(() => ({}))
+            throw new Error(`Failed to create emergency session: ${response.status} - ${errorData.message || 'Unknown error'}`)
+          }
+
+          const data = await response.json()
+          
+          if (!data.success) {
+            throw new Error(data.message || 'Failed to create emergency chat session')
+          }
+
+          // Set the real session ID from the API response
+          sessionIdRef.current = data.sessionId
+          setState(prev => ({ 
+            ...prev, 
+            sessionId: data.sessionId,
+            sessionStartTime: Date.now()
+          }))
           isInitialized.current = true
-          console.log('[SendMessage] Created emergency session:', tempSessionId)
+          console.log('[SendMessage] Created emergency session:', data.sessionId)
         } else {
           throw new Error(`No active session found. Session state: ref=${sessionIdRef.current}, state=${state.sessionId}, initialized=${isInitialized.current}`)
         }
@@ -612,8 +669,9 @@ export function useChat({
         })
       }
 
-      // Clean up local state
-      sessionStorage.removeItem("chatSessionId")
+      // Clean up local state for this student
+      const studentSessionKey = `chatSessionId_${studentId}`
+      sessionStorage.removeItem(studentSessionKey)
       sessionIdRef.current = null
       sessionStartTimeRef.current = null
       isInitialized.current = false
@@ -674,15 +732,16 @@ export function useChat({
     const initializeChat = async () => {
       if (!isInitialized.current && studentId) {
         try {
-          // Check for existing session
-          const savedSessionId = sessionStorage.getItem("chatSessionId")
+          // Check for existing session for this specific student
+          const studentSessionKey = `chatSessionId_${studentId}`
+          const savedSessionId = sessionStorage.getItem(studentSessionKey)
           
           if (savedSessionId && !savedSessionId.startsWith('temp_')) {
             // Continue existing session
             sessionIdRef.current = savedSessionId
             setState(prev => ({ ...prev, sessionId: savedSessionId }))
             isInitialized.current = true
-            console.log('Continuing existing chat session:', savedSessionId)
+            console.log('Continuing existing chat session for student', studentId, ':', savedSessionId)
             
             // Fetch existing messages for this session (will also set session start time)
             const messageData = await fetchExistingMessages(savedSessionId)

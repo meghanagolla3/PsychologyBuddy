@@ -16,7 +16,9 @@ import StudentLayout from "@/src/components/StudentDashboard/Layout/StudentLayou
 import BadgeUnlockedModal from "./BadgeUnlockedModal";
 import BackToDashboard from "../Layout/BackToDashboard";
 import Image from "next/image";
+import { ChallengesView } from "./ChallengesView";
 
+type Tab = "badges" | "challenges";
 
 interface EarnedBadge {
   id: string;
@@ -39,8 +41,32 @@ interface InProgressBadge {
   color: string;
 }
 
+function TabButton({
+  active,
+  children,
+  onClick,
+}: {
+  active: boolean;
+  children: React.ReactNode;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      onClick={onClick}
+      className={`px-8 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 ${
+        active
+          ? "bg-[#3B82F6] text-white shadow-md"
+          : "text-[#64748B] hover:bg-[#F1F5F9]"
+      }`}
+    >
+      {children}
+    </button>
+  );
+}
+
 export default function BadgesStreaksPage() {
   const router = useRouter();
+  const [tab, setTab] = useState<Tab>("badges");
   const [earnedBadges, setEarnedBadges] = useState<EarnedBadge[]>([]);
   const [inProgressBadges, setInProgressBadges] = useState<InProgressBadge[]>(
     []
@@ -82,134 +108,135 @@ export default function BadgesStreaksPage() {
 
   return (
     <StudentLayout>
-      <div className="max-w-7xl mx-auto">
-      <div className="min-h-screen px-3 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-6 md:py-8 lg:py-10">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
         {/* Back Button */}
-                  <BackToDashboard />
-        
+        <div className="mb-6">
+          <BackToDashboard />
+        </div>
 
         {/* Page Header */}
-        <div className="flex items-start gap-3 sm:gap-4 mt-3 sm:mt-5 mb-6 sm:mb-8 md:mb-10">
-          <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl bg-blue-50 flex items-center justify-center border border-blue-100 flex-shrink-0">
-<Image
-            src="/badge.svg"
-            alt="Psychology Buddy Logo"
-            width={63}
-            height={63}
-            className="w-[20px] h-[20px] sm:w-[25px] sm:h-[25px] md:w-[40px] md:h-[40px] lg:w-[50px] lg:h-[50px]"
-          />          </div>
-          <div className="flex-1 min-w-0">
-            <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-[32px] font-bold text-[#2F3D43]">
-              Badge & Streaks
-            </h1>
-            <p className="text-[#686D70] text-sm sm:text-base md:text-[16px] mt-1">
-              Track Progress and Celebrate consistency
-            </p>
+        <div className="flex items-center gap-4 mb-8">
+          <div className="w-12 h-12 rounded-xl bg-[#3B82F61A] flex items-center justify-center flex-shrink-0">
+            <AwardIcon className="h-6 w-6 text-[#3B82F6]" />
+          </div>
+          <div>
+            <h1 className="text-2xl font-bold text-[#1E293B]">Badge, Streaks And Challenges</h1>
+            <p className="text-sm text-[#64748B]">Track Progress and Celebrate consistency</p>
           </div>
         </div>
 
-        {/* Stats Row */}
-        <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 mb-6 sm:mb-8 md:mb-10">
-          <div className="flex-1 bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-gray-100 shadow-xl flex flex-col items-center">
-            <Flame size={28} className="text-[#F54900]" />
-            <h2 className="text-2xl sm:text-3xl font-bold mt-2">{currentStreak}</h2>
-            <p className="text-xs sm:text-sm text-gray-500 mt-1">Current Streak</p>
-          </div>
-
-          <div className="flex-1 bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-gray-100 shadow-xl flex flex-col items-center">
-            <AwardIcon size={28} className="text-[#2397E0]" />
-            <h2 className="text-2xl sm:text-3xl font-bold mt-2">{earnedBadges.length}</h2>
-            <p className="text-xs sm:text-sm text-gray-500 mt-1">Earned Badges</p>
-          </div>
+        {/* Tabs */}
+        <div className="inline-flex p-1 rounded-2xl bg-white border border-[#E2E8F0] shadow-sm mb-8">
+          <TabButton active={tab === "badges"} onClick={() => setTab("badges")}>
+            Badges &amp; Streaks
+          </TabButton>
+          <TabButton active={tab === "challenges"} onClick={() => setTab("challenges")}>
+            Challenges
+          </TabButton>
         </div>
 
-        {/* Earned Badges */}
-        <div className="mb-6 sm:mb-8 md:mb-10">
-          <h2 className="text-lg sm:text-xl md:text-[24px] font-semibold text-[#2F3D43] mb-3 sm:mb-4">
-            Earned Badges ({earnedBadges.length})
-          </h2>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 md:gap-5">
-            {earnedBadges.map((badge) => (
-              <div
-                key={badge.id}
-                className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 md:p-8 shadow-lg border border-gray-100 text-center"
-              >
-                <div
-  className={cn(
-    "w-16 h-16 sm:w-20 sm:h-20 rounded-full flex items-center justify-center mx-auto mb-2 sm:mb-3",
-    badge.iconBg
-  )}
->
-  <div className="scale-150 sm:scale-200">{badge.icon}</div>
-</div>
-                <p className="font-semibold text-gray-800 text-sm sm:text-base md:text-[17px]">
-                  {badge.name}
-                </p>
-                <p className="text-xs sm:text-sm md:text-[14px] text-[#686D70] mt-1">
-                  {badge.requirement}
-                </p>
-                <p className="text-xs sm:text-sm md:text-[14px] text-[#1B9EE0] mt-1.5 sm:mt-2 font-medium">
-                  {badge.date}
-                </p>
+        {/* Conditional Content */}
+        {tab === "challenges" ? <ChallengesView /> : (
+          <div className="space-y-10">
+            {/* Top Stats */}
+            <div className="grid grid-cols-2 gap-4">
+              <div className="bg-white rounded-[20px] p-6 text-center border border-[#E2E8F0] shadow-sm">
+                <div className="flex items-center justify-center gap-2 mb-1">
+                  <Flame className="h-6 w-6 text-[#F59E0B]" />
+                  <span className="text-3xl font-bold text-[#1E293B]">{currentStreak}</span>
+                </div>
+                <p className="text-sm text-[#64748B]">Current Streak</p>
               </div>
-            ))}
-          </div>
-        </div>
+              <div className="bg-white rounded-[20px] p-6 text-center border border-[#E2E8F0] shadow-sm">
+                <div className="flex items-center justify-center gap-2 mb-1">
+                  <AwardIcon className="h-6 w-6 text-[#3B82F6]" />
+                  <span className="text-3xl font-bold text-[#1E293B]">{earnedBadges.length}</span>
+                </div>
+                <p className="text-sm text-[#64748B]">Earned Badges</p>
+              </div>
+            </div>
 
-        {/* In Progress Badges */}
-        <div className="mb-6 sm:mb-8 md:mb-10">
-          <h2 className="text-lg sm:text-xl md:text-[24px] font-semibold text-[#2F3D43] mb-3 sm:mb-4">
-            In Progress ({inProgressBadges.length})
-          </h2>
+            {/* Earned Badges Section */}
+            <section>
+              <h2 className="text-[18px] font-bold text-[#1E293B] mb-6">
+                Earned Badges ({earnedBadges.length})
+              </h2>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
-            {inProgressBadges.map((badge) => (
-              <div
-                key={badge.id}
-                className="bg-white p-4 sm:p-6 md:p-8 lg:p-10 rounded-xl sm:rounded-2xl shadow-sm border border-gray-100"
-              >
-                <div className="flex items-start sm:items-center gap-3 sm:gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+                {earnedBadges.map((badge) => (
                   <div
-  className={cn(
-    "w-12 h-12 sm:w-16 sm:h-16 md:w-20 md:h-20 rounded-lg sm:rounded-xl flex items-center justify-center flex-shrink-0",
-    badge.iconBg
-  )}
->
-  <div className="scale-200 sm:scale-250">{badge.icon}</div>
-</div>
-
-                  <div className="flex-1 min-w-0">
-                    <div className="flex justify-between items-start sm:items-center">
-                      <p className="font-semibold text-[#2F3D43] text-sm sm:text-base md:text-[18px] truncate">
-                        {badge.name}
-                      </p>
-                      <p className="text-xs sm:text-sm font-semibold text-gray-500 flex-shrink-0">
-                        {badge.progress}%
-                      </p>
+                    key={badge.id}
+                    className="bg-white rounded-[20px] p-6 border border-[#E2E8F0] shadow-sm text-center flex flex-col items-center justify-center aspect-square"
+                  >
+                    <div className={cn(
+                      "w-12 h-12 rounded-full flex items-center justify-center mb-4 bg-opacity-10",
+                      badge.iconBg.replace('bg-', 'bg-')
+                    )}>
+                      <div className="scale-125">{badge.icon}</div>
                     </div>
-
-                    <p className="text-xs sm:text-sm md:text-[14px] text-[#686D70] mt-1">
+                    <h3 className="font-bold text-[#1E293B] text-[15px] mb-1 leading-tight">
+                      {badge.name}
+                    </h3>
+                    <p className="text-[12px] text-[#64748B] mb-3 leading-tight line-clamp-2">
                       {badge.requirement}
                     </p>
+                    <p className="text-[11px] font-medium text-[#3B82F6]">
+                      {badge.date}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </section>
 
-                    {/* Progress Bar */}
-                    <div className="w-full h-1.5 sm:h-2 bg-gray-100 rounded-full mt-2 sm:mt-3 overflow-hidden">
-                      <div
-                        className={cn(
-                          "h-full rounded-full transition-all duration-500",
-                          badge.color
-                        )}
-                        style={{ width: `${badge.progress}%` }}
-                      ></div>
+            {/* In Progress Badges Section */}
+            <section>
+              <h2 className="text-[18px] font-bold text-[#1E293B] mb-6">
+                In Progress ({inProgressBadges.length})
+              </h2>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {inProgressBadges.map((badge) => (
+                  <div
+                    key={badge.id}
+                    className="bg-white p-5 rounded-[20px] border border-[#E2E8F0] shadow-sm"
+                  >
+                    <div className="flex gap-4 items-center">
+                      <div className={cn(
+                        "w-14 h-14 rounded-xl flex items-center justify-center flex-shrink-0 bg-opacity-10",
+                        badge.iconBg
+                      )}>
+                        <div className="scale-150">{badge.icon}</div>
+                      </div>
+
+                      <div className="flex-1 min-w-0">
+                        <div className="flex justify-between items-start mb-1">
+                          <h3 className="font-bold text-[#1E293B] text-[15px] truncate">
+                            {badge.name}
+                          </h3>
+                          <span className="text-[11px] font-bold text-[#64748B]">
+                            {badge.progress}%
+                          </span>
+                        </div>
+                        <p className="text-[12px] text-[#64748B] mb-3 line-clamp-1">
+                          {badge.requirement}
+                        </p>
+                        <div className="w-full h-1.5 bg-[#F1F5F9] rounded-full overflow-hidden">
+                          <div
+                            className={cn(
+                              "h-full rounded-full transition-all duration-500",
+                              badge.color
+                            )}
+                            style={{ width: `${badge.progress}%` }}
+                          />
+                        </div>
+                      </div>
                     </div>
                   </div>
-                </div>
+                ))}
               </div>
-            ))}
+            </section>
           </div>
-        </div>
-      </div>
+        )}
       </div>
     </StudentLayout>
   );

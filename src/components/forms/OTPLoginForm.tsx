@@ -185,7 +185,7 @@ export function OTPLoginForm({ onBack }: OTPLoginFormProps) {
       {/* Footer */}
       <div className="mt-6 pt-6 border-t border-gray-200 text-center space-y-3">
         <p className="text-xs text-gray-500">
-          Available for School Admins, Counselors & Teachers
+          Available for School Admins, Counselors, Teachers & Parents
         </p>
         <div className="text-sm">
           <span className="text-gray-600">Prefer email login? </span>

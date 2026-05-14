@@ -53,13 +53,38 @@ export function AlertsOverview() {
       }
 
       const response = await fetch(`/api/admin/alerts?${params.toString()}`);
-      const result = await response.json();
+      
+      // Check if response is OK
+      if (!response.ok) {
+        console.error('API response not OK:', response.status, response.statusText);
+        return;
+      }
+      
+      // Check if response body is empty
+      const responseText = await response.text();
+      if (!responseText.trim()) {
+        console.error('Empty response from API');
+        return;
+      }
+      
+      // Parse JSON safely
+      let result;
+      try {
+        result = JSON.parse(responseText);
+      } catch (parseError) {
+        console.error('Failed to parse JSON response:', parseError);
+        console.error('Response text:', responseText);
+        return;
+      }
       
       console.log('Alerts API Response:', result); // Debug logging
       
-      if (result.success) {
+      if (result && result.success) {
+        // Ensure data is an array
+        const alertsData = Array.isArray(result.data) ? result.data : [];
+        
         // Transform API data to match Alert interface
-        const transformedAlerts = result.data.map((item: any) => {
+        const transformedAlerts = alertsData.map((item: any) => {
           const severity = item.metadata?.severity || item.type;
           console.log('Processing alert:', item.id, 'severity:', severity, 'type:', typeof severity);
           
@@ -76,10 +101,12 @@ export function AlertsOverview() {
         console.log('Transformed alerts:', transformedAlerts); // Debug logging
         setAlerts(transformedAlerts);
       } else {
-        console.error('API returned error:', result.error);
+        console.error('API returned error:', result?.error || 'Unknown error');
+        setAlerts([]); // Set empty array on error
       }
     } catch (error) {
       console.error('Failed to fetch alerts:', error);
+      setAlerts([]); // Set empty array on error
     } finally {
       setLoading(false);
     }

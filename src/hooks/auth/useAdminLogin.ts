@@ -96,8 +96,12 @@ export function useAdminLogin() {
             router.push('/admin');
           } else if (userRole === 'ADMIN') {
             router.push('/admin');
+          } else if (userRole === 'COUNSELOR') {
+            router.push('/counselor');
+          }else if (userRole === 'PARENT') {
+            router.push('/parent');
           } else {
-            router.push('/dashboard'); // Fallback
+            router.push('/'); // Fallback
           }
         }, 1500);
       } else {

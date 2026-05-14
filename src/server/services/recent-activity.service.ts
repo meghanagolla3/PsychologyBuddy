@@ -137,9 +137,10 @@ export class RecentActivityService {
     limit: number;
     offset: number;
   }): Promise<ActivityItem[]> {
-    const { adminSchoolId, classId, search, type, dateFilter, limit, offset } = params;
+    try {
+      const { adminSchoolId, classId, search, type, dateFilter, limit, offset } = params;
 
-    const activities: ActivityItem[] = [];
+      const activities: ActivityItem[] = [];
 
     // Build base user filter
     const userFilter: any = {};
@@ -506,7 +507,9 @@ export class RecentActivityService {
     // Alert resolved and active alerts
     if (!type || type === 'alert') {
       // Get all alerts (both active and resolved) - apply date filter
-      const allAlerts = await prisma.escalationAlert.findMany({
+      let allAlerts = [];
+      try {
+        allAlerts = await prisma.escalationAlert.findMany({
         where: {
           user: userFilter,
           createdAt: dateFilter,
@@ -530,7 +533,11 @@ export class RecentActivityService {
         orderBy: { createdAt: 'desc' },
         take: limit * 2, // Get more to filter later
         skip: offset
-      });
+        });
+      } catch (error) {
+        console.error('Error fetching escalation alerts:', error);
+        allAlerts = [];
+      }
 
       // Filter and transform alerts
       const alertActivities = allAlerts.map((alert: any) => ({
@@ -557,7 +564,11 @@ export class RecentActivityService {
 
     // Apply pagination after sorting
     return activities.slice(offset, offset + limit);
+  } catch (error) {
+    console.error('Error in fetchActivities:', error);
+    return [];
   }
+}
 
   /**
    * Count total activities for pagination
@@ -569,9 +580,10 @@ export class RecentActivityService {
     type?: string;
     dateFilter?: { gte?: Date; lte?: Date };
   }): Promise<number> {
-    // For simplicity, return a count from mood checkins as a baseline
-    // In production, you'd want to maintain a dedicated activity log table
-    const { adminSchoolId, classId, search, type, dateFilter } = params;
+    try {
+      // For simplicity, return a count from mood checkins as a baseline
+      // In production, you'd want to maintain a dedicated activity log table
+      const { adminSchoolId, classId, search, type, dateFilter } = params;
 
     const userFilter: any = {};
     if (adminSchoolId) {
@@ -600,6 +612,10 @@ export class RecentActivityService {
     }
 
     return await prisma.moodCheckin.count({ where: whereClause });
+    } catch (error) {
+      console.error('Error in countActivities:', error);
+      return 0;
+    }
   }
 
   /**

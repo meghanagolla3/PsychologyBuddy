@@ -102,6 +102,7 @@ export function usePermissions() {
     isSuperAdmin: userRole === 'SUPERADMIN',
     isAdmin: userRole === 'ADMIN',
     isStudent: userRole === 'STUDENT',
+    isParent: userRole === 'PARENT',
     
     // Utility functions
     hasPermission,

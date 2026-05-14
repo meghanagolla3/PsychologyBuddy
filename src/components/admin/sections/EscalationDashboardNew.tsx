@@ -5,7 +5,6 @@ import {
   Search, 
   AlertTriangle, 
   Clock, 
-  CheckCircle,
   ChevronRight,
   X,
   Calendar,
@@ -14,7 +13,7 @@ import {
   Dumbbell,
   Music,
   Heart,
-  RefreshCw
+  CheckCircle
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -49,6 +48,7 @@ import { toast } from "@/components/ui/use-toast";
 import { AdminHeader } from "@/src/components/admin/layout/AdminHeader";
 import { usePermissions } from "@/src/hooks/usePermissions";
 import { useTimeFilter } from "@/src/contexts/TimeFilterContext";
+import { useAuth } from "@/src/contexts/AuthContext";
 
 interface Resource {
   id?: string;
@@ -115,10 +115,10 @@ interface AlertDetailModalProps {
   isOpen: boolean
   onClose: () => void
   onUpdateStatus: (alertId: string, status: string, notes?: string, selectedResources?: any[]) => void
+  currentUserId?: string
 }
 
-function AlertDetailModal({ alert, isOpen, onClose, onUpdateStatus }: AlertDetailModalProps) {
-  const [resolutionNotes, setResolutionNotes] = useState(alert?.notes || '');
+function AlertDetailModal({ alert, isOpen, onClose, onUpdateStatus, currentUserId }: AlertDetailModalProps) {
   const [selectedResourceType, setSelectedResourceType] = useState<string>("");
   const [resourceSearchQuery, setResourceSearchQuery] = useState("");
   const [selectedResources, setSelectedResources] = useState<{ id: string; name: string; type: string; duration: string }[]>([]);
@@ -126,6 +126,12 @@ function AlertDetailModal({ alert, isOpen, onClose, onUpdateStatus }: AlertDetai
   const [loadingResources, setLoadingResources] = useState(false);
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [updating, setUpdating] = useState(false);
+  
+  // Counselor assignment states
+  const [selectedCounselor, setSelectedCounselor] = useState<string>("");
+  const [selectedLevel, setSelectedLevel] = useState<string>("");
+  const [availableCounselors, setAvailableCounselors] = useState<Array<{ id: string; name: string; email: string }>>([]);
+  const [loadingCounselors, setLoadingCounselors] = useState(false);
 
   // Parse recommended resources from notes
   const [parsedNotes, recommendedResources] = useMemo((): [string, Resource[]] => {
@@ -148,10 +154,6 @@ function AlertDetailModal({ alert, isOpen, onClose, onUpdateStatus }: AlertDetai
     return [notesPart, parsedResources];
   }, [alert?.notes]);
 
-  // Update resolutionNotes with parsed notes when alert changes
-  useEffect(() => {
-    setResolutionNotes(parsedNotes);
-  }, [parsedNotes]);
 
   const fetchResources = async () => {
     try {
@@ -244,10 +246,86 @@ function AlertDetailModal({ alert, isOpen, onClose, onUpdateStatus }: AlertDetai
     }
   };
 
-  // Fetch real resources from the API when modal opens
+  const fetchCounselors = async () => {
+    try {
+      setLoadingCounselors(true);
+      console.log('Fetching counselors...');
+      
+      const response = await fetch('/api/counselors');
+      console.log('Counselors API response status:', response.status);
+      console.log('Counselors API response headers:', response.headers);
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Counselors API error response:', errorText);
+        throw new Error(`Failed to fetch counselors: ${response.status} ${errorText}`);
+      }
+      
+      const data = await response.json();
+      console.log('Counselors API response raw data:', data);
+      console.log('Counselors API response type:', typeof data);
+      console.log('Counselors API response keys:', Object.keys(data));
+      
+      // Handle different response formats
+      let counselors = [];
+      
+      if (data.success && data.data && data.data.counselors) {
+        // Standard API response format
+        counselors = data.data.counselors.map((counselor: any) => ({
+          id: counselor.id,
+          name: `${counselor.firstName} ${counselor.lastName}`,
+          email: counselor.email
+        }));
+      } else if (data.success && data.counselors) {
+        // Debug endpoint format and potentially main endpoint
+        counselors = data.counselors.map((counselor: any) => ({
+          id: counselor.id,
+          name: `${counselor.firstName} ${counselor.lastName}`,
+          email: counselor.email
+        }));
+      } else if (data.counselors) {
+        // Direct counselors array
+        counselors = data.counselors.map((counselor: any) => ({
+          id: counselor.id,
+          name: `${counselor.firstName} ${counselor.lastName}`,
+          email: counselor.email
+        }));
+      } else if (Array.isArray(data)) {
+        // Direct array response
+        counselors = data.map((counselor: any) => ({
+          id: counselor.id,
+          name: `${counselor.firstName} ${counselor.lastName}`,
+          email: counselor.email
+        }));
+      } else {
+        console.error('Unexpected counselors API response format:', data);
+        console.error('Response details:', {
+          success: data.success,
+          hasData: !!data.data,
+          hasCounselors: !!data.counselors,
+          isArray: Array.isArray(data),
+          keys: Object.keys(data)
+        });
+        setAvailableCounselors([]);
+        return;
+      }
+      
+      setAvailableCounselors(counselors);
+      console.log('Counselors fetched successfully:', counselors);
+      
+    } catch (error) {
+      console.error('Error fetching counselors:', error);
+      setAvailableCounselors([]);
+    } finally {
+      setLoadingCounselors(false);
+    }
+  };
+
+  // Fetch real resources and counselors from the API when modal opens
   useEffect(() => {
     if (isOpen) {
       fetchResources();
+      fetchCounselors();
     }
   }, [isOpen]);
 
@@ -275,14 +353,6 @@ function AlertDetailModal({ alert, isOpen, onClose, onUpdateStatus }: AlertDetai
   const dateTime = formatDateTime(alert.createdAt);
 
   const handleCloseAlert = async () => {
-    if (!resolutionNotes.trim()) {
-      toast({
-        title: "Resolution Notes Required",
-        description: "Please add resolution notes before closing the alert.",
-        variant: "destructive",
-      });
-      return;
-    }
     setShowConfirmation(true);
   };
 
@@ -290,7 +360,7 @@ function AlertDetailModal({ alert, isOpen, onClose, onUpdateStatus }: AlertDetai
     setUpdating(true);
     
     // Pass selected resources separately
-    await onUpdateStatus(alert.id, 'resolved', resolutionNotes, selectedResources);
+    await onUpdateStatus(alert.id, 'resolved', '', selectedResources);
     setUpdating(false);
     setShowConfirmation(false);
     onClose();
@@ -298,10 +368,74 @@ function AlertDetailModal({ alert, isOpen, onClose, onUpdateStatus }: AlertDetai
       title: "Alert Closed",
       description: "The alert has been marked as resolved.",
     });
-    setResolutionNotes("");
     setSelectedResourceType("");
     setResourceSearchQuery("");
     setSelectedResources([]);
+  };
+
+  const handleAssignCounselor = async () => {
+    if (!selectedCounselor || !selectedLevel) {
+      toast({
+        title: "Missing Information",
+        description: "Please select both a counselor and a level.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+
+    setUpdating(true);
+    
+    try {
+      // First assign the counselor to the student
+      const assignResponse = await fetch('/api/counselors/assign', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          counselorId: selectedCounselor,
+          studentIds: [alert.studentId],
+          assignedBy: currentUserId || 'admin',
+          level: selectedLevel,
+          escalationAlertId: alert.id
+        })
+      });
+
+      if (!assignResponse.ok) {
+        throw new Error('Failed to assign counselor');
+      }
+
+      const assignResult = await assignResponse.json();
+      console.log('Counselor assignment result:', assignResult);
+
+      // Update the alert status to 'reviewed' (not resolved) - alert will be resolved when counselor completes session
+      await onUpdateStatus(alert.id, 'reviewed', '', selectedResources);
+      
+      setUpdating(false);
+      onClose();
+      
+      toast({
+        title: "Counselor Assigned",
+        description: `Student has been assigned to counselor. Alert will be resolved when counseling session is completed.`,
+      });
+      
+      // Reset form
+      setSelectedResourceType("");
+      setResourceSearchQuery("");
+      setSelectedResources([]);
+      setSelectedCounselor("");
+      setSelectedLevel("");
+      
+    } catch (error) {
+      console.error('Error assigning counselor:', error);
+      setUpdating(false);
+      toast({
+        title: "Assignment Failed",
+        description: "Failed to assign counselor. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   return (
@@ -423,9 +557,9 @@ function AlertDetailModal({ alert, isOpen, onClose, onUpdateStatus }: AlertDetai
 
             {/* Close Alert Form (for open alerts) */}
             {alert.status === 'open' && (
-              <div className="space-y-4 pt-2 border-t border-border">
+              <div className="space-y-4 pt-2 ">
                 {/* Resolution Notes */}
-                <div>
+                {/* <div>
                   <Label className="text-sm font-medium text-[#64748B] mb-2 block">
                     Resolution Notes <span className="text-destructive">*</span>
                   </Label>
@@ -435,125 +569,83 @@ function AlertDetailModal({ alert, isOpen, onClose, onUpdateStatus }: AlertDetai
                     onChange={(e) => setResolutionNotes(e.target.value)}
                     className="min-h-[100px] resize-none"
                   />
-                </div>
+                </div> */}
 
                 {/* Recommended Resources */}
-                <div className="space-y-3">
-                  <Label className="text-sm font-medium text-[#64748B] block">
-                    Recommended Resources (optional)
-                  </Label>
-                  
-                  {/* Step 1: Select Resource Type */}
-                  <Select value={selectedResourceType} onValueChange={(value) => {
-                    setSelectedResourceType(value);
-                    setResourceSearchQuery("");
-                  }}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select resource type..." />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {resourceTypes.map((type) => {
-                        const IconComponent = type.icon;
-                        return (
-                          <SelectItem key={type.id} value={type.id}>
-                            <div className="flex items-center gap-2">
-                              <IconComponent className="h-4 w-4" />
-                              {type.label}
-                            </div>
-                          </SelectItem>
-                        );
-                      })}
-                    </SelectContent>
-                  </Select>
+                
 
-                  {/* Step 2: Select Specific Resource */}
-                  {selectedResourceType && (
+                {/* Counselor Assignment Section */}
+                <div className="space-y-4 pt-4 border-t border-border">
+                  <div className="grid grid-cols-2 gap-4">
+                    {/* Counselor Selection */}
                     <div className="space-y-2">
-                      <Input
-                        placeholder="Search resources..."
-                        value={resourceSearchQuery}
-                        onChange={(e) => setResourceSearchQuery(e.target.value)}
-                        className="text-sm"
-                      />
-                      <div className="max-h-32 overflow-y-auto border rounded-lg divide-y">
-                        {loadingResources ? (
-                          <div className="px-3 py-2 text-sm text-[#64748B]">
-                            Loading resources...
-                          </div>
-                        ) : (
-                          availableResources[selectedResourceType]
-                            ?.filter((r: any) => r.name.toLowerCase().includes(resourceSearchQuery.toLowerCase()))
-                            .map((resource: any) => {
-                              const isAlreadySelected = selectedResources.some(sr => sr.id === resource.id);
-                              return (
-                                <div
-                                  key={resource.id}
-                                  className={cn(
-                                    "flex items-center justify-between px-3 py-2 text-sm cursor-pointer transition-colors",
-                                    isAlreadySelected 
-                                      ? "bg-[#E2E8F0]/50 text-[#64748B]" 
-                                      : "hover:bg-[#E2E8F0]/30"
-                                  )}
-                                  onClick={() => {
-                                    if (!isAlreadySelected) {
-                                      const typeLabel = resourceTypes.find(t => t.id === selectedResourceType)?.label || selectedResourceType;
-                                      setSelectedResources([...selectedResources, {
-                                        id: resource.id,
-                                        name: resource.name,
-                                        type: typeLabel,
-                                        duration: resource.duration
-                                      }]);
-                                    }
-                                  }}
-                                >
-                                  <span>{resource.name}</span>
-                                  <span className="text-xs text-[#64748B]">{resource.duration}</span>
+                      <Label className="text-sm font-medium text-[#64748B]">
+                        Select counselor <span className="text-destructive">*</span>
+                      </Label>
+                      <Select value={selectedCounselor} onValueChange={setSelectedCounselor} disabled={loadingCounselors}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Choose counselor..." />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {loadingCounselors ? (
+                            <div className="px-3 py-2 text-sm text-[#64748B]">
+                              Loading counselors...
+                            </div>
+                          ) : availableCounselors.length === 0 ? (
+                            <div className="px-3 py-2 text-sm text-[#64748B]">
+                              No counselors found. Please add counselors first.
+                            </div>
+                          ) : (
+                            availableCounselors.map((counselor) => (
+                              <SelectItem key={counselor.id} value={counselor.id}>
+                                <div className="flex flex-col">
+                                  <span className="font-medium">{counselor.name}</span>
+                                  <span className="text-xs text-[#64748B]">{counselor.email}</span>
                                 </div>
-                              );
-                            })
-                        )}
-                      </div>
+                              </SelectItem>
+                            ))
+                          )}
+                        </SelectContent>
+                      </Select>
                     </div>
-                  )}
 
-                  {/* Selected Resources Display */}
-                  {selectedResources.length > 0 && (
+                    {/* Level Selection */}
                     <div className="space-y-2">
-                      <p className="text-xs text-[#64748B]">Selected resources:</p>
-                      <div className="space-y-1">
-                        {selectedResources.map((resource) => (
-                          <div
-                            key={resource.id}
-                            className="flex items-center justify-between rounded-lg border border-primary/30 bg-primary/5 px-3 py-2"
-                          >
-                            <div className="flex-1 min-w-0">
-                              <p className="text-sm font-medium text-foreground truncate">{resource.name}</p>
-                              <p className="text-xs text-[#64748B]">{resource.type} • {resource.duration}</p>
-                            </div>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="h-6 w-6 shrink-0"
-                              onClick={() => setSelectedResources(selectedResources.filter(r => r.id !== resource.id))}
-                            >
-                              <X className="h-3 w-3" />
-                            </Button>
-                          </div>
-                        ))}
-                      </div>
+                      <Label className="text-sm font-medium text-[#64748B]">
+                        Select Level <span className="text-destructive">*</span>
+                      </Label>
+                      <Select value={selectedLevel} onValueChange={setSelectedLevel}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Choose level..." />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="level1">Level 1</SelectItem>
+                          <SelectItem value="level2">Level 2</SelectItem>
+                          <SelectItem value="level3">Level 3</SelectItem>
+                        </SelectContent>
+                      </Select>
                     </div>
-                  )}
-                </div>
+                  </div>
 
-                {/* Close Alert Button */}
-                <Button 
-                  className="w-full gap-2 bg-green-600 hover:bg-green-700 text-white"
-                  onClick={handleCloseAlert}
-                  disabled={updating}
-                >
-                  <CheckCircle className="h-4 w-4" />
-                  {updating ? "Closing..." : "Close Alert"}
-                </Button>
+                  {/* Action Buttons */}
+                  <div className="flex gap-3">
+                    <Button 
+                      variant="outline" 
+                      className="flex-1"
+                      onClick={onClose}
+                      disabled={updating}
+                    >
+                      Cancel
+                    </Button>
+                    <Button 
+                      className="flex-1 gap-2 bg-blue-600 hover:bg-blue-700 text-white"
+                      onClick={handleAssignCounselor}
+                      disabled={updating || !selectedCounselor || !selectedLevel}
+                    >
+                      {updating ? "Assigning..." : "Assign"}
+                    </Button>
+                  </div>
+                </div>
               </div>
             )}
 
@@ -561,34 +653,10 @@ function AlertDetailModal({ alert, isOpen, onClose, onUpdateStatus }: AlertDetai
             {alert.status !== 'open' && (parsedNotes || recommendedResources.length > 0) && (
               <div>
                 {/* Resolution Notes */}
-                {parsedNotes && (
-                  <div className="mb-4">
-                    <p className="text-sm font-medium text-muted-foreground mb-2">Resolution Notes</p>
-                    <div className="rounded-lg bg-green-50 border border-green-200 p-4">
-                      <p className="text-sm text-foreground leading-relaxed">{parsedNotes}</p>
-                    </div>
-                  </div>
-                )}
+                
                 
                 {/* Recommended Resources */}
-                {recommendedResources.length > 0 && (
-                  <div>
-                    <p className="text-sm font-medium text-muted-foreground mb-2">Recommended Resources</p>
-                    <div className="space-y-2">
-                      {recommendedResources.map((resource, index) => (
-                        <div
-                          key={resource.id || index}
-                          className="flex items-center justify-between rounded-lg border border-primary/30 bg-primary/5 px-3 py-2"
-                        >
-                          <div className="flex-1 min-w-0">
-                            <p className="text-sm font-medium text-foreground truncate">{resource.name}</p>
-                            <p className="text-xs text-[#64748B]">{resource.type} {resource.duration && `(${resource.duration})`}</p>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
+                
               </div>
             )}
           </div>
@@ -635,6 +703,7 @@ export function EscalationDashboardNew() {
   
   const { isSuperAdmin, userSchoolId } = usePermissions()
   const { timeFilter, dateRange } = useTimeFilter()
+  const { user } = useAuth()
 
   // Set initial school based on permissions
   useEffect(() => {
@@ -740,6 +809,7 @@ export function EscalationDashboardNew() {
     fetchAlerts()
   }, [statusFilter, priorityFilter, searchTerm, selectedSchool, timeFilter, dateRange])
 
+  
   // Update alert status using real API
   const updateAlertStatus = async (alertId: string, status: string, notes?: string, selectedResources?: any[]) => {
     try {
@@ -1023,6 +1093,7 @@ export function EscalationDashboardNew() {
         isOpen={isModalOpen}
         onClose={closeAlertDetail}
         onUpdateStatus={updateAlertStatus}
+        currentUserId={user?.id}
       />
     </div>
   );

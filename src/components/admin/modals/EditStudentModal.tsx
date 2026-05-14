@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/src/contexts/AuthContext';
-import { X, Edit, ChevronDown, Check } from 'lucide-react';
+import { X, Edit, ChevronDown, Check, Plus } from 'lucide-react';
 import { toast } from '@/components/ui/use-toast';
 import { useAdminLoading, AdminActions } from '@/src/contexts/AdminLoadingContext';
 import { LoadingButton } from '@/src/components/admin/ui/AdminLoader';
@@ -37,14 +37,10 @@ interface FormData {
   email: string;
   phone: string;
   dateOfBirth: string;
-  classId: string;
+  grade: string;
+  section: string;
   schoolId: string;
   locationId: string;
-  emergencyContact: {
-    name: string;
-    phone: string;
-    relationship: string;
-  };
   status: 'ACTIVE' | 'INACTIVE' | 'SUSPENDED';
 }
 
@@ -63,14 +59,10 @@ export function EditStudentModal({ student, onClose, onSuccess, schools, classes
     email: '',
     phone: '',
     dateOfBirth: '',
-    classId: '',
+    grade: '',
+    section: 'A',
     schoolId: '',
     locationId: '',
-    emergencyContact: {
-      name: '',
-      phone: '',
-      relationship: ''
-    },
     status: 'ACTIVE'
   });
   const [errors, setErrors] = useState<Partial<FormData>>({});
@@ -84,6 +76,12 @@ export function EditStudentModal({ student, onClose, onSuccess, schools, classes
     { value: 'INACTIVE', label: 'Inactive' },
     { value: 'SUSPENDED', label: 'Suspended' }
   ];
+
+  // School-related sections state
+  const [isSectionPopoverOpen, setIsSectionPopoverOpen] = useState(false);
+  const [newSection, setNewSection] = useState("");
+  const [sections, setSections] = useState<string[]>([]);
+  const [loadingSections, setLoadingSections] = useState(false);
 
   // Location state
   const [isLocationPopoverOpen, setIsLocationPopoverOpen] = useState(false);
@@ -131,14 +129,10 @@ export function EditStudentModal({ student, onClose, onSuccess, schools, classes
           email: student.email || '',
           phone: student.phone || '',
           dateOfBirth: processedDateOfBirth,
-          classId: student.classRef?.name || student.className || student.class_name || '',
+          grade: String(student.classRef?.grade || student.grade || ''),
+          section: student.classRef?.section || student.section || 'A',
           schoolId: student.school?.id || student.schoolId || student.school_id || '',
           locationId: student.location?.id || student.locationId || student.location_id || '',
-          emergencyContact: {
-            name: student.studentProfile?.emergencyContact?.name || student.emergencyContact?.name || student.emergency_contact?.name || '',
-            phone: student.studentProfile?.emergencyContact?.phone || student.emergencyContact?.phone || student.emergency_contact?.phone || '',
-            relationship: student.studentProfile?.emergencyContact?.relationship || student.emergencyContact?.relationship || student.emergency_contact?.relationship || ''
-          },
           status: student.studentProfile?.status || student.status || 'ACTIVE'
         });
       } catch (error) {
@@ -149,6 +143,60 @@ export function EditStudentModal({ student, onClose, onSuccess, schools, classes
     }
   }, [student]);
 
+  // Fetch school sections when school is selected
+  useEffect(() => {
+    const fetchSchoolSections = async () => {
+      if (formData.schoolId) {
+        setLoadingSections(true);
+        try {
+          const response = await fetch(
+            `/api/admin/schools/${formData.schoolId}/sections`,
+          );
+          
+          if (!response.ok) {
+            console.warn(`Sections API returned ${response.status} -这可能表示该端点不存在`);
+            setSections([]);
+            return;
+          }
+          
+          const contentType = response.headers.get("content-type");
+          if (!contentType || !contentType.includes("application/json")) {
+            console.warn('Sections API returned non-JSON response');
+            setSections([]);
+            return;
+          }
+          
+          const data = await response.json();
+          if (data.success) {
+            setSections(data.sections || []);
+          } else {
+            setSections([]);
+            toast({
+              title: "Error",
+              description: "Failed to load school sections",
+              variant: "destructive",
+            });
+          }
+        } catch (error) {
+          console.error("Error fetching school sections:", error);
+          setSections([]);
+          toast({
+            title: "Error",
+            description: "Failed to load school sections",
+            variant: "destructive",
+          });
+        } finally {
+          setLoadingSections(false);
+        }
+      } else {
+        setSections([]);
+        // Don't reset section when schoolId is empty - keep existing value
+      }
+    };
+
+    fetchSchoolSections();
+  }, [formData.schoolId]);
+
   // Fetch school locations when school is selected
   useEffect(() => {
     const fetchSchoolLocations = async () => {
@@ -157,31 +205,41 @@ export function EditStudentModal({ student, onClose, onSuccess, schools, classes
         setLoadingLocations(true);
         try {
           const response = await fetch(
-            `/api/admin/schools/locations?schoolId=${formData.schoolId}`,
-            {
-              headers: {
-                "x-user-id": user?.id || "admin@calmpath.ai",
-              },
-            }
+            `/api/admin/schools/${formData.schoolId}/locations`,
           );
-          console.log('Locations response status:', response.status);
+          
+          if (!response.ok) {
+            console.warn(`Locations API returned ${response.status} -这可能表示该端点不存在`);
+            setLocations([]);
+            return;
+          }
+          
+          const contentType = response.headers.get("content-type");
+          if (!contentType || !contentType.includes("application/json")) {
+            console.warn('Locations API returned non-JSON response');
+            setLocations([]);
+            return;
+          }
+          
           const data = await response.json();
-          console.log('Locations data:', data);
-          setLocations(data || []);
+          if (data.success) {
+            setLocations(data.locations || []);
+          } else {
+            setLocations([]);
+          }
         } catch (error) {
-          console.error("Error fetching school locations:", error);
+          console.error('Error fetching school locations:', error);
           setLocations([]);
         } finally {
           setLoadingLocations(false);
         }
       } else {
-        console.log('No schoolId provided, clearing locations');
         setLocations([]);
       }
     };
 
     fetchSchoolLocations();
-  }, [formData.schoolId, user?.id]);
+  }, [formData.schoolId]);
 
   // Check student ID uniqueness
   const checkStudentIdUniqueness = async (studentId: string) => {
@@ -248,23 +306,7 @@ export function EditStudentModal({ student, onClose, onSuccess, schools, classes
       processedValue = numericValue.slice(0, 10);
     }
     
-    // Handle nested emergency contact fields
-    if (field.startsWith('emergencyContact.')) {
-      const nestedField = field.split('.')[1];
-      // Apply phone processing to emergency contact phone
-      if (nestedField === 'phone') {
-        // Only allow numeric input
-        const numericValue = processedValue.replace(/\D/g, '');
-        // Limit to 10 digits
-        processedValue = numericValue.slice(0, 10);
-      }
-      setFormData(prev => ({
-        ...prev,
-        emergencyContact: { ...prev.emergencyContact, [nestedField]: processedValue }
-      }));
-    } else {
-      setFormData(prev => ({ ...prev, [field]: processedValue }));
-    }
+    setFormData(prev => ({ ...prev, [field]: processedValue }));
     
     // Clear error for this field
     if (errors[field as keyof FormData]) {
@@ -279,10 +321,12 @@ export function EditStudentModal({ student, onClose, onSuccess, schools, classes
     else if (studentIdError) newErrors.studentId = studentIdError;
     if (!formData.firstName.trim()) newErrors.firstName = 'First name is required';
     if (!formData.lastName.trim()) newErrors.lastName = 'Last name is required';
+    if (!formData.phone.trim()) newErrors.phone = 'Phone number is required';
     if (formData.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
       newErrors.email = 'Invalid email format';
     }
-    if (!formData.classId) newErrors.classId = 'Class is required';
+    if (!formData.grade) newErrors.grade = 'Grade is required';
+    if (!formData.section) newErrors.section = 'Section is required';
     if (!formData.schoolId) newErrors.schoolId = 'School is required';
     if (!formData.dateOfBirth) {
       newErrors.dateOfBirth = 'Date of birth is required';
@@ -329,11 +373,18 @@ export function EditStudentModal({ student, onClose, onSuccess, schools, classes
       await executeWithLoading(
         AdminActions.EDIT_STUDENT,
         (async () => {
+          // Convert grade and section to classId for API compatibility
+          const submitData = {
+            ...formData,
+            classId: `${formData.grade}-${formData.section}`,
+            locationId: formData.locationId
+          };
+
           const response = await fetch(`/api/students/${student.id}`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             credentials: 'include',
-            body: JSON.stringify(formData)
+            body: JSON.stringify(submitData)
           });
           const data = await response.json();
           
@@ -605,21 +656,168 @@ export function EditStudentModal({ student, onClose, onSuccess, schools, classes
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Class *
+                  Grade *
                 </label>
                 <Input
                   type="text"
-                  value={formData.classId}
-                  onChange={(e) => handleInputChange('classId', e.target.value)}
+                  value={formData.grade}
+                  onChange={(e) => handleInputChange('grade', e.target.value)}
                   className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                    errors.classId ? 'border-red-500' : 'border-gray-300'
+                    errors.grade ? 'border-red-500' : 'border-gray-300'
                   }`}
-                  placeholder="Enter class name"
+                  placeholder="Enter grade (e.g., 9, 10, 11, 12)"
                 />
-                {errors.classId && (
-                  <p className="mt-1 text-sm text-red-600">{errors.classId}</p>
+                {errors.grade && (
+                  <p className="mt-1 text-sm text-red-600">{errors.grade}</p>
                 )}
               </div>
+
+              {/* School-related sections - Only show when school is selected */}
+              {formData.schoolId && (
+                <div className="space-y-4">
+                  <div className="grid gap-2">
+                    <Label>Section</Label>
+                    <Popover
+                      open={isSectionPopoverOpen}
+                      onOpenChange={setIsSectionPopoverOpen}
+                    >
+                      <PopoverTrigger asChild>
+                        <Button
+                          variant="outline"
+                          role="combobox"
+                          className="w-full justify-between hover:bg-gray-200"
+                          disabled={loadingSections}
+                        >
+                          <span
+                            className={
+                              formData.section ? "" : "text-muted-foreground"
+                            }
+                          >
+                            {loadingSections
+                              ? "Loading sections..."
+                              : formData.section || "Select section..."}
+                          </span>
+                          <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent
+                        className="w-full p-2 border bg-white shadow-xl rounded-[6px]"
+                        align="start"
+                      >
+                        <div className="space-y-2">
+                          {sections.length > 0 ? (
+                            sections.map((section) => (
+                              <div
+                                key={section}
+                                className="flex items-center gap-2 px-2 py-1.5 rounded cursor-pointer hover:bg-muted"
+                                onClick={() => {
+                                  setFormData((prev) => ({ ...prev, section }));
+                                  setIsSectionPopoverOpen(false);
+                                }}
+                              >
+                                <div
+                                  className={`h-4 w-4 border rounded-full flex items-center justify-center ${formData.section === section ? "bg-primary border-primary" : "border-input"}`}
+                                >
+                                  {formData.section === section && (
+                                    <div className="h-2 w-2 rounded-full bg-primary-foreground" />
+                                  )}
+                                </div>
+                                <span className="text-sm">{section}</span>
+                              </div>
+                            ))
+                          ) : (
+                            <div className="px-2 py-1.5 text-sm text-muted-foreground">
+                              No sections available for this school
+                            </div>
+                          )}
+                          <div className="border-t pt-2 mt-2">
+                            <div className="flex gap-2">
+                              <Input
+                                placeholder="Add new section..."
+                                value={newSection}
+                                onChange={(e) => setNewSection(e.target.value)}
+                                className="h-8 text-sm"
+                                onClick={(e) => e.stopPropagation()}
+                              />
+                              <Button
+                                size="sm"
+                                className="h-8"
+                                onClick={async (e) => {
+                                  e.stopPropagation();
+                                  if (
+                                    newSection.trim() &&
+                                    !sections.includes(newSection.trim())
+                                  ) {
+                                    try {
+                                      const response = await fetch(
+                                        `/api/admin/schools/${formData.schoolId}/sections`,
+                                        {
+                                          method: "POST",
+                                          headers: {
+                                            "Content-Type": "application/json",
+                                            "x-user-id":
+                                              user?.id || "admin@calmpath.ai",
+                                          },
+                                          body: JSON.stringify({
+                                            name: newSection.trim(),
+                                          }),
+                                        },
+                                      );
+                                      
+                                      if (!response.ok) {
+                                        throw new Error(`HTTP error! status: ${response.status}`);
+                                      }
+                                      
+                                      const contentType = response.headers.get("content-type");
+                                      if (!contentType || !contentType.includes("application/json")) {
+                                        throw new Error("Invalid response format from server");
+                                      }
+                                      
+                                      const result = await response.json();
+                                      if (result.success) {
+                                        const newSectionValue = newSection.trim();
+                                        setSections((prev) => [
+                                          ...prev,
+                                          newSectionValue,
+                                        ]);
+                                        // Automatically select the newly added section
+                                        setFormData((prev) => ({ ...prev, section: newSectionValue }));
+                                        toast({ title: "Section Added" });
+                                        setNewSection("");
+                                        setIsSectionPopoverOpen(false);
+                                      } else {
+                                        toast({
+                                          title: "Error",
+                                          description:
+                                            result.error ||
+                                            "Failed to create section",
+                                          variant: "destructive",
+                                        });
+                                      }
+                                    } catch (error) {
+                                      console.error("Section creation error:", error);
+                                      toast({
+                                        title: "Error",
+                                        description: "Failed to create section. Please try again.",
+                                        variant: "destructive",
+                                      });
+                                    }
+                                  }
+                                }}
+                              >
+                                <Plus className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          </div>
+                        </div>
+                      </PopoverContent>
+                    </Popover>
+                    {errors.section && (
+                      <p className="mt-1 text-sm text-red-600">{errors.section}</p>
+                    )}
+                  </div>
+                </div>
+              )}
 
               {user?.role?.name === 'SUPERADMIN' ? (
               <div>
@@ -730,55 +928,6 @@ export function EditStudentModal({ student, onClose, onSuccess, schools, classes
                     )}
                 </div>
               )}
-            </div>
-          </div>
-
-          
-          {/* Emergency Contact */}
-          <div>
-            <h3 className="text-lg font-medium text-gray-900 mb-4">Emergency Contact</h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Name
-                </label>
-                <Input
-                  type="text"
-                  value={formData.emergencyContact.name}
-                  onChange={(e) => handleInputChange('emergencyContact.name', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  placeholder="Parent/Guardian name"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Contact Phone
-                </label>
-                <Input
-                  type="tel"
-                  value={formData.emergencyContact.phone}
-                  onChange={(e) => handleInputChange('emergencyContact.phone', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  placeholder="Enter phone number"
-                  inputMode="numeric"
-                  pattern="[0-9]*"
-                  maxLength={10}
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Relationship
-                </label>
-                <Input
-                  type="text"
-                  value={formData.emergencyContact.relationship}
-                  onChange={(e) => handleInputChange('emergencyContact.relationship', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  placeholder="Parent, Guardian, etc."
-                />
-              </div>
             </div>
           </div>
 

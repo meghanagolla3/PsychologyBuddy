@@ -21,64 +21,57 @@ Version 2.0 introduces specialized dashboards and permission systems for **Couns
 
 ## 🔐 Permission Matrix
 
-| Feature                  | SA      | Admin     | Counselor      | Parent        | Student          |
-|--------------------------|------------|---|--------|----------- |---------|---------|
-| **Dashboard Access**     | ✅ All    | ✅ School | ✅ Alert Students | ✅ Own Children | ✅ Personal |
-| **Student List**         | ✅ All | ✅ School | ⚠️ Alert Students Only | ⚠️ Own Children Only | ❌ |
-| **Student Profiles**     | ✅ All | ✅ School | ⚠️ Alert Students Only | ⚠️ Own Children Only | ✅ Own |
-| **Escalation Alerts**    | ✅ All | ✅ School | ✅ Assigned Students | ✅ Own Children | ❌ |
-| **Chat Monitoring**      | ✅ All | ❌ | ⚠️ Alert Students Only | ⚠️ Own Children Only | ❌ |
-| **Journal Access**       | ✅ All | ❌ | ⚠️ Alert Students Only | ⚠️ Own Children Only | ✅ Own |
-| **Mood Check-ins**       | ✅ All | ✅ School | ⚠️ Alert Students Only | ⚠️ Own Children Only | ✅ Own |
-| **Meditation Data**      | ✅ All | ✅ School | ⚠️ Alert Students Only | ⚠️ Own Children Only | ✅ Own |
-| **Academic Info**        | ✅ All | ✅ School | ⚠️ Alert Students Only | ⚠️ Own Children Only | ✅ Own |
-| **Parent Communication** | ✅ All | ✅ School | ✅ Assigned Students | ❌ | ❌ |
-
----
+| Feature | SuperAdmin | Admin | Counselor | Parent | Student |
+|---------|------------|-------|-----------|---------|---------|
+| **Dashboard Access** | ✅ All | ✅ School | ✅ Alert Students | ✅ Own Children | ✅ Personal |
+| **Escalation Alerts** | ✅ All | ✅ School | ✅ Assigned Students | ✅ Own Children | ❌ |
+| **Counseling Sessions** | ✅ All | ✅ School | ✅ Assigned Students | ❌ | ❌ |
+| **Parent Details** | ✅ All | ✅ School | ✅ Alert Student Parents | ❌ | ❌ |
+| **Counselor Management** | ✅ All Schools | ✅ Own School | ❌ | ❌ | ❌ |
 
 ## 🎯 Counselor Permissions
 
 ### 📊 Scope of Access
-- **Primary Focus**: Students with active escalation alerts
-- **Secondary Access**: Historical data for students previously under care
-- **No Access**: Students without escalation alerts (unless assigned)
+- **Primary Focus**: Students with active escalation alerts only
+- **No Access**: Students without escalation alerts
+- **Limited Features**: Only alerts, sessions, and parent details
 
 ### 🔍 Specific Permissions
 
-#### Student Information
+#### Escalation Alerts
 ```typescript
 // Can view students with escalation alerts
-counselor.students.view.alerts_only
-
-// Can view student profiles for alert students
-counselor.profiles.view.assigned_students
-
-// Can view escalation history
 counselor.escalations.view.assigned_students
-```
 
-#### Communication Access
-```typescript
-// Can monitor chat for alert students
-counselor.chat.monitor.assigned_students
-
-// Can view journal entries (with consent)
-counselor.journaling.view.assigned_students
-
-// Can view mood patterns
-counselor.mood.view.assigned_students
-```
-
-#### Intervention Tools
-```typescript
 // Can respond to escalations
 counselor.escalations.respond.assigned_students
 
-// Can create intervention plans
-counselor.interventions.create.assigned_students
+// Can view escalation history
+counselor.escalations.history.assigned_students
+```
+
+#### Counseling Sessions
+```typescript
+// Can view scheduled sessions
+counselor.sessions.view.assigned_students
 
 // Can schedule counseling sessions
 counselor.sessions.schedule.assigned_students
+
+// Can manage session notes
+counselor.sessions.manage.assigned_students
+```
+
+#### Parent Details
+```typescript
+// Can view parent contact information
+counselor.parents.view.assigned_students
+
+// Can communicate with parents
+counselor.parents.contact.assigned_students
+
+// Can view parent consent status
+counselor.parents.consent.assigned_students
 ```
 
 ### 🔄 Assignment Logic
@@ -88,6 +81,119 @@ counselor.sessions.schedule.assigned_students
 2. School/grade assignments
 3. Specialization matching
 4. Current caseload capacity
+```
+
+---
+
+## 🎯 Counselor Management Permissions
+
+### 📊 Who Can Add Counselors
+
+#### SuperAdmin Capabilities
+```typescript
+// Can add counselors to any school
+superadmin.counselors.create.all_schools
+
+// Can view all counselors across all schools
+superadmin.counselors.view.all_schools
+
+// Can update any counselor's information
+superadmin.counselors.update.all_schools
+
+// Can deactivate any counselor
+superadmin.counselors.deactivate.all_schools
+```
+
+#### School Admin Capabilities
+```typescript
+// Can add counselors only to their own school
+admin.counselors.create.own_school
+
+// Can view counselors only in their own school
+admin.counselors.view.own_school
+
+// Can update counselors only in their own school
+admin.counselors.update.own_school
+
+// Can deactivate counselors only in their own school
+admin.counselors.deactivate.own_school
+```
+
+### 🔍 Management Rules
+
+#### SuperAdmin Rules
+- ✅ Can add counselors to ANY school in the system
+- ✅ Can view and manage ALL counselors across all schools
+- ✅ Can override school admin decisions
+- ✅ Can transfer counselors between schools
+- ✅ Can set system-wide counselor policies
+
+#### School Admin Rules
+- ✅ Can add counselors ONLY to their assigned school
+- ✅ Can view and manage counselors ONLY in their school
+- ❌ Cannot access counselors from other schools
+- ❌ Cannot transfer counselors to other schools
+- ❌ Cannot override SuperAdmin decisions
+
+### 🏫 School Assignment Logic
+```sql
+-- SuperAdmin: Can assign counselors to any school
+INSERT INTO CounselorAssignments (
+  counselorId, 
+  schoolId, 
+  assignedBy
+) VALUES (
+  'counselor-uuid',
+  'any-school-uuid',  -- Can be any school
+  'superadmin-uuid'
+);
+
+-- School Admin: Can only assign to their own school
+INSERT INTO CounselorAssignments (
+  counselorId, 
+  schoolId, 
+  assignedBy
+) VALUES (
+  'counselor-uuid',
+  'admin-school-uuid',  -- Must be admin's school
+  'admin-uuid'
+);
+```
+
+### 🛡️ Security Controls
+```typescript
+// SuperAdmin middleware - no school restrictions
+export const withSuperAdminPermission = (permission: SuperAdminPermission) => {
+  return async (req: Request, res: Response, next: NextFunction) => {
+    const superadmin = await getCurrentSuperAdmin(req);
+    
+    if (!superadmin.hasPermission(permission)) {
+      return res.status(403).json({ error: 'Insufficient permissions' });
+    }
+    
+    next();
+  };
+};
+
+// School Admin middleware - school-scoped restrictions
+export const withSchoolAdminPermission = (permission: AdminPermission) => {
+  return async (req: Request, res: Response, next: NextFunction) => {
+    const admin = await getCurrentSchoolAdmin(req);
+    
+    // Verify admin belongs to the school they're trying to manage
+    if (req.params.schoolId && req.params.schoolId !== admin.schoolId) {
+      return res.status(403).json({ 
+        error: 'Can only manage counselors in your own school' 
+      });
+    }
+    
+    if (!admin.hasPermission(permission)) {
+      return res.status(403).json({ error: 'Insufficient permissions' });
+    }
+    
+    next();
+  };
+};
 ```
 
 ---
@@ -207,10 +313,9 @@ const parentChildren = await db.student.findMany({
 ```typescript
 // src/components/counselor/CounselorDashboard.tsx
 interface CounselorDashboard {
-  activeCaseload: Student[];      // Students with active alerts
-  escalationQueue: Alert[];       // Pending escalations
-  scheduledSessions: Session[];   // Upcoming appointments
-  wellnessMetrics: Metrics[];     // Caseload statistics
+  escalationAlerts: Alert[];      // Active escalation alerts
+  counselingSessions: Session[];  // Scheduled counseling sessions
+  parentDetails: ParentInfo[];    // Parent contact information
 }
 ```
 
@@ -220,8 +325,7 @@ interface CounselorDashboard {
 interface ParentDashboard {
   childrenOverview: Child[];      // Own children's status
   recentAlerts: Alert[];          // Critical alerts only
-  academicProgress: Progress[];  // School performance
-  wellnessSummary: Summary[];     // Mood/activity overview
+  counselorCommunication: Message[]; // Communication with counselors
 }
 ```
 
@@ -344,18 +448,39 @@ CREATE TABLE CounselorAssignments (
 INSERT INTO Roles (name, description) VALUES 
 ('COUNSELOR', 'School counselor with access to students requiring mental health support');
 
--- Counselor Permissions
+-- Counselor Permissions (Focused on 3 core features)
 INSERT INTO Permissions (name, module, description) VALUES 
 ('counselor.dashboard.view', 'DASHBOARD', 'View counselor dashboard'),
-('counselor.students.view.alerts_only', 'STUDENTS', 'View students with escalation alerts'),
-('counselor.profiles.view.assigned_students', 'PROFILES', 'View profiles of assigned students'),
 ('counselor.escalations.view.assigned_students', 'ESCALATIONS', 'View escalations for assigned students'),
 ('counselor.escalations.respond.assigned_students', 'ESCALATIONS', 'Respond to escalations for assigned students'),
-('counselor.chat.monitor.assigned_students', 'CHAT', 'Monitor chat for assigned students'),
-('counselor.journaling.view.assigned_students', 'JOURNALING', 'View journal entries for assigned students'),
-('counselor.mood.view.assigned_students', 'MOOD', 'View mood data for assigned students'),
-('counselor.interventions.create.assigned_students', 'INTERVENTIONS', 'Create intervention plans for assigned students'),
-('counselor.sessions.schedule.assigned_students', 'SESSIONS', 'Schedule counseling sessions');
+('counselor.escalations.history.assigned_students', 'ESCALATIONS', 'View escalation history for assigned students'),
+('counselor.sessions.view.assigned_students', 'SESSIONS', 'View counseling sessions for assigned students'),
+('counselor.sessions.schedule.assigned_students', 'SESSIONS', 'Schedule counseling sessions for assigned students'),
+('counselor.sessions.manage.assigned_students', 'SESSIONS', 'Manage session notes for assigned students'),
+('counselor.parents.view.assigned_students', 'PARENTS', 'View parent details for assigned students'),
+('counselor.parents.contact.assigned_students', 'PARENTS', 'Contact parents of assigned students'),
+('counselor.parents.consent.assigned_students', 'PARENTS', 'View parent consent status for assigned students');
+```
+
+#### SuperAdmin Counselor Management Permissions
+```sql
+-- SuperAdmin can manage counselors across all schools
+INSERT INTO Permissions (name, module, description) VALUES 
+('superadmin.counselors.create.all_schools', 'COUNSELOR_MANAGEMENT', 'Add counselors to any school'),
+('superadmin.counselors.view.all_schools', 'COUNSELOR_MANAGEMENT', 'View all counselors across all schools'),
+('superadmin.counselors.update.all_schools', 'COUNSELOR_MANAGEMENT', 'Update any counselor''s information'),
+('superadmin.counselors.deactivate.all_schools', 'COUNSELOR_MANAGEMENT', 'Deactivate any counselor'),
+('superadmin.counselors.transfer.schools', 'COUNSELOR_MANAGEMENT', 'Transfer counselors between schools');
+```
+
+#### School Admin Counselor Management Permissions
+```sql
+-- School Admin can manage counselors only in their own school
+INSERT INTO Permissions (name, module, description) VALUES 
+('admin.counselors.create.own_school', 'COUNSELOR_MANAGEMENT', 'Add counselors to own school'),
+('admin.counselors.view.own_school', 'COUNSELOR_MANAGEMENT', 'View counselors in own school'),
+('admin.counselors.update.own_school', 'COUNSELOR_MANAGEMENT', 'Update counselors in own school'),
+('admin.counselors.deactivate.own_school', 'COUNSELOR_MANAGEMENT', 'Deactivate counselors in own school');
 ```
 
 #### Parent Role
@@ -381,41 +506,141 @@ INSERT INTO Permissions (name, module, description) VALUES
 
 ## 🚀 API Endpoints
 
+### 👨‍⚕️ Counselor Management APIs
+
+#### SuperAdmin Counselor Management
+```typescript
+// POST /api/superadmin/counselors
+// SuperAdmin can add counselors to any school
+export async function POST(request: Request) {
+  const superadmin = await getCurrentSuperAdmin(request);
+  const { counselorData, schoolId } = await request.json();
+  
+  // SuperAdmin can assign to any school
+  const counselor = await createCounselor({
+    ...counselorData,
+    schoolId,
+    assignedBy: superadmin.id
+  });
+  
+  return Response.json(counselor);
+}
+
+// GET /api/superadmin/counselors
+// SuperAdmin can view all counselors across all schools
+export async function GET(request: Request) {
+  const superadmin = await getCurrentSuperAdmin(request);
+  
+  const counselors = await getAllCounselors(); // No school filter
+  return Response.json(counselors);
+}
+
+// PUT /api/superadmin/counselors/:counselorId
+// SuperAdmin can update any counselor
+export async function PUT(
+  request: Request,
+  { params }: { params: { counselorId: string } }
+) {
+  const superadmin = await getCurrentSuperAdmin(request);
+  const updateData = await request.json();
+  
+  const counselor = await updateCounselor(params.counselorId, updateData);
+  return Response.json(counselor);
+}
+```
+
+#### School Admin Counselor Management
+```typescript
+// POST /api/admin/counselors
+// School Admin can add counselors only to their own school
+export async function POST(request: Request) {
+  const admin = await getCurrentSchoolAdmin(request);
+  const counselorData = await request.json();
+  
+  // School Admin can only assign to their own school
+  const counselor = await createCounselor({
+    ...counselorData,
+    schoolId: admin.schoolId, // Must be admin's school
+    assignedBy: admin.id
+  });
+  
+  return Response.json(counselor);
+}
+
+// GET /api/admin/counselors
+// School Admin can view counselors only in their own school
+export async function GET(request: Request) {
+  const admin = await getCurrentSchoolAdmin(request);
+  
+  const counselors = await getCounselorsBySchool(admin.schoolId);
+  return Response.json(counselors);
+}
+
+// PUT /api/admin/counselors/:counselorId
+// School Admin can update counselors only in their own school
+export async function PUT(
+  request: Request,
+  { params }: { params: { counselorId: string } }
+) {
+  const admin = await getCurrentSchoolAdmin(request);
+  const updateData = await request.json();
+  
+  // Verify counselor belongs to admin's school
+  const counselor = await getCounselor(params.counselorId);
+  if (counselor.schoolId !== admin.schoolId) {
+    return Response.json({ 
+      error: 'Can only manage counselors in your own school' 
+    }, { status: 403 });
+  }
+  
+  const updatedCounselor = await updateCounselor(params.counselorId, updateData);
+  return Response.json(updatedCounselor);
+}
+```
+
 ### 👨‍⚕️ Counselor APIs
 
-#### Dashboard & Caseload
+#### Dashboard & Core Features
 ```typescript
 // GET /api/counselor/dashboard
-// Returns counselor's dashboard with assigned students
+// Returns counselor's dashboard with alerts, sessions, and parent details
 export async function GET(request: Request) {
   const counselor = await getCurrentCounselor(request);
   
   const dashboard = {
-    activeCaseload: await getAssignedStudents(counselor.id),
-    pendingEscalations: await getPendingEscalations(counselor.id),
-    scheduledSessions: await getUpcomingSessions(counselor.id),
-    caseloadMetrics: await getCaseloadMetrics(counselor.id)
+    escalationAlerts: await getAssignedEscalations(counselor.id),
+    counselingSessions: await getUpcomingSessions(counselor.id),
+    parentDetails: await getParentDetails(counselor.id)
   };
   
   return Response.json(dashboard);
 }
 
-// GET /api/counselor/students/:studentId
-// Returns student profile if counselor has access
-export async function GET(
-  request: Request, 
-  { params }: { params: { studentId: string } }
-) {
+// GET /api/counselor/escalations
+// Returns all escalation alerts for assigned students
+export async function GET(request: Request) {
   const counselor = await getCurrentCounselor(request);
   
-  // Verify access
-  const hasAccess = await canAccessStudent(counselor.id, params.studentId);
-  if (!hasAccess) {
-    return Response.json({ error: 'Access denied' }, { status: 403 });
-  }
+  const escalations = await getAssignedEscalations(counselor.id);
+  return Response.json(escalations);
+}
+
+// GET /api/counselor/sessions
+// Returns all counseling sessions for assigned students
+export async function GET(request: Request) {
+  const counselor = await getCurrentCounselor(request);
   
-  const student = await getStudentProfile(params.studentId);
-  return Response.json(student);
+  const sessions = await getCounselingSessions(counselor.id);
+  return Response.json(sessions);
+}
+
+// GET /api/counselor/parents
+// Returns parent details for students with escalation alerts
+export async function GET(request: Request) {
+  const counselor = await getCurrentCounselor(request);
+  
+  const parents = await getParentDetails(counselor.id);
+  return Response.json(parents);
 }
 ```
 
@@ -516,39 +741,29 @@ export async function POST(request: Request) {
 
 ### 👨‍⚕️ Counselor Dashboard Components
 
-#### Caseload Overview
+#### Counselor Dashboard Overview
 ```typescript
-// src/components/counselor/CaseloadOverview.tsx
-interface CaseloadOverviewProps {
-  activeStudents: Student[];
-  pendingEscalations: EscalationAlert[];
-  upcomingSessions: CounselingSession[];
+// src/components/counselor/CounselorDashboardOverview.tsx
+interface CounselorDashboardProps {
+  escalationAlerts: Alert[];
+  counselingSessions: Session[];
+  parentDetails: ParentInfo[];
 }
 
-export function CaseloadOverview({ 
-  activeStudents, 
-  pendingEscalations, 
-  upcomingSessions 
-}: CaseloadOverviewProps) {
+export function CounselorDashboardOverview({ 
+  escalationAlerts, 
+  counselingSessions, 
+  parentDetails 
+}: CounselorDashboardProps) {
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
       <Card>
         <CardHeader>
-          <CardTitle>Active Caseload</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="text-2xl font-bold">{activeStudents.length}</div>
-          <p className="text-sm text-muted-foreground">Students requiring support</p>
-        </CardContent>
-      </Card>
-      
-      <Card>
-        <CardHeader>
-          <CardTitle>Pending Escalations</CardTitle>
+          <CardTitle>Active Escalations</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold text-red-600">
-            {pendingEscalations.length}
+            {escalationAlerts.length}
           </div>
           <p className="text-sm text-muted-foreground">Requiring immediate attention</p>
         </CardContent>
@@ -556,13 +771,25 @@ export function CaseloadOverview({
       
       <Card>
         <CardHeader>
-          <CardTitle>Today's Sessions</CardTitle>
+          <CardTitle>Scheduled Sessions</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold text-green-600">
-            {upcomingSessions.length}
+            {counselingSessions.length}
           </div>
-          <p className="text-sm text-muted-foreground">Scheduled appointments</p>
+          <p className="text-sm text-muted-foreground">Upcoming appointments</p>
+        </CardContent>
+      </Card>
+      
+      <Card>
+        <CardHeader>
+          <CardTitle>Parent Contacts</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="text-2xl font-bold text-blue-600">
+            {parentDetails.length}
+          </div>
+          <p className="text-sm text-muted-foreground">Available for communication</p>
         </CardContent>
       </Card>
     </div>
@@ -570,27 +797,83 @@ export function CaseloadOverview({
 }
 ```
 
-#### Student List (Alert-Based)
+#### Escalation Alerts List
 ```typescript
-// src/components/counselor/StudentList.tsx
-export function StudentList() {
-  const [students, setStudents] = useState<Student[]>([]);
+// src/components/counselor/EscalationAlertsList.tsx
+export function EscalationAlertsList() {
+  const [alerts, setAlerts] = useState<Alert[]>([]);
   
   useEffect(() => {
-    // Only fetch students with escalation alerts
-    fetch('/api/counselor/students?filter=alerts_only')
+    fetch('/api/counselor/escalations')
       .then(res => res.json())
-      .then(data => setStudents(data));
+      .then(data => setAlerts(data));
   }, []);
 
   return (
     <div className="space-y-4">
-      {students.map(student => (
-        <StudentCard 
-          key={student.id} 
-          student={student}
-          showAlertStatus={true}
-          showEscalationHistory={true}
+      {alerts.map(alert => (
+        <AlertCard 
+          key={alert.id} 
+          alert={alert}
+          showStudentInfo={true}
+          showParentContact={true}
+          showActions={true}
+        />
+      ))}
+    </div>
+  );
+}
+```
+
+#### Counseling Sessions
+```typescript
+// src/components/counselor/CounselingSessions.tsx
+export function CounselingSessions() {
+  const [sessions, setSessions] = useState<Session[]>([]);
+  
+  useEffect(() => {
+    fetch('/api/counselor/sessions')
+      .then(res => res.json())
+      .then(data => setSessions(data));
+  }, []);
+
+  return (
+    <div className="space-y-4">
+      {sessions.map(session => (
+        <SessionCard 
+          key={session.id} 
+          session={session}
+          showStudentInfo={true}
+          showParentContact={true}
+          showActions={true}
+        />
+      ))}
+    </div>
+  );
+}
+```
+
+#### Parent Details List
+```typescript
+// src/components/counselor/ParentDetailsList.tsx
+export function ParentDetailsList() {
+  const [parents, setParents] = useState<ParentInfo[]>([]);
+  
+  useEffect(() => {
+    fetch('/api/counselor/parents')
+      .then(res => res.json())
+      .then(data => setParents(data));
+  }, []);
+
+  return (
+    <div className="space-y-4">
+      {parents.map(parent => (
+        <ParentCard 
+          key={parent.id} 
+          parent={parent}
+          showStudentInfo={true}
+          showContactInfo={true}
+          showConsentStatus={true}
         />
       ))}
     </div>

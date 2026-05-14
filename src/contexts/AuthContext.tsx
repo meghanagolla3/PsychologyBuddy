@@ -4,6 +4,15 @@ import React, { createContext, useContext, useEffect, useState } from 'react';
 
 interface User {
   adminProfile?: any;
+  counselorProfile?: {
+    department?: string;
+    specialization?: string;
+    availability?: string;
+  };
+  parentProfile?: {
+    id?: string;
+    department?: string;
+  };
   id: string;
   email?: string;
   studentId?: string;

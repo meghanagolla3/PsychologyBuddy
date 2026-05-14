@@ -18,7 +18,7 @@ export const GET = withPermission({
     
     return Response.json({
       success: true,
-      sections: sections.data || []
+      sections: (sections as any).data || []
     });
   } catch (error) {
     console.error('Get school sections error:', error);
@@ -54,7 +54,7 @@ export const POST = withPermission({
     
     return Response.json({
       success: true,
-      section: section.data
+      section: (section as any).data
     });
   } catch (error) {
     console.error('Create school section error:', error);

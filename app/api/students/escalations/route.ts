@@ -314,7 +314,7 @@ export async function PATCH(req: Request) {
     let finalNotes = notes || '';
     if (recommendedResources && recommendedResources.length > 0) {
       const resourcesData = {
-        recommendedResources: recommendedResources.map(r => ({
+        recommendedResources: recommendedResources.map((r: any) => ({
           id: r.id,
           name: r.name,
           type: r.type,

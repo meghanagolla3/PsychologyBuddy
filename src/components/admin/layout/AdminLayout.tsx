@@ -14,7 +14,7 @@ export function AdminLayout({
   children: React.ReactNode;
 }) {
   return (
-    <Protected role={['ADMIN', 'SUPERADMIN', 'SCHOOL_SUPERADMIN']}>
+    <Protected role={['ADMIN', 'SUPERADMIN', 'SCHOOL_SUPERADMIN', 'PARENT']}>
       <SchoolFilterProvider>
         <TimeFilterProvider>
           <AdminLoadingProvider>

@@ -68,7 +68,7 @@ This document contains all the hex color codes used in this project.
 ## Dark Mode Colors
 
 ### Background & Foreground (Dark)
-- **Background**: `#1E293B` (Dark background)
+- **Background**: `#1E293B` (Dark background) 
 - **Foreground**: `#F1F5F9` (Light text)
 
 ### Card & Popover (Dark)

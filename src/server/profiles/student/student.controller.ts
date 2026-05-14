@@ -35,6 +35,14 @@ export class StudentController {
     action: 'VIEW' 
   })(async (req: NextRequest, ctx: any) => {
     try {
+      // Counselors should use the dedicated /api/counselor/students endpoint
+      if (ctx.user.role.name === 'COUNSELOR') {
+        return NextResponse.json(
+          { success: false, message: 'Counselors should use /api/counselor/students endpoint' },
+          { status: 403 }
+        );
+      }
+
       const { searchParams } = new URL(req.url);
       const search = searchParams.get('search') || undefined;
       const status = searchParams.get('status') || undefined;
@@ -85,6 +93,11 @@ export class StudentController {
       });
 
       const result = await StudentService.getStudentsBySchool(schoolId, { search, status, classId, locationId: effectiveLocationId, page, limit });
+      console.log('getStudents result:', {
+        totalStudents: result.data?.students?.length || 0,
+        firstStudent: result.data?.students?.[0]?.firstName + ' ' + result.data?.students?.[0]?.lastName,
+        firstStudentSchool: result.data?.students?.[0]?.school?.name
+      });
       return NextResponse.json(result);
     } catch (error) {
       console.error('Get students error:', error);
@@ -288,6 +301,29 @@ export class StudentController {
       return NextResponse.json(result);
     } catch (error) {
       console.error('Generate student ID error:', error);
+      const errorResponse = handleError(error);
+      return NextResponse.json(errorResponse, { status: errorResponse.error?.code || 500 });
+    }
+  });
+
+  // GET /api/students/with-alerts - Get students with active escalation alerts
+  static getStudentsWithAlerts = withPermission({ 
+    module: 'ESCALATIONS', 
+    action: 'VIEW' 
+  })(async (req: NextRequest, ctx: any) => {
+    try {
+      // Counselors should use the dedicated /api/counselor/alerts endpoint
+      if (ctx.user.role.name === 'COUNSELOR') {
+        return NextResponse.json(
+          { success: false, message: 'Counselors should use /api/counselor/alerts endpoint' },
+          { status: 403 }
+        );
+      }
+
+      const result = await StudentService.getStudentsWithAlerts(ctx.user);
+      return NextResponse.json(result);
+    } catch (error) {
+      console.error('Get students with alerts error:', error);
       const errorResponse = handleError(error);
       return NextResponse.json(errorResponse, { status: errorResponse.error?.code || 500 });
     }

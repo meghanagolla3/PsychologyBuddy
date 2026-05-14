@@ -47,10 +47,14 @@ interface FormData {
   locationId: string;
   dateOfBirth: string;
   status: 'ACTIVE' | 'INACTIVE' | 'SUSPENDED';
-  emergencyContact: {
-    name: string;
+  parent?: {
+    firstName: string;
+    lastName: string;
+    email: string;
     phone: string;
-    relationship: string;
+    password: string;
+    childName: string;
+    childClass: string;
   };
 }
 
@@ -67,10 +71,14 @@ interface FormErrors {
   locationId?: string;
   dateOfBirth?: string;
   status?: string;
-  emergencyContact?: {
-    name?: string;
+  parent?: {
+    firstName?: string;
+    lastName?: string;
+    email?: string;
     phone?: string;
-    relationship?: string;
+    password?: string;
+    childName?: string;
+    childClass?: string;
   };
 }
 
@@ -100,10 +108,14 @@ export function AddStudentModal({
     locationId: "",
     dateOfBirth: "",
     status: "ACTIVE",
-    emergencyContact: {
-      name: "",
+    parent: {
+      firstName: "",
+      lastName: "",
+      email: "",
       phone: "",
-      relationship: "",
+      password: "",
+      childName: "",
+      childClass: "",
     },
   });
   const [errors, setErrors] = useState<Partial<FormErrors>>({});
@@ -239,7 +251,15 @@ export function AddStudentModal({
         },
       });
 
-      const data = await response.json();
+      let data;
+      try {
+        data = await response.json();
+      } catch (jsonError) {
+        console.error("Failed to parse JSON response:", jsonError);
+        // If JSON parsing fails, treat as API failure and clear error
+        setStudentIdError("");
+        return;
+      }
 
       if (response.ok) {
         if (data.exists) {
@@ -250,9 +270,11 @@ export function AddStudentModal({
       } else {
         // If API fails, don't show error to user, just log it
         console.error("Failed to check student ID uniqueness:", data.error);
+        setStudentIdError("");
       }
     } catch (error) {
       console.error("Error checking student ID uniqueness:", error);
+      setStudentIdError("");
     } finally {
       setIsCheckingStudentId(false);
     }
@@ -439,16 +461,19 @@ export function AddStudentModal({
       setSubmitError("");
     }
 
-    // Handle nested emergency contact fields
-    if (field.startsWith('emergencyContact.')) {
-      const emergencyField = field.split('.')[1]; // Get 'name', 'phone', or 'relationship'
-      setFormData((prev) => ({
-        ...prev,
-        emergencyContact: {
-          ...prev.emergencyContact,
-          [emergencyField]: processedValue
-        }
-      }));
+    // Handle nested parent fields
+    if (field.startsWith('parent.')) {
+      const parentField = field.split('.')[1]; // Get parent field name
+      setFormData((prev) => {
+        const updatedParent = {
+          ...(prev.parent || {}),
+          [parentField]: processedValue
+        };
+        return {
+          ...prev,
+          parent: updatedParent
+        } as FormData;
+      });
     } else {
       setFormData((prev) => ({ ...prev, [field]: processedValue }));
     }
@@ -523,46 +548,22 @@ export function AddStudentModal({
         newErrors.dateOfBirth = "Please enter a valid date of birth";
       }
     }
-    
-    // Emergency contact validation
-    if (!formData.emergencyContact.name.trim()) {
-      newErrors.emergencyContact = { 
-        ...newErrors.emergencyContact,
-        name: "Emergency contact name is required" 
-      };
-    } else if (formData.emergencyContact.name.length < 3) {
-      newErrors.emergencyContact = { 
-        ...newErrors.emergencyContact,
-        name: "Emergency contact name must be at least 3 characters" 
-      };
+
+    // Parent validation (required)
+    if (!formData.parent?.firstName || formData.parent.firstName.trim().length < 2) {
+      newErrors.parent = { ...newErrors.parent, firstName: "Parent first name is required and must be at least 2 characters" };
     }
-    
-    if (!formData.emergencyContact.phone.trim()) {
-      newErrors.emergencyContact = { 
-        ...newErrors.emergencyContact,
-        phone: "Emergency contact phone is required" 
-      };
-    } else {
-      // Remove all non-numeric characters for validation
-      const cleanPhone = formData.emergencyContact.phone.replace(/\D/g, '');
-      if (cleanPhone.length !== 10) {
-        newErrors.emergencyContact = { 
-          ...newErrors.emergencyContact,
-          phone: "Emergency contact phone must be exactly 10 digits" 
-        };
-      }
+    if (!formData.parent?.lastName || formData.parent.lastName.trim().length < 2) {
+      newErrors.parent = { ...newErrors.parent, lastName: "Parent last name is required and must be at least 2 characters" };
     }
-    
-    if (!formData.emergencyContact.relationship.trim()) {
-      newErrors.emergencyContact = { 
-        ...newErrors.emergencyContact,
-        relationship: "Relationship is required" 
-      };
-    } else if (formData.emergencyContact.relationship.length < 2) {
-      newErrors.emergencyContact = { 
-        ...newErrors.emergencyContact,
-        relationship: "Relationship must be at least 2 characters" 
-      };
+    if (!formData.parent?.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.parent.email)) {
+      newErrors.parent = { ...newErrors.parent, email: "Parent email is required and must be valid" };
+    }
+    if (!formData.parent?.phone || !/^\d{10}$/.test(formData.parent.phone)) {
+      newErrors.parent = { ...newErrors.parent, phone: "Parent phone is required and must be exactly 10 digits" };
+    }
+    if (!formData.parent?.password || formData.parent.password.length < 8) {
+      newErrors.parent = { ...newErrors.parent, password: "Parent password is required and must be at least 8 characters" };
     }
 
     setErrors(newErrors);
@@ -595,6 +596,7 @@ export function AddStudentModal({
             ...formData,
             classId,
             schoolId: formData.schoolId,
+            parent: formData.parent?.firstName || formData.parent?.email ? formData.parent : undefined,
           };
 
           const response = await fetch("/api/students", {
@@ -1182,73 +1184,125 @@ export function AddStudentModal({
                 </div>
             )}
 
-            {/* Emergency Contact Section */}
+            {/* Parent Details Section */}
             <div className="mt-2">
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Emergency Contact *
+                Parent Details
               </label>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div>
-                  <label className="block text-xs font-medium text-gray-600 mb-1">
-                    Contact Name *
-                  </label>
-                  <Input
-                    type="text"
-                    name="emergencyContact.name"
-                    value={formData.emergencyContact.name}
-                    onChange={(e) => handleInputChange("emergencyContact.name", e.target.value)}
-                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                      errors.emergencyContact?.name ? "border-red-500" : "border-gray-300"
-                    }`}
-                    placeholder="Enter emergency contact name"
-                    required
-                  />
-                  {errors.emergencyContact?.name && (
-                    <p className="mt-1 text-sm text-red-600">{errors.emergencyContact.name}</p>
-                  )}
-                </div>
+              <div className="bg-gray-50 p-4 rounded-lg border">
+                <p className="text-xs text-gray-600 mb-3">Add parent details to create a parent account alongside the student</p>
                 
-                <div>
-                  <label className="block text-xs font-medium text-gray-600 mb-1">
-                    Contact Phone *
-                  </label>
-                  <Input
-                    type="tel"
-                    name="emergencyContact.phone"
-                    value={formData.emergencyContact.phone}
-                    onChange={(e) => handleInputChange("emergencyContact.phone", e.target.value)}
-                    inputMode="numeric"
-                    pattern="[0-9]*"
-                    maxLength={10}
-                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                      errors.emergencyContact?.phone ? "border-red-500" : "border-gray-300"
-                    }`}
-                    placeholder="Enter 10-digit phone number"
-                    required
-                  />
-                  {errors.emergencyContact?.phone && (
-                    <p className="mt-1 text-sm text-red-600">{errors.emergencyContact?.phone}</p>
-                  )}
-                </div>
-                
-                <div>
-                  <label className="block text-xs font-medium text-gray-600 mb-1">
-                    Relationship *
-                  </label>
-                  <Input
-                    type="text"
-                    name="emergencyContact.relationship"
-                    value={formData.emergencyContact.relationship}
-                    onChange={(e) => handleInputChange("emergencyContact.relationship", e.target.value)}
-                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                      errors.emergencyContact?.relationship ? "border-red-500" : "border-gray-300"
-                    }`}
-                    placeholder="e.g., Parent, Guardian, Sibling"
-                    required
-                  />
-                  {errors.emergencyContact?.relationship && (
-                    <p className="mt-1 text-sm text-red-600">{errors.emergencyContact?.relationship}</p>
-                  )}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-medium text-gray-600 mb-1">
+                      Parent First Name
+                    </label>
+                    <Input
+                      type="text"
+                      value={formData.parent?.firstName || ""}
+                      onChange={(e) => handleInputChange("parent.firstName", e.target.value)}
+                      className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                        errors.parent?.firstName ? "border-red-500" : "border-gray-300"
+                      }`}
+                      placeholder="Enter parent first name"
+                    />
+                    {errors.parent?.firstName && (
+                      <p className="mt-1 text-sm text-red-600">{errors.parent.firstName}</p>
+                    )}
+                  </div>
+                  
+                  <div>
+                    <label className="block text-xs font-medium text-gray-600 mb-1">
+                      Parent Last Name
+                    </label>
+                    <Input
+                      type="text"
+                      value={formData.parent?.lastName || ""}
+                      onChange={(e) => handleInputChange("parent.lastName", e.target.value)}
+                      className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                        errors.parent?.lastName ? "border-red-500" : "border-gray-300"
+                      }`}
+                      placeholder="Enter parent last name"
+                    />
+                    {errors.parent?.lastName && (
+                      <p className="mt-1 text-sm text-red-600">{errors.parent.lastName}</p>
+                    )}
+                  </div>
+                  
+                  <div>
+                    <label className="block text-xs font-medium text-gray-600 mb-1">
+                      Parent Email
+                    </label>
+                    <Input
+                      type="email"
+                      value={formData.parent?.email || ""}
+                      onChange={(e) => handleInputChange("parent.email", e.target.value)}
+                      className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                        errors.parent?.email ? "border-red-500" : "border-gray-300"
+                      }`}
+                      placeholder="Enter parent email"
+                    />
+                    {errors.parent?.email && (
+                      <p className="mt-1 text-sm text-red-600">{errors.parent.email}</p>
+                    )}
+                  </div>
+                  
+                  <div>
+                    <label className="block text-xs font-medium text-gray-600 mb-1">
+                      Parent Phone
+                    </label>
+                    <Input
+                      type="tel"
+                      value={formData.parent?.phone || ""}
+                      onChange={(e) => handleInputChange("parent.phone", e.target.value)}
+                      inputMode="numeric"
+                      pattern="[0-9]*"
+                      maxLength={10}
+                      className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                        errors.parent?.phone ? "border-red-500" : "border-gray-300"
+                      }`}
+                      placeholder="Enter 10-digit phone number"
+                    />
+                    {errors.parent?.phone && (
+                      <p className="mt-1 text-sm text-red-600">{errors.parent.phone}</p>
+                    )}
+                  </div>
+                  
+                  <div>
+                    <label className="block text-xs font-medium text-gray-600 mb-1">
+                      Parent Password
+                    </label>
+                    <Input
+                      type="password"
+                      value={formData.parent?.password || ""}
+                      onChange={(e) => handleInputChange("parent.password", e.target.value)}
+                      className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                        errors.parent?.password ? "border-red-500" : "border-gray-300"
+                      }`}
+                      placeholder="Min 8 characters (auto-generated if empty)"
+                    />
+                    {errors.parent?.password && (
+                      <p className="mt-1 text-sm text-red-600">{errors.parent.password}</p>
+                    )}
+                  </div>
+                  
+                  <div>
+                    <label className="block text-xs font-medium text-gray-600 mb-1">
+                      Child Name (for parent profile)
+                    </label>
+                    <Input
+                      type="text"
+                      value={formData.parent?.childName || ""}
+                      onChange={(e) => handleInputChange("parent.childName", e.target.value)}
+                      className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                        errors.parent?.childName ? "border-red-500" : "border-gray-300"
+                      }`}
+                      placeholder="Student's full name"
+                    />
+                    {errors.parent?.childName && (
+                      <p className="mt-1 text-sm text-red-600">{errors.parent.childName}</p>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>

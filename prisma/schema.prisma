@@ -8,67 +8,76 @@ datasource db {
 }
 
 model User {
-  id                       String                           @id @default(uuid())
-  firstName                String
-  lastName                 String
-  email                    String                           @unique
-  phone                    String?
-  password                 String?
-  schoolId                 String?
-  createdAt                DateTime                         @default(now())
-  updatedAt                DateTime                         @updatedAt
-  emailVerified            Boolean                          @default(false)
-  classId                  String?
-  roleId                   String
-  status                   String                           @default("ACTIVE")
-  studentId                String?                          @unique
-  locationId               String?
-  lastActive               DateTime?
-  adminNotifications       AdminNotification[]
-  adminProfile             AdminProfile?
-  artJournals              ArtJournal[]
-  completions              ArticleCompletion[]              @relation("UserCompletions")
-  articles                 Article[]                        @relation("UserArticles")
-  audioJournals            AudioJournal[]
-  createdBadges            Badge[]                          @relation("BadgeCreator")
-  chatSessions             ChatSession[]
-  dailyLogins              DailyLogin[]
-  escalationAlerts         EscalationAlert[]
-  highRiskAlerts           HighRiskAlert[]
-  locationAdminAssignments LocationAdminAssignment[]
-  assignedLocations        LocationAdminAssignment[]        @relation("AssignmentAssigner")
-  meditations              Meditation[]                     @relation("UserMeditations")
-  meditationInstructions   MeditationListeningInstruction[] @relation("UserMeditationInstruction")
-  moodCheckins             MoodCheckin[]
-  musicInstructions        MusicInstruction[]               @relation("UserMusicInstruction")
-  musicTherapy             MusicTherapy[]                   @relation("UserMusic")
-  ratings                  Rating[]                         @relation("UserRatings")
-  resourceAccess           ResourceAccess[]
-  savedArticles            SavedArticle[]                   @relation("UserSaves")
-  primaryAdminSchools      School[]                         @relation("SchoolPrimaryAdmin")
-  sessions                 Session[]
-  streaks                  Streak?
-  studentProfile           StudentProfile?
-  summaries                Summary[]
-  triggerSelections        TriggerSelection[]
-  userBadges               UserBadge[]
-  classRef                 Class?                           @relation(fields: [classId], references: [id])
-  location                 SchoolLocation?                  @relation(fields: [locationId], references: [id])
-  role                     Role                             @relation(fields: [roleId], references: [id])
-  school                   School?                          @relation(fields: [schoolId], references: [id])
-  writingJournals          WritingJournal[]
+  id                     String                           @id @default(uuid())
+  firstName              String
+  lastName               String
+  email                  String                           @unique
+  phone                  String?
+  password               String?
+  schoolId               String?
+  locationId             String?
+  createdAt              DateTime                         @default(now())
+  updatedAt              DateTime                         @updatedAt
+  emailVerified          Boolean                          @default(false)
+  classId                String?
+  roleId                 String
+  status                 String                           @default("ACTIVE")
+  studentId              String?                          @unique
+  parentId               String?
+  adminNotifications     AdminNotification[]
+  adminProfile           AdminProfile?
+  counselorProfile       CounselorProfile?
+  parentProfile          ParentProfile?       @relation("ParentProfile")
+  parent                User?                  @relation("StudentParent", fields: [parentId], references: [id])
+  artJournals            ArtJournal[]
+  completions            ArticleCompletion[]              @relation("UserCompletions")
+  articles               Article[]                        @relation("UserArticles")
+  audioJournals          AudioJournal[]
+  createdBadges          Badge[]                          @relation("BadgeCreator")
+  createdChallenges      Challenge[]                      @relation("ChallengeCreator")
+  chatSessions           ChatSession[]
+  dailyLogins            DailyLogin[]
+  escalationAlerts       EscalationAlert[]
+  highRiskAlerts         HighRiskAlert[]
+  meditations            Meditation[]                     @relation("UserMeditations")
+  meditationInstructions MeditationListeningInstruction[] @relation("UserMeditationInstruction")
+  moodCheckins           MoodCheckin[]
+  musicInstructions      MusicInstruction[]               @relation("UserMusicInstruction")
+  musicTherapy           MusicTherapy[]                   @relation("UserMusic")
+  ratings                Rating[]                         @relation("UserRatings")
+  resourceAccess         ResourceAccess[]
+  savedArticles          SavedArticle[]                   @relation("UserSaves")
+  sessions               Session[]
+  studentCounselingSessions CounselingSession[]            @relation("CounselingSessionStudent")
+  counselorCounselingSessions CounselingSession[]          @relation("CounselingSessionCounselor")
+  counselorAssignments   CounselorAssignment[]             @relation("CounselorAssignments")
+  studentAssignments     CounselorAssignment[]             @relation("StudentAssignments")
+  streaks                Streak?
+  studentProfile         StudentProfile?
+  summaries              Summary[]
+  triggerSelections      TriggerSelection[]
+  userBadges             UserBadge[]
+  userChallenges        UserChallenge[]
+  challengeAssignments  ChallengeAssignment[]              @relation("ChallengeAssigner")
+  challengeTargetAssignments ChallengeAssignment[]          @relation("ChallengeTargetUser")
+  children               User[]                          @relation("StudentParent")
+  counselorParentMeetings ParentMeeting[]                  @relation("ParentMeetingCounselor")
+  studentParentMeetings  ParentMeeting[]                  @relation("ParentMeetingStudent")
+  classRef               Class?                           @relation(fields: [classId], references: [id])
+  role                   Role                             @relation(fields: [roleId], references: [id])
+  school                 School?                          @relation(fields: [schoolId], references: [id])
+  location               SchoolLocation?                  @relation(fields: [locationId], references: [id])
+  writingJournals        WritingJournal[]
 
   @@map("Users")
 }
 
 model StudentProfile {
-  id               String    @id @default(uuid())
-  userId           String    @unique
-  profileImage     String?
-  status           String    @default("ACTIVE")
-  dateOfBirth      DateTime?
-  emergencyContact Json?
-  user             User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id           String  @id @default(uuid())
+  userId       String  @unique
+  profileImage String?
+  status       String  @default("ACTIVE")
+  user         User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("StudentProfiles")
 }
@@ -84,14 +93,59 @@ model AdminProfile {
   @@map("AdminProfiles")
 }
 
+model CounselorProfile {
+  id               String            @id @default(uuid())
+  userId           String            @unique
+  department       String            @default("Student Counseling")
+  profileImageUrl  String?
+  user             User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("CounselorProfiles")
+}
+
+model ParentProfile {
+  id               String            @id @default(uuid())
+  userId           String            @unique
+  department       String            @default("Parent Services")
+  profileImageUrl  String?
+  user             User              @relation("ParentProfile", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("ParentProfiles")
+}
+
+model ParentMeeting {
+  id          String   @id @default(uuid())
+  counselorId String
+  studentId   String
+  parentName  String
+  date        DateTime
+  time        String
+  purpose     String
+  level       String
+  status      String   @default("SCHEDULED")
+  notes       String?
+  discussion  String?
+  recommendations String?
+  requestedBy String   @default("COUNSELOR") // "COUNSELOR" or "PARENT"
+  schoolId    String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  counselor User   @relation("ParentMeetingCounselor", fields: [counselorId], references: [id], onDelete: Cascade)
+  student   User   @relation("ParentMeetingStudent", fields: [studentId], references: [id], onDelete: Cascade)
+  school    School @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+
+  @@map("ParentMeetings")
+}
+
 model School {
   id                     String                           @id @default(uuid())
   name                   String
+  address                String?
   phone                  String?
   email                  String?
   createdAt              DateTime                         @default(now())
   updatedAt              DateTime                         @updatedAt
-  primaryAdminId         String?
   articles               Article[]
   classes                Class[]
   journalingConfig       JournalingToolConfig?
@@ -99,46 +153,50 @@ model School {
   meditationInstructions MeditationListeningInstruction[]
   musicInstructions      MusicInstruction[]
   musicResources         MusicResource[]
-  locations              SchoolLocation[]
-  primaryAdmin           User?                            @relation("SchoolPrimaryAdmin", fields: [primaryAdminId], references: [id])
   users                  User[]
+  schoolLocations        SchoolLocation[]
+  counselingSessions     CounselingSession[]
+  parentMeetings        ParentMeeting[]
+  challenges            Challenge[]
+  challengeAssignments   ChallengeAssignment[] @relation("ChallengeAssignmentTargetSchool")
 
   @@map("Schools")
 }
 
 model SchoolLocation {
-  id                       String                    @id @default(uuid())
-  schoolId                 String
-  name                     String
-  address                  String?
-  city                     String?
-  state                    String?
-  country                  String?
-  postalCode               String?
-  notes                    String?
-  isMain                   Boolean                   @default(false)
-  createdAt                DateTime                  @default(now())
-  updatedAt                DateTime                  @updatedAt
-  classes                  Class[]
-  locationAdminAssignments LocationAdminAssignment[]
-  school                   School                    @relation(fields: [schoolId], references: [id], onDelete: Cascade)
-  users                    User[]
+  id         String   @id @default(uuid())
+  schoolId   String
+  name       String
+  address    String?
+  city       String?
+  state      String?
+  country    String?
+  postalCode String?
+  notes      String?
+  isMain     Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  school     School   @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  users      User[]
+  classes    Class[]
 
   @@map("SchoolLocations")
 }
 
 model Class {
-  id         String          @id @default(uuid())
-  name       String
-  grade      Int
-  section    String?
-  schoolId   String
-  createdAt  DateTime        @default(now())
-  updatedAt  DateTime        @updatedAt
+  id        String   @id @default(uuid())
+  name      String
+  grade     Int
+  section   String?
+  schoolId  String
   locationId String?
-  location   SchoolLocation? @relation(fields: [locationId], references: [id])
-  school     School          @relation(fields: [schoolId], references: [id], onDelete: Cascade)
-  users      User[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  school    School   @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  location  SchoolLocation? @relation(fields: [locationId], references: [id])
+  users     User[]
+  counselingSessions CounselingSession[]
+  challengeAssignments ChallengeAssignment[] @relation("ChallengeAssignmentClass")
 
   @@map("Classes")
 }
@@ -183,20 +241,6 @@ model AdminPermission {
 
   @@unique([adminProfileId, permissionId])
   @@map("AdminPermissions")
-}
-
-model LocationAdminAssignment {
-  id         String         @id @default(uuid())
-  locationId String
-  adminId    String
-  assignedAt DateTime       @default(now())
-  assignedBy String
-  admin      User           @relation(fields: [adminId], references: [id], onDelete: Cascade, map: "LocationAdminAssignment_adminId_fkey")
-  assigner   User           @relation("AssignmentAssigner", fields: [assignedBy], references: [id], map: "LocationAdminAssignment_assignedBy_fkey")
-  location   SchoolLocation @relation(fields: [locationId], references: [id], onDelete: Cascade, map: "LocationAdminAssignment_locationId_fkey")
-
-  @@unique([locationId, adminId])
-  @@map("LocationAdminAssignments")
 }
 
 model ChatSession {
@@ -264,18 +308,17 @@ model Summary {
 }
 
 model JournalingToolConfig {
-  id                 String  @id @default(uuid())
-  schoolId           String  @unique
-  enableWriting      Boolean @default(true)
-  enableAudio        Boolean @default(true)
-  enableArt          Boolean @default(true)
-  maxAudioDuration   Int     @default(300)
-  autoSaveAudio      Boolean @default(true)
-  enableUndo         Boolean @default(true)
-  enableRedo         Boolean @default(true)
-  enableClearCanvas  Boolean @default(true)
-  enableColorPalette Boolean @default(true)
-  school             School  @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  id                String  @id @default(uuid())
+  schoolId          String  @unique
+  enableWriting     Boolean @default(true)
+  enableAudio       Boolean @default(true)
+  enableArt         Boolean @default(true)
+  maxAudioDuration  Int     @default(300)
+  autoSaveAudio     Boolean @default(true)
+  enableUndo        Boolean @default(true)
+  enableRedo        Boolean @default(true)
+  enableClearCanvas Boolean @default(true)
+  school            School  @relation(fields: [schoolId], references: [id], onDelete: Cascade)
 
   @@map("JournalingToolConfig")
 }
@@ -496,7 +539,6 @@ model Article {
   savedArticles      SavedArticle[]      @relation("ArticleSaves")
   sectionBlocks      SectionBlock[]
 
-  @@unique([title, schoolId])
   @@map("Articles")
 }
 
@@ -612,7 +654,6 @@ model Streak {
   userId     String   @unique
   count      Int      @default(0)
   lastActive DateTime @default(now())
-  bestStreak Int      @default(0)
   user       User     @relation(fields: [userId], references: [id])
 
   @@map("Streaks")
@@ -654,6 +695,8 @@ model EscalationAlert {
   createdAt               DateTime            @default(now())
   updatedAt               DateTime            @updatedAt
   adminNotifications      AdminNotification[]
+  counselingSession      CounselingSession?
+  counselorAssignments     CounselorAssignment[]
   user                    User                @relation(fields: [studentId], references: [id])
 
   @@map("EscalationAlerts")
@@ -895,23 +938,10 @@ model MusicResourceGoal {
   @@map("MusicResourceGoals")
 }
 
-model OTP {
-  id          String   @id @default(uuid())
-  phoneNumber String   @unique
-  otp         String
-  attempts    Int      @default(0)
-  createdAt   DateTime @default(now())
-  expiresAt   DateTime
-  isVerified  Boolean  @default(false)
-  userId      String?
-
-  @@map("OTPs")
-}
-
 model Badge {
   id             String      @id @default(uuid())
   name           String
-  icon           String?
+  icon           String
   description    String
   requirement    String
   isActive       Boolean     @default(true)
@@ -920,7 +950,7 @@ model Badge {
   createdBy      String
   createdAt      DateTime    @default(now())
   schoolId       String?
-  admin          User        @relation("BadgeCreator", fields: [createdBy], references: [id], onDelete: Cascade)
+  admin          User        @relation("BadgeCreator", fields: [createdBy], references: [id])
   userBadges     UserBadge[]
 
   @@map("Badges")
@@ -936,6 +966,82 @@ model UserBadge {
 
   @@unique([userId, badgeId])
   @@map("UserBadges")
+}
+
+model Challenge {
+  id          String   @id @default(uuid())
+  name        String
+  description String
+  instructions String
+  category    String?
+  isActive    Boolean  @default(true)
+  createdBy   String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  schoolId    String?
+  
+  // Challenge timing
+  startsAt    DateTime @default(now()) // When challenge becomes active
+  endsAt      DateTime @default(dbgenerated("(now() + interval '7 days')")) // When challenge expires
+  
+  // Challenge requirements - which tools are needed
+  requiresMeditation      Boolean @default(false)
+  requiresMusic           Boolean @default(false)
+  requiresPsychoeducation Boolean @default(false)
+  requiresJournaling      Boolean @default(false)
+  
+  // Assignment settings
+  assignmentType String @default("INDIVIDUAL") // INDIVIDUAL, CLASS, SCHOOL
+  targetClassId  String? // For class assignments
+  targetSchoolId String? // For school assignments
+  
+  // Relations
+  creator     User               @relation("ChallengeCreator", fields: [createdBy], references: [id])
+  school      School?            @relation(fields: [schoolId], references: [id])
+  userChallenges UserChallenge[]
+  challengeAssignments ChallengeAssignment[]
+  
+  @@map("Challenges")
+}
+
+model UserChallenge {
+  id           String   @id @default(uuid())
+  userId       String
+  challengeId  String
+  assignedAt   DateTime @default(now()) // When challenge was assigned to user
+  startedAt    DateTime? // When user actually started the challenge
+  completedAt  DateTime? // When user completed the challenge
+  status       String   @default("ASSIGNED") // ASSIGNED, IN_PROGRESS, COMPLETED, EXPIRED
+  
+  // Progress tracking
+  progressPercentage Int @default(0) // 0-100 completion percentage
+  lastActivityAt     DateTime? // Last time user interacted with challenge
+  
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  challenge  Challenge @relation(fields: [challengeId], references: [id], onDelete: Cascade)
+  
+  @@unique([userId, challengeId])
+  @@map("UserChallenges")
+}
+
+model ChallengeAssignment {
+  id           String   @id @default(uuid())
+  challengeId  String
+  assignedBy   String   // Who made the assignment
+  assignmentType String // INDIVIDUAL, CLASS, SCHOOL
+  targetUserId   String? // For individual assignments
+  targetClassId  String? // For class assignments
+  targetSchoolId String? // For school assignments
+  assignedAt   DateTime @default(now())
+  
+  // Relations
+  challenge    Challenge @relation(fields: [challengeId], references: [id], onDelete: Cascade)
+  assigner     User      @relation("ChallengeAssigner", fields: [assignedBy], references: [id])
+  targetUser   User?     @relation("ChallengeTargetUser", fields: [targetUserId], references: [id])
+  targetClass  Class?    @relation("ChallengeAssignmentClass", fields: [targetClassId], references: [id])
+  targetSchool School?   @relation("ChallengeAssignmentTargetSchool", fields: [targetSchoolId], references: [id])
+  
+  @@map("ChallengeAssignments")
 }
 
 enum SenderType {
@@ -962,4 +1068,104 @@ enum BadgeType {
   MEDITATION_COUNT
   MUSIC_COUNT
   MOOD_CHECKIN
+}
+
+enum SessionStatus {
+  SCHEDULED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+  MISSED
+}
+
+model CounselingSession {
+  id                 String          @id @default(uuid())
+  schoolId           String
+  studentId          String
+  counselorId        String
+  escalationId       String?          @unique
+  classId            String?
+  section            String?
+  sessionType        String          // INTAKE, FOLLOW_UP
+  level              String?         // Level 01, Level 02, Level 03
+  title              String?
+  status             SessionStatus   @default(SCHEDULED)
+  scheduledAt        DateTime
+  startedAt          DateTime?
+  endedAt            DateTime?
+  notes              String?
+  outcome            String?
+  followUpNeeded     Boolean         @default(false)
+  nextSessionAt      DateTime?
+  previousSessionId  String?
+  createdAt          DateTime        @default(now())
+  updatedAt          DateTime        @updatedAt
+  
+  // Relations
+  student            User            @relation("CounselingSessionStudent", fields: [studentId], references: [id], onDelete: Cascade)
+  counselor          User            @relation("CounselingSessionCounselor", fields: [counselorId], references: [id], onDelete: Cascade)
+  school             School          @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  class              Class?          @relation(fields: [classId], references: [id])
+  escalation         EscalationAlert? @relation(fields: [escalationId], references: [id])
+  intake             SessionIntake?
+  report             SessionReport?
+  previousSession    CounselingSession? @relation("SessionPrevious", fields: [previousSessionId], references: [id])
+  nextSessions       CounselingSession[] @relation("SessionPrevious")
+  
+  @@map("CounselingSessions")
+}
+
+model SessionIntake {
+  id               String  @id @default(uuid())
+  sessionId        String  @unique
+  basicInfo        Json    @default("{}")
+  complaints       Json    @default("{}")
+  factors          Json    @default("{}")
+  familyHistory    String  @default("")
+  personalHistory  Json    @default("{}")
+  sessionReport    Json    @default("{}")
+  status           String  @default("DRAFT")
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  
+  session          CounselingSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  
+  @@map("SessionIntakes")
+}
+
+model SessionReport {
+  id               String  @id @default(uuid())
+  sessionId        String  @unique
+  behavioralTags   String[] @default([])
+  summary          String  @default("")
+  recommendations  String[] @default([])
+  notes            String  @default("")
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  
+  session          CounselingSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  
+  @@map("SessionReports")
+}
+
+model CounselorAssignment {
+  id               String   @id @default(uuid())
+  counselorId      String
+  studentId        String
+  escalationAlertId String?
+  assignedBy       String?
+  level            String?
+  assignedAt       DateTime @default(now())
+  status           String   @default("ACTIVE")
+  sessionStatus    String   @default("PENDING")
+  notes            String?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  
+  // Relations
+  counselor        User     @relation("CounselorAssignments", fields: [counselorId], references: [id], onDelete: Cascade)
+  student          User     @relation("StudentAssignments", fields: [studentId], references: [id], onDelete: Cascade)
+  escalationAlert   EscalationAlert? @relation(fields: [escalationAlertId], references: [id])
+  
+  @@map("CounselorAssignments")
 }

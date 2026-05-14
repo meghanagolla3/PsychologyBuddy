@@ -45,8 +45,8 @@ export function withPermission(options: PermissionOptions) {
   return function <T extends (...args: any[]) => any>(handler: T) {
 
     return async function (req: NextRequest, ctx: any) {
-
-      // Step 1: Get session from cookie
+      try {
+        // Step 1: Get session from cookie
 
       const sessionId = req.cookies.get('sessionId')?.value || 
 
@@ -106,7 +106,7 @@ export function withPermission(options: PermissionOptions) {
 
 
 
-      const user = session.user;
+      const user = (session as any).user;
 
 
 
@@ -152,9 +152,9 @@ export function withPermission(options: PermissionOptions) {
 
 
 
-      // Check admin status
+      // Check admin/parent/counselor status
 
-      if (user.role?.name && ['ADMIN', 'SCHOOL_SUPERADMIN', 'SUPERADMIN'].includes(user.role.name)) {
+      if (user.role?.name && ['ADMIN', 'SCHOOL_SUPERADMIN', 'SUPERADMIN', 'COUNSELOR', 'PARENT'].includes(user.role.name)) {
 
         const adminStatus = user.status || 'ACTIVE';
 
@@ -277,32 +277,11 @@ export function withPermission(options: PermissionOptions) {
 
         ctx.userSchoolId = userSchoolId;
 
-        // Check if user is a primary admin for location-specific permissions
+        // Primary admin logic removed
 
-        const primaryAdminSchool = await prisma.school.findFirst({
-
-          where: { primaryAdminId: user.id },
-
-          select: { id: true }
-
-        });
-
-        if (primaryAdminSchool) {
-
-          ctx.isPrimaryAdmin = true;
-
-          ctx.primarySchoolId = primaryAdminSchool.id;
-
-        }
-
-        // For ADMIN users, get their assigned locations
-        if (user.role.name === "ADMIN") {
-          const assignedLocations = await prisma.locationAdminAssignment.findMany({
-            where: { adminId: user.id },
-            select: { locationId: true }
-          });
-          
-          ctx.userLocationIds = assignedLocations.map(loc => loc.locationId);
+        // For ADMIN users, use their assigned location if available
+        if (user.role.name === "ADMIN" && user.locationId) {
+          ctx.userLocationIds = [user.locationId];
         }
 
         // Note: This will be implemented in specific API routes that need location access
@@ -312,6 +291,18 @@ export function withPermission(options: PermissionOptions) {
       // Step 8: Pass user into API handler context
 
       return handler(req, { ...ctx, user, userSchoolId });
+
+      } catch (error) {
+        console.error('Permission middleware error:', error);
+        return NextResponse.json(
+          { 
+            success: false, 
+            message: 'Internal server error in permission check',
+            error: error instanceof Error ? error.message : 'Unknown error'
+          },
+          { status: 500 }
+        );
+      }
 
     };
 

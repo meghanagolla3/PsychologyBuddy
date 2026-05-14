@@ -4,7 +4,7 @@ import { CreateStudentData, UpdateStudentData } from './student.validators';
 
 export type ExtendedUpdateStudentData = UpdateStudentData & {
   schoolId?: string;
-  dateOfBirth?: string;
+  locationId?: string;
   emergencyContact?: {
     name?: string;
     phone?: string;
@@ -13,9 +13,9 @@ export type ExtendedUpdateStudentData = UpdateStudentData & {
 };
 
 export const StudentRepository = {
-  // Create student with profile
-  createStudent: async (data: CreateStudentData & { roleId: string; schoolId: string; studentId: string; locationId: string }) => {
-    return prisma.user.create({
+  // Create student with profile and optionally a parent
+  createStudent: async (data: CreateStudentData & { roleId: string; schoolId: string; studentId: string; locationId: string }, parentRoleId?: string, parentPassword?: string) => {
+    const result = await prisma.user.create({
       data: {
         studentId: data.studentId,
         email: data.email || `${data.studentId.toLowerCase()}@school.local`,
@@ -31,8 +31,6 @@ export const StudentRepository = {
         studentProfile: {
           create: {
             status: data.status || 'ACTIVE',
-            dateOfBirth: new Date(data.dateOfBirth).toISOString(),
-            emergencyContact: data.emergencyContact,
           },
         },
       },
@@ -61,6 +59,43 @@ export const StudentRepository = {
         },
       },
     });
+
+    // If parent data is provided, create parent user separately
+    if (data.parent && parentRoleId) {
+      const hashedParentPassword = parentPassword
+        ? await PasswordUtil.hash(parentPassword)
+        : await PasswordUtil.hash(`Parent@${Date.now()}`);
+
+      const parent = await prisma.user.create({
+        data: {
+          firstName: data.parent.firstName,
+          lastName: data.parent.lastName,
+          email: data.parent.email,
+          phone: data.parent.phone,
+          password: hashedParentPassword,
+          roleId: parentRoleId,
+          schoolId: data.schoolId,
+          studentId: result.id, // Store the student's UUID in parent's studentId field
+          status: 'ACTIVE',
+          emailVerified: true,
+          parentProfile: {
+            create: {
+              department: "Parent Services",
+            },
+          },
+        },
+      });
+
+      // Update student record with parentId
+      await prisma.user.update({
+        where: { id: result.id },
+        data: {
+          parentId: parent.id, // Set the parent's UUID in student's parentId field
+        },
+      });
+    }
+
+    return result;
   },
 
   // Get students by school (Admin only - school-scoped)
@@ -146,7 +181,9 @@ export const StudentRepository = {
             moodCheckins: true,
             escalationAlerts: {
               where: {
-                status: 'resolved'
+                status: {
+                  in: ['open', 'assigned', 'in_progress']
+                }
               }
             }
           },
@@ -164,6 +201,16 @@ export const StudentRepository = {
     console.log('Sample student data:', students.slice(0, 2));
 
     console.log('Student repository raw results:', students.length);
+    
+    // Debug alert counts for each student
+    students.forEach((student, index) => {
+      console.log(`Repository Student ${index + 1}:`, {
+        name: `${student.firstName} ${student.lastName}`,
+        _count: student._count,
+        escalationAlertsCount: student._count?.escalationAlerts,
+        hasAlerts: student._count?.escalationAlerts > 0
+      });
+    });
     console.log('Student details:', students.map(s => ({
       id: s.id,
       studentId: s.studentId,
@@ -238,18 +285,83 @@ export const StudentRepository = {
       }
     }
 
-    // Handle classId - if it's not a UUID, try to find by custom ID first, then by name
-    let classIdToUpdate = data.classId;
-    if (data.classId && !data.classId.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i)) {
-      // First try to find class by custom ID
-      const classRecord = await prisma.class.findFirst({
-        where: { id: data.classId },
+    // Handle locationId - if it's not a UUID, try to find by custom ID first, then by name
+    let locationIdToUpdate = data.locationId;
+    console.log('Location update - data.locationId:', data.locationId);
+    if (data.locationId && !data.locationId.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i)) {
+      // First try to find location by custom ID
+      const location = await prisma.schoolLocation.findFirst({
+        where: { id: data.locationId },
         select: { id: true }
       });
-      if (classRecord) {
-        classIdToUpdate = classRecord.id;
+      if (location) {
+        locationIdToUpdate = location.id;
       } else {
         // If not found by ID, try by name
+        const locationByName = await prisma.schoolLocation.findFirst({
+          where: { name: data.locationId },
+          select: { id: true }
+        });
+        if (locationByName) {
+          locationIdToUpdate = locationByName.id;
+        } else {
+          throw new Error(`Location with ID or name "${data.locationId}" not found`);
+        }
+      }
+    }
+
+    // Handle classId - if it's not a UUID, try to find by grade and section combination, or create if doesn't exist
+    let classIdToUpdate = data.classId;
+    if (data.classId && !data.classId.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i)) {
+      // Parse the grade-section format (e.g., "9-B" -> grade: 9, section: "B")
+      const gradeSectionMatch = data.classId.match(/^(\d+)-([A-Za-z])$/);
+      if (gradeSectionMatch) {
+        const grade = parseInt(gradeSectionMatch[1]);
+        const section = gradeSectionMatch[2];
+        
+        // Find class by grade and section combination
+        const classByGradeSection = await prisma.class.findFirst({
+          where: {
+            grade: grade,
+            section: section,
+            ...(schoolIdToUpdate && { schoolId: schoolIdToUpdate }) // Filter by school if available
+          },
+          select: { id: true }
+        });
+        
+        if (classByGradeSection) {
+          classIdToUpdate = classByGradeSection.id;
+          
+          // Update the class name to match the new format
+          const expectedName = `Class ${grade}-${section}`;
+          await prisma.class.update({
+            where: { id: classIdToUpdate },
+            data: { name: expectedName }
+          });
+          console.log(`Updated class name to: ${expectedName}`);
+        } else {
+          // Class doesn't exist, create it automatically
+          if (!schoolIdToUpdate) {
+            throw new Error(`Cannot create class with grade ${grade} and section ${section} without a school`);
+          }
+          
+          console.log(`Class not found for grade ${grade} and section ${section}, creating new class...`);
+          
+          const newClass = await prisma.class.create({
+            data: {
+              name: `Class ${grade}-${section}`,
+              grade: grade,
+              section: section,
+              schoolId: schoolIdToUpdate,
+            },
+            select: { id: true }
+          });
+          
+          console.log(`Created new class with ID: ${newClass.id}`);
+          classIdToUpdate = newClass.id;
+        }
+      } else {
+        // If not in grade-section format, try by name
         const classByName = await prisma.class.findFirst({
           where: { name: data.classId },
           select: { id: true }
@@ -257,27 +369,40 @@ export const StudentRepository = {
         if (classByName) {
           classIdToUpdate = classByName.id;
         } else {
-          throw new Error(`Class with ID or name "${data.classId}" not found`);
+          throw new Error(`Class with name "${data.classId}" not found`);
         }
       }
     }
 
-    return prisma.user.update({
+    // Handle studentId update - validate uniqueness if provided
+    if (data.studentId) {
+      // Check if new student ID already exists (excluding current student)
+      const existingStudent = await prisma.user.findFirst({
+        where: {
+          studentId: data.studentId,
+          id: { not: id }, // Exclude current student
+          role: {
+            name: 'STUDENT'
+          }
+        }
+      });
+      
+      if (existingStudent) {
+        throw new Error(`Student ID ${data.studentId} already exists`);
+      }
+    }
+
+    const updatedStudent = await prisma.user.update({
       where: { id },
       data: {
+        ...(data.studentId && { studentId: data.studentId }),
         ...(data.firstName && { firstName: data.firstName }),
         ...(data.lastName && { lastName: data.lastName }),
         ...(data.email && { email: data.email }),
         ...(data.phone && { phone: data.phone }),
         ...(classIdToUpdate && { classId: classIdToUpdate }),
         ...(schoolIdToUpdate && { schoolId: schoolIdToUpdate }),
-        studentProfile: {
-          update: {
-            ...(data.status && { status: data.status }),
-            ...(data.dateOfBirth && { dateOfBirth: new Date(data.dateOfBirth) }),
-            ...(data.emergencyContact && { emergencyContact: data.emergencyContact }),
-          },
-        },
+        ...(locationIdToUpdate && { locationId: locationIdToUpdate }),
       },
       include: {
         role: true,
@@ -296,8 +421,70 @@ export const StudentRepository = {
             section: true,
           },
         },
+        location: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
       },
     });
+    
+    console.log('Final locationIdToUpdate:', locationIdToUpdate);
+    
+    return updatedStudent;
+  },
+
+  // Get students by parent ID
+  getStudentsByParentId: async (parentId: string) => {
+    try {
+      const students = await prisma.user.findMany({
+        where: {
+          studentProfile: {
+            user: {
+              parentProfile: {
+                userId: parentId
+              }
+            }
+          }
+        },
+        include: {
+          studentProfile: {
+            include: {
+              user: {
+                select: {
+                  id: true,
+                  studentId: true,
+                  firstName: true,
+                  lastName: true,
+                  classRef: {
+                    select: {
+                      id: true,
+                      name: true,
+                      grade: true,
+                      section: true
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      });
+
+      return students.map(student => ({
+        id: student.id,
+        studentId: student.studentId,
+        name: student.name,
+        email: student.email,
+        className: student.className,
+        grade: student.grade,
+        section: student.section
+      }));
+    } catch (error) {
+      console.error('Error getting students by parent ID:', error);
+      return [];
+    }
   },
 
   // Student self-update (limited fields)
@@ -445,6 +632,11 @@ export const StudentRepository = {
       where: { userId: id },
     });
 
+    // Delete escalation alerts (no cascade delete)
+    await prisma.escalationAlert.deleteMany({
+      where: { studentId: id },
+    });
+
     // Perform hard delete of user (cascade will handle most other relations)
     await prisma.user.delete({
       where: { id },
@@ -493,7 +685,7 @@ export const StudentRepository = {
 
     // Character-by-character comparison with exact case sensitivity
     const caseSensitiveMatch = allStudents.find(student => 
-      student.studentId === studentId // Strict equality with case sensitivity
+      student.studentId !== null && student.studentId === studentId // Strict equality with case sensitivity
     );
 
     if (caseSensitiveMatch) {
@@ -573,7 +765,7 @@ export const StudentRepository = {
 
       // Exact character-by-character comparison
       const hasExactMatch = allStudentIds.some(student => 
-        student.studentId === studentId // Strict equality with case sensitivity
+        student.studentId !== null && student.studentId === studentId // Strict equality with case sensitivity
       );
 
       if (hasExactMatch) {
@@ -597,5 +789,77 @@ export const StudentRepository = {
   // Auto-generate student email
   generateStudentEmail: async (studentId: string, schoolDomain: string) => {
     return `${studentId.toLowerCase()}@${schoolDomain}`;
+  },
+
+  // Get students with active escalation alerts
+  getStudentsWithAlerts: async (user: any) => {
+    // Build the where clause
+    let whereClause: any = {
+      role: {
+        name: 'STUDENT'
+      },
+      escalationAlerts: {
+        some: {
+          status: 'open' // Only get students with open alerts
+        }
+      }
+    };
+
+    // If user is a counselor, only show students from their assigned school
+    if (user.role?.name === 'COUNSELOR') {
+      if (!user.schoolId) {
+        return []; // Return empty if counselor is not assigned to a school
+      }
+      whereClause.schoolId = user.schoolId;
+    }
+
+    const studentsWithAlerts = await prisma.user.findMany({
+      where: whereClause,
+      include: {
+        escalationAlerts: {
+          where: {
+            status: 'open'
+          },
+          select: {
+            id: true,
+            category: true,
+            priority: true,
+            createdAt: true,
+            status: true
+          },
+          orderBy: {
+            createdAt: 'desc'
+          }
+        },
+        school: {
+          select: {
+            id: true,
+            name: true
+          }
+        },
+        studentProfile: {
+          select: {
+            status: true
+          }
+        }
+      },
+      orderBy: {
+        escalationAlerts: {
+          _count: 'desc'
+        }
+      }
+    });
+
+    // Transform the data to match the expected format
+    return studentsWithAlerts.map(student => ({
+      id: student.id,
+      firstName: student.firstName,
+      lastName: student.lastName,
+      email: student.email,
+      studentId: student.studentId,
+      school: student.school,
+      escalationAlerts: student.escalationAlerts,
+      status: student.studentProfile?.status || 'UNKNOWN'
+    }));
   },
 };
