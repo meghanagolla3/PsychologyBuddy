@@ -3,6 +3,8 @@
 import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { CalendarIcon, CalendarPlus, Clock, Eye, Play, Plus, User, Mail, FileText, CalendarDays, UserRound, Briefcase, CircleCheck, CalendarClock } from 'lucide-react';
+import { AdminLoader } from '@/src/components/admin/ui/AdminLoader';
+import { RingSpinner } from '@/src/components/ui/Spinners';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { ParentMeetingModal } from '@/src/components/counselor/sections/ParentMeetings/ParentMeetingModal';
@@ -305,6 +307,7 @@ export default function ParentMeetingsPage() {
   const [detailsMeeting, setDetailsMeeting] = useState<Meeting | null>(null);
   const [acceptModalOpen, setAcceptModalOpen] = useState(false);
   const [selectedMeeting, setSelectedMeeting] = useState<Meeting | null>(null);
+  const [actionLoading, setActionLoading] = useState<string | null>(null);
 
   useEffect(() => {
     const tabParam = searchParams.get('tab');
@@ -356,6 +359,7 @@ export default function ParentMeetingsPage() {
 
   const handleStartSession = async (meetingId: string) => {
     try {
+      setActionLoading(meetingId);
       console.log('Starting session for meeting:', meetingId);
       
       // Notify parent and update meeting status to PENDING
@@ -390,6 +394,8 @@ export default function ParentMeetingsPage() {
       }
     } catch (error) {
       console.error('Error starting session:', error);
+    } finally {
+      setActionLoading(null);
     }
   };
 
@@ -402,6 +408,7 @@ export default function ParentMeetingsPage() {
     if (!selectedMeeting) return;
 
     try {
+      setActionLoading(selectedMeeting.id);
       console.log('Accepting counselor meeting:', selectedMeeting.id);
 
       const response = await fetch(`/api/counselor/parent-meetings/${selectedMeeting.id}/accept`, {
@@ -425,6 +432,8 @@ export default function ParentMeetingsPage() {
       }
     } catch (error) {
       console.error('Error accepting meeting:', error);
+    } finally {
+      setActionLoading(null);
     }
   };
 
@@ -432,6 +441,7 @@ export default function ParentMeetingsPage() {
     if (!selectedMeeting) return;
 
     try {
+      setActionLoading(selectedMeeting.id);
       console.log('Declining counselor meeting:', selectedMeeting.id);
 
       const response = await fetch(`/api/counselor/parent-meetings/${selectedMeeting.id}/decline`, {
@@ -455,11 +465,14 @@ export default function ParentMeetingsPage() {
       }
     } catch (error) {
       console.error('Error declining meeting:', error);
+    } finally {
+      setActionLoading(null);
     }
   };
 
   const handleDeclineMeeting = async (meetingId: string) => {
     try {
+      setActionLoading(meetingId);
       console.log('Declining parent meeting request:', meetingId);
       
       // Update meeting status to CANCELLED (declined)
@@ -483,11 +496,14 @@ export default function ParentMeetingsPage() {
       }
     } catch (error) {
       console.error('Error declining meeting:', error);
+    } finally {
+      setActionLoading(null);
     }
   };
 
   const handleCancelMeeting = async (meetingId: string) => {
     try {
+      setActionLoading(meetingId);
       console.log('Canceling counselor meeting:', meetingId);
       
       // Update meeting status to CANCELLED (canceled by counselor)
@@ -511,6 +527,8 @@ export default function ParentMeetingsPage() {
       }
     } catch (error) {
       console.error('Error canceling meeting:', error);
+    } finally {
+      setActionLoading(null);
     }
   };
 
@@ -597,9 +615,8 @@ export default function ParentMeetingsPage() {
         </div>
 
         {loading ? (
-          <div className="text-center py-12">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#3B82F6] mx-auto"></div>
-            <p className="text-[#64748B] mt-2">Loading parent meetings...</p>
+          <div className="py-20">
+            <AdminLoader size="md" message="Loading parent meetings..." />
           </div>
         ) : filteredMeetings.length === 0 ? (
           <div className="text-center py-16 bg-[#F1F5F9] rounded-lg border border-[#E2E8F0]">
@@ -861,29 +878,32 @@ export default function ParentMeetingsPage() {
                       <>
                         <button
                           onClick={() => handleAcceptMeeting(m)}
-                          className="flex-1 lg:flex-none inline-flex h-9 items-center justify-center gap-1.5 rounded-[14px] bg-[#24A965] px-4 text-[12px] font-normal text-[#FFFFFF] hover:bg-[#24A965]/90 transition-colors"
+                          disabled={actionLoading === m.id}
+                          className="flex-1 lg:flex-none inline-flex h-9 items-center justify-center gap-1.5 rounded-[14px] bg-[#24A965] px-4 text-[12px] font-normal text-[#FFFFFF] hover:bg-[#24A965]/90 transition-colors disabled:opacity-50"
                         >
-                          Confirm
+                          {actionLoading === m.id ? <RingSpinner size="sm" color="white" /> : "Confirm"}
                         </button>
                         <button
                           onClick={() => handleDeclineMeeting(m.id)}
-                          className="flex-1 lg:flex-none inline-flex h-9 items-center justify-center gap-1.5 px-4 text-[12px] font-normal text-[#E23439] hover:bg-[#FFEFEF] hover:text-[#E23439]/90 rounded-[14px] transition-colors border border-[#E23439]/90"
+                          disabled={actionLoading === m.id}
+                          className="flex-1 lg:flex-none inline-flex h-9 items-center justify-center gap-1.5 px-4 text-[12px] font-normal text-[#E23439] hover:bg-[#FFEFEF] hover:text-[#E23439]/90 rounded-[14px] transition-colors border border-[#E23439]/90 disabled:opacity-50"
                         >
-                          Decline
+                          {actionLoading === m.id ? <RingSpinner size="sm" color="blue" /> : "Decline"}
                         </button>
                       </>
                     ) : active === 'Pending' && m.status === 'PENDING' && m.requestedBy === 'COUNSELOR' ? (
                       <button
                         onClick={() => handleCancelMeeting(m.id)}
-                        className="flex-1 lg:flex-none inline-flex h-9 items-center justify-center gap-1.5 px-4 text-[12px] font-normal text-[#E23439] hover:bg-[#FFEFEF] hover:text-[#E23439]/90 rounded-[14px] transition-colors border border-[#E23439]/90"
+                        disabled={actionLoading === m.id}
+                        className="flex-1 lg:flex-none inline-flex h-9 items-center justify-center gap-1.5 px-4 text-[12px] font-normal text-[#E23439] hover:bg-[#FFEFEF] hover:text-[#E23439]/90 rounded-[14px] transition-colors border border-[#E23439]/90 disabled:opacity-50"
                       >
-                        Cancel
+                        {actionLoading === m.id ? <RingSpinner size="sm" color="blue" /> : "Cancel"}
                       </button>
                     ) : active === 'Pending' && (m.status === 'SCHEDULED' || m.status === 'CANCELLED') ? (
                       <div className="w-full lg:w-auto text-center lg:text-right text-[#64748B] pr-4">—</div>
                     ) : active === 'Completed' ? (
                       <button
-                        onClick={() => router.push(`/counselor/parent-meetings/${m.id}?mode=preview`)}
+                        onClick={() => router.push(`/counselor/parent-meetings/${m.id}`)}
                         className="w-full rounded-[12px] bg-[#F8F8F8] hover:bg-[#F1F3F4] text-[#3A3A3A] px-4 h-[36px] text-[12px] font-medium transition-all md:w-auto flex items-center justify-center"
                       >
                         <Eye className="h-4 w-4 mr-1" />
@@ -899,6 +919,9 @@ export default function ParentMeetingsPage() {
                       </button>
                     ) : (
                       <>
+                      <div className="flex gap-2">
+                        <div className="flex gap-2">
+
                         <button
                           onClick={() => {
                             if (active === 'Pending') {
@@ -908,17 +931,35 @@ export default function ParentMeetingsPage() {
                             }
                           }}
                           className="w-full rounded-[12px] bg-[#F8F8F8] hover:bg-[#F1F3F4] text-[#3A3A3A] px-4 h-[36px] text-[12px] font-medium transition-all md:w-auto flex items-center justify-center"
-                        >
+                          >
                           <Eye className="h-4 w-4 mr-1" />
-                          View Details
+                          View
                         </button>
+                          </div>
                         <button
                           onClick={() => handleStartSession(m.id)}
-                          className="w-full md:w-auto rounded-[15px] bg-[#3C83F6] hover:from-[#3195E7] hover:to-[#52A9F0] text-white border-none px-4 h-[38px] text-[14px] font-normal transition-all flex items-center justify-center"
+                          disabled={actionLoading === m.id}
+                          className="w-full md:w-full rounded-[15px] bg-[#3C83F6] hover:from-[#3195E7] hover:to-[#52A9F0] text-white border-none px-6 h-[38px] text-[14px] font-normal transition-all flex items-center justify-center disabled:opacity-50"
                         >
-                          <CalendarClock className="h-4 w-4 mr-1" />
-                          Start Session
+                          {actionLoading === m.id ? (
+                            <RingSpinner size="sm" color="white" />
+                          ) : (
+                            <>
+                              {m.status === 'IN_PROGRESS' ? (
+                                <>
+                                  <Play className="h-4 w-4 mr-1" />
+                                  Resume
+                                </>
+                              ) : (
+                                <>
+                                  <CalendarClock className="h-4 w-4 mr-1" />
+                                  Start Session
+                                </>
+                              )}
+                            </>
+                          )}
                         </button>
+                        </div>
                       </>
                     )}
                   </div>
@@ -952,6 +993,7 @@ export default function ParentMeetingsPage() {
         } : null}
         onConfirm={handleConfirmAccept}
         onDecline={handleDeclineFromModal}
+        isLoading={actionLoading === selectedMeeting?.id}
       />
 
       <MeetingDetailsDialog

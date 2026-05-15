@@ -10,6 +10,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { CreateChallengeDialog } from "@/src/components/shared/CreateChallengeDialog";
 import { AssignChallengeDialog } from "@/src/components/shared/AssignChallengeDialog";
 import { ChallengeDetailsDialog } from "@/src/components/shared/ChallengeDetailsDialog";
+import { ChallengeActivity } from "@/src/components/shared/ChallengeActivity";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -249,9 +250,9 @@ export default function ChallengesPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#f2f3f4]">
+    <div className="min-h-screen ">
       {/* Header Section */}
-      <div className="bg-[#f2f3f4]">
+      <div>
         <div className="mx-auto max-w-8xl px-4 md:px-6 py-6">
           <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
             <div>
@@ -292,12 +293,19 @@ export default function ChallengesPage() {
 
         {activeTab === "Challenges" ? (
           isLoading ? (
-            <div className="flex items-center justify-center">
-              <div className="text-sm text-[#64748B]">Loading challenges...</div>
+            <div className="flex items-center justify-center py-20">
+              <div className="flex flex-col items-center gap-3">
+                <div className="h-8 w-8 animate-spin rounded-full border-2 border-[#3B82F6] border-t-transparent" />
+                <div className="text-sm text-[#64748B]">Loading challenges...</div>
+              </div>
             </div>
           ) : challenges.length === 0 ? (
-            <div className="rounded-xl border border-[#E2E8F0] bg-[#FFFFFF] p-10 text-center text-sm text-[#64748B]">
-              No challenges found. Create your first challenge to get started!
+            <div className="rounded-xl border border-[#E2E8F0] bg-[#FFFFFF] p-20 text-center">
+              <div className="bg-[#F1F5F9] h-16 w-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Trophy className="h-8 w-8 text-[#64748B]" />
+              </div>
+              <h3 className="text-lg font-bold text-[#1E293B]">No challenges found</h3>
+              <p className="text-sm text-[#64748B]">Create your first challenge to get started!</p>
             </div>
           ) : (
             <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
@@ -310,7 +318,6 @@ export default function ChallengesPage() {
                     setAssignOpen(true);
                   }}
                   onDetails={(challenge) => {
-                    console.log('Counselor View Details clicked for challenge:', challenge);
                     setSelectedChallenge(challenge);
                     setDetailsOpen(true);
                   }}
@@ -319,9 +326,7 @@ export default function ChallengesPage() {
             </div>
           )
         ) : (
-          <div className="rounded-xl border border-[#E2E8F0] bg-[#FFFFFF] p-10 text-center text-sm text-[#64748B]">
-            No activity yet.
-          </div>
+          <ChallengeActivity />
         )}
 
         <CreateChallengeDialog 

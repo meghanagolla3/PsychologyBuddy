@@ -1,262 +1,281 @@
 "use client";
 
-import React from 'react';
-import { ParentLayout } from '../layout/ParentLayout';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Button } from '@/components/ui/button';
+import React, { useState, useEffect } from "react";
+import { ParentLayout } from "../layout/ParentLayout";
 import { 
   Calendar, 
-  MessageSquare, 
-  FileText, 
-  TrendingUp, 
-  Clock,
-  Star,
-  Heart,
-  Brain,
-  Users
-} from 'lucide-react';
+  BookOpen, 
+  Dumbbell, 
+  Trophy, 
+  MessageSquare,
+  TrendingUp
+} from "lucide-react";
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  Tooltip,
+  ResponsiveContainer,
+  CartesianGrid,
+} from "recharts";
+import { useAuth } from "@/src/contexts/AuthContext";
+import { cn } from "@/src/lib/utils";
+import { Button } from "@/components/ui/button";
+
+const datasets: Record<string, { day: string; value: number }[]> = {
+  Tools: [
+    { day: "Mon", value: 3 },
+    { day: "Tue", value: 3 },
+    { day: "Wed", value: 2 },
+    { day: "Thu", value: 6 },
+    { day: "Fri", value: 4 },
+    { day: "Sat", value: 7 },
+    { day: "Sun", value: 5 },
+  ],
+  Exercises: [
+    { day: "Mon", value: 1 },
+    { day: "Tue", value: 2 },
+    { day: "Wed", value: 3 },
+    { day: "Thu", value: 2 },
+    { day: "Fri", value: 4 },
+    { day: "Sat", value: 3 },
+    { day: "Sun", value: 2 },
+  ],
+  Streak: [
+    { day: "Mon", value: 1 },
+    { day: "Tue", value: 2 },
+    { day: "Wed", value: 3 },
+    { day: "Thu", value: 4 },
+    { day: "Fri", value: 5 },
+    { day: "Sat", value: 6 },
+    { day: "Sun", value: 7 },
+  ],
+  Badges: [
+    { day: "Mon", value: 0 },
+    { day: "Tue", value: 1 },
+    { day: "Wed", value: 1 },
+    { day: "Thu", value: 2 },
+    { day: "Fri", value: 2 },
+    { day: "Sat", value: 3 },
+    { day: "Sun", value: 3 },
+  ],
+  Challenges: [
+    { day: "Mon", value: 0 },
+    { day: "Tue", value: 1 },
+    { day: "Wed", value: 0 },
+    { day: "Thu", value: 1 },
+    { day: "Fri", value: 1 },
+    { day: "Sat", value: 0 },
+    { day: "Sun", value: 0 },
+  ],
+};
+
+const tabs = ["Tools", "Exercises", "Streak", "Badges", "Challenges"] as const;
 
 export function ParentDashboard() {
+  const { user } = useAuth();
+  const [active, setActive] = useState<(typeof tabs)[number]>("Tools");
+  const [upcomingMeeting, setUpcomingMeeting] = useState<any>(null);
+  const [dashboardStats, setDashboardStats] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+      try {
+        const [meetingRes, statsRes] = await Promise.all([
+          fetch('/api/parent/meetings-test'),
+          fetch('/api/parent/dashboard-stats')
+        ]);
+
+        if (meetingRes.ok) {
+          const result = await meetingRes.json();
+          if (result.success && result.data.length > 0) {
+            const sorted = result.data
+              .filter((m: any) => ['SCHEDULED', 'PENDING'].includes(m.status))
+              .sort((a: any, b: any) => new Date(a.date).getTime() - new Date(b.date).getTime());
+            
+            if (sorted.length > 0) {
+              setUpcomingMeeting(sorted[0]);
+            }
+          }
+        }
+
+        if (statsRes.ok) {
+          const result = await statsRes.json();
+          if (result.success) {
+            setDashboardStats(result.data);
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching dashboard data:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  const stats = [
+    { icon: BookOpen, label: "Tools Used", value: dashboardStats?.stats?.toolsUsed || 0 },
+    { icon: Dumbbell, label: "Exercises Done", value: dashboardStats?.stats?.exercisesDone || 0 },
+    { icon: Trophy, label: "Challenges", value: dashboardStats?.stats?.challenges || 0 },
+    { icon: MessageSquare, label: "Total counsel Session", value: dashboardStats?.stats?.sessions || 0 },
+  ];
+
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric'
+    });
+  };
+
+  if (loading && !dashboardStats) {
+    return (
+      <ParentLayout>
+        <div className="flex flex-col items-center justify-center min-h-[60vh]">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#2D85F2]"></div>
+          <p className="text-[#707D8F] mt-4 font-medium">Loading child's progress...</p>
+        </div>
+      </ParentLayout>
+    );
+  }
+
   return (
     <ParentLayout>
-      <div className="space-y-4 sm:space-y-6">
-        {/* Welcome Section */}
-        <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl sm:rounded-2xl p-4 sm:p-6 text-white">
-          <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold mb-2">Welcome back, Jane!</h1>
-          <p className="text-sm sm:text-base text-blue-100">Here's what's happening with your child's progress today.</p>
-        </div>
+      <div className="p-4 sm:p-8 space-y-6 sm:space-y-8 max-w-7xl mx-auto">
+        <header>
+          <h1 className="text-2xl sm:text-[32px] font-bold text-[#3A3A3A]">
+            Welcome back, {user?.firstName || 'Parent'} <span aria-hidden>👋</span>
+          </h1>
+          <p className="mt-1 text-sm sm:text-[16px] text-[#707D8F]">
+            Here's how {dashboardStats?.childName || 'your child'} is doing this week.
+          </p>
+        </header>
 
-        {/* Quick Stats */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-          <Card>
-            <CardContent className="p-4 sm:p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-xs sm:text-sm font-medium text-gray-600">Next Session</p>
-                  <p className="text-lg sm:text-2xl font-bold text-gray-900">Tomorrow</p>
-                  <p className="text-xs text-gray-500">2:00 PM</p>
-                </div>
-                <Calendar className="h-6 w-6 sm:h-8 sm:w-8 text-blue-600" />
+        {/* Upcoming Meeting */}
+        <section className="rounded-[20px] border border-[#2D85F2]/20 bg-[#2D85F2]/5 p-4 sm:p-6">
+          <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+            <div className="flex items-start gap-3 sm:gap-4">
+              <div className="flex h-10 w-10 sm:h-12 sm:w-12 shrink-0 items-center justify-center rounded-2xl bg-white shadow-sm text-[#2D85F2]">
+                <Calendar className="h-5 w-5 sm:h-6 sm:w-6" />
               </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className="p-4 sm:p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-xs sm:text-sm font-medium text-gray-600">Messages</p>
-                  <p className="text-lg sm:text-2xl font-bold text-gray-900">5</p>
-                  <p className="text-xs text-gray-500">2 unread</p>
-                </div>
-                <MessageSquare className="h-6 w-6 sm:h-8 sm:w-8 text-green-600" />
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className="p-4 sm:p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-xs sm:text-sm font-medium text-gray-600">Reports</p>
-                  <p className="text-lg sm:text-2xl font-bold text-gray-900">12</p>
-                  <p className="text-xs text-gray-500">This month</p>
-                </div>
-                <FileText className="h-6 w-6 sm:h-8 sm:w-8 text-purple-600" />
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className="p-4 sm:p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-xs sm:text-sm font-medium text-gray-600">Progress</p>
-                  <p className="text-lg sm:text-2xl font-bold text-gray-900">85%</p>
-                  <p className="text-xs text-gray-500">Good</p>
-                </div>
-                <TrendingUp className="h-6 w-6 sm:h-8 sm:w-8 text-orange-600" />
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Child Info Card */}
-        <Card>
-          <CardHeader className="pb-3 sm:pb-6">
-            <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
-              <Users className="h-4 w-4 sm:h-5 sm:w-5" />
-              Your Child's Information
-            </CardTitle>
-            <CardDescription className="text-xs sm:text-sm">
-              Quick overview of your child's current status
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="pt-0">
-            <div className="flex items-start space-x-3 sm:space-x-4">
-              <Avatar className="h-12 w-12 sm:h-16 sm:w-16">
-                <AvatarImage src="/placeholder-child.jpg" />
-                <AvatarFallback className="bg-blue-100 text-blue-600 text-sm sm:text-lg">
-                  JS
-                </AvatarFallback>
-              </Avatar>
-              <div className="flex-1 space-y-2">
-                <div>
-                  <h3 className="font-semibold text-base sm:text-lg">John Smith</h3>
-                  <p className="text-xs sm:text-sm text-gray-600">Class 9-A • Student ID: STU001</p>
-                </div>
-                <div className="flex flex-wrap gap-1 sm:gap-2">
-                  <Badge variant="secondary" className="text-xs">Active</Badge>
-                  <Badge variant="outline" className="text-xs">Good Progress</Badge>
-                  <Badge className="bg-green-100 text-green-800 text-xs">On Track</Badge>
-                </div>
+              <div className="min-w-0">
+                <p className="text-base sm:text-[18px] font-bold text-[#3A3A3A]">Upcoming Meeting</p>
+                <p className="mt-1 text-xs sm:text-[14px] text-[#707D8F] line-clamp-2">
+                  {upcomingMeeting ? (
+                    `${formatDate(upcomingMeeting.date)} · ${upcomingMeeting.time} · ${upcomingMeeting.counselorName} · Duration : 01 hr`
+                  ) : (
+                    "No upcoming meetings scheduled"
+                  )}
+                </p>
               </div>
             </div>
-          </CardContent>
-        </Card>
+            {upcomingMeeting && (
+              <div className="flex gap-2 sm:gap-3">
+                <Button className="flex-1 sm:flex-none rounded-[12px] bg-[#2D85F2] hover:bg-[#2D85F2]/90 px-4 sm:px-6 py-2 sm:py-2.5 h-auto text-sm font-semibold">
+                  Confirm
+                </Button>
+                <Button variant="outline" className="flex-1 sm:flex-none rounded-[12px] border-[#EF4444]/40 text-[#EF4444] hover:bg-[#EF4444]/5 px-4 sm:px-6 py-2 sm:py-2.5 h-auto text-sm font-semibold">
+                  Cancel
+                </Button>
+              </div>
+            )}
+          </div>
+        </section>
 
-        {/* Recent Activities */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
-          <Card>
-            <CardHeader className="pb-3 sm:pb-6">
-              <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
-                <Clock className="h-4 w-4 sm:h-5 sm:w-5" />
-                Recent Activities
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3 sm:space-y-4">
-              <div className="flex items-center space-x-2 sm:space-x-3">
-                <div className="w-2 h-2 bg-blue-600 rounded-full flex-shrink-0"></div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-xs sm:text-sm font-medium truncate">Completed meditation session</p>
-                  <p className="text-xs text-gray-500">2 hours ago</p>
-                </div>
+        {/* Activity Summary */}
+        <section className="rounded-[24px] border border-[#E5E5E5] bg-white p-5 sm:p-8 shadow-sm">
+          <h2 className="text-lg sm:text-[20px] font-bold text-[#3A3A3A]">Activity Summary</h2>
+          <div className="mt-4 sm:mt-6 grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
+            {stats.map(({ icon: Icon, label, value }) => (
+              <div
+                key={label}
+                className="rounded-[20px] bg-[#F8FAFC] p-4 sm:p-6 text-center border border-[#F1F5F9]"
+              >
+                <Icon className="mx-auto h-5 w-5 sm:h-6 sm:w-6 text-[#2D85F2]" />
+                <p className="mt-2 sm:mt-3 text-xl sm:text-[28px] font-bold text-[#3A3A3A]">{value}</p>
+                <p className="mt-0.5 sm:mt-1 text-[11px] sm:text-[13px] text-[#707D8F] font-medium leading-tight">{label}</p>
               </div>
-              <div className="flex items-center space-x-2 sm:space-x-3">
-                <div className="w-2 h-2 bg-green-600 rounded-full flex-shrink-0"></div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-xs sm:text-sm font-medium truncate">Submitted mood check-in</p>
-                  <p className="text-xs text-gray-500">5 hours ago</p>
-                </div>
-              </div>
-              <div className="flex items-center space-x-2 sm:space-x-3">
-                <div className="w-2 h-2 bg-purple-600 rounded-full flex-shrink-0"></div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-xs sm:text-sm font-medium truncate">Attended counseling session</p>
-                  <p className="text-xs text-gray-500">Yesterday</p>
-                </div>
-              </div>
-              <div className="flex items-center space-x-2 sm:space-x-3">
-                <div className="w-2 h-2 bg-orange-600 rounded-full flex-shrink-0"></div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-xs sm:text-sm font-medium truncate">Created art journal entry</p>
-                  <p className="text-xs text-gray-500">2 days ago</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+            ))}
+          </div>
+        </section>
 
-          <Card>
-            <CardHeader className="pb-3 sm:pb-6">
-              <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
-                <Star className="h-4 w-4 sm:h-5 sm:w-5" />
-                Wellness Overview
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3 sm:space-y-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-2">
-                  <Heart className="h-3 w-3 sm:h-4 sm:w-4 text-red-500" />
-                  <span className="text-xs sm:text-sm font-medium">Mood</span>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <div className="w-16 sm:w-24 h-2 bg-gray-200 rounded-full overflow-hidden">
-                    <div className="w-4/5 h-full bg-green-500"></div>
-                  </div>
-                  <span className="text-xs sm:text-sm text-gray-600">Good</span>
-                </div>
-              </div>
-              
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-2">
-                  <Brain className="h-3 w-3 sm:h-4 sm:w-4 text-blue-500" />
-                  <span className="text-xs sm:text-sm font-medium">Stress</span>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <div className="w-16 sm:w-24 h-2 bg-gray-200 rounded-full overflow-hidden">
-                    <div className="w-2/5 h-full bg-yellow-500"></div>
-                  </div>
-                  <span className="text-xs sm:text-sm text-gray-600">Low</span>
-                </div>
-              </div>
-              
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-2">
-                  <Users className="h-3 w-3 sm:h-4 sm:w-4 text-purple-500" />
-                  <span className="text-xs sm:text-sm font-medium">Social</span>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <div className="w-16 sm:w-24 h-2 bg-gray-200 rounded-full overflow-hidden">
-                    <div className="w-3/5 h-full bg-blue-500"></div>
-                  </div>
-                  <span className="text-xs sm:text-sm text-gray-600">Moderate</span>
-                </div>
-              </div>
-
-              <Button className="w-full mt-3 sm:mt-4 text-xs sm:text-sm py-2" variant="outline">
-                View Detailed Report
-              </Button>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Upcoming Events */}
-        <Card>
-          <CardHeader className="pb-3 sm:pb-6">
-            <CardTitle className="text-base sm:text-lg">Upcoming Events</CardTitle>
-            <CardDescription className="text-xs sm:text-sm">
-              Important dates and appointments
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3 sm:space-y-4">
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 sm:p-4 bg-blue-50 rounded-lg gap-2 sm:gap-0">
-                <div className="flex-1">
-                  <p className="text-xs sm:text-sm font-medium">Counseling Session</p>
-                  <p className="text-xs text-gray-600">With Dr. Sarah Johnson</p>
-                </div>
-                <div className="text-right sm:text-left">
-                  <p className="text-xs sm:text-sm font-medium">Tomorrow</p>
-                  <p className="text-xs text-gray-600">2:00 PM</p>
-                </div>
-              </div>
-              
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 sm:p-4 bg-green-50 rounded-lg gap-2 sm:gap-0">
-                <div className="flex-1">
-                  <p className="text-xs sm:text-sm font-medium">Parent-Teacher Meeting</p>
-                  <p className="text-xs text-gray-600">Quarterly progress review</p>
-                </div>
-                <div className="text-right sm:text-left">
-                  <p className="text-xs sm:text-sm font-medium">Dec 15</p>
-                  <p className="text-xs text-gray-600">10:00 AM</p>
-                </div>
-              </div>
-              
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 sm:p-4 bg-purple-50 rounded-lg gap-2 sm:gap-0">
-                <div className="flex-1">
-                  <p className="text-xs sm:text-sm font-medium">Wellness Workshop</p>
-                  <p className="text-xs text-gray-600">Stress management techniques</p>
-                </div>
-                <div className="text-right sm:text-left">
-                  <p className="text-xs sm:text-sm font-medium">Dec 20</p>
-                  <p className="text-xs text-gray-600">4:00 PM</p>
-                </div>
-              </div>
+        {/* Activity Trends */}
+        <section className="rounded-[24px] border border-[#E5E5E5] bg-white p-5 sm:p-8 shadow-sm">
+          <div className="flex items-center justify-between flex-wrap gap-4">
+            <h2 className="text-lg sm:text-[20px] font-bold text-[#3A3A3A]">Activity Trends</h2>
+            <div className="flex flex-wrap gap-1.5 sm:gap-2">
+              {tabs.map((tab) => (
+                <button
+                  key={tab}
+                  onClick={() => setActive(tab)}
+                  className={cn(
+                    "rounded-[10px] px-3 sm:px-4 py-1.5 sm:py-2 text-[11px] sm:text-[13px] font-semibold transition-all",
+                    active === tab
+                      ? "bg-[#2D85F2] text-white shadow-md shadow-[#2D85F2]/20"
+                      : "bg-[#F1F5F9] text-[#64748B] hover:bg-[#E2E8F0]"
+                  )}
+                >
+                  {tab}
+                </button>
+              ))}
             </div>
-          </CardContent>
-        </Card>
+          </div>
+
+          <div className="mt-6 sm:mt-8 h-[250px] sm:h-[320px] w-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart 
+                data={dashboardStats?.datasets?.[active] || []} 
+                margin={{ top: 10, right: 10, left: -10, bottom: 20 }}
+              >
+                <CartesianGrid stroke="#F1F5F9" vertical={false} strokeDasharray="3 3" />
+                <XAxis
+                  dataKey="day"
+                  tick={{ fill: "#94A3B8", fontSize: 10 }}
+                  axisLine={false}
+                  tickLine={false}
+                  padding={{ left: 10, right: 10 }}
+                />
+                <YAxis
+                  tick={{ fill: "#94A3B8", fontSize: 10 }}
+                  axisLine={false}
+                  tickLine={false}
+                  allowDecimals={false}
+                  tickCount={5}
+                />
+                <Tooltip
+                  contentStyle={{
+                    background: "#ffffff",
+                    border: "1px solid #E2E8F0",
+                    borderRadius: 12,
+                    fontSize: 11,
+                    boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.1)",
+                  }}
+                  labelStyle={{ color: "#3A3A3A", fontWeight: 'bold', marginBottom: 2 }}
+                  formatter={(value: any) => [`${value}`, active]}
+                />
+                <Line
+                  type="monotone"
+                  dataKey="value"
+                  stroke="#2D85F2"
+                  strokeWidth={2.5}
+                  dot={{ r: 3.5, stroke: "#2D85F2", fill: "#ffffff", strokeWidth: 1.5 }}
+                  activeDot={{ r: 5, strokeWidth: 0 }}
+                  animationDuration={1000}
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+
+          <div className="mt-4 sm:mt-6 flex items-center gap-2 text-xs sm:text-[14px] text-[#707D8F] bg-[#F8FAFC] p-3 sm:p-4 rounded-[12px] border border-[#F1F5F9]">
+            <TrendingUp className="h-3.5 w-3.5 text-[#10B981] shrink-0" />
+            <span className="line-clamp-1">Your child used {dashboardStats?.stats?.toolsUsed || 0} tools this week — <span className="font-bold text-[#10B981]">live tracking!</span></span>
+          </div>
+        </section>
       </div>
     </ParentLayout>
   );

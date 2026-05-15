@@ -68,6 +68,8 @@ export const GET = withPermission({
       studentClassGrade: meeting.student.classRef?.name || '',
       requestedBy: meeting.requestedBy || 'COUNSELOR',
       notes: meeting.notes,
+      discussion: meeting.discussion,
+      recommendations: meeting.recommendations,
       createdAt: meeting.createdAt.toISOString(),
       updatedAt: meeting.updatedAt.toISOString()
     }));

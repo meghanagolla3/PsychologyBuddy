@@ -12,6 +12,7 @@ import { AdminHeader } from "@/src/components/admin/layout/AdminHeader";
 import { CreateChallengeDialog } from "@/src/components/shared/CreateChallengeDialog";
 import { AssignChallengeDialog } from "@/src/components/shared/AssignChallengeDialog";
 import { ChallengeDetailsDialog } from "@/src/components/shared/ChallengeDetailsDialog";
+import { ChallengeActivity } from "@/src/components/shared/ChallengeActivity";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -138,10 +139,10 @@ function ChallengeCard({ challenge, onAssign, onDetails }: { challenge: Challeng
             {challenge.status}
           </span>
         </div> */}
-        <div className="flex items-start justify-between bg-gradient-to-l from-[#F9FEFF] to-[#F3FAFF] to-[#EEF8FF] px-4 py-6">
+        <div className="flex items-start justify-between bg-gradient-to-l from-[#F9FEFF] to-[#F3FAFF] to-[#e7f5ff] px-4 py-6">
   <div className="flex gap-3">
-    <div className="flex items-center px-4 py-4 justify-center rounded-[11px] bg-white shadow-sm border border-[#E2E8F0]">
-      <Trophy className="h-[21px] w-[21px] text-[#3C83F6]" />
+    <div className="flex items-center px-4.5 py-4 justify-center rounded-[16px] bg-white  ">
+      <Trophy className="h-[26px] w-[26px] text-[#3C83F6]" />
     </div>
 
     <div className="flex flex-col">
@@ -287,12 +288,19 @@ export default function Challenges() {
 
         {activeTab === "Challenges" ? (
           isLoading ? (
-            <div className="flex items-center justify-center">
-              <div className="text-sm text-[#64748B]">Loading challenges...</div>
+            <div className="flex items-center justify-center py-20">
+              <div className="flex flex-col items-center gap-3">
+                <div className="h-8 w-8 animate-spin rounded-full border-2 border-[#3B82F6] border-t-transparent" />
+                <div className="text-sm text-[#64748B]">Loading challenges...</div>
+              </div>
             </div>
           ) : challenges.length === 0 ? (
-            <div className="rounded-xl border border-[#E2E8F0] bg-[#FFFFFF] p-10 text-center text-sm text-[#64748B]">
-              No challenges found. Create your first challenge to get started!
+            <div className="rounded-xl border border-[#E2E8F0] bg-[#FFFFFF] p-20 text-center">
+              <div className="bg-[#F1F5F9] h-16 w-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Trophy className="h-8 w-8 text-[#64748B]" />
+              </div>
+              <h3 className="text-lg font-bold text-[#1E293B]">No challenges found</h3>
+              <p className="text-sm text-[#64748B]">Create your first challenge to get started!</p>
             </div>
           ) : (
             <div className="grid grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
@@ -307,7 +315,6 @@ export default function Challenges() {
                     setAssignOpen(true);
                   }}
                   onDetails={(challenge) => {
-                    console.log('View Details clicked for challenge:', challenge);
                     setSelectedChallenge(challenge);
                     setDetailsOpen(true);
                   }}
@@ -316,9 +323,7 @@ export default function Challenges() {
             </div>
           )
         ) : (
-          <div className="rounded-xl border border-[#E2E8F0] bg-[#FFFFFF] p-10 text-center text-sm text-[#64748B]">
-            No activity yet.
-          </div>
+          <ChallengeActivity isAdmin />
         )}
 
         <CreateChallengeDialog 

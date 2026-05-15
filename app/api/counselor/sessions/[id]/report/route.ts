@@ -1,19 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { withPermission } from '@/src/middleware/permission.middleware';
-import { CounselingService } from '@/src/server/counseling/counseling.service';
 import prisma from '@/src/prisma';
 
-const counselingService = new CounselingService();
-
-// Get Follow-up Report Data
+// Get Session Follow-up Report
 export const GET = withPermission({
   module: 'COUNSELING_SESSIONS',
   action: 'VIEW',
-})(async (req: NextRequest, { params, user }: any) => {
+})(async (req: NextRequest, { params, user, userSchoolId }: any) => {
   try {
     const { id } = await params;
 
-    if (!user.id || !user.schoolId) {
+    const isSuperAdmin = user.role?.name === 'SUPERADMIN';
+    const isAdmin = user.role?.name === 'ADMIN' || user.role?.name === 'SCHOOL_SUPERADMIN';
+    const schoolId = userSchoolId || user.schoolId;
+
+    if (!user.id || (!schoolId && !isSuperAdmin)) {
       return NextResponse.json(
         { success: false, message: 'User not authenticated or not assigned to a school' },
         { status: 401 }
@@ -21,138 +22,116 @@ export const GET = withPermission({
     }
 
     // Check if session exists and belongs to user's school
+    const where: any = { id };
+    if (!isSuperAdmin) {
+      where.schoolId = schoolId;
+      if (!isAdmin) {
+        where.counselorId = user.id;
+      }
+    }
+
     const session = await prisma.counselingSession.findFirst({
-      where: {
-        id,
-        schoolId: user.schoolId,
-        counselorId: user.id,
-      },
+      where,
       include: {
         student: {
           select: {
             id: true,
             firstName: true,
             lastName: true,
-            studentId: true,
           },
         },
-        previousSession: {
-          select: {
-            id: true,
-            scheduledAt: true,
-            sessionType: true,
-          },
-        },
+        report: true,
       },
     });
 
     if (!session) {
       return NextResponse.json(
-        { success: false, message: 'Session not found' },
+        { success: false, message: 'Session not found or access denied' },
         { status: 404 }
       );
-    }
-
-    if (session.sessionType !== 'FOLLOW_UP') {
-      return NextResponse.json(
-        { success: false, message: 'This is not a follow-up session' },
-        { status: 400 }
-      );
-    }
-
-    // Get existing report or create draft
-    let report = await prisma.sessionReport.findUnique({
-      where: { sessionId: id },
-    });
-
-    if (!report) {
-      // Create draft report
-      report = await prisma.sessionReport.create({
-        data: {
-          sessionId: id,
-          behavioralTags: [],
-          summary: '',
-          recommendations: [],
-          notes: '',
-        },
-      });
     }
 
     return NextResponse.json({
       success: true,
-      data: {
-        ...report,
-        session,
-      },
+      data: session.report,
     });
   } catch (error: any) {
     console.error('Get report error:', error);
     return NextResponse.json(
-      { success: false, message: 'Failed to get report data' },
+      { success: false, message: 'Failed to fetch report data' },
       { status: 500 }
     );
   }
 });
-
-// Save Follow-up Report Draft
+// Update/Save Session Report
 export const PATCH = withPermission({
   module: 'COUNSELING_SESSIONS',
-  action: 'UPDATE',
-})(async (req: NextRequest, { params, user }: any) => {
+  action: 'EDIT',
+})(async (req: NextRequest, { params, user, userSchoolId }: any) => {
   try {
     const { id } = await params;
-    const reportData = await req.json();
+    const body = await req.json();
+    const { behavioralTags, summary, recommendations, notes } = body;
 
-    if (!user.id || !user.schoolId) {
+    const isSuperAdmin = user.role?.name === 'SUPERADMIN';
+    const isAdmin = user.role?.name === 'ADMIN' || user.role?.name === 'SCHOOL_SUPERADMIN';
+    const schoolId = userSchoolId || user.schoolId;
+
+    if (!user.id || (!schoolId && !isSuperAdmin)) {
       return NextResponse.json(
-        { success: false, message: 'User not authenticated or not assigned to a school' },
+        { success: false, message: 'User not authenticated' },
         { status: 401 }
       );
     }
 
-    // Check if session exists and belongs to user
+    // Check access
+    const where: any = { id };
+    if (!isSuperAdmin) {
+      where.schoolId = schoolId;
+      if (!isAdmin) {
+        where.counselorId = user.id;
+      }
+    }
+
     const session = await prisma.counselingSession.findFirst({
-      where: {
-        id,
-        schoolId: user.schoolId,
-        counselorId: user.id,
-      },
+      where,
+      include: { report: true }
     });
 
     if (!session) {
       return NextResponse.json(
-        { success: false, message: 'Session not found' },
+        { success: false, message: 'Session not found or access denied' },
         { status: 404 }
       );
     }
 
-    // Update or create report
+    // Upsert the report
     const report = await prisma.sessionReport.upsert({
       where: { sessionId: id },
       update: {
-        behavioralTags: reportData.behavioralTags || [],
-        summary: reportData.summary || '',
-        recommendations: reportData.recommendations || [],
-        notes: reportData.notes || '',
+        behavioralTags: behavioralTags || [],
+        summary: summary || '',
+        recommendations: recommendations || [],
+        notes: notes || '',
+        updatedAt: new Date(),
       },
       create: {
         sessionId: id,
-        behavioralTags: reportData.behavioralTags || [],
-        summary: reportData.summary || '',
-        recommendations: reportData.recommendations || [],
-        notes: reportData.notes || '',
+        behavioralTags: behavioralTags || [],
+        summary: summary || '',
+        recommendations: recommendations || [],
+        notes: notes || '',
       },
     });
 
     return NextResponse.json({
       success: true,
       data: report,
-      message: 'Report draft saved successfully',
     });
   } catch (error: any) {
-    console.error('Save report error:', error);
+    console.error('Update report error:', error);
     return NextResponse.json(
-      { success: false, message: 'Failed to save report draft' },
+      { success: false, message: 'Failed to update report data' },
       { status: 500 }
     );
   }

@@ -126,8 +126,9 @@ export const GET = withPermission({
     const timeFilter = searchParams.get('timeFilter');
     const startDate = searchParams.get('startDate');
     const endDate = searchParams.get('endDate');
+    const search = searchParams.get('search');
 
-    console.log('[EscalationAPI] Query params:', { status, limit, offset, schoolId, priority, timeFilter, startDate, endDate });
+    console.log('[EscalationAPI] Query params:', { status, limit, offset, schoolId, priority, timeFilter, startDate, endDate, search });
     console.log('[EscalationAPI] User role:', user.role.name, 'User school:', user.schoolId);
 
     // Build where clause
@@ -139,6 +140,23 @@ export const GET = withPermission({
 
     if (priority && priority !== 'all') {
       whereClause.priority = priority;
+    }
+
+    // Add search filter
+    if (search) {
+      whereClause.OR = [
+        { studentName: { contains: search, mode: 'insensitive' } },
+        { description: { contains: search, mode: 'insensitive' } },
+        {
+          user: {
+            OR: [
+              { firstName: { contains: search, mode: 'insensitive' } },
+              { lastName: { contains: search, mode: 'insensitive' } },
+              { email: { contains: search, mode: 'insensitive' } },
+            ]
+          }
+        }
+      ];
     }
 
     // Add school filtering based on user role
@@ -265,9 +283,21 @@ export const GET = withPermission({
     console.log('[EscalationAPI] Formatted alerts count:', formattedAlerts.length);
     console.log('[EscalationAPI] Sample alert:', formattedAlerts[0] || 'No alerts');
 
+    // Get stats for the current filters (without pagination)
+    const [openCount, highCount, resolvedCount] = await Promise.all([
+      prisma.escalationAlert.count({ where: { ...whereClause, status: 'open' } }),
+      prisma.escalationAlert.count({ where: { ...whereClause, priority: 'high', status: { not: 'resolved' } } }),
+      prisma.escalationAlert.count({ where: { ...whereClause, status: 'resolved' } }),
+    ]);
+
     return NextResponse.json({
       success: true,
       alerts: formattedAlerts,
+      stats: {
+        openCount,
+        highCount,
+        resolvedCount
+      },
       pagination: {
         total: totalCount,
         limit,

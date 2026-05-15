@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { MeetingAcceptModal } from "@/src/components/counselor/sections/ParentMeetings/MeetingAcceptModal";
+import { AdminHeader } from "@/src/components/admin/layout/AdminHeader";
 import {
   Select,
   SelectContent,
@@ -38,22 +39,22 @@ interface Meeting {
 const statusStyles: Record<Status, { label: string; className: string; dot: string }> = {
   completed: {
     label: "Completed",
-    className: "bg-[#10B981]/15 text-[#10B981] border-[#10B981]/20",
-    dot: "bg-[#10B981]",
+    className: "bg-[#EBFFF2] text-[#16A249] border-[#16A249]",
+    dot: "bg-[#16A249]",
   },
   decline: {
     label: "Decline",
-    className: "bg-[#EF4444]/15 text-[#EF4444] border-[#EF4444]/20",
+    className: "bg-[#FFF7F7] text-[#E53935] border-[#E53935]",
     dot: "bg-[#EF4444]",
   },
   requested: {
     label: "Requested",
-    className: "bg-[#F59E0B]/15 text-[#F59E0B] border-[#F59E0B]/20",
+    className: "bg-[#FFFAF3] text-[#F59E0B] border-[#F59E0B]",
     dot: "bg-[#F59E0B]",
   },
   schedule: {
     label: "Schedule",
-    className: "bg-[#3B82F6]/15 text-[#3B82F6] border-[#3B82F6]/20",
+    className: "bg-[#3B82F6]/5 text-[#3B82F6] border-[#3B82F6]",
     dot: "bg-[#3B82F6]",
   },
 };
@@ -63,7 +64,7 @@ function StatusBadge({ status }: { status: Status }) {
   return (
     <span
       className={cn(
-        "inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-medium",
+        "inline-flex items-center gap-1.5 rounded-[12px] border px-4 py-1 text-[14px] font-medium",
         s.className,
       )}
     >
@@ -73,7 +74,7 @@ function StatusBadge({ status }: { status: Status }) {
   );
 }
 
-function MeetingCard({ meeting, onViewDetails, onDeclineViewDetails }: { meeting: Meeting; onViewDetails: (meeting: Meeting) => void; onDeclineViewDetails: (meeting: Meeting) => void }) {
+function MeetingCard({ meeting }: { meeting: Meeting }) {
   const router = useRouter();
 
   const handleViewDetails = () => {
@@ -81,110 +82,87 @@ function MeetingCard({ meeting, onViewDetails, onDeclineViewDetails }: { meeting
   };
 
   return (
-    <Card className="p-5 shadow-sm border-[#E2E8F0] hover:shadow-md transition-shadow">
+    <Card className="p-8 shadow-none rounded-[20px] border-none hover:shadow-md transition-shadow">
       <div className="flex items-start justify-between gap-3">
         <div className="space-y-1">
-          <h3 className="font-semibold text-[#1E293B]">{meeting.title}</h3>
-          <p className="text-sm text-[#64748B]">
+          <h3 className="font-medium text-[20px] text-[#3A3A3A]">{meeting.parent}'s Session</h3>
+          <p className="text-[14px] text-[#767676]">
             {meeting.parent} <span className="mx-1">↔</span> {meeting.counselor}
           </p>
-          <p className="text-sm text-[#64748B]">
+          <p className="text-[14px] text-[#767676]">
             {meeting.date} - {meeting.time}
           </p>
         </div>
         <StatusBadge status={meeting.status} />
       </div>
-      <div className="my-4 h-px bg-[#E2E8F0]" />
+      <div className="my-4 h-px bg-[#D6D6D6]" />
       <div className="flex items-center justify-between">
-        <span className="text-sm text-[#64748B]">
+        <span className="text-[14px] text-[#767676]">
           Initiated by {meeting.initiatedBy}
         </span>
-        {meeting.status === 'completed' && (
-          <button
-            onClick={handleViewDetails}
-            className="text-sm font-medium text-[#3B82F6] hover:text-[#3B82F6]/80 hover:underline"
-          >
-            View Details
-          </button>
-        )}
-        {meeting.status === 'requested' && (
-          <button
-            onClick={() => onViewDetails(meeting)}
-            className="text-sm font-medium text-[#3B82F6] hover:text-[#3B82F6]/80 hover:underline"
-          >
-            View Details
-          </button>
-        )}
-        {meeting.status === 'decline' && (
-          <button
-            onClick={() => onDeclineViewDetails(meeting)}
-            className="text-sm font-medium text-[#3B82F6] hover:text-[#3B82F6]/80 hover:underline"
-          >
-            View Details
-          </button>
-        )}
+        <button
+          onClick={handleViewDetails}
+          className="text-[14px] font-medium text-[#2D85F2] hover:text-[#3B82F6]/80 cursor-pointer"
+        >
+          View Details
+        </button>
       </div>
     </Card>
   );
 }
 
-async function fetchMeetings(): Promise<Meeting[]> {
+async function fetchMeetings({ page = 1, limit = 9 }): Promise<any> {
   try {
-    const response = await fetch("/api/parent-meetings/all");
+    const response = await fetch(`/api/parent-meetings/all?page=${page}&limit=${limit}`);
     if (!response.ok) throw new Error("Failed to fetch meetings");
     const data = await response.json();
     if (!data.success) throw new Error(data.message || "Failed to fetch meetings");
     
-    return data.data.map((meeting: any) => ({
-      id: meeting.id,
-      title: meeting.purpose || "Meeting",
-      parent: meeting.parentName,
-      counselor: meeting.counselorName,
-      date: new Date(meeting.date).toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'short',
-        day: 'numeric'
-      }),
-      time: meeting.time,
-      status: meeting.status === 'COMPLETED' ? 'completed' :
-              meeting.status === 'CANCELLED' ? 'decline' :
-              meeting.status === 'PENDING' ? 'requested' : 'schedule',
-      initiatedBy: meeting.requestedBy === 'PARENT' ? 'parent' : 'counselor',
-      studentName: meeting.studentName,
-      studentClass: meeting.studentClass,
-      parentEmail: meeting.parentEmail,
-      parentPhone: meeting.parentPhone,
-    }));
+    return {
+      data: data.data.map((meeting: any) => ({
+        id: meeting.id,
+        title: meeting.purpose || "Meeting",
+        parent: meeting.parentName,
+        counselor: meeting.counselorName,
+        date: new Date(meeting.date).toLocaleDateString('en-US', {
+          year: 'numeric',
+          month: 'short',
+          day: 'numeric'
+        }),
+        time: meeting.time,
+        status: meeting.status === 'COMPLETED' ? 'completed' :
+                meeting.status === 'CANCELLED' ? 'decline' :
+                meeting.status === 'PENDING' ? 'requested' : 'schedule',
+        initiatedBy: meeting.requestedBy === 'PARENT' ? 'parent' : 'counselor',
+        studentName: meeting.studentName,
+        studentClass: meeting.studentClass,
+        parentEmail: meeting.parentEmail,
+        parentPhone: meeting.parentPhone,
+      })),
+      pagination: data.pagination
+    };
   } catch (error) {
     console.error("Error fetching meetings:", error);
-    return [];
+    return { data: [], pagination: { totalPages: 0, page: 1 } };
   }
 }
 
 export default function ParentMeetingsPage() {
   const [query, setQuery] = useState("");
   const [status, setStatus] = useState<string>("all");
-  const [modalOpen, setModalOpen] = useState(false);
-  const [selectedMeeting, setSelectedMeeting] = useState<Meeting | null>(null);
-  const [declineModalOpen, setDeclineModalOpen] = useState(false);
-  const [selectedDeclineMeeting, setSelectedDeclineMeeting] = useState<Meeting | null>(null);
-  const { data: meetings = [], isLoading } = useQuery({
-    queryKey: ["admin-parent-meetings"],
-    queryFn: fetchMeetings,
+  const [page, setPage] = useState(1);
+  const limit = 10;
+
+  const { data, isLoading } = useQuery({
+    queryKey: ["admin-parent-meetings", page],
+    queryFn: () => fetchMeetings({ page, limit }),
   });
 
-  const handleViewDetails = (meeting: Meeting) => {
-    setSelectedMeeting(meeting);
-    setModalOpen(true);
-  };
-
-  const handleDeclineViewDetails = (meeting: Meeting) => {
-    setSelectedDeclineMeeting(meeting);
-    setDeclineModalOpen(true);
-  };
+  const meetings = data?.data || [];
+  const pagination = data?.pagination;
 
   const filtered = useMemo(() => {
-    return meetings.filter((m) => {
+    return meetings.filter((m: any) => {
       const matchesQuery =
         !query ||
         m.title.toLowerCase().includes(query.toLowerCase()) ||
@@ -195,27 +173,28 @@ export default function ParentMeetingsPage() {
   }, [meetings, query, status]);
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC]">
-      <div className="mx-auto max-w-6xl px-6 py-10">
-        <header className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
-          <div>
-            <h1 className="text-2xl font-bold text-[#1E293B]">Parent Meetings</h1>
-            <p className="text-sm text-[#64748B]">
-              All parent-counselor meetings and requests.
-            </p>
-          </div>
-          <div className="flex flex-wrap items-center gap-3">
+    <div className="flex flex-col min-h-screen bg-[#f2f3f4]">
+      <AdminHeader
+        title="Parent Meetings"
+        subtitle="All parent-counselor meetings and requests."
+        showSchoolFilter={true}
+        showTimeFilter={true}
+        
+      />
+
+      <div className="mx-auto w-full max-w-8xl px-6 py-8">
+        <div className="flex items-center gap-3">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#64748B]" />
               <Input
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder="Search Parent and student"
-                className="w-72 pl-9 bg-[#FFFFFF]"
+                className="w-72 pl-9 bg-[#FFFFFF] border-none shadow-sm h-9"
               />
             </div>
             <Select value={status} onValueChange={setStatus}>
-              <SelectTrigger className="w-36 bg-[#FFFFFF]">
+              <SelectTrigger className="w-36 bg-[#FFFFFF] border-none shadow-sm h-9">
                 <SelectValue placeholder="All Status" />
               </SelectTrigger>
               <SelectContent>
@@ -227,113 +206,45 @@ export default function ParentMeetingsPage() {
               </SelectContent>
             </Select>
           </div>
-        </header>
 
         {isLoading ? (
           <div className="mt-8 flex items-center justify-center">
             <div className="text-sm text-[#64748B]">Loading meetings...</div>
           </div>
         ) : (
-          <div className="mt-8 grid gap-4 md:grid-cols-2">
-            {filtered.map((m) => (
-              <MeetingCard key={m.id} meeting={m} onViewDetails={handleViewDetails} onDeclineViewDetails={handleDeclineViewDetails} />
+          <div className="mt-8 grid gap-4 md:grid-cols-3">
+            {filtered.map((m: any) => (
+              <MeetingCard key={m.id} meeting={m} />
             ))}
           </div>
         )}
 
-        <MeetingAcceptModal
-          open={modalOpen}
-          onOpenChange={setModalOpen}
-          meeting={selectedMeeting ? {
-            id: selectedMeeting.id,
-            studentName: selectedMeeting.studentName || 'Student',
-            studentClass: selectedMeeting.studentClass,
-            parentName: selectedMeeting.parent,
-            parentEmail: selectedMeeting.parentEmail,
-            parentPhone: selectedMeeting.parentPhone,
-            date: selectedMeeting.date,
-            time: selectedMeeting.time,
-            purpose: selectedMeeting.title,
-            requestedBy: selectedMeeting.initiatedBy === 'parent' ? 'PARENT' : 'COUNSELOR',
-          } : null}
-          readOnly
-        />
+        {/* Pagination UI */}
+        {pagination && pagination.totalPages > 1 && (
+          <div className="flex items-center justify-between mt-8">
+            <Button
+              variant="outline"
+              disabled={page === 1}
+              onClick={() => setPage((p) => p - 1)}
+              className="px-4 py-2 border-none shadow-sm rounded-[12px] bg-white text-[#767676] disabled:opacity-40"
+            >
+              Previous
+            </Button>
 
-        <Dialog open={declineModalOpen} onOpenChange={setDeclineModalOpen}>
-          <DialogContent className="w-full max-w-[520px] gap-0 rounded-2xl p-6">
-            <DialogHeader>
-              <DialogTitle className="flex items-center gap-2 text-[17px] font-semibold text-[#1E293B]">
-                <User className="h-4 w-4" />
-                Parent Meeting Details
-              </DialogTitle>
-              <p className="mt-1 text-[12px] text-[#64748B]">
-                Review the meeting information and parent details.
-              </p>
-            </DialogHeader>
+            <p className="text-sm text-[#767676]">
+              Page <span className="font-medium text-[#3A3A3A]">{pagination.page}</span> of <span className="font-medium text-[#3A3A3A]">{pagination.totalPages}</span>
+            </p>
 
-            {selectedDeclineMeeting && (
-              <div className="mt-4 space-y-4">
-                <div className="rounded-lg border border-[#E2E8F0] bg-[#E2E8F0]/30 px-4 py-3">
-                  <div className="flex items-center justify-between">
-                    <span className="text-[12px] text-[#64748B]">Student Name</span>
-                    <span className="text-[13px] font-medium text-[#1E293B]">{selectedDeclineMeeting.studentName || 'N/A'}</span>
-                  </div>
-                  <div className="mt-2 flex items-center justify-between">
-                    <span className="text-[12px] text-[#64748B]">Class</span>
-                    <span className="text-[13px] font-medium text-[#1E293B]">{selectedDeclineMeeting.studentClass || 'N/A'}</span>
-                  </div>
-                </div>
-
-                <div>
-                  <h3 className="mb-2 text-[13px] font-semibold text-[#1E293B]">Parent Information</h3>
-                  <div className="grid grid-cols-2 gap-3">
-                    <div className="rounded-lg border border-[#E2E8F0] px-3 py-2">
-                      <div className="flex items-center gap-1.5 text-[11px] text-[#64748B]">
-                        <User className="h-3 w-3" /> Parent name
-                      </div>
-                      <div className="mt-1 text-[13px] text-[#1E293B]">{selectedDeclineMeeting.parent}</div>
-                    </div>
-                    <div className="rounded-lg border border-[#E2E8F0] px-3 py-2">
-                      <div className="flex items-center gap-1.5 text-[11px] text-[#64748B]">
-                        <Mail className="h-3 w-3" /> Email
-                      </div>
-                      <div className="mt-1 truncate text-[13px] text-[#1E293B]">{selectedDeclineMeeting.parentEmail || 'Not available'}</div>
-                    </div>
-                  </div>
-                </div>
-
-                <div>
-                  <h3 className="mb-2 text-[13px] font-semibold text-[#1E293B]">Meeting Information</h3>
-                  <div className="grid grid-cols-2 gap-3">
-                    <div className="rounded-lg border border-[#E2E8F0] px-3 py-2">
-                      <div className="flex items-center gap-1.5 text-[11px] text-[#64748B]">
-                        <CalendarDays className="h-3 w-3" /> Scheduled Date
-                      </div>
-                      <div className="mt-1 text-[13px] text-[#1E293B]">{selectedDeclineMeeting.date} at {selectedDeclineMeeting.time}</div>
-                    </div>
-                    <div className="rounded-lg border border-[#E2E8F0] px-3 py-2">
-                      <div className="flex items-center gap-1.5 text-[11px] text-[#64748B]">
-                        <Clock className="h-3 w-3" /> Status
-                      </div>
-                      <div className="mt-1">
-                        <span className="rounded-full bg-[#EF4444]/10 px-2.5 py-0.5 text-[11px] font-medium text-[#EF4444]">
-                          Declined
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <div>
-                  <h3 className="mb-2 text-[13px] font-semibold text-[#1E293B]">Purpose</h3>
-                  <div className="rounded-lg border border-[#E2E8F0] bg-[#E2E8F0]/30 px-4 py-3 text-[13px] text-[#1E293B]/80">
-                    {selectedDeclineMeeting.title || "No purpose provided"}
-                  </div>
-                </div>
-              </div>
-            )}
-          </DialogContent>
-        </Dialog>
+            <Button
+              variant="outline"
+              disabled={page === pagination.totalPages}
+              onClick={() => setPage((p) => p + 1)}
+              className="px-4 py-2 border-none shadow-sm rounded-[12px] bg-white text-[#767676] disabled:opacity-40"
+            >
+              Next
+            </Button>
+          </div>
+        )}
       </div>
     </div>
   );

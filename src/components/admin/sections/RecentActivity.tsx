@@ -22,7 +22,7 @@ import { useAuth } from "@/src/contexts/AuthContext";
 // ------------------------------
 interface Activity {
   id: string;
-  type: "alert" | "session" | "badge" | "checkin" | "content";
+  type: "alert" | "session" | "badge" | "checkin" | "content" | "meeting" | "assignment";
   message: string;
   time: string;
   isImportant?: boolean;
@@ -104,6 +104,8 @@ const mapActivityType = (type: string): Activity["type"] => {
     case "streak": return "badge";
     case "session": return "session";
     case "alert": return "alert";
+    case "meeting": return "meeting";
+    case "assignment": return "assignment";
     default: return "content";
   }
 };
@@ -134,6 +136,8 @@ const iconMap = {
   badge: Award,
   checkin: UserCheck,
   content: BookOpen,
+  meeting: Clock,
+  assignment: UserCheck,
 };
 
 const styleMap = {
@@ -142,6 +146,8 @@ const styleMap = {
   badge: "bg-[#F59E0B]/10 text-[#F59E0B]",
   checkin: "bg-[#10B981]/10 text-[#10B981]",
   content: "bg-[#3B82F6]/10 text-[#3B82F6]",
+  meeting: "bg-[#8B5CF6]/10 text-[#8B5CF6]",
+  assignment: "bg-[#06B6D4]/10 text-[#06B6D4]",
 };
 
 // ------------------------------

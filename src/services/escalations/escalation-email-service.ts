@@ -262,7 +262,7 @@ export class EscalationEmailService {
 
     const urgencyBadge = data.requiresImmediateAction 
       ? `<div style="display: inline-block; background: linear-gradient(135deg, #dc2626, #ef4444); color: white; padding: 8px 16px; border-radius: 20px; font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 16px;">
-          🚨 Immediate Action Required
+           Immediate Action Required
         </div>`
       : `<div style="display: inline-block; background: linear-gradient(135deg, #3b82f6, #1d4ed8); color: white; padding: 8px 16px; border-radius: 20px; font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 16px;">
           📋 Attention Required
@@ -355,7 +355,7 @@ export class EscalationEmailService {
           <div style="padding: 0 24px 24px 24px;">
             <div style="background: linear-gradient(135deg, #fee2e2, #fecaca); border-radius: 12px; padding: 20px; border-left: 4px solid #ef4444;">
               <h2 style="margin: 0 0 16px 0; color: #991b1b; font-size: 14px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">
-                🚨 Action Required
+                Action Required
               </h2>
               <p style="margin: 0; color: #7f1d1d; line-height: 1.6; font-weight: 500;">
                 This escalation requires immediate attention. Please check your admin dashboard for full details and take appropriate action to ensure student safety.

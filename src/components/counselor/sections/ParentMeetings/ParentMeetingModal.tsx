@@ -31,6 +31,7 @@ interface Student {
 }
 
 export function ParentMeetingModal({ open, onOpenChange, onMeetingCreated }: ParentMeetingModalProps) {
+  const [timeOpen, setTimeOpen] = useState(false);
   const [formData, setFormData] = useState({
     studentId: '',
     studentName: '',
@@ -45,7 +46,6 @@ export function ParentMeetingModal({ open, onOpenChange, onMeetingCreated }: Par
   const [error, setError] = useState<string | null>(null);
   const [dropdowns, setDropdowns] = useState({
     student: false,
-    time: false,
   });
   const [students, setStudents] = useState<Student[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
@@ -165,7 +165,10 @@ export function ParentMeetingModal({ open, onOpenChange, onMeetingCreated }: Par
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="w-full max-w-md gap-0 rounded-2xl p-6">
+      <DialogContent 
+        className="w-full max-w-md gap-0 rounded-2xl p-6"
+        onPointerDownOutside={(e) => e.preventDefault()}
+      >
         <DialogHeader className="flex items-left justify-left">
           <DialogTitle className="text-[17px] font-medium text-[#3A3A3A] mb-6">Schedule a parent meeting</DialogTitle>
         </DialogHeader>
@@ -279,38 +282,120 @@ export function ParentMeetingModal({ open, onOpenChange, onMeetingCreated }: Par
             </div>
             <div>
               <label className="block text-[14px] font-medium text-[#767676] mb-1">Time</label>
-              <div className="relative">
-                <Button
-                  variant="outline"
-                  onClick={() => setDropdowns({ ...dropdowns, time: !dropdowns.time })}
-                  className="w-full h-10 justify-start text-left font-normal border-[#E6E6E6] bg-white rounded-lg"
-                >
-                  <Clock className="mr-2 h-4 w-4 text-[#4293FE]" />
-                  {formData.time || "Select time"}
-                </Button>
-                {dropdowns.time && (
-                  <div className="absolute z-20 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-48 overflow-y-auto no-scrollbar">
-                    {Array.from({ length: 24 }).map((_, hour) => (
-                      [0, 30].map(minute => {
-                        const timeString = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
+              <Popover open={timeOpen} onOpenChange={setTimeOpen}>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className={cn(
+                      "w-full h-10 justify-start text-left font-normal border-[#E6E6E6] bg-white rounded-lg",
+                      !formData.time && "text-muted-foreground"
+                    )}
+                  >
+                    <Clock className="mr-2 h-4 w-4 text-[#4293FE]" />
+                    {formData.time ? (
+                      (() => {
+                        const [h, m] = formData.time.split(':');
+                        const hour = parseInt(h);
+                        const displayHour = hour === 0 ? 12 : hour > 12 ? hour - 12 : hour;
+                        const ampm = hour >= 12 ? 'PM' : 'AM';
+                        return `${displayHour}:${m} ${ampm}`;
+                      })()
+                    ) : (
+                      <span>Select time</span>
+                    )}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-[280px] p-0 z-[100] bg-white border rounded-xl shadow-lg" align="start">
+                  <div className="flex h-64">
+                    {/* Hours */}
+                    <div className="flex-1 overflow-y-auto py-2 border-r border-gray-100 no-scrollbar">
+                      <div className="px-2 mb-1 text-[10px] font-bold text-gray-400 uppercase tracking-wider">Hour</div>
+                      {Array.from({ length: 12 }, (_, i) => i + 1).map((h) => {
+                        const currentHour24 = parseInt((formData.time || "09:00").split(':')[0]);
+                        const currentHour12 = currentHour24 === 0 ? 12 : currentHour24 > 12 ? currentHour24 - 12 : currentHour24;
                         return (
                           <button
-                            key={timeString}
+                            key={h}
                             type="button"
                             onClick={() => {
-                              setFormData({ ...formData, time: timeString });
-                              setDropdowns({ ...dropdowns, time: false });
+                              const [_, m] = (formData.time || "09:00").split(':');
+                              const ampm = currentHour24 >= 12 ? 'PM' : 'AM';
+                              let newHour24 = h;
+                              if (ampm === 'PM' && h < 12) newHour24 += 12;
+                              if (ampm === 'AM' && h === 12) newHour24 = 0;
+                              setFormData({ ...formData, time: `${newHour24.toString().padStart(2, '0')}:${m}` });
                             }}
-                            className="w-full px-3 py-2 text-left text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-600 transition-colors"
+                            className={cn(
+                              "w-full px-3 py-2 text-sm text-center transition-colors hover:bg-gray-50",
+                              currentHour12 === h ? "bg-blue-50 text-blue-600 font-semibold" : "text-gray-700"
+                            )}
                           >
-                            {timeString}
+                            {h}
                           </button>
                         );
-                      })
-                    ))}
+                      })}
+                    </div>
+                    {/* Minutes */}
+                    <div className="flex-1 overflow-y-auto py-2 border-r border-gray-100 no-scrollbar">
+                      <div className="px-2 mb-1 text-[10px] font-bold text-gray-400 uppercase tracking-wider">Min</div>
+                      {["00", "05", "10", "15", "20", "25", "30", "35", "40", "45", "50", "55"].map((m) => (
+                        <button
+                          key={m}
+                          type="button"
+                          onClick={() => {
+                            const [h, _] = (formData.time || "09:00").split(':');
+                            setFormData({ ...formData, time: `${h}:${m}` });
+                          }}
+                          className={cn(
+                            "w-full px-3 py-2 text-sm text-center transition-colors hover:bg-gray-50",
+                            (formData.time || "09:00").split(':')[1] === m ? "bg-blue-50 text-blue-600 font-semibold" : "text-gray-700"
+                          )}
+                        >
+                          {m}
+                        </button>
+                      ))}
+                    </div>
+                    {/* AM/PM */}
+                    <div className="flex-1 py-2">
+                      <div className="px-2 mb-1 text-[10px] font-bold text-gray-400 uppercase tracking-wider text-center">Period</div>
+                      {['AM', 'PM'].map((p) => {
+                        const currentHour24 = parseInt((formData.time || "09:00").split(':')[0]);
+                        const ampm = currentHour24 >= 12 ? 'PM' : 'AM';
+                        return (
+                          <button
+                            key={p}
+                            type="button"
+                            onClick={() => {
+                              const [h24, m] = (formData.time || "09:00").split(':');
+                              let hour12 = parseInt(h24) % 12;
+                              if (hour12 === 0) hour12 = 12;
+                              let newHour24 = hour12;
+                              if (p === 'PM' && hour12 < 12) newHour24 += 12;
+                              if (p === 'AM' && hour12 === 12) newHour24 = 0;
+                              setFormData({ ...formData, time: `${newHour24.toString().padStart(2, '0')}:${m}` });
+                            }}
+                            className={cn(
+                              "w-full px-3 py-2 text-sm text-center transition-colors hover:bg-gray-50",
+                              ampm === p ? "bg-blue-50 text-blue-600 font-semibold" : "text-gray-700"
+                            )}
+                          >
+                            {p}
+                          </button>
+                        );
+                      })}
+                    </div>
                   </div>
-                )}
-              </div>
+                  <div className="p-2 border-t border-gray-100 bg-gray-50 flex justify-end">
+                    <button 
+                      type="button"
+                      onClick={() => setTimeOpen(false)}
+                      className="text-xs font-medium text-blue-600 hover:text-blue-700 px-2 py-1 rounded"
+                    >
+                      Done
+                    </button>
+                  </div>
+                </PopoverContent>
+              </Popover>
             </div>
           </div>
 

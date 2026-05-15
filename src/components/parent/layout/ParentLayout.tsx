@@ -11,7 +11,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
   return (
     <Protected role={['PARENT']}>
-      <div className="flex h-screen bg-background overflow-hidden">
+      <div className="flex h-screen bg-[#f2f3f4] overflow-hidden">
         {/* Mobile Sidebar Overlay */}
         {sidebarOpen && (
           <div 
@@ -30,7 +30,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
         {/* Main Content */}
         <main className="flex-1 flex flex-col overflow-hidden lg:ml-0">
-          <header className="flex h-[72px] shrink-0 items-center justify-between border-b border-border bg-card px-4 sm:px-6 lg:px-8">
+          <header className="flex h-[72px] shrink-0 items-center justify-between border-b border-border bg-white px-4 sm:px-6 lg:px-8">
             {/* Mobile Menu Toggle */}
             <button
               onClick={() => setSidebarOpen(!sidebarOpen)}

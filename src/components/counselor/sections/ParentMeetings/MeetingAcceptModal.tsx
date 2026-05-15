@@ -2,6 +2,7 @@ import { X, User, GraduationCap, Mail, Phone, Calendar, Clock, MessageSquare, Us
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
+import { RingSpinner } from "@/src/components/ui/Spinners";
 
 interface MeetingAcceptModalProps {
   open: boolean;
@@ -21,9 +22,10 @@ interface MeetingAcceptModalProps {
   onConfirm?: () => void;
   onDecline?: () => void;
   readOnly?: boolean;
+  isLoading?: boolean;
 }
 
-export function MeetingAcceptModal({ open, onOpenChange, meeting, onConfirm, onDecline, readOnly = false }: MeetingAcceptModalProps) {
+export function MeetingAcceptModal({ open, onOpenChange, meeting, onConfirm, onDecline, readOnly = false, isLoading = false }: MeetingAcceptModalProps) {
   if (!meeting) return null;
 
   const formatDate = (dateString: string) => {
@@ -104,14 +106,16 @@ export function MeetingAcceptModal({ open, onOpenChange, meeting, onConfirm, onD
                 variant="ghost"
                 className="text-[#EF4444] hover:bg-[#EF4444]/10 hover:text-[#EF4444]"
                 onClick={onDecline}
+                disabled={isLoading}
               >
-                Decline
+                {isLoading ? <RingSpinner size="sm" color="blue" /> : "Decline"}
               </Button>
               <Button
                 className="bg-[#10B981] text-white hover:bg-[#059669]"
                 onClick={onConfirm}
+                disabled={isLoading}
               >
-                Confirm meeting
+                {isLoading ? <RingSpinner size="sm" color="white" /> : "Confirm meeting"}
               </Button>
             </div>
           )}

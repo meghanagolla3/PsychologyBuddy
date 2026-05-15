@@ -21,6 +21,15 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
+import { format } from "date-fns";
+import { Calendar as CalendarIcon } from "lucide-react";
+import { Calendar } from "@/components/ui/calendar";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { cn } from "@/lib/utils";
 
 function CreateChallengeDialog({
   open,
@@ -33,6 +42,8 @@ function CreateChallengeDialog({
   const [journalType, setJournalType] = useState<"write" | "audio" | "art">("audio");
   const [selectedCategory, setSelectedCategory] = useState<string>("");
   const [assignmentType, setAssignmentType] = useState<"INDIVIDUAL" | "CLASS" | "SCHOOL">("INDIVIDUAL");
+  const [startDate, setStartDate] = useState<Date>();
+  const [endDate, setEndDate] = useState<Date>();
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -79,8 +90,8 @@ function CreateChallengeDialog({
     const challengeData = {
       name: formData.get("ch-name") as string,
       description: formData.get("ch-desc") as string,
-      startsAt: formData.get("ch-start-date") as string,
-      endsAt: formData.get("ch-end-date") as string,
+      startsAt: startDate?.toISOString(),
+      endsAt: endDate?.toISOString(),
       instructions: formData.get("ch-instructions") as string,
       requiresJournaling: tool === "journaling",
       requiresMeditation: tool === "meditation",
@@ -146,15 +157,57 @@ function CreateChallengeDialog({
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-1.5">
               <Label htmlFor="ch-start-date">
-                Start Date & Time <Req />
+                Start Date <Req />
               </Label>
-              <Input id="ch-start-date" name="ch-start-date" type="datetime-local" className="bg-[#F1F5F9]/40" required />
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant={"outline"}
+                    className={cn(
+                      "w-full justify-start text-left font-normal bg-[#F1F5F9]/40 rounded-[16px] border-[#E2E8F0] h-10",
+                      !startDate && "text-muted-foreground"
+                    )}
+                  >
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {startDate ? format(startDate, "PPP") : <span>Pick a date</span>}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0">
+                  <Calendar
+                    mode="single"
+                    selected={startDate}
+                    onSelect={setStartDate}
+                    // initialFocus
+                  />
+                </PopoverContent>
+              </Popover>
             </div>
             <div className="space-y-1.5">
               <Label htmlFor="ch-end-date">
-                End Date & Time <Req />
+                End Date <Req />
               </Label>
-              <Input id="ch-end-date" name="ch-end-date" type="datetime-local" className="bg-[#F1F5F9]/40" required />
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant={"outline"}
+                    className={cn(
+                      "w-full justify-start text-left font-normal bg-[#F1F5F9]/40 rounded-[16px] border-[#E2E8F0] h-10",
+                      !endDate && "text-muted-foreground"
+                    )}
+                  >
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {endDate ? format(endDate, "PPP") : <span>Pick a date</span>}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0">
+                  <Calendar
+                    mode="single"
+                    selected={endDate}
+                    onSelect={setEndDate}
+                    // initialFocus
+                  />
+                </PopoverContent>
+              </Popover>
             </div>
           </div>
 
@@ -255,21 +308,7 @@ function CreateChallengeDialog({
             </div>
           )}
 
-          <div className="space-y-1.5">
-            <Label className="text-sm font-normal">
-              Assignment Type <Req />
-            </Label>
-            <Select value={assignmentType} onValueChange={(value: "INDIVIDUAL" | "CLASS" | "SCHOOL") => setAssignmentType(value)}>
-              <SelectTrigger className="w-[200px]">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="INDIVIDUAL">Individual Student</SelectItem>
-                <SelectItem value="CLASS">Entire Class</SelectItem>
-                <SelectItem value="SCHOOL">Entire School</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+          
 
           <div className="flex justify-end gap-3 pt-2">
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>

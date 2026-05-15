@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Search, Calendar, ChevronDown, CalendarDays, X } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { AdminHeader } from "../../layout/AdminHeader";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
@@ -12,7 +13,6 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { CalendarDay } from "react-day-picker";
 
@@ -74,10 +74,18 @@ export default function Sessions() {
   const [sessions, setSessions] = useState<Session[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [page, setPage] = useState(1);
+  const [limit] = useState(10);
+  const [pagination, setPagination] = useState({
+    total: 0,
+    totalPages: 0,
+    page: 1,
+    limit: 10
+  });
 
   useEffect(() => {
     fetchSessions();
-  }, []);
+  }, [page]);
 
   const fetchSessions = async () => {
     try {
@@ -88,7 +96,8 @@ export default function Sessions() {
       if (sessionType !== "All Types") params.append('sessionType', sessionType);
       if (status !== "All Status") params.append('status', status);
       if (search) params.append('search', search);
-      params.append('limit', '100');
+      params.append('page', page.toString());
+      params.append('limit', limit.toString());
 
       const response = await fetch(`/api/admin/sessions?${params.toString()}`);
       const result = await response.json();
@@ -121,6 +130,9 @@ export default function Sessions() {
           section: session.section,
         }));
         setSessions(transformedSessions);
+        if (result.pagination) {
+          setPagination(result.pagination);
+        }
       } else {
         setError(result.message || 'Failed to fetch sessions');
       }
@@ -132,22 +144,20 @@ export default function Sessions() {
     }
   };
 
-  // Refetch when filters change
+  // Refetch when filters change and reset to page 1
   useEffect(() => {
+    setPage(1);
     fetchSessions();
   }, [sessionType, status]);
 
-  // Debounced search
+  // Debounced search and reset to page 1
   useEffect(() => {
     const timer = setTimeout(() => {
+      setPage(1);
       fetchSessions();
     }, 500);
     return () => clearTimeout(timer);
   }, [search]);
-
-  const handleViewDetails = (sessionId: string) => {
-    router.push(`/counselor/sessions/${sessionId}/completed`);
-  };
 
   const formatDateTime = (dateString: string) => {
     const date = new Date(dateString);
@@ -320,7 +330,7 @@ export default function Sessions() {
                         </td>
                         <td className="px-6 py-4">
                           <button 
-                            onClick={() => handleViewDetails(s.id)}
+                            onClick={() => router.push(`/admin/sessions/${s.id}/completed`)}
                             className="text-[14px] font-medium bg-[#F0F7FF] px-4 py-2 rounded-[12px] text-[#2D85F2] hover:cursor-pointer hover:bg-[#e5f1ff]"
                           >
                             View Details
@@ -334,6 +344,33 @@ export default function Sessions() {
             </table>
           </div>
         </Card>
+
+        {/* Pagination UI */}
+        {pagination && pagination.totalPages > 1 && (
+          <div className="flex items-center justify-between mt-4">
+            <Button
+              variant="outline"
+              disabled={page === 1}
+              onClick={() => setPage((p) => p - 1)}
+              className="px-4 py-2 border-[#000000]/8 rounded-[12px] text-[#767676] disabled:opacity-40"
+            >
+              Previous
+            </Button>
+
+            <p className="text-sm text-[#767676]">
+              Page <span className="font-medium text-[#3A3A3A]">{pagination.page}</span> of <span className="font-medium text-[#3A3A3A]">{pagination.totalPages}</span>
+            </p>
+
+            <Button
+              variant="outline"
+              disabled={page === pagination.totalPages}
+              onClick={() => setPage((p) => p + 1)}
+              className="px-4 py-2 border-[#000000]/8 rounded-[12px] text-[#767676] disabled:opacity-40"
+            >
+              Next
+            </Button>
+          </div>
+        )}
       </div>
     </div>
   );

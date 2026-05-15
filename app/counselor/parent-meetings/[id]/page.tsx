@@ -9,6 +9,9 @@ import React, {
 } from 'react';
 
 import { useRouter, useSearchParams } from 'next/navigation';
+import { cn } from '@/lib/utils';
+import html2canvas from 'html2canvas';
+import jsPDF from 'jspdf';
 
 import {
   Mail,
@@ -29,6 +32,7 @@ import {
   Save,
   Download,
 } from 'lucide-react';
+import { AdminLoader } from '@/src/components/admin/ui/AdminLoader';
 
 type SectionKey =
   | 'consent'
@@ -49,6 +53,7 @@ interface Meeting {
   time: string;
   purpose: string;
   level: string;
+  studentClass?: string;
   status:
     | 'SCHEDULED'
     | 'COMPLETED'
@@ -95,8 +100,8 @@ const SectionShell = memo(
     children,
   }: SectionShellProps) => {
     return (
-      <section className="bg-white rounded-xl border border-slate-200 shadow-sm">
-        <header className="flex items-center justify-between px-4 py-3">
+      <section className="bg-white rounded-[22px] border border-slate-200">
+        <header className="flex items-center justify-between px-8 py-6">
           <div className="flex items-center gap-2.5">
             {number !== undefined ? (
               <span
@@ -108,7 +113,7 @@ const SectionShell = memo(
               icon
             )}
 
-            <h2 className="text-sm font-semibold text-slate-800">
+            <h2 className="text-[16px] font-medium text-[#3A3A3A]">
               {title}
             </h2>
           </div>
@@ -131,7 +136,7 @@ const SectionShell = memo(
         </header>
 
         {isOpen && (
-          <div className="px-4 pb-4">
+          <div className="px-7 pb-4">
             {children}
           </div>
         )}
@@ -150,11 +155,11 @@ interface BulletListProps {
 const BulletList = memo(
   ({ items, color }: BulletListProps) => {
     return (
-      <ul className="space-y-2">
+      <ul className="space-y-2 px-4">
         {items.map((item, index) => (
           <li
             key={`${item}-${index}`}
-            className="flex gap-2 text-sm text-slate-700"
+            className="flex gap-2 p-1 text-sm text-slate-700"
           >
             <span
               className={`mt-1.5 w-1.5 h-1.5 rounded-full ${color} shrink-0`}
@@ -261,7 +266,7 @@ const EditableList = memo(
             onChange={handleChange}
             onKeyDown={handleKeyDown}
             placeholder="Add a point..."
-            className={`flex-1 px-3 py-2 text-sm rounded-lg border ${inputBorder} ${inputBg} focus:outline-none focus:ring-2 ${ringColor}`}
+            className={`flex-1 px-3 py-3 text-sm rounded-[15px] border ${inputBorder} ${inputBg} focus:outline-none focus:ring-2 ${ringColor}`}
           />
 
           <button
@@ -337,6 +342,10 @@ export default function ParentMeetingDetailsPage({
 
   const [notes, setNotes] =
     useState<string[]>([]);
+
+  const [isCompleting, setIsCompleting] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [downloading, setDownloading] = useState(false);
 
   const [
     draftDiscussion,
@@ -482,7 +491,7 @@ export default function ParentMeetingDetailsPage({
       {
         icon: <User className="w-4 h-4" />,
         label: 'Class/Batch',
-        value: meeting.level || 'N/A',
+        value: meeting.studentClass || meeting.level || 'N/A',
       },
       {
         icon: <Clock className="w-4 h-4" />,
@@ -498,6 +507,8 @@ export default function ParentMeetingDetailsPage({
         if (!meeting?.id) {
           return;
         }
+
+        setIsSaving(true);
 
         const response = await fetch(
           `/api/counselor/parent-meetings/${meeting.id}`,
@@ -529,6 +540,8 @@ export default function ParentMeetingDetailsPage({
       } catch (error) {
         console.error('Save error:', error);
         alert('Could not save meeting details');
+      } finally {
+        setIsSaving(false);
       }
     }, [
       meeting,
@@ -538,71 +551,104 @@ export default function ParentMeetingDetailsPage({
       notes,
     ]);
 
-  const handleDownload = useCallback(() => {
-    const lines: string[] = [];
+  const handleDownload = async () => {
+    const originalMode = mode;
 
-    lines.push(
-      'Parent - Meeting Details',
-      ''
-    );
+    try {
+      setDownloading(true);
 
-    info.forEach((item) => {
-      lines.push(
-        `${item.label}: ${item.value}`
-      );
-    });
-
-    lines.push(
-      '',
-      'Meeting Purpose',
-      purpose
-    );
-
-    lines.push('', 'Discussion');
-
-    discussion.forEach((d) =>
-      lines.push(`• ${d}`)
-    );
-
-    lines.push('', 'Recommendations');
-
-    recommendations.forEach((r) =>
-      lines.push(`• ${r}`)
-    );
-
-    lines.push('', 'Notes');
-
-    notes.forEach((n) =>
-      lines.push(`• ${n}`)
-    );
-
-    const blob = new Blob(
-      [lines.join('\n')],
-      {
-        type: 'text/plain',
+      // Step 1: Save form data if in edit mode
+      if (mode === 'edit') {
+        await handleSaveDraft();
       }
-    );
 
-    const url =
-      URL.createObjectURL(blob);
+      // Small delay to ensure save completes
+      await new Promise((resolve) => setTimeout(resolve, 800));
 
-    const a =
-      document.createElement('a');
+      // Step 2: Switch to preview mode
+      setMode("preview");
 
-    a.href = url;
-    a.download =
-      'meeting-details.txt';
+      // Wait for DOM to fully render
+      await new Promise((resolve) => setTimeout(resolve, 1200));
 
-    a.click();
+      const element = document.getElementById("meeting-details-content");
 
-    URL.revokeObjectURL(url);
-  }, [
-    info,
-    purpose,
-    discussion,
-    recommendations,
-    notes,
-  ]);
+      if (!element) {
+        throw new Error("Preview element not found");
+      }
+
+      // Ensure A4 layout BEFORE capture
+      element.style.width = "794px";   // A4 width (96 DPI)
+      element.style.minHeight = "1123px";
+      element.style.background = "#ffffff";
+      element.style.padding = "40px";
+      element.style.boxSizing = "border-box";
+
+      // Step 3: Capture canvas
+      const canvas = await html2canvas(element, {
+        scale: 2, // High quality
+        useCORS: true,
+        backgroundColor: "#ffffff",
+        logging: false,
+        onclone: (clonedDoc) => {
+          const styles = clonedDoc.querySelectorAll('style');
+          styles.forEach(style => {
+            if (style.textContent) {
+              style.textContent = style.textContent
+                .replace(/oklch\([^)]+\)/g, '#ffffff') 
+                .replace(/lab\([^)]+\)/g, '#ffffff')
+                .replace(/lch\([^)]+\)/g, '#ffffff');
+            }
+          });
+        }
+      });
+
+      const imgData = canvas.toDataURL("image/jpeg", 1.0);
+
+      // Step 4: Create PDF
+      const pdf = new jsPDF("p", "mm", "a4");
+      const pdfWidth = 210;
+      const pdfHeight = 297;
+      const imgWidth = pdfWidth;
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+      let position = 0;
+
+      // Step 5: Handle multi-page
+      if (imgHeight <= pdfHeight) {
+        pdf.addImage(imgData, "JPEG", 0, 0, imgWidth, imgHeight);
+      } else {
+        let heightLeft = imgHeight;
+        pdf.addImage(imgData, "JPEG", 0, position, imgWidth, imgHeight);
+        heightLeft -= pdfHeight;
+
+        while (heightLeft > 0) {
+          position = heightLeft - imgHeight;
+          pdf.addPage();
+          pdf.addImage(imgData, "JPEG", 0, position, imgWidth, imgHeight);
+          heightLeft -= pdfHeight;
+        }
+      }
+
+      // Step 6: File name
+      const studentName = meeting?.studentName ? meeting.studentName.replace(/\s+/g, '_') : "student";
+      const date = new Date().toISOString().split("T")[0];
+      const filename = `meeting_report_${studentName}_${date}.pdf`;
+
+      // Step 7: Download
+      pdf.save(filename);
+
+      // Restore mode
+      if (originalMode !== "preview") {
+        setTimeout(() => setMode(originalMode), 500);
+      }
+    } catch (error) {
+      console.error("PDF download error:", error);
+      alert("Failed to download PDF report");
+    } finally {
+      setDownloading(false);
+    }
+  };
 
   const handleCompleteSession = useCallback(async () => {
     try {
@@ -610,6 +656,8 @@ export default function ParentMeetingDetailsPage({
         alert('Meeting not found');
         return;
       }
+
+      setIsCompleting(true);
 
       // First save any unsaved changes
       await handleSaveDraft();
@@ -636,6 +684,8 @@ export default function ParentMeetingDetailsPage({
     } catch (error) {
       console.error('Error completing session:', error);
       alert('Could not complete session');
+    } finally {
+      setIsCompleting(false);
     }
   }, [meeting, handleSaveDraft, router]);
 
@@ -644,95 +694,108 @@ export default function ParentMeetingDetailsPage({
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        Loading...
+        <AdminLoader size="lg" message="Loading meeting details..." />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-slate-50">
-      <header className="sticky top-0 z-10 bg-white border-b border-slate-200">
-        <div className="mx-auto max-w-2xl px-4 py-3 flex items-center gap-3">
-          <button
-            type="button"
-            onClick={() => router.back()}
-            className="p-1.5 rounded-md hover:bg-slate-100 text-slate-600"
-          >
-            <ArrowLeft className="w-5 h-5" />
-          </button>
+    <div className="min-h-screen">
+      <div className="mx-auto max-w-8xl px-5 py-3">
+        <button 
+          onClick={() => router.back()}
+          className="mb-4 inline-flex items-center gap-1.5 text-sm text-[#64748B] hover:text-[#1E293B]"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          Back to Meetings
+        </button>
 
-          <h1 className="text-base font-semibold text-slate-800 flex-1">
-            Parent - Meeting Details
-          </h1>
-        </div>
+        <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h1 className="text-2xl font-bold text-[#1E293B]">Parent Meeting Details</h1>
+            <p className="text-sm text-[#64748B]">
+              {meeting?.studentName} • {meeting?.studentEmail}
+            </p>
+          </div>
 
-        <div className="mx-auto max-w-2xl px-4 pb-3 flex flex-wrap items-center gap-2">
-          {mode === 'edit' && (
-            <>
+          <div className="flex flex-wrap items-center gap-2">
+            <div className="inline-flex rounded-[16px] bg-[#E2E8F0] p-1">
               <button
-                type="button"
-                onClick={() => setMode('edit')}
-                className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium border ${
-                  mode === 'edit'
-                    ? 'bg-blue-600 text-white border-blue-600'
-                    : 'bg-white text-slate-700 border-slate-300'
-                }`}
+                onClick={() => setMode("edit")}
+                className={cn(
+                  "inline-flex items-center gap-1 rounded-[13px] px-4 py-1.5 text-[14px] font-medium transition-colors",
+                  mode === "edit"
+                    ? "bg-[#3B82F6] text-[#FFFFFF] shadow-sm"
+                    : "text-[#64748B] hover:text-[#1E293B]"
+                )}
               >
-                <Pencil className="w-3.5 h-3.5" />
-                Edit
+                <Pencil className="h-3.5 w-3.5" /> Edit
               </button>
-
               <button
-                type="button"
-                onClick={() =>
-                  setMode('preview')
-                }
-                className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium border ${
-                  mode === 'preview'
-                    ? 'bg-blue-600 text-white border-blue-600'
-                    : 'bg-white text-slate-700 border-slate-300'
-                }`}
+                onClick={() => setMode("preview")}
+                className={cn(
+                  "inline-flex items-center gap-1.5 rounded-[13px] px-4 py-1.5 text-[14px] font-medium transition-colors",
+                  mode === "preview"
+                    ? "bg-[#3B82F6] text-[#FFFFFF] shadow-sm"
+                    : "text-[#64748B] hover:text-[#1E293B]"
+                )}
               >
-                <Eye className="w-3.5 h-3.5" />
-                Preview
+                <Eye className="h-3.5 w-3.5" /> Preview
               </button>
+            </div>
 
-              <button
-                type="button"
+            {mode === 'edit' && (
+              <button 
                 onClick={handleSaveDraft}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium border bg-white text-slate-700 border-slate-300"
+                disabled={isSaving}
+                className="inline-flex items-center gap-1.5 rounded-[13px] border border-[#E2E8F0] bg-[#FFFFFF] px-4 py-2 text-[14px] font-medium text-[#1E293B] hover:bg-[#E2E8F0] disabled:opacity-50"
               >
-                <Save className="w-3.5 h-3.5" />
-                Save
+                {isSaving ? (
+                  <>
+                    <div className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-[#1E293B] border-t-transparent" />
+                    Saving...
+                  </>
+                ) : (
+                  <>
+                    <Save className="h-3.5 w-3.5" /> Save as Draft
+                  </>
+                )}
               </button>
-            </>
-          )}
+            )}
 
-          <button
-            type="button"
-            onClick={handleDownload}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium border bg-white text-slate-700 border-slate-300"
-          >
-            <Download className="w-3.5 h-3.5" />
-            Download
-          </button>
+            <button 
+              onClick={handleDownload}
+              disabled={downloading}
+              className="inline-flex items-center gap-1.5 rounded-[13px] border border-[#E2E8F0] bg-[#FFFFFF] px-4 py-2 text-[14px] font-medium text-[#1E293B] hover:bg-[#E2E8F0] disabled:opacity-50"
+            >
+              {downloading ? (
+                <>
+                  <div className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-[#1E293B] border-t-transparent" />
+                  Downloading...
+                </>
+              ) : (
+                <>
+                  <Download className="h-3.5 w-3.5" /> Download
+                </>
+              )}
+            </button>
+          </div>
         </div>
-      </header>
 
-      <main className={`mx-auto max-w-2xl px-4 py-4 space-y-3 ${mode === 'edit' ? 'pb-28' : 'pb-4'}`}>
-        <section className="bg-white rounded-xl border border-slate-200 p-4 shadow-sm">
+      <main id="meeting-details-content" className={`mx-auto max-w-6xl px-4 py-4 space-y-3 ${mode === 'edit' ? 'pb-14' : 'pb-4'}`}>
+        <section className="bg-[#FEFEFE] rounded-[12px] border border-[#E5E5E5] p-6">
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm">
             {info.map((item) => (
               <div key={item.label}>
-                <div className="flex items-center gap-1.5 text-xs text-slate-500 mb-1">
-                  <span className="text-slate-400">
+                <div className="flex items-center gap-1.5 text-[16px] text-[#939393] mb-2">
+                  <span className="text-[#939393]">
                     {item.icon}
                   </span>
 
                   {item.label}
                 </div>
 
-                <div className="text-sm font-medium text-slate-800">
+                <div className="text-[16px] font-medium text-[#3A3A3A]">
                   {item.value}
                 </div>
               </div>
@@ -746,7 +809,7 @@ export default function ParentMeetingDetailsPage({
           isOpen={open.purpose}
           onToggle={toggle}
           number={1}
-          numberBg="bg-emerald-500"
+          numberBg="bg-[#16A249]"
         >
           {mode === 'edit' ? (
             <textarea
@@ -755,10 +818,10 @@ export default function ParentMeetingDetailsPage({
                 handlePurposeChange
               }
               rows={4}
-              className="w-full px-3 py-2 text-sm rounded-lg border border-emerald-200 bg-emerald-50/30 focus:outline-none focus:ring-2 focus:ring-emerald-300"
+              className="w-full px-8 py-3 text-[16px] rounded-[16px] border border-[#B8D8C4] bg-[#EEFEF4] focus:outline-none focus:ring-2 focus:ring-[#B8D8C4]"
             />
           ) : (
-            <div className="bg-emerald-50/60 border border-emerald-100 rounded-lg p-3">
+            <div className="bg-[#EEFEF4] border border-[#B8D8C4] rounded-[16px] p-5">
               <p className="text-sm text-slate-700">
                 {purpose}
               </p>
@@ -772,7 +835,7 @@ export default function ParentMeetingDetailsPage({
           isOpen={open.discussion}
           onToggle={toggle}
           number={2}
-          numberBg="bg-sky-500"
+          numberBg="bg-[#3496D0]"
         >
           {mode === 'edit' ? (
             <EditableList
@@ -782,15 +845,15 @@ export default function ParentMeetingDetailsPage({
               setDraft={
                 setDraftDiscussion
               }
-              color="bg-sky-500"
-              inputBorder="border-sky-200"
-              inputBg="bg-sky-50/30"
-              ringColor="focus:ring-sky-300"
+              color="bg-[#3496D0]"
+              inputBorder="border-[#3496D0]/30"
+              inputBg="bg-[#3496D0]/10"
+              ringColor="focus:ring-[#3496D0]/30"
             />
           ) : (
             <BulletList
               items={discussion}
-              color="bg-sky-500"
+              color="bg-[#3496D0]"
             />
           )}
         </SectionShell>
@@ -801,7 +864,7 @@ export default function ParentMeetingDetailsPage({
           isOpen={open.recommendations}
           onToggle={toggle}
           number={3}
-          numberBg="bg-violet-500"
+          numberBg="bg-[#6A63E9]"
         >
           {mode === 'edit' ? (
             <EditableList
@@ -811,15 +874,15 @@ export default function ParentMeetingDetailsPage({
               }
               draft={draftRec}
               setDraft={setDraftRec}
-              color="bg-violet-500"
-              inputBorder="border-violet-200"
-              inputBg="bg-violet-50/30"
-              ringColor="focus:ring-violet-300"
+              color="bg-[#6A63E9]"
+              inputBorder="border-[#6A63E9]/30"
+              inputBg="bg-[#6A63E9]/10"
+              ringColor="focus:ring-[#6A63E9]/30"
             />
           ) : (
             <BulletList
               items={recommendations}
-              color="bg-violet-500"
+              color="bg-[#6A63E9]"
             />
           )}
         </SectionShell>
@@ -830,7 +893,7 @@ export default function ParentMeetingDetailsPage({
           isOpen={open.notes}
           onToggle={toggle}
           number={4}
-          numberBg="bg-amber-500"
+          numberBg="bg-[#EB941A]"
         >
           {mode === 'edit' ? (
             <EditableList
@@ -838,10 +901,10 @@ export default function ParentMeetingDetailsPage({
               setItems={setNotes}
               draft={draftNote}
               setDraft={setDraftNote}
-              color="bg-amber-500"
-              inputBorder="border-amber-200"
-              inputBg="bg-amber-50/30"
-              ringColor="focus:ring-amber-300"
+              color="bg-[#EB941A]"
+              inputBorder="border-[#EB941A]/30"
+              inputBg="bg-[#EB941A]/10"
+              ringColor="focus:ring-[#EB941A]/30"
             />
           ) : (
             <BulletList
@@ -855,17 +918,28 @@ export default function ParentMeetingDetailsPage({
       </main>
 
       {mode === 'edit' && (
-        <footer className="fixed bottom-0 inset-x-0 bg-white border-t border-slate-200">
-          <div className="mx-auto max-w-2xl px-4 py-3 flex justify-end">
+       
+          <div className="flex justify-center">
             <button 
               onClick={handleCompleteSession}
-              className="px-6 py-2.5 rounded-lg bg-blue-600 text-white text-sm font-semibold hover:bg-blue-700"
+              disabled={isCompleting}
+              className="inline-flex items-center gap-1.5 rounded-[13px] bg-[#3B82F6] px-6 py-2.5 text-[14px] font-medium text-[#FFFFFF] hover:bg-[#3B82F6E6] disabled:opacity-50 shadow-sm"
             >
-              Complete Session
+              {isCompleting ? (
+                <>
+                  <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                  Completing Session...
+                </>
+              ) : (
+                <>
+                  <Check className="h-4 w-4" />
+                  Complete Session
+                </>
+              )}
             </button>
           </div>
-        </footer>
       )}
+      </div>
     </div>
   );
 }

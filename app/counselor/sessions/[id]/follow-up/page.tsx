@@ -180,6 +180,16 @@ export default function FollowUpSessionPage() {
   ];
 
   const safeString = (val: any) => (typeof val === 'string' ? val : '');
+  
+  const processHistoryValue = (val: any) => {
+    if (!val) return '';
+    if (typeof val === 'string') return val;
+    if (typeof val === 'object' && val !== null) {
+      if ('text' in val) return val.text || '';
+      return JSON.stringify(val);
+    }
+    return String(val);
+  };
 
   // Preview components - same as intake page
   const SectionTitle = ({ num, title }: { num: string; title: string }) => (
@@ -331,25 +341,6 @@ export default function FollowUpSessionPage() {
         
         setPreviousIntake(intakeResult.data);
         
-        // Handle personal history - it might be stored differently
-        let personalHistoryValue = '';
-        if (intakeResult.data.personalHistory) {
-          if (typeof intakeResult.data.personalHistory === 'string') {
-            personalHistoryValue = intakeResult.data.personalHistory;
-          } else if (typeof intakeResult.data.personalHistory === 'object') {
-            // Check if it has a 'text' field (JSON format)
-            if (intakeResult.data.personalHistory.text) {
-              personalHistoryValue = intakeResult.data.personalHistory.text;
-            } else {
-              personalHistoryValue = JSON.stringify(intakeResult.data.personalHistory);
-            }
-          } else {
-            personalHistoryValue = String(intakeResult.data.personalHistory);
-          }
-        }
-        
-        console.log('Processed personal history (other path):', personalHistoryValue);
-        
         // Populate editable intake data state
         setIntakeData({
           basicInfo: {
@@ -367,8 +358,8 @@ export default function FollowUpSessionPage() {
           factors: {
             predisposing: intakeResult.data.factors?.predisposing || []
           },
-          familyHistory: intakeResult.data.familyHistory || '',
-          personalHistory: personalHistoryValue
+          familyHistory: processHistoryValue(intakeResult.data.familyHistory),
+          personalHistory: processHistoryValue(intakeResult.data.personalHistory)
         });
         console.log('Previous intake set:', intakeResult.data);
       }
@@ -501,25 +492,6 @@ export default function FollowUpSessionPage() {
           if (intakeResult.data.studentId === studentId || !intakeResult.data.studentId) {
             setPreviousIntake(intakeResult.data);
             
-            // Handle personal history - it might be stored differently
-            let personalHistoryValue = '';
-            if (intakeResult.data.personalHistory) {
-              if (typeof intakeResult.data.personalHistory === 'string') {
-                personalHistoryValue = intakeResult.data.personalHistory;
-              } else if (typeof intakeResult.data.personalHistory === 'object') {
-                // Check if it has a 'text' field (JSON format)
-                if (intakeResult.data.personalHistory.text) {
-                  personalHistoryValue = intakeResult.data.personalHistory.text;
-                } else {
-                  personalHistoryValue = JSON.stringify(intakeResult.data.personalHistory);
-                }
-              } else {
-                personalHistoryValue = String(intakeResult.data.personalHistory);
-              }
-            }
-            
-            console.log('Processed personal history:', personalHistoryValue);
-            
             // Populate editable intake data state
             setIntakeData({
               basicInfo: {
@@ -537,8 +509,8 @@ export default function FollowUpSessionPage() {
               factors: {
                 predisposing: intakeResult.data.factors?.predisposing || []
               },
-              familyHistory: intakeResult.data.familyHistory || '',
-              personalHistory: personalHistoryValue
+              familyHistory: processHistoryValue(intakeResult.data.familyHistory),
+              personalHistory: processHistoryValue(intakeResult.data.personalHistory)
             });
             console.log('Previous intake set successfully for student:', studentId);
           } else {
@@ -870,7 +842,7 @@ export default function FollowUpSessionPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC]">
+    <div className="min-h-screen">
       <div className="mx-auto max-w-8xl px-5 py-3">
         <button 
           onClick={() => router.back()}

@@ -326,12 +326,14 @@ export class CounselingRepository {
   }
 
   // Get session by ID
-  async getSessionById(sessionId: string, schoolId: string) {
+  async getSessionById(sessionId: string, schoolId: string | null) {
+    const where: any = { id: sessionId };
+    if (schoolId) {
+      where.schoolId = schoolId;
+    }
+    
     return await prisma.counselingSession.findFirst({
-      where: {
-        id: sessionId,
-        schoolId,
-      },
+      where,
       include: {
         student: {
           select: {
@@ -396,13 +398,18 @@ export class CounselingRepository {
   }
 
   // Get previous sessions for a student
-  async getStudentPreviousSessions(studentId: string, schoolId: string, limit = 5) {
+  async getStudentPreviousSessions(studentId: string, schoolId: string | null, limit = 5) {
+    const where: any = {
+      studentId,
+      status: SessionStatus.COMPLETED,
+    };
+    
+    if (schoolId) {
+      where.schoolId = schoolId;
+    }
+
     return await prisma.counselingSession.findMany({
-      where: {
-        studentId,
-        schoolId,
-        status: SessionStatus.COMPLETED,
-      },
+      where,
       orderBy: { scheduledAt: 'desc' },
       take: limit,
       include: {
@@ -418,12 +425,14 @@ export class CounselingRepository {
   }
 
   // Update session
-  async updateSession(sessionId: string, schoolId: string, data: UpdateSessionData) {
+  async updateSession(sessionId: string, schoolId: string | null, data: UpdateSessionData) {
+    const where: any = { id: sessionId };
+    if (schoolId) {
+      where.schoolId = schoolId;
+    }
+
     return await prisma.counselingSession.update({
-      where: {
-        id: sessionId,
-        schoolId,
-      },
+      where,
       data,
       include: {
         student: {

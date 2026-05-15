@@ -270,10 +270,7 @@ export const ROLE_PERMISSIONS = {
 
 
     "organizations.view",
-
     "organizations.update",
-
-
 
     "psycho.education.view",
 

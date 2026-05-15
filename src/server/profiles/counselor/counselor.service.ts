@@ -260,6 +260,9 @@ export class CounselorService {
       let assignmentsUpdated = 0;
 
       for (const studentId of studentIds) {
+        const student = students.find(s => s.id === studentId);
+        const studentName = student ? `${student.firstName} ${student.lastName}` : "a student";
+        
         if (escalationAlertId) {
           // Check if an assignment for this specific alert already exists
           const existingAlertAssignment = await prisma.counselorAssignment.findFirst({
@@ -304,6 +307,18 @@ export class CounselorService {
             where: { id: escalationAlertId },
             data: { assignedTo: counselorId }
           });
+
+          // Create notification for the counselor
+          await prisma.counselorNotification.create({
+            data: {
+              userId: counselorId,
+              alertId: escalationAlertId,
+              type: 'escalation',
+              message: `New high-risk case assigned: ${studentName}`,
+              severity: level === 'critical' ? 'critical' : 'high',
+              read: false
+            }
+          });
         } else {
           // General assignment (no specific alert)
           // Always create a new record for history as requested by user
@@ -319,6 +334,17 @@ export class CounselorService {
           });
           assignmentsCreated++;
           console.log(`[CounselorService] Created new general assignment for student ${studentId}`);
+
+          // Create notification for the counselor
+          await prisma.counselorNotification.create({
+            data: {
+              userId: counselorId,
+              type: 'system',
+              message: `New student assigned: ${studentName}`,
+              severity: 'medium',
+              read: false
+            }
+          });
         }
       }
       

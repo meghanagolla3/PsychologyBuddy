@@ -180,7 +180,7 @@ export function AlertsIndex() {
         <div className="relative">
           <button 
             onClick={() => setDropdowns(prev => ({ ...prev, filter: !prev.filter }))}
-            className="inline-flex h-10 items-center justify-between rounded-[8px] gap-3 px-4 text-[13px] font-medium bg-[#F5F5F5] text-[#3A3A3A]" 
+            className="inline-flex h-10 items-center justify-between rounded-[8px] gap-3 px-4 text-[13px] font-medium bg-white text-[#3A3A3A]" 
             style={{ color: '#3A3A3A' }}
           >
             <span>{
@@ -219,7 +219,7 @@ export function AlertsIndex() {
 
       <div className="overflow-hidden border border-[#E1E1E1] rounded-[16px]" style={{ backgroundColor: '#FFFFFF' }}>
         {/* Header - hidden on mobile */}
-        <div className="hidden md:grid grid-cols-[1.6fr_1fr_1fr_1.4fr] items-center gap-4 border-b px-6 py-3" style={{ borderColor: '#E1E1E1', backgroundColor: '#F5F5F5' }}>
+        <div className="hidden md:grid grid-cols-[1.6fr_1fr_1fr_1.4fr] items-center gap-4 border-b px-6 py-3" style={{ borderColor: '#E1E1E1', backgroundColor: '#eeeeeec9' }}>
           <div className="text-[15px] font-medium" style={{ color: '#1E293B' }}>Student Name</div>
           <div className="text-[15px] font-medium" style={{ color: '#1E293B' }}>Class</div>
           <div className="text-[15px] font-medium" style={{ color: '#1E293B' }}>Alert Time</div>
@@ -319,7 +319,7 @@ export function AlertsIndex() {
                     <Button
                       variant="secondary"
                       size="sm"
-                      className="w-full md:w-auto rounded-[13px] bg-gradient-to-b from-[#FF6C6C] to-[#E94A4A] text-white border-none px-4 h-9 text-[13px] font-medium"
+                      className="w-full md:w-auto rounded-[14px] bg-gradient-to-b from-[#52A9F0] to-[#3195E7] hover:from-[#3195E7] hover:to-[#52A9F0] text-white border-none shadow-sm px-4 h-[38px] text-[14px] font-medium transition-all"
                       disabled
                     >
                       <CheckCircle className="h-4 w-4 mr-1" />

@@ -13,7 +13,8 @@ import {
   User, 
   LogOut, 
   ChevronUp,
-  Users
+  Users,
+  LayoutDashboard
 } from 'lucide-react';
 
 type NavItem = {
@@ -25,8 +26,8 @@ type NavItem = {
 };
 
 const navItems: NavItem[] = [
-  { label: "Dashboard", icon: LayoutGrid, to: "/counselor", match: (p) => p === "/counselor" },
-  { label: "Alerts", icon: AlertTriangle, to: "/counselor/alerts", match: (p) => p.startsWith("/counselor/alerts"), badge: 3 },
+  { label: "Dashboard", icon: LayoutDashboard, to: "/counselor", match: (p) => p === "/counselor" },
+  { label: "Alerts", icon: AlertTriangle, to: "/counselor/alerts", match: (p) => p.startsWith("/counselor/alerts") },
   { label: "Parent Meetings", icon: UserCheck, to: "/counselor/parent-meetings" },
   { label: "Sessions", icon: CalendarClock, to: "/counselor/sessions" },
   // { label: "My Students", icon: Users, to: "/counselor/students", match: (p) => p.startsWith("/counselor/students") },
@@ -80,9 +81,9 @@ export function Sidebar({ className, onClose }: CounselorSidebarProps) {
   };
 
   return (
-    <aside className={cn('flex w-[240px] shrink-0 flex-col border-r border-[#E2E8F0] bg-white h-full', className)}>
+    <aside className={cn('flex w-[250px] shrink-0 flex-col border-r border-[#E2E8F0] bg-white h-full', className)}>
       {/* Logo */}
-      <div className="flex items-center gap-3 px-4 py-6 border-b border-[#E2E8F0]">
+      <div className="flex items-center gap-3 px-4 py-3 border-b border-[#E2E8F0]">
         <img 
           src="/logo1.png"
           alt="Psychology Buddy" 
@@ -101,13 +102,13 @@ export function Sidebar({ className, onClose }: CounselorSidebarProps) {
                 <button
                   onClick={() => handleNavigation(item.to)}
                   className={[
-                    "group flex w-full items-center gap-3 rounded-[14px] px-3 py-2.5 text-[14px] h-[44px] font-medium transition-colors",
+                    "group flex w-full items-center gap-3 rounded-[16px] px-3 py-3.5 text-[16px] m-2 h-[50px] font-medium transition-colors",
                     active
-                      ? "bg-[#3c83f6] text-white shadow-sm"
-                      : "text-[#65758b] hover:bg-[#F6F9FE] hover:text-[#3C83F6]",
+                      ? "bg-[#F6F9FE] text-[#3C83F6] font-semibold"
+                      : "text-[#65758b] hover:bg-[#F6F9FE] hover:text-[#242424]",
                   ].join(" ")}
                 >
-                  <Icon className="h-[18px] w-[18px]" strokeWidth={1.8} />
+                  <Icon className="h-[20px] w-[20px]" strokeWidth={2.3} />
                   <span className="flex-1 text-left">{item.label}</span>
                   {item.badge !== undefined && (
                     <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-[#EF4444] px-1.5 text-[11px] font-semibold text-white">
