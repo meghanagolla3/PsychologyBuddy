@@ -81,8 +81,6 @@ export const POST = withPermission({
         where: { id: currentSession.escalationId },
         data: {
           status: 'RESOLVED',
-          resolvedAt: new Date(),
-          resolution: 'Intake session completed',
         },
       });
     }
@@ -112,13 +110,7 @@ export const POST = withPermission({
       },
     });
 
-    // Update current session to reference the follow-up
-    await prisma.counselingSession.update({
-      where: { id },
-      data: {
-        nextSessionId: followUpSession.id,
-      },
-    });
+    // Note: Schema doesn't have nextSessionId field, skipping this update
 
     return NextResponse.json({
       success: true,

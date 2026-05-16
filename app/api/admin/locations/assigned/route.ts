@@ -26,32 +26,27 @@ export const GET = withPermission({
       );
     }
 
-    // Get admin's assigned locations
-    const assignedLocations = await prisma.locationAdminAssignment.findMany({
-      where: { adminId: user.id },
-      include: {
-        location: {
-          select: {
-            id: true,
-            name: true,
-            address: true,
-            city: true,
-          }
-        }
+    // Get admin's assigned location based on their locationId
+    const assignedLocation = await prisma.schoolLocation.findFirst({
+      where: { id: user.locationId },
+      select: {
+        id: true,
+        name: true,
+        address: true,
+        city: true,
       }
     });
 
-    console.log('Found assigned locations:', assignedLocations.length);
-    console.log('Location assignments:', assignedLocations);
+    console.log('Found assigned location:', assignedLocation);
 
     return NextResponse.json({
       success: true,
-      data: assignedLocations.map(assignment => ({
-        locationId: assignment.locationId,
-        name: assignment.location.name,
-        address: assignment.location.address,
-        city: assignment.location.city
-      }))
+      data: assignedLocation ? [{
+        locationId: assignedLocation.id,
+        name: assignedLocation.name,
+        address: assignedLocation.address,
+        city: assignedLocation.city
+      }] : []
     });
 
   } catch (error) {

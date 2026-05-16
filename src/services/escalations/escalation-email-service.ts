@@ -50,8 +50,7 @@ export class EscalationEmailService {
           school: {
             select: {
               id: true,
-              name: true,
-              primaryAdminId: true
+              name: true
             }
           }
         }
@@ -94,32 +93,7 @@ export class EscalationEmailService {
           schoolName: student.school?.name || 'Unknown School'
         })))
 
-        // 2. Get Primary Admin of the school
-        if (student.school?.primaryAdminId) {
-          const primaryAdmin = await prisma.user.findUnique({
-            where: { id: student.school.primaryAdminId },
-            select: {
-              id: true,
-              email: true,
-              firstName: true,
-              lastName: true,
-              role: {
-                select: {
-                  name: true
-                }
-              }
-            }
-          })
-
-          if (primaryAdmin) {
-            recipients.push({
-              ...primaryAdmin,
-              role: primaryAdmin.role.name,
-              schoolId: schoolId || undefined,
-              schoolName: student.school?.name || 'Unknown School'
-            })
-          }
-        }
+        // 2. Get Primary Admin of the school - primaryAdminId field doesn't exist in schema, skipping
       }
 
       // 3. Get all regular Admins for this school

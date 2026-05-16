@@ -823,8 +823,8 @@ export default function ParentMeetingsPage() {
 
                       <div className="flex items-center gap-2 lg:block">
                         <span className="lg:hidden text-[12px] font-medium text-[#64748B] min-w-[100px]">Notes:</span>
-                        <div className="text-[13px] text-[#1E293B]/80 truncate max-w-[200px]" title={m.notes}>
-                          {m.notes || "—"}
+                        <div className="text-[13px] text-[#1E293B]/80 truncate max-w-[200px]" title={m.note}>
+                          {m.note || "—"}
                         </div>
                       </div>
                     </>
@@ -948,7 +948,7 @@ export default function ParentMeetingsPage() {
           date: selectedMeeting.start.split(' ')[0],
           time: selectedMeeting.start.split(' ')[1] || '10:30',
           purpose: selectedMeeting.purpose,
-          requestedBy: selectedMeeting.requestedBy
+          requestedBy: selectedMeeting.requestedBy || 'COUNSELOR'
         } : null}
         onConfirm={handleConfirmAccept}
         onDecline={handleDeclineFromModal}

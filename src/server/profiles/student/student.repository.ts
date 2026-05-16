@@ -474,12 +474,12 @@ export const StudentRepository = {
 
       return students.map(student => ({
         id: student.id,
-        studentId: student.studentId,
-        name: student.name,
+        studentId: student.studentProfile?.user?.studentId,
+        name: `${student.studentProfile?.user?.firstName} ${student.studentProfile?.user?.lastName}`,
         email: student.email,
-        className: student.className,
-        grade: student.grade,
-        section: student.section
+        className: student.studentProfile?.user?.classRef?.name,
+        grade: student.studentProfile?.user?.classRef?.grade,
+        section: student.studentProfile?.user?.classRef?.section
       }));
     } catch (error) {
       console.error('Error getting students by parent ID:', error);

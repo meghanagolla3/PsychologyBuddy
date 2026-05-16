@@ -203,7 +203,9 @@ export class MeditationAdminService {
 
   async getMeditationCategoryById(data: GetSingleMeditationCategoryInput) {
     try {
-      const category = await this.repository.getMeditationCategoryById(data.id);
+      const category = await prisma.meditationCategory.findUnique({
+        where: { id: data.id }
+      });
 
       if (!category) {
         return {

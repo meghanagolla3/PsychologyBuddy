@@ -31,8 +31,6 @@ function Calendar({
     <DayPicker
       showOutsideDays={showOutsideDays}
       captionLayout={captionLayout}
-      fromYear={2020}
-      toYear={2035}
       className={cn(
         "w-fit rounded-2xl border border-[#E5E7EB] bg-white p-4",
         className
@@ -76,10 +74,6 @@ function Calendar({
 
         dropdown:
           "absolute inset-0 opacity-0 cursor-pointer z-20",
-
-        // Table
-        table:
-          "w-full border-collapse",
 
         weekdays:
           "flex justify-between mb-2",
@@ -169,7 +163,7 @@ function Calendar({
           </div>
         ),
 
-        Dropdown: ({ value, onChange, options, children }) => {
+        Dropdown: ({ value, onChange, options }) => {
           const selectedOption = options?.find((opt) => opt.value === value)
           
           const handleChange = (val: string) => {
@@ -182,7 +176,7 @@ function Calendar({
           return (
             <div className="relative inline-flex items-center group px-1 py-0.5 rounded hover:bg-gray-100 transition-colors">
               <span className="text-[17px] font-medium text-[#4293FE]">
-                {selectedOption?.label || children}
+                {selectedOption?.label || 'Select'}
               </span>
               <ChevronDown className="h-4 w-4 ml-1 text-[#6B7280] group-hover:text-gray-900" />
               <select

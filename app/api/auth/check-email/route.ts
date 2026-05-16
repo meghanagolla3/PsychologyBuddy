@@ -28,7 +28,14 @@ export const GET = async (req: NextRequest) => {
     }
 
     const existingUser = await prisma.user.findFirst({
-      where: whereClause
+      where: whereClause,
+      include: {
+        role: {
+          select: {
+            name: true
+          }
+        }
+      }
     });
 
     return Response.json({

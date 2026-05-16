@@ -19,7 +19,6 @@ export const ParentRepository = {
         parentProfile: {
           create: {
             department: "Parent Services",
-            studentId: data.studentId, // Add studentId to link parent to student
           },
         },
       },

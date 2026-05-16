@@ -3,7 +3,7 @@ import { withPermission } from '@/src/middleware/permission.middleware';
 import prisma from '@/src/prisma';
 
 export const GET = withPermission({
-  module: 'PARENT_MANAGEMENT',
+  module: 'USER_MANAGEMENT',
   action: 'VIEW',
 })(async (req: NextRequest, { params, user }: any) => {
   try {

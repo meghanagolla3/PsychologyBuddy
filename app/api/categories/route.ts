@@ -88,22 +88,22 @@ export async function GET(request: NextRequest) {
     if (formattedCategories.length === 0) {
       const defaultCategories = {
         meditation: [
-          { id: 'mindfulness', name: 'Mindfulness' },
-          { id: 'breathing', name: 'Breathing' },
-          { id: 'guided', name: 'Guided Meditation' }
+          { id: 'mindfulness', name: 'Mindfulness', order: 0 },
+          { id: 'breathing', name: 'Breathing', order: 1 },
+          { id: 'guided', name: 'Guided Meditation', order: 2 }
         ],
         music: [
-          { id: 'relaxation', name: 'Relaxation' },
-          { id: 'focus', name: 'Focus' },
-          { id: 'sleep', name: 'Sleep' }
+          { id: 'relaxation', name: 'Relaxation', order: 0 },
+          { id: 'focus', name: 'Focus', order: 1 },
+          { id: 'sleep', name: 'Sleep', order: 2 }
         ],
         psychoeducation: [
-          { id: 'anxiety', name: 'Anxiety Management' },
-          { id: 'stress', name: 'Stress Relief' },
-          { id: 'self-esteem', name: 'Self-Esteem' }
+          { id: 'anxiety', name: 'Anxiety Management', order: 0 },
+          { id: 'stress', name: 'Stress Relief', order: 1 },
+          { id: 'self-esteem', name: 'Self-Esteem', order: 2 }
         ]
       };
-      
+
       formattedCategories = defaultCategories[tool as keyof typeof defaultCategories] || [];
     }
 

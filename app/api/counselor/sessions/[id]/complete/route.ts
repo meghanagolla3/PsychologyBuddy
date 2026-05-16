@@ -115,13 +115,7 @@ export const PATCH = withPermission({
           },
         });
 
-        // Update current session to reference the next session
-        await prisma.counselingSession.update({
-          where: { id },
-          data: {
-            nextSessionId: nextSession.id,
-          },
-        });
+        // Note: Schema doesn't have nextSessionId field, skipping this update
       }
 
       return NextResponse.json({

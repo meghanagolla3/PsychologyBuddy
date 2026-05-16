@@ -450,8 +450,6 @@ export default function ParentMeetingDetailsPage({
         </div>
 
         <div className="mx-auto max-w-2xl px-4 pb-3 flex flex-wrap items-center gap-2">
-          {mode === 'edit' && (
-            <>
               <button
                 type="button"
                 onClick={() => setMode('edit')}
@@ -488,17 +486,15 @@ export default function ParentMeetingDetailsPage({
                 <Save className="w-3.5 h-3.5" />
                 Save
               </button>
-            </>
-          )}
 
-          <button
-            type="button"
-            onClick={handleDownload}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium border bg-white text-slate-700 border-slate-300"
-          >
-            <Download className="w-3.5 h-3.5" />
-            Download
-          </button>
+              <button
+                type="button"
+                onClick={handleDownload}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium border bg-white text-slate-700 border-slate-300"
+              >
+                <Download className="w-3.5 h-3.5" />
+                Download
+              </button>
         </div>
       </header>
 

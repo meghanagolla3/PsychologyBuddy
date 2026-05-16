@@ -4,7 +4,7 @@ import prisma from '@/src/prisma';
 
 // GET - Get available tools for challenges
 export const GET = withPermission({
-  module: 'ADMIN',
+  module: 'CHALLENGES',
   action: 'VIEW',
 })(async (req: NextRequest, { user }: any) => {
   try {
@@ -38,7 +38,7 @@ export const GET = withPermission({
       select: {
         id: true,
         title: true,
-        duration: true,
+        durationSec: true,
         description: true,
       },
       orderBy: { title: 'asc' },
@@ -63,8 +63,7 @@ export const GET = withPermission({
       select: {
         id: true,
         title: true,
-        summary: true,
-        estimatedReadTime: true,
+        description: true,
       },
       orderBy: { title: 'asc' },
     });
@@ -74,12 +73,9 @@ export const GET = withPermission({
       where: { schoolId },
       select: {
         id: true,
-        writingEnabled: true,
-        audioEnabled: true,
-        artEnabled: true,
-        writingPrompts: true,
-        audioPrompts: true,
-        artPrompts: true,
+        enableWriting: true,
+        enableAudio: true,
+        enableArt: true,
       },
     });
 
@@ -90,39 +86,28 @@ export const GET = withPermission({
       journaling: {
         available: !!journalingConfig,
         config: journalingConfig ? {
-          writingEnabled: journalingConfig.writingEnabled,
-          audioEnabled: journalingConfig.audioEnabled,
-          artEnabled: journalingConfig.artEnabled,
-          types: []
+          enableWriting: journalingConfig.enableWriting,
+          enableAudio: journalingConfig.enableAudio,
+          enableArt: journalingConfig.enableArt,
         } : null
       }
     };
 
     // Add journaling types if enabled
     if (journalingConfig) {
-      const journalTypes = [];
-      if (journalingConfig.writingEnabled) {
-        journalTypes.push({
-          type: 'writing',
-          name: 'Writing Journal',
-          prompts: journalingConfig.writingPrompts || []
-        });
+      const journalTypes: { type: string; name: string }[] = [];
+      if (journalingConfig.enableWriting) {
+        journalTypes.push({ type: 'writing', name: 'Writing Journal' });
       }
-      if (journalingConfig.audioEnabled) {
-        journalTypes.push({
-          type: 'audio',
-          name: 'Audio Journal',
-          prompts: journalingConfig.audioPrompts || []
-        });
+      if (journalingConfig.enableAudio) {
+        journalTypes.push({ type: 'audio', name: 'Audio Journal' });
       }
-      if (journalingConfig.artEnabled) {
-        journalTypes.push({
-          type: 'art',
-          name: 'Art Journal',
-          prompts: journalingConfig.artPrompts || []
-        });
+      if (journalingConfig.enableArt) {
+        journalTypes.push({ type: 'art', name: 'Art Journal' });
       }
-      tools.journaling.config.types = journalTypes;
+      if (tools.journaling.config) {
+        (tools.journaling.config as any).types = journalTypes;
+      }
     }
 
     return NextResponse.json({

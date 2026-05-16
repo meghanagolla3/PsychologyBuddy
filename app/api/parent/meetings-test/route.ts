@@ -63,7 +63,7 @@ export const GET = withPermission({
       purpose: meeting.purpose,
       level: meeting.level || 'medium',
       status: meeting.status,
-      parentName: meeting.student.parent?.name || 'Unknown Parent',
+      parentName: meeting.student.parent ? `${meeting.student.parent.firstName} ${meeting.student.parent.lastName}` : 'Unknown Parent',
       parentId: meeting.student.parentId,
       studentClassGrade: meeting.student.classRef?.name || '',
       requestedBy: meeting.requestedBy || 'COUNSELOR',

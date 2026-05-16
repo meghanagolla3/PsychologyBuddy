@@ -83,7 +83,7 @@ export async function GET(req: NextRequest) {
   } catch (error) {
     console.error('Error in student search API:', error);
     return NextResponse.json(
-      { error: 'Failed to search students', details: error.message },
+      { error: 'Failed to search students', details: error instanceof Error ? error.message : String(error) },
       { status: 500 }
     );
   }

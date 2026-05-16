@@ -205,7 +205,7 @@ export function ViewCounselorModal({ counselor, onClose }: ViewCounselorModalPro
           </div>
 
           {/* Recent Activity */}
-          {(counselor.assignedStudents?.length || counselor.activeEscalations?.length || counselor.scheduledSessions?.length) > 0 && (
+          {((counselor.assignedStudents?.length ?? 0) || (counselor.activeEscalations?.length ?? 0) || (counselor.scheduledSessions?.length ?? 0)) > 0 && (
             <div className="space-y-4">
               <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
                 <Calendar className="h-5 w-5" />
