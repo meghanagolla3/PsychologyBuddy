@@ -119,12 +119,3 @@ export const PATCH = withPermission({
     );
   }
 });
-      );
-    }
-
-    return NextResponse.json(
-      { success: false, message: 'Failed to update session' },
-      { status: 500 }
-    );
-  }
-});

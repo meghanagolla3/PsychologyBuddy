@@ -27,114 +27,25 @@ export const GET = withPermission({
   try {
     console.log('Fetching challenges for admin:', user.id, 'role:', user.role.name, 'schoolId:', user.schoolId);
 
-    let challenges: Awaited<ReturnType<typeof prisma.challenge.findMany>> & {
-      creator: {
-        firstName: string;
-        lastName: string;
-        role: {
-          name: string;
-        };
-      };
-      school?: {
-        name: string;
-      };
-      _count: {
-        userChallenges: number;
-      };
-    }[];
+    let challenges = await prisma.challenge.findMany({
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
 
     // Check user role and schoolId to determine scope
     if (user.role.name === 'SUPERADMIN') {
       // Super Admin can see all challenges from all schools
       challenges = await prisma.challenge.findMany({
-        include: {
-          creator: {
-            select: {
-              firstName: true,
-              lastName: true,
-              role: {
-                select: {
-                  name: true,
-                }
-              }
-            }
-          },
-          school: {
-            select: {
-              name: true,
-            }
-          },
-          _count: {
-            select: {
-              userChallenges: true,
-            }
-          }
-        },
         orderBy: {
           createdAt: 'desc',
         },
       });
-    } else if (user.role.name === 'SCHOOL_SUPERADMIN') {
-      // School Super Admin can see all challenges from their school
+    } else if (user.role.name === 'SCHOOL_SUPERADMIN' || user.role.name === 'ADMIN') {
+      // School Super Admin and Regular Admin can see challenges from their school
       challenges = await prisma.challenge.findMany({
         where: {
           schoolId: user.schoolId,
-        },
-        include: {
-          creator: {
-            select: {
-              firstName: true,
-              lastName: true,
-              role: {
-                select: {
-                  name: true,
-                }
-              }
-            }
-          },
-          school: {
-            select: {
-              name: true,
-            }
-          },
-          _count: {
-            select: {
-              userChallenges: true,
-            }
-          }
-        },
-        orderBy: {
-          createdAt: 'desc',
-        },
-      });
-    } else if (user.role.name === 'ADMIN') {
-      // Regular Admin can see all challenges from their school
-      challenges = await prisma.challenge.findMany({
-        where: {
-          schoolId: user.schoolId,
-        },
-        include: {
-          creator: {
-            select: {
-              firstName: true,
-              lastName: true,
-              role: {
-                select: {
-                  name: true,
-                }
-              }
-            }
-          },
-          school: {
-            select: {
-              name: true,
-            }
-          },
-          _count: {
-            select: {
-              userChallenges: true,
-            }
-          }
         },
         orderBy: {
           createdAt: 'desc',
@@ -147,7 +58,7 @@ export const GET = withPermission({
 
     console.log('Admin - Found challenges:', challenges.length);
     console.log('Admin - User role:', user.role.name, 'schoolId:', user.schoolId);
-    console.log('Admin - Challenges:', challenges.map(c => ({ id: c.id, name: c.name, schoolId: c.schoolId, schoolName: c.school?.name })));
+    console.log('Admin - Challenges:', challenges.map(c => ({ id: c.id, name: c.name, schoolId: c.schoolId })));
 
     const formattedChallenges = challenges.map((challenge) => ({
       id: challenge.id,
@@ -162,10 +73,8 @@ export const GET = withPermission({
       requiresMusic: challenge.requiresMusic,
       requiresPsychoeducation: challenge.requiresPsychoeducation,
       requiresJournaling: challenge.requiresJournaling,
-      createdBy: `${challenge.creator.firstName} ${challenge.creator.lastName}`,
-      creatorRole: challenge.creator.role.name,
-      schoolName: challenge.school?.name || 'Unknown School',
-      participantCount: challenge._count.userChallenges,
+      createdBy: challenge.createdBy,
+      schoolId: challenge.schoolId,
       createdAt: challenge.createdAt,
       updatedAt: challenge.updatedAt,
     }));
@@ -209,24 +118,6 @@ export const POST = withPermission({
         createdBy: user.id,
         schoolId,
       },
-      include: {
-        creator: {
-          select: {
-            firstName: true,
-            lastName: true,
-            role: {
-              select: {
-                name: true,
-              }
-            }
-          }
-        },
-        school: {
-          select: {
-            name: true,
-          }
-        }
-      }
     });
 
     const formattedChallenge = {
@@ -242,9 +133,8 @@ export const POST = withPermission({
       requiresMusic: challenge.requiresMusic,
       requiresPsychoeducation: challenge.requiresPsychoeducation,
       requiresJournaling: challenge.requiresJournaling,
-      createdBy: `${challenge.creator.firstName} ${challenge.creator.lastName}`,
-      creatorRole: challenge.creator.role.name,
-      schoolName: challenge.school?.name || 'Unknown School',
+      createdBy: challenge.createdBy,
+      schoolId: challenge.schoolId,
       createdAt: challenge.createdAt,
       updatedAt: challenge.updatedAt,
     };
@@ -259,7 +149,7 @@ export const POST = withPermission({
     
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { success: false, message: 'Validation error', errors: error.errors },
+        { success: false, message: 'Validation error', errors: error.issues },
         { status: 400 }
       );
     }
@@ -316,24 +206,6 @@ export const PUT = withPermission({
     const challenge = await prisma.challenge.update({
       where: { id },
       data: validatedData,
-      include: {
-        creator: {
-          select: {
-            firstName: true,
-            lastName: true,
-            role: {
-              select: {
-                name: true,
-              }
-            }
-          }
-        },
-        school: {
-          select: {
-            name: true,
-          }
-        }
-      }
     });
 
     const formattedChallenge = {
@@ -349,9 +221,8 @@ export const PUT = withPermission({
       requiresMusic: challenge.requiresMusic,
       requiresPsychoeducation: challenge.requiresPsychoeducation,
       requiresJournaling: challenge.requiresJournaling,
-      createdBy: `${challenge.creator.firstName} ${challenge.creator.lastName}`,
-      creatorRole: challenge.creator.role.name,
-      schoolName: challenge.school?.name || 'Unknown School',
+      createdBy: challenge.createdBy,
+      schoolId: challenge.schoolId,
       createdAt: challenge.createdAt,
       updatedAt: challenge.updatedAt,
     };
@@ -366,7 +237,7 @@ export const PUT = withPermission({
     
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { success: false, message: 'Validation error', errors: error.errors },
+        { success: false, message: 'Validation error', errors: error.issues },
         { status: 400 }
       );
     }

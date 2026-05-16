@@ -18,7 +18,7 @@ export function SessionTabs({ activeTab, onTabChange }: SessionTabsProps) {
         {tabs.map((tab) => (
           <button
             key={tab.id}
-            onClick={() => onTabChange(tab.id)}
+            onClick={() => onTabChange(tab.id as 'upcoming' | 'completed' | 'cancelled')}
             className={`
               py-2 px-1 border-b-2 font-medium text-sm
               ${activeTab === tab.id

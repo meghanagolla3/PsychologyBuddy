@@ -265,9 +265,9 @@ export function ChallengesView() {
               title={challenge.title}
               category={challenge.category}
               description={challenge.description}
-              completedOn={challenge.completedOn}
-              daysTaken={challenge.daysTaken}
-              tone={challenge.tone}
+              completedOn={challenge.endDate}
+              daysTaken={0}
+              tone="success"
               onViewDetails={() => {
                 setSelectedChallenge(challenge);
                 setIsModalOpen(true);

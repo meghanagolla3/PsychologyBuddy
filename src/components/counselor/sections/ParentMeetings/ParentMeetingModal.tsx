@@ -94,7 +94,7 @@ export function ParentMeetingModal({ open, onOpenChange, onMeetingCreated }: Par
       level: student.level,
       parentName: student.parentName,
     });
-    setDropdowns({ student: false });
+    setDropdowns({ student: false, time: false });
     setSearchTerm('');
   };
 
@@ -181,7 +181,7 @@ export function ParentMeetingModal({ open, onOpenChange, onMeetingCreated }: Par
                 value={formData.studentName || searchTerm}
                 onChange={(e) => {
                   setSearchTerm(e.target.value);
-                  setDropdowns({ student: true });
+                  setDropdowns({ student: true, time: false });
                 }}
                 placeholder="Search and select student"
                 className="w-full h-10 rounded-lg border border-gray-200 px-3 text-[14px]"
@@ -271,7 +271,6 @@ export function ParentMeetingModal({ open, onOpenChange, onMeetingCreated }: Par
                         setFormData({ ...formData, date: format(date, "yyyy-MM-dd") });
                       }
                     }}
-                    initialFocus
                     className="p-3"
                   />
                 </PopoverContent>

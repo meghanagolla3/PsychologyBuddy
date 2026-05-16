@@ -159,13 +159,13 @@ export const POST = withPermission({
     
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { error: 'Validation failed', details: error.errors },
+        { error: 'Validation failed', details: error.issues },
         { status: 400 }
       );
     }
 
     return NextResponse.json(
-      { error: 'Failed to assign challenge', details: error.message },
+      { error: 'Failed to assign challenge', details: error instanceof Error ? error.message : String(error) },
       { status: 500 }
     );
   }

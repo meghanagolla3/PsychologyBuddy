@@ -214,7 +214,7 @@ export const GET = withPermission({
     })) || [];
 
     // Determine last active time
-    const lastActiveAt = student.lastActive || student.createdAt;
+    const lastActiveAt = student.createdAt;
 
     const studentData = {
       id: student.id,

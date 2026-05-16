@@ -24,8 +24,7 @@ async function addChallengesViewPermission() {
       challengesPermission = await prisma.permission.create({
         data: {
           name: 'challenges.view',
-          module: 'challenges',
-          description: 'View assigned challenges and track progress'
+          module: 'challenges'
         }
       });
     }

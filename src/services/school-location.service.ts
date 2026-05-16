@@ -78,8 +78,35 @@ export class SchoolLocationService {
     isMain?: boolean;
   }) {
     try {
-      // SchoolLocation model doesn't exist in schema yet
-      throw new Error('School locations feature is not available. The SchoolLocation model has not been implemented in the database schema.');
+      // If this is marked as main location, unmark existing main location
+      if (data.isMain) {
+        const existingLocation = await prisma.schoolLocation.findUnique({
+          where: { id: locationId },
+        });
+
+        if (existingLocation) {
+          await prisma.schoolLocation.updateMany({
+            where: { schoolId: existingLocation.schoolId, isMain: true, id: { not: locationId } },
+            data: { isMain: false },
+          });
+        }
+      }
+
+      const location = await prisma.schoolLocation.update({
+        where: { id: locationId },
+        data,
+        include: {
+          school: { select: { name: true } },
+          _count: {
+            select: {
+              users: true,
+              classes: true,
+            },
+          },
+        },
+      });
+
+      return ApiResponse.success(location, 'School location updated successfully');
     } catch (error) {
       throw error;
     }
@@ -114,8 +141,24 @@ export class SchoolLocationService {
   // Get location by ID
   static async getLocationById(locationId: string) {
     try {
-      // SchoolLocation model doesn't exist in schema yet
-      throw new Error('School locations feature is not available. The SchoolLocation model has not been implemented in the database schema.');
+      const location = await prisma.schoolLocation.findUnique({
+        where: { id: locationId },
+        include: {
+          school: { select: { name: true } },
+          _count: {
+            select: {
+              users: true,
+              classes: true,
+            },
+          },
+        },
+      });
+
+      if (!location) {
+        throw AuthError.notFound('Location not found');
+      }
+
+      return ApiResponse.success(location, 'Location retrieved successfully');
     } catch (error) {
       throw error;
     }
@@ -124,8 +167,11 @@ export class SchoolLocationService {
   // Delete school location
   static async deleteLocation(locationId: string) {
     try {
-      // SchoolLocation model doesn't exist in schema yet
-      throw new Error('School locations feature is not available. The SchoolLocation model has not been implemented in the database schema.');
+      await prisma.schoolLocation.delete({
+        where: { id: locationId },
+      });
+
+      return ApiResponse.success(null, 'School location deleted successfully');
     } catch (error) {
       throw error;
     }
@@ -175,8 +221,24 @@ export class SchoolLocationService {
   // Get users and classes for a specific location
   static async getLocationDetails(locationId: string) {
     try {
-      // SchoolLocation model doesn't exist in schema yet
-      throw new Error('School locations feature is not available. The SchoolLocation model has not been implemented in the database schema.');
+      const location = await prisma.schoolLocation.findUnique({
+        where: { id: locationId },
+        include: {
+          users: {
+            include: {
+              role: { select: { name: true } },
+            },
+          },
+          classes: true,
+          school: { select: { name: true } },
+        },
+      });
+
+      if (!location) {
+        throw AuthError.notFound('Location not found');
+      }
+
+      return ApiResponse.success(location, 'Location details retrieved successfully');
     } catch (error) {
       throw error;
     }

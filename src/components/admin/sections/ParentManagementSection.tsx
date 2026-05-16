@@ -277,7 +277,11 @@ export default function ParentManagementSection() {
 
       {editParent && (
         <EditParentModal
-          parent={editParent}
+          parent={{
+            ...editParent,
+            childName: editParent.children[0]?.name || '',
+            childClass: editParent.children[0]?.className || ''
+          }}
           onClose={() => setEditParent(null)}
           onSuccess={() => {
             setEditParent(null);
