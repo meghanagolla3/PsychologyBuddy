@@ -4,7 +4,7 @@ import prisma from '@/src/prisma';
 
 // GET - Get available tools for challenges
 export const GET = withPermission({
-  module: 'ADMIN',
+  module: 'CHALLENGES',
   action: 'VIEW',
 })(async (req: NextRequest, { user }: any) => {
   try {
@@ -38,11 +38,19 @@ export const GET = withPermission({
       select: {
         id: true,
         title: true,
-        duration: true,
+        durationSec: true,
         description: true,
       },
       orderBy: { title: 'asc' },
     });
+
+    // Map meditation resources to match the frontend expected structure
+    const meditationData = meditationResources.map((m) => ({
+      id: m.id,
+      title: m.title,
+      duration: m.durationSec,
+      description: m.description,
+    }));
 
     // Get music resources
     const musicResources = await prisma.musicResource.findMany({
@@ -63,37 +71,42 @@ export const GET = withPermission({
       select: {
         id: true,
         title: true,
-        summary: true,
-        estimatedReadTime: true,
+        description: true,
+        readTime: true,
       },
       orderBy: { title: 'asc' },
     });
+
+    // Map psychoeducation articles to match the frontend expected structure
+    const psychoeducationData = psychoeducationResources.map((a) => ({
+      id: a.id,
+      title: a.title,
+      summary: a.description,
+      estimatedReadTime: a.readTime,
+    }));
 
     // Get journaling configuration
     const journalingConfig = await prisma.journalingToolConfig.findUnique({
       where: { schoolId },
       select: {
         id: true,
-        writingEnabled: true,
-        audioEnabled: true,
-        artEnabled: true,
-        writingPrompts: true,
-        audioPrompts: true,
-        artPrompts: true,
+        enableWriting: true,
+        enableAudio: true,
+        enableArt: true,
       },
     });
 
     const tools = {
-      meditation: meditationResources,
+      meditation: meditationData,
       music: musicResources,
-      psychoeducation: psychoeducationResources,
+      psychoeducation: psychoeducationData,
       journaling: {
         available: !!journalingConfig,
         config: journalingConfig ? {
-          writingEnabled: journalingConfig.writingEnabled,
-          audioEnabled: journalingConfig.audioEnabled,
-          artEnabled: journalingConfig.artEnabled,
-          types: []
+          writingEnabled: journalingConfig.enableWriting,
+          audioEnabled: journalingConfig.enableAudio,
+          artEnabled: journalingConfig.enableArt,
+          types: [] as any[]
         } : null
       }
     };
@@ -101,28 +114,30 @@ export const GET = withPermission({
     // Add journaling types if enabled
     if (journalingConfig) {
       const journalTypes = [];
-      if (journalingConfig.writingEnabled) {
+      if (journalingConfig.enableWriting) {
         journalTypes.push({
           type: 'writing',
           name: 'Writing Journal',
-          prompts: journalingConfig.writingPrompts || []
+          prompts: [] as string[]
         });
       }
-      if (journalingConfig.audioEnabled) {
+      if (journalingConfig.enableAudio) {
         journalTypes.push({
           type: 'audio',
           name: 'Audio Journal',
-          prompts: journalingConfig.audioPrompts || []
+          prompts: [] as string[]
         });
       }
-      if (journalingConfig.artEnabled) {
+      if (journalingConfig.enableArt) {
         journalTypes.push({
           type: 'art',
           name: 'Art Journal',
-          prompts: journalingConfig.artPrompts || []
+          prompts: [] as string[]
         });
       }
-      tools.journaling.config.types = journalTypes;
+      if (tools.journaling.config) {
+        tools.journaling.config.types = journalTypes;
+      }
     }
 
     return NextResponse.json({

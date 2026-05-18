@@ -83,6 +83,179 @@ export default function Sessions() {
     limit: 10
   });
 
+  const [selectedSessionId, setSelectedSessionId] = useState<string | null>(null);
+  const [modalLoading, setModalLoading] = useState(false);
+  const [modalData, setModalData] = useState<any | null>(null);
+  const [modalError, setModalError] = useState<string | null>(null);
+
+  const fetchSessionReportData = async (sessionId: string) => {
+    try {
+      setModalLoading(true);
+      setModalError(null);
+      setModalData(null);
+
+      // Fetch session details
+      const sessionResponse = await fetch(`/api/counselor/sessions/${sessionId}`);
+      const sessionResult = await sessionResponse.json();
+
+      if (!sessionResult.success) {
+        throw new Error(sessionResult.message || "Failed to fetch session data");
+      }
+
+      const sessionData = sessionResult.data;
+
+      let intakeData = null;
+      const isFollowUpSession = sessionData.sessionType === "FOLLOW_UP";
+
+      if (isFollowUpSession) {
+        // Fetch current follow-up report
+        const currentReportResponse = await fetch(`/api/counselor/sessions/${sessionId}/report`);
+        const currentReportResult = await currentReportResponse.json();
+
+        if (!currentReportResult.success) {
+          throw new Error(currentReportResult.message || "Failed to fetch follow-up report data");
+        }
+
+        // Traverse to find the original intake data
+        let originalIntakeData = null;
+        let currentSessionId = sessionData.previousSessionId;
+        let traversalCount = 0;
+        const maxTraversal = 10;
+
+        while (currentSessionId && traversalCount < maxTraversal) {
+          try {
+            const intakeResponse = await fetch(`/api/counselor/sessions/${currentSessionId}/intake`);
+            const intakeResult = await intakeResponse.json();
+            
+            if (intakeResult.success && intakeResult.data) {
+              originalIntakeData = intakeResult.data;
+              break;
+            } else {
+              const prevSessionResponse = await fetch(`/api/counselor/sessions/${currentSessionId}`);
+              const prevSessionResult = await prevSessionResponse.json();
+              
+              if (prevSessionResult.success && prevSessionResult.data?.previousSessionId) {
+                currentSessionId = prevSessionResult.data.previousSessionId;
+              } else {
+                break;
+              }
+            }
+          } catch (err) {
+            break;
+          }
+          traversalCount++;
+        }
+
+        // Fetch previous reports
+        const allPreviousReports = [];
+        let currentPreviousSessionId = sessionData.previousSessionId;
+        let reportTraversalCount = 0;
+
+        while (currentPreviousSessionId && reportTraversalCount < maxTraversal) {
+          try {
+            const previousSessionResponse = await fetch(`/api/counselor/sessions/${currentPreviousSessionId}`);
+            const previousSessionResult = await previousSessionResponse.json();
+            
+            if (!previousSessionResult.success) break;
+            const prevSessionData = previousSessionResult.data;
+            
+            if (prevSessionData?.sessionType === "FOLLOW_UP") {
+              const previousReportResponse = await fetch(`/api/counselor/sessions/${currentPreviousSessionId}/report`);
+              const previousReportResult = await previousReportResponse.json();
+              
+              if (previousReportResult.success) {
+                allPreviousReports.unshift({
+                  sessionId: currentPreviousSessionId,
+                  report: previousReportResult.data
+                });
+              }
+            } else {
+              break;
+            }
+            currentPreviousSessionId = prevSessionData?.previousSessionId;
+          } catch (err) {
+            break;
+          }
+          reportTraversalCount++;
+        }
+
+        const sessionReports: any[] = [];
+        if (sessionData.previousSessionId && originalIntakeData) {
+          const intakeBehavioralTags = originalIntakeData?.sessionReport?.behaviors || 
+                                     originalIntakeData?.sessionReport?.behavioralTags || 
+                                     originalIntakeData?.sessionReport?.customTags || [];
+          sessionReports.push({
+            sessionNumber: 1,
+            sessionId: "intake-session",
+            report: {
+              behavioralTags: intakeBehavioralTags,
+              summary: originalIntakeData?.sessionReport?.sessionSummary || originalIntakeData?.sessionReport?.summary || "Intake session completed",
+              recommendations: originalIntakeData?.sessionReport?.recommendations || ["Continue with follow-up sessions as needed"],
+              notes: originalIntakeData?.sessionReport?.notes || "Initial intake session completed."
+            }
+          });
+        }
+
+        allPreviousReports.forEach((prevReport, index) => {
+          sessionReports.push({
+            sessionNumber: sessionReports.length + 1,
+            sessionId: prevReport.sessionId,
+            report: prevReport.report
+          });
+        });
+
+        sessionReports.push({
+          sessionNumber: sessionReports.length + 1,
+          sessionId: sessionId,
+          report: currentReportResult.data
+        });
+
+        intakeData = {
+          ...originalIntakeData,
+          basicInfo: {
+            ...(originalIntakeData?.basicInfo || {}),
+            date: new Date(sessionData.scheduledAt).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" }),
+            monthYear: new Date(sessionData.scheduledAt).toLocaleDateString("en-US", { month: "long", year: "numeric" }),
+            place: originalIntakeData?.basicInfo?.place || sessionData.student?.school?.city || "Not specified",
+            age: originalIntakeData?.basicInfo?.age || sessionData.student?.age?.toString(),
+            gender: originalIntakeData?.basicInfo?.gender || sessionData.student?.gender,
+            informant: originalIntakeData?.basicInfo?.informant || "Follow-up Session",
+          },
+          sessionReports,
+          sessionReport: {
+            behaviors: currentReportResult.data.behavioralTags || [],
+            customTags: currentReportResult.data.behavioralTags || [],
+            sessionSummary: currentReportResult.data.summary || currentReportResult.data.notes || "",
+            manualRecommendations: currentReportResult.data.recommendations?.join("\n") || "",
+            recommendations: currentReportResult.data.recommendations || [],
+            selectedResources: [],
+            notes: currentReportResult.data.notes || "",
+          }
+        };
+      } else {
+        const intakeResponse = await fetch(`/api/counselor/sessions/${sessionId}/intake`);
+        const intakeResult = await intakeResponse.json();
+
+        if (!intakeResult.success) {
+          throw new Error(intakeResult.message || "Failed to fetch intake data");
+        }
+
+        intakeData = intakeResult.data;
+      }
+
+      setModalData({
+        session: sessionData,
+        intakeData,
+        isFollowUpSession
+      });
+    } catch (err: any) {
+      console.error("Error fetching modal session report:", err);
+      setModalError(err.message || "Failed to load session report data");
+    } finally {
+      setModalLoading(false);
+    }
+  };
+
   useEffect(() => {
     fetchSessions();
   }, [page]);
@@ -330,7 +503,10 @@ export default function Sessions() {
                         </td>
                         <td className="px-6 py-4">
                           <button 
-                            onClick={() => router.push(`/admin/sessions/${s.id}/completed`)}
+                            onClick={() => {
+                              setSelectedSessionId(s.id);
+                              fetchSessionReportData(s.id);
+                            }}
                             className="text-[14px] font-medium bg-[#F0F7FF] px-4 py-2 rounded-[12px] text-[#2D85F2] hover:cursor-pointer hover:bg-[#e5f1ff]"
                           >
                             View Details
@@ -372,6 +548,368 @@ export default function Sessions() {
           </div>
         )}
       </div>
+
+      {/* Session Report Preview Modal */}
+      {selectedSessionId && (
+        <div className="fixed inset-0 bg-[#0F172A]/40 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fade-in">
+          <div className="relative bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-3xl w-full max-w-4xl max-h-[90vh] flex flex-col shadow-2xl overflow-hidden animate-slide-up">
+            {/* Modal Header */}
+            <div className="flex items-center justify-between px-6 py-4 border-b border-[#E2E8F0] dark:border-slate-800">
+              <div>
+                <h2 className="text-xl font-bold text-[#1E293B] dark:text-white">Session Report Preview</h2>
+                {modalData && (
+                  <p className="text-sm text-[#767676] dark:text-slate-400 mt-0.5">
+                    Student: <span className="font-semibold text-[#3A3A3A] dark:text-slate-200">{modalData.session.student ? `${modalData.session.student.firstName} ${modalData.session.student.lastName}` : "N/A"}</span> | 
+                    Counselor: <span className="font-semibold text-[#3A3A3A] dark:text-slate-200">{modalData.session.counselor ? `${modalData.session.counselor.firstName} ${modalData.session.counselor.lastName}` : "N/A"}</span>
+                  </p>
+                )}
+              </div>
+              <button 
+                onClick={() => {
+                  setSelectedSessionId(null);
+                  setModalData(null);
+                  setModalError(null);
+                }}
+                className="p-2 text-[#767676] hover:text-[#3A3A3A] dark:hover:text-white transition-colors hover:bg-slate-50 dark:hover:bg-slate-800 rounded-xl"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            {/* Modal Body */}
+            <div className="flex-1 overflow-y-auto p-6 md:p-8 space-y-6">
+              {modalLoading ? (
+                <div className="flex flex-col items-center justify-center py-16 space-y-3">
+                  <div className="h-8 w-8 animate-spin rounded-full border-4 border-[#2D85F2] border-t-transparent"></div>
+                  <p className="text-sm text-[#767676]">Generating report preview...</p>
+                </div>
+              ) : modalError ? (
+                <div className="text-center py-16">
+                  <p className="text-red-500 font-semibold mb-2">{modalError}</p>
+                  <button
+                    onClick={() => fetchSessionReportData(selectedSessionId)}
+                    className="text-xs bg-[#F0F7FF] text-[#2D85F2] px-4 py-2 rounded-xl font-medium"
+                  >
+                    Retry Fetching
+                  </button>
+                </div>
+              ) : !modalData ? (
+                <div className="text-center py-16 text-[#767676]">
+                  No report details found for this session.
+                </div>
+              ) : (() => {
+                const { intakeData, session, isFollowUpSession } = modalData;
+                const basicInfo = intakeData.basicInfo || {};
+                const complaints = intakeData.complaints || {};
+                const factors = intakeData.factors || {};
+                const sessionReport = intakeData.sessionReport || {};
+
+                const SectionTitle = ({ num, title }: { num: string; title: string }) => (
+                  <div className="mb-4 mt-8 border-b border-[#E2E8F0] dark:border-slate-800 pb-2">
+                    <h3 className="text-sm font-semibold tracking-wide text-[#2D85F2] uppercase">
+                      {num} &nbsp; {title}
+                    </h3>
+                  </div>
+                );
+
+                const Row = ({ label, value }: { label: string; value: string }) => (
+                  <div className="grid grid-cols-[140px_1fr] gap-4 py-2 border-b border-slate-50 dark:border-slate-800/50">
+                    <div className="text-[11px] font-bold tracking-wide text-[#767676] dark:text-slate-400 uppercase">{label}</div>
+                    <div className="text-sm text-[#1E293B] dark:text-slate-200">{value || "Not specified"}</div>
+                  </div>
+                );
+
+                const Bullet = ({ text }: { text: string }) => (
+                  <li className="flex gap-3 py-1.5 items-start">
+                    <span className="mt-2 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-[#2D85F2]" />
+                    <span className="text-sm leading-relaxed text-[#1E293B] dark:text-slate-300">{text}</span>
+                  </li>
+                );
+
+                const formatDuration = () => {
+                  if (complaints.durationStart && complaints.durationEnd) {
+                    return `From ${complaints.durationStart} to ${complaints.durationEnd}`;
+                  }
+                  return "Not specified";
+                };
+
+                const safeString = (value: any): string => {
+                  if (value === null || value === undefined) return "";
+                  if (typeof value === "string") return value;
+                  if (typeof value === "number") return value.toString();
+                  if (typeof value === "object") {
+                    if (value.text && typeof value.text === "string") return value.text;
+                    return JSON.stringify(value);
+                  }
+                  return String(value);
+                };
+
+                return (
+                  <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-2xl p-6 md:p-8 shadow-sm">
+                    <div className="flex flex-col md:flex-row justify-between items-start md:items-center pb-4 border-b border-[#E2E8F0] dark:border-slate-800">
+                      <h1 className="text-2xl font-bold text-[#1E293B] dark:text-white">Counselling Session Report</h1>
+                      <div className="mt-2 md:mt-0 flex flex-wrap gap-x-4 gap-y-1 text-xs text-[#767676] dark:text-slate-400">
+                        <span>Date: {basicInfo.date || "N/A"}</span>
+                        <span>Period: {basicInfo.monthYear || "N/A"}</span>
+                        <span>Place: {basicInfo.place || "N/A"}</span>
+                      </div>
+                    </div>
+
+                    {isFollowUpSession ? (
+                      <>
+                        <SectionTitle num="01" title="BASIC INFORMATION" />
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6">
+                          <Row label="STUDENT NAME" value={`${session.student?.firstName || ""} ${session.student?.lastName || ""}`.trim()} />
+                          <Row label="STUDENT ID" value={session.student?.studentId} />
+                          <Row label="AGE" value={basicInfo.age ? `${basicInfo.age} Yrs` : `${session.student?.age || ""} Yrs`} />
+                          <Row label="GENDER" value={basicInfo.gender || session.student?.gender} />
+                          <Row label="CLASS" value={session.student?.classRef?.name || session.student?.classRef?.grade || "Not specified"} />
+                        </div>
+
+                        <SectionTitle num="02" title="PREDISPOSING & PRECIPITATING FACTORS" />
+                        <ul className="space-y-1">
+                          {intakeData.factors?.predisposing && intakeData.factors.predisposing.length > 0 ? (
+                            intakeData.factors.predisposing.map((factor: string, index: number) => (
+                              <Bullet key={index} text={factor} />
+                            ))
+                          ) : (
+                            <Bullet text="Not specified" />
+                          )}
+                        </ul>
+
+                        <SectionTitle num="03" title="FAMILY HISTORY" />
+                        <p className="text-sm leading-relaxed text-[#1E293B] dark:text-slate-300">
+                          {safeString(intakeData.familyHistory) || "Not specified"}
+                        </p>
+
+                        <SectionTitle num="04" title="PERSONAL HISTORY" />
+                        <p className="text-sm leading-relaxed text-[#1E293B] dark:text-slate-300">
+                          {safeString(intakeData.personalHistory?.text || intakeData.personalHistory) || "Not specified"}
+                        </p>
+
+                        <SectionTitle num="05" title="CHIEF COMPLAINTS" />
+                        <p className="text-xs text-[#767676] dark:text-slate-400 mb-2">
+                          Duration: {intakeData.complaints?.durationStart && intakeData.complaints?.durationEnd 
+                            ? `${intakeData.complaints.durationStart} — ${intakeData.complaints.durationEnd}`
+                            : "Not specified"}
+                        </p>
+                        <ul className="space-y-1">
+                          {intakeData.complaints?.complaints && intakeData.complaints.complaints.length > 0 ? (
+                            intakeData.complaints.complaints.map((complaint: string, index: number) => (
+                              <Bullet key={index} text={complaint} />
+                            ))
+                          ) : (
+                            <Bullet text="Not specified" />
+                          )}
+                        </ul>
+
+                        {intakeData.sessionReports && intakeData.sessionReports.length > 0 ? (
+                          intakeData.sessionReports.map((sessionReportData: any, index: number) => (
+                            <div key={sessionReportData.sessionId} className="mt-8 border-t border-slate-100 dark:border-slate-800 pt-6">
+                              <SectionTitle 
+                                num={`0${6 + index}`} 
+                                title={`SESSION REPORT ${sessionReportData.sessionNumber}`} 
+                              />
+                              <p className="mb-3 text-[11px] font-bold tracking-wide text-[#767676] dark:text-slate-400 uppercase">OBSERVATIONS DURING SESSION</p>
+                              <div className="flex flex-wrap gap-2 mb-4">
+                                {sessionReportData.report.behavioralTags && sessionReportData.report.behavioralTags.length > 0 ? (
+                                  sessionReportData.report.behavioralTags.map((behavior: string, tagIndex: number) => (
+                                    <span
+                                      key={`${behavior}-${tagIndex}`}
+                                      className="rounded-full border border-slate-100 dark:border-slate-800 bg-[#F8FAFC] dark:bg-slate-800 px-3 py-1 text-xs font-medium text-[#1E293B] dark:text-slate-200"
+                                    >
+                                      {behavior}
+                                    </span>
+                                  ))
+                                ) : (
+                                  <span className="rounded-full border border-slate-100 dark:border-slate-800 bg-[#F8FAFC] dark:bg-slate-800 px-3 py-1 text-xs text-[#767676]">
+                                    Not specified
+                                  </span>
+                                )}
+                              </div>
+
+                              <p className="mb-2 mt-4 text-[11px] font-bold tracking-wide text-[#767676] dark:text-slate-400 uppercase">
+                                SESSION SUMMARY / INTERPRETATION
+                              </p>
+                              <p className="text-sm leading-relaxed text-[#1E293B] dark:text-slate-300 mb-4 bg-slate-50 dark:bg-slate-800/40 p-4 rounded-xl">
+                                {sessionReportData.report.summary || sessionReportData.report.notes || "Not specified"}
+                              </p>
+
+                              <p className="mb-2 mt-4 text-[11px] font-bold tracking-wide text-[#767676] dark:text-slate-400 uppercase">
+                                RECOMMENDATIONS
+                              </p>
+                              <ul className="space-y-1">
+                                {sessionReportData.report.recommendations && sessionReportData.report.recommendations.length > 0 ? (
+                                  sessionReportData.report.recommendations.map((recommendation: string, idx: number) => (
+                                    <Bullet key={idx} text={recommendation} />
+                                  ))
+                                ) : (
+                                  <Bullet text="Not specified" />
+                                )}
+                              </ul>
+                            </div>
+                          ))
+                        ) : (
+                          <>
+                            <SectionTitle num="06" title="SESSION REPORT" />
+                            <p className="mb-3 text-[11px] font-bold tracking-wide text-[#767676] dark:text-slate-400 uppercase">OBSERVATIONS DURING SESSION</p>
+                            <div className="flex flex-wrap gap-2 mb-4">
+                              {sessionReport.behaviors && sessionReport.behaviors.length > 0 ? (
+                                sessionReport.behaviors.map((behavior: string) => (
+                                  <span
+                                    key={behavior}
+                                    className="rounded-full border border-slate-100 dark:border-slate-800 bg-[#F8FAFC] dark:bg-slate-800 px-3 py-1 text-xs font-medium text-[#1E293B] dark:text-slate-200"
+                                  >
+                                    {behavior}
+                                  </span>
+                                ))
+                              ) : (
+                                <span className="rounded-full border border-slate-100 dark:border-slate-800 bg-[#F8FAFC] dark:bg-slate-800 px-3 py-1 text-xs text-[#767676]">
+                                  Not specified
+                                </span>
+                              )}
+                            </div>
+
+                            <p className="mb-2 mt-4 text-[11px] font-bold tracking-wide text-[#767676] dark:text-slate-400 uppercase">
+                              SESSION SUMMARY / INTERPRETATION
+                            </p>
+                            <p className="text-sm leading-relaxed text-[#1E293B] dark:text-slate-300 mb-4 bg-slate-50 dark:bg-slate-800/40 p-4 rounded-xl">
+                              {sessionReport.sessionSummary || "Not specified"}
+                            </p>
+
+                            <p className="mb-2 mt-4 text-[11px] font-bold tracking-wide text-[#767676] dark:text-slate-400 uppercase">
+                              RECOMMENDATIONS
+                        </p>
+                            <ul className="space-y-1">
+                              {sessionReport.recommendations && sessionReport.recommendations.length > 0 ? (
+                                sessionReport.recommendations.map((recommendation: string, idx: number) => (
+                                  <Bullet key={idx} text={recommendation} />
+                                ))
+                              ) : (
+                                <Bullet text="Not specified" />
+                              )}
+                            </ul>
+                          </>
+                        )}
+                      </>
+                    ) : (
+                      <>
+                        <SectionTitle num="01" title="BASIC INFORMATION" />
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6">
+                          <Row label="STUDENT NAME" value={`${session.student?.firstName || ""} ${session.student?.lastName || ""}`.trim()} />
+                          <Row label="STUDENT ID" value={session.student?.studentId} />
+                          <Row label="AGE" value={basicInfo.age ? `${basicInfo.age} Yrs` : `${session.student?.age || ""} Yrs`} />
+                          <Row label="GENDER" value={basicInfo.gender || session.student?.gender} />
+                          <Row label="CLASS" value={session.student?.classRef?.name || (session.student?.classRef?.grade ? `${session.student.classRef.grade} - ${session.student.classRef.section || ""}` : "") || "Not specified"} />
+                          <Row label="INFORMANTS" value={basicInfo.informant} />
+                        </div>
+
+                        <SectionTitle num="02" title="PREDISPOSING & PRECIPITATING FACTORS" />
+                        <ul className="space-y-1">
+                          {factors.predisposing && factors.predisposing.length > 0 ? (
+                            factors.predisposing.map((factor: string, idx: number) => (
+                              <Bullet key={idx} text={factor} />
+                            ))
+                          ) : (
+                            <Bullet text="Not specified" />
+                          )}
+                        </ul>
+
+                        <SectionTitle num="03" title="FAMILY HISTORY" />
+                        <p className="text-sm leading-relaxed text-[#1E293B] dark:text-slate-300">
+                          {safeString(intakeData.familyHistory) || "Not specified"}
+                        </p>
+
+                        <SectionTitle num="04" title="PERSONAL HISTORY" />
+                        <p className="text-sm leading-relaxed text-[#1E293B] dark:text-slate-300">
+                          {safeString(intakeData.personalHistory?.text) || "Not specified"}
+                        </p>
+
+                        <SectionTitle num="05" title="CHIEF COMPLAINTS" />
+                        <p className="text-xs text-[#767676] dark:text-slate-400 mb-2">{formatDuration()}</p>
+                        <p className="mt-3 text-[11px] font-bold tracking-wide text-[#767676] dark:text-slate-400 uppercase">AS PER STUDENT</p>
+                        <ul className="space-y-1 mt-2">
+                          {complaints.complaints && complaints.complaints.length > 0 ? (
+                            complaints.complaints.map((complaint: string, idx: number) => (
+                              <Bullet key={idx} text={complaint} />
+                            ))
+                          ) : (
+                            <Bullet text="Not specified" />
+                          )}
+                        </ul>
+
+                        <SectionTitle num="06" title="SESSION REPORT" />
+                        <p className="mb-3 text-[11px] font-bold tracking-wide text-[#767676] dark:text-slate-400 uppercase">OBSERVATIONS DURING SESSION</p>
+                        <div className="flex flex-wrap gap-2 mb-4">
+                          {sessionReport.behaviors && sessionReport.behaviors.length > 0 ? (
+                            sessionReport.behaviors.map((behavior: string) => (
+                              <span
+                                key={behavior}
+                                className="rounded-full border border-slate-100 dark:border-slate-800 bg-[#F8FAFC] dark:bg-slate-800 px-3 py-1 text-xs font-medium text-[#1E293B] dark:text-slate-200"
+                              >
+                                {behavior}
+                              </span>
+                            ))
+                          ) : (
+                            <span className="rounded-full border border-slate-100 dark:border-slate-800 bg-[#F8FAFC] dark:bg-slate-800 px-3 py-1 text-xs text-[#767676]">
+                              Not specified
+                            </span>
+                          )}
+                        </div>
+
+                        <p className="mb-2 mt-4 text-[11px] font-bold tracking-wide text-[#767676] dark:text-slate-400 uppercase">
+                          SESSION SUMMARY / INTERPRETATION
+                        </p>
+                        <p className="text-sm leading-relaxed text-[#1E293B] dark:text-slate-300 mb-4 bg-slate-50 dark:bg-slate-800/40 p-4 rounded-xl">
+                          {sessionReport.sessionSummary || "Not specified"}
+                        </p>
+
+                        <p className="mb-2 mt-4 text-[11px] font-bold tracking-wide text-[#767676] dark:text-slate-400 uppercase">
+                          RECOMMENDATIONS
+                        </p>
+                        <ul className="space-y-1">
+                          {sessionReport.recommendations && sessionReport.recommendations.length > 0 ? (
+                            sessionReport.recommendations.map((recommendation: string, idx: number) => (
+                              <Bullet key={idx} text={recommendation} />
+                            ))
+                          ) : (
+                            <Bullet text="Not specified" />
+                          )}
+                        </ul>
+                      </>
+                    )}
+                  </div>
+                );
+              })()}
+            </div>
+
+            {/* Modal Footer */}
+            <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-[#E2E8F0] dark:border-slate-800 bg-[#F8FAFC] dark:bg-slate-900/50">
+              <button
+                onClick={() => {
+                  setSelectedSessionId(null);
+                  setModalData(null);
+                  setModalError(null);
+                }}
+                className="px-5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800 text-sm font-medium text-[#767676] dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
+              >
+                Close Preview
+              </button>
+              {modalData && (
+                <button
+                  onClick={() => {
+                    setSelectedSessionId(null);
+                    router.push(`/admin/sessions/${selectedSessionId}/completed`);
+                  }}
+                  className="px-5 py-2.5 rounded-xl bg-[#2D85F2] hover:bg-[#2574d6] text-white text-sm font-semibold transition-colors"
+                >
+                  View Full Report
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

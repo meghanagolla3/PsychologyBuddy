@@ -5,7 +5,7 @@ import { CreateParentData, UpdateParentData } from './parent.validators';
 export const ParentRepository = {
   // Create parent with profile
   createParent: async (data: CreateParentData & { roleId: string }) => {
-    return prisma.user.create({
+    const parent = await prisma.user.create({
       data: {
         firstName: data.firstName,
         lastName: data.lastName,
@@ -19,7 +19,6 @@ export const ParentRepository = {
         parentProfile: {
           create: {
             department: "Parent Services",
-            studentId: data.studentId, // Add studentId to link parent to student
           },
         },
       },
@@ -31,6 +30,15 @@ export const ParentRepository = {
         parentProfile: true,
       },
     });
+
+    if (data.studentId) {
+      await prisma.user.update({
+        where: { id: data.studentId },
+        data: { parentId: parent.id },
+      });
+    }
+
+    return parent;
   },
 
   // Get parents by school (Admin only - school-scoped)

@@ -80,9 +80,8 @@ export const POST = withPermission({
       await prisma.escalationAlert.update({
         where: { id: currentSession.escalationId },
         data: {
-          status: 'RESOLVED',
-          resolvedAt: new Date(),
-          resolution: 'Intake session completed',
+          status: 'resolved',
+          notes: 'Intake session completed',
         },
       });
     }
@@ -112,13 +111,7 @@ export const POST = withPermission({
       },
     });
 
-    // Update current session to reference the follow-up
-    await prisma.counselingSession.update({
-      where: { id },
-      data: {
-        nextSessionId: followUpSession.id,
-      },
-    });
+    // The followUpSession already references the current session via previousSessionId, so the relation is established.
 
     return NextResponse.json({
       success: true,

@@ -653,6 +653,7 @@ model Streak {
   id         String   @id @default(uuid())
   userId     String   @unique
   count      Int      @default(0)
+  bestStreak Int      @default(0)
   lastActive DateTime @default(now())
   user       User     @relation(fields: [userId], references: [id])
 

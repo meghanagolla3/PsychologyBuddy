@@ -112,7 +112,7 @@ export const AdminRepository = {
 
         // Check if locationAdminAssignment model exists
 
-        if (!prisma.locationAdminAssignment) {
+        if (!(prisma as any).locationAdminAssignment) {
 
           console.log('locationAdminAssignment model not found, trying raw query for assignment creation');
 
@@ -142,7 +142,7 @@ export const AdminRepository = {
 
         } else {
 
-          const assignment = await prisma.locationAdminAssignment.create({
+          const assignment = await (prisma as any).locationAdminAssignment.create({
 
             data: {
 
@@ -306,7 +306,7 @@ export const AdminRepository = {
 
         name: {
 
-          in: ['ADMIN', 'SCHOOL_SUPERADMIN', 'SUPERADMIN', 'PARENT'],
+          in: ['ADMIN', 'SCHOOL_SUPERADMIN', 'SUPERADMIN'],
 
         },
 
@@ -472,7 +472,7 @@ export const AdminRepository = {
 
             // Check if locationAdminAssignment model exists
 
-            if (!prisma.locationAdminAssignment) {
+            if (!(prisma as any).locationAdminAssignment) {
 
               console.log('locationAdminAssignment model not found, trying raw query');
 
@@ -574,7 +574,7 @@ export const AdminRepository = {
 
             // Query location assignments for this admin
 
-            const locationAssignments = await prisma.locationAdminAssignment.findMany({
+            const locationAssignments = await (prisma as any).locationAdminAssignment.findMany({
 
               where: { adminId: admin.id },
 
@@ -610,7 +610,7 @@ export const AdminRepository = {
 
               ...admin,
 
-              assignedLocations: locationAssignments.map(assignment => assignment.location)
+              assignedLocations: locationAssignments.map((assignment: any) => assignment.location)
 
             };
 
@@ -850,7 +850,7 @@ export const AdminRepository = {
 
         // Check if locationAdminAssignment model exists
 
-        if (!prisma.locationAdminAssignment) {
+        if (!(prisma as any).locationAdminAssignment) {
 
           console.log('locationAdminAssignment model not found, using raw query for update');
 
@@ -884,7 +884,7 @@ export const AdminRepository = {
 
           // Delete existing assignments
 
-          await prisma.locationAdminAssignment.deleteMany({
+          await (prisma as any).locationAdminAssignment.deleteMany({
 
             where: { adminId: id }
 
@@ -894,7 +894,7 @@ export const AdminRepository = {
 
           // Create new assignment
 
-          await prisma.locationAdminAssignment.create({
+          await (prisma as any).locationAdminAssignment.create({
 
             data: {
 
@@ -1072,7 +1072,7 @@ export const AdminRepository = {
 
           name: {
 
-            in: ['ADMIN', 'SCHOOL_SUPERADMIN', 'SUPERADMIN', 'PARENT'],
+            in: ['ADMIN', 'SCHOOL_SUPERADMIN', 'SUPERADMIN'],
 
           },
 
@@ -1280,7 +1280,7 @@ export const AdminRepository = {
 
           name: {
 
-            in: ['ADMIN', 'SCHOOL_SUPERADMIN', 'PARENT'],
+            in: ['ADMIN', 'SCHOOL_SUPERADMIN'],
 
           },
 

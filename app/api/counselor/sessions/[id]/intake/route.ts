@@ -102,12 +102,24 @@ export const POST = withPermission({
     const intake = await prisma.sessionIntake.upsert({
       where: { sessionId: id },
       update: {
-        data: body,
+        basicInfo: body.basicInfo || {},
+        complaints: body.complaints || {},
+        factors: body.factors || {},
+        familyHistory: body.familyHistory || '',
+        personalHistory: body.personalHistory || {},
+        sessionReport: body.sessionReport || {},
+        status: body.status || 'DRAFT',
         updatedAt: new Date(),
       },
       create: {
         sessionId: id,
-        data: body,
+        basicInfo: body.basicInfo || {},
+        complaints: body.complaints || {},
+        factors: body.factors || {},
+        familyHistory: body.familyHistory || '',
+        personalHistory: body.personalHistory || {},
+        sessionReport: body.sessionReport || {},
+        status: body.status || 'DRAFT',
       },
     });
 

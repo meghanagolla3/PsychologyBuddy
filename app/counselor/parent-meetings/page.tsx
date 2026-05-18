@@ -21,6 +21,7 @@ interface Meeting {
   start: string;
   end: string;
   note?: string;
+  notes?: string;
   purpose?: string;
   level?: string;
   status: 'SCHEDULED' | 'COMPLETED' | 'CANCELLED' | 'PENDING' | 'IN_PROGRESS';
@@ -989,7 +990,7 @@ export default function ParentMeetingsPage() {
           date: selectedMeeting.start.split(' ')[0],
           time: selectedMeeting.start.split(' ')[1] || '10:30',
           purpose: selectedMeeting.purpose,
-          requestedBy: selectedMeeting.requestedBy
+          requestedBy: selectedMeeting.requestedBy || 'COUNSELOR'
         } : null}
         onConfirm={handleConfirmAccept}
         onDecline={handleDeclineFromModal}

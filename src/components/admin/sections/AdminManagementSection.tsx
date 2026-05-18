@@ -84,6 +84,8 @@ const ROLE_STYLES: Record<string, { bg: string; text: string; label: string }> =
   "SUPERADMIN": { bg: "bg-[#3B82F6]/10", text: "text-[#3B82F6]", label: "Super Admin" },
   "SCHOOL_SUPERADMIN": { bg: "bg-[#10B981]/10", text: "text-[#10B981]", label: "School Superadmin" },
   "ADMIN": { bg: "bg-[#3B82F6]/10", text: "text-[#3B82F6]", label: "Admin" },
+  "PARENT": { bg: "bg-[#F59E0B]/10", text: "text-[#F59E0B]", label: "Parent" },
+  "COUNSELOR": { bg: "bg-[#8B5CF6]/10", text: "text-[#8B5CF6]", label: "Counselor" },
   // Default fallback for unknown roles
   "DEFAULT": { bg: "bg-gray-100", text: "text-gray-600", label: "Unknown Role" },
 };
@@ -251,6 +253,11 @@ export function AdminManagementSection() {
 
   const filteredAdmins = useMemo(() => {
     return admins.filter((admin) => {
+      // Robust client-side filter to completely exclude parents and counselors from this admin table
+      if (admin.role?.name === 'PARENT' || admin.role?.name === 'COUNSELOR') {
+        return false;
+      }
+
       const term = searchTerm.toLowerCase();
       return (
         admin.firstName.toLowerCase().includes(term) ||

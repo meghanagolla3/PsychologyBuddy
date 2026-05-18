@@ -79,7 +79,7 @@ export function AssignChallengeDialog({
     } catch (error) {
       console.error('Error searching students:', error);
       setStudents([]);
-      setSearchError(`Search failed: ${error.message}`);
+      setSearchError(`Search failed: ${(error as any).message}`);
     } finally {
       setIsSearching(false);
     }
@@ -186,7 +186,7 @@ export function AssignChallengeDialog({
       handleClose();
     } catch (error) {
       console.error("Assignment error:", error);
-      setSearchError(`Assignment failed: ${error.message}`);
+      setSearchError(`Assignment failed: ${(error as any).message}`);
     } finally {
       setIsAssigning(false);
     }

@@ -389,6 +389,12 @@ export class MeditationRepository {
     return { categories, total };
   }
 
+  async getMeditationCategoryById(id: string) {
+    return this.prisma.meditationCategory.findUnique({
+      where: { id },
+    });
+  }
+
   async updateMeditationCategory(id: string, data: UpdateMeditationCategoryInput) {
     return this.prisma.meditationCategory.update({
       where: { id },

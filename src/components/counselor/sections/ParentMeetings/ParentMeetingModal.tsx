@@ -274,7 +274,6 @@ export function ParentMeetingModal({ open, onOpenChange, onMeetingCreated }: Par
                         setFormData({ ...formData, date: format(date, "yyyy-MM-dd") });
                       }
                     }}
-                    initialFocus
                     className="p-3"
                   />
                 </PopoverContent>

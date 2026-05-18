@@ -4,7 +4,7 @@ import prisma from '@/src/prisma';
 
 // GET - Get single challenge by ID
 export const GET = withPermission({
-  module: 'ADMIN',
+  module: 'CHALLENGES',
   action: 'VIEW',
 })(async (req: NextRequest, { user, params }: any) => {
   try {
@@ -47,14 +47,10 @@ export const GET = withPermission({
                 select: {
                   firstName: true,
                   lastName: true,
-                  studentProfile: {
+                  classRef: {
                     select: {
-                      classRef: {
-                        select: {
-                          grade: true,
-                          section: true,
-                        }
-                      }
+                      grade: true,
+                      section: true,
                     }
                   }
                 }
@@ -96,14 +92,10 @@ export const GET = withPermission({
                 select: {
                   firstName: true,
                   lastName: true,
-                  studentProfile: {
+                  classRef: {
                     select: {
-                      classRef: {
-                        select: {
-                          grade: true,
-                          section: true,
-                        }
-                      }
+                      grade: true,
+                      section: true,
                     }
                   }
                 }
@@ -131,7 +123,8 @@ export const GET = withPermission({
       id: challenge.id,
       name: challenge.name,
       description: challenge.description,
-      dateTime: challenge.dateTime,
+      startsAt: challenge.startsAt,
+      endsAt: challenge.endsAt,
       instructions: challenge.instructions,
       isActive: challenge.isActive,
       requiresMeditation: challenge.requiresMeditation,
@@ -146,8 +139,8 @@ export const GET = withPermission({
         id: uc.id,
         userId: uc.userId,
         userName: `${uc.user.firstName} ${uc.user.lastName}`,
-        userClass: uc.user.studentProfile?.classRef 
-          ? `Class ${uc.user.studentProfile.classRef.grade}-${uc.user.studentProfile.classRef.section}`
+        userClass: uc.user.classRef 
+          ? `Class ${uc.user.classRef.grade}-${uc.user.classRef.section}`
           : 'N/A',
         status: uc.status,
         startedAt: uc.startedAt,

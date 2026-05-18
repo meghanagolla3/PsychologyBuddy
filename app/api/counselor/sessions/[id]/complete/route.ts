@@ -115,13 +115,6 @@ export const PATCH = withPermission({
           },
         });
 
-        // Update current session to reference the next session
-        await prisma.counselingSession.update({
-          where: { id },
-          data: {
-            nextSessionId: nextSession.id,
-          },
-        });
       }
 
       return NextResponse.json({

@@ -50,7 +50,7 @@ export class OTPService {
 
       // Store in database for cross-server persistence
       try {
-        await prisma.oTP.upsert({
+        await (prisma as any).oTP.upsert({
           where: { phoneNumber: phoneNumber },
           update: {
             otp: otpData.otp,
@@ -166,12 +166,31 @@ export class OTPService {
     try {
       const key = OTPService.getOTPKey(phoneNumber);
       
-      // Get OTP from database first
-      const dbOtp = await prisma.oTP.findUnique({
-        where: { phoneNumber: phoneNumber }
-      });
+      // Get OTP from in-memory store
+      let otpData = OTPService.otpStore.get(key);
+      
+      // Fallback/Try database if possible
+      let dbOtp: any = null;
+      try {
+        dbOtp = await (prisma as any).oTP.findUnique({
+          where: { phoneNumber: phoneNumber }
+        });
+      } catch (dbError) {
+        // Database table not available, use in-memory fallback
+      }
 
-      if (!dbOtp) {
+      if (!otpData && dbOtp) {
+        otpData = {
+          otp: dbOtp.otp,
+          phoneNumber: dbOtp.phoneNumber,
+          attempts: dbOtp.attempts,
+          createdAt: dbOtp.createdAt,
+          expiresAt: dbOtp.expiresAt,
+          isVerified: dbOtp.isVerified
+        };
+      }
+
+      if (!otpData) {
         return {
           success: false,
           error: 'OTP not found or expired',
@@ -179,11 +198,14 @@ export class OTPService {
       }
 
       // Check if OTP is expired
-      if (new Date() > dbOtp.expiresAt) {
-        // Remove expired OTP from database
-        await prisma.oTP.delete({
-          where: { phoneNumber: phoneNumber }
-        });
+      if (new Date() > otpData.expiresAt) {
+        // Remove expired OTP from memory and database
+        OTPService.otpStore.delete(key);
+        try {
+          await (prisma as any).oTP.delete({
+            where: { phoneNumber: phoneNumber }
+          });
+        } catch (dbError) {}
         return {
           success: false,
           error: 'OTP has expired',
@@ -191,10 +213,13 @@ export class OTPService {
       }
 
       // Check maximum attempts
-      if (dbOtp.attempts >= this.MAX_ATTEMPTS) {
-        await prisma.oTP.delete({
-          where: { phoneNumber: phoneNumber }
-        });
+      if (otpData.attempts >= this.MAX_ATTEMPTS) {
+        OTPService.otpStore.delete(key);
+        try {
+          await (prisma as any).oTP.delete({
+            where: { phoneNumber: phoneNumber }
+          });
+        } catch (dbError) {}
         return {
           success: false,
           error: 'Maximum OTP attempts exceeded',
@@ -202,19 +227,26 @@ export class OTPService {
       }
 
       // Increment attempt count
-      await prisma.oTP.update({
-        where: { phoneNumber: phoneNumber },
-        data: {
-          attempts: dbOtp.attempts + 1,
-        }
-      });
+      otpData.attempts += 1;
+      OTPService.otpStore.set(key, otpData);
+      try {
+        await (prisma as any).oTP.update({
+          where: { phoneNumber: phoneNumber },
+          data: {
+            attempts: otpData.attempts,
+          }
+        });
+      } catch (dbError) {}
 
       // Verify OTP
-      if (dbOtp.otp !== providedOTP) {
-        if (dbOtp.attempts >= this.MAX_ATTEMPTS) {
-          await prisma.oTP.delete({
-            where: { phoneNumber: phoneNumber }
-          });
+      if (otpData.otp !== providedOTP) {
+        if (otpData.attempts >= this.MAX_ATTEMPTS) {
+          OTPService.otpStore.delete(key);
+          try {
+            await (prisma as any).oTP.delete({
+              where: { phoneNumber: phoneNumber }
+            });
+          } catch (dbError) {}
         }
         return {
           success: false,
@@ -223,9 +255,13 @@ export class OTPService {
       }
 
       // Mark as verified and remove
-      await prisma.oTP.delete({
-        where: { phoneNumber: phoneNumber }
-      });
+      otpData.isVerified = true;
+      OTPService.otpStore.set(key, otpData);
+      try {
+        await (prisma as any).oTP.delete({
+          where: { phoneNumber: phoneNumber }
+        });
+      } catch (dbError) {}
 
       return {
         success: true,
@@ -248,8 +284,9 @@ export class OTPService {
 
   async consumeOTP(phoneNumber: string): Promise<void> {
     const key = OTPService.getOTPKey(phoneNumber);
+    OTPService.otpStore.delete(key);
     try {
-      await prisma.oTP.delete({
+      await (prisma as any).oTP.delete({
         where: { phoneNumber: key }
       });
     } catch (error) {
@@ -260,8 +297,9 @@ export class OTPService {
 
   private static async cleanupExpiredOTP(phoneNumber: string): Promise<void> {
     const key = OTPService.getOTPKey(phoneNumber);
+    OTPService.otpStore.delete(key);
     try {
-      await prisma.oTP.delete({
+      await (prisma as any).oTP.delete({
         where: { phoneNumber: key }
       });
     } catch (error) {

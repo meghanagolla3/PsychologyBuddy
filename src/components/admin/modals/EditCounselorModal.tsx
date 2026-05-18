@@ -236,8 +236,8 @@ export function EditCounselorModal({ counselor, onClose, onSuccess, schools }: E
 
     try {
       await executeWithLoading(
-        AdminActions.UPDATE_ADMIN,
-        async () => {
+        AdminActions.EDIT_ADMIN,
+        (async () => {
           const response = await fetch(`/api/counselors/${counselor.id}`, {
             method: 'PUT',
             headers: {
@@ -258,7 +258,7 @@ export function EditCounselorModal({ counselor, onClose, onSuccess, schools }: E
           } else {
             setSubmitError(data.message || 'Failed to update counselor');
           }
-        },
+        })(),
         'Updating counselor...'
       );
     } catch (error) {
@@ -446,9 +446,8 @@ export function EditCounselorModal({ counselor, onClose, onSuccess, schools }: E
               </label>
               {user?.role?.name === 'SUPERADMIN' ? (
                 <SchoolSearch
-                  selectedSchool={selectedSchool}
+                  initialSchool={selectedSchool}
                   onSchoolSelect={(school) => handleInputChange('schoolId', school?.id || '')}
-                  error={errors.schoolId}
                 />
               ) : (
                 <div className="p-3 bg-gray-50 border rounded-md">
@@ -467,9 +466,8 @@ export function EditCounselorModal({ counselor, onClose, onSuccess, schools }: E
               </label>
               <LocationSearch
                 schoolId={formData.schoolId}
-                selectedLocation={counselor.location}
+                initialLocationId={counselor.locationId || counselor.location?.id}
                 onLocationSelect={(location) => handleInputChange('locationId', location?.id || '')}
-                error={errors.locationId}
               />
               {errors.locationId && (
                 <p className="text-red-500 text-sm mt-1">{errors.locationId}</p>

@@ -104,7 +104,12 @@ export async function GET(request: NextRequest) {
         ]
       };
       
-      formattedCategories = defaultCategories[tool as keyof typeof defaultCategories] || [];
+      const items = defaultCategories[tool as keyof typeof defaultCategories] || [];
+      formattedCategories = items.map((item, index) => ({
+        id: item.id,
+        name: item.name,
+        order: index
+      }));
     }
 
     console.log("Returning categories:", formattedCategories);

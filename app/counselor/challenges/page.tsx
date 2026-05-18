@@ -348,12 +348,6 @@ export default function ChallengesPage() {
             id: selectedChallenge.id,
             title: selectedChallenge.name,
             category: selectedChallenge.category,
-            startDate: selectedChallenge.startsAt?.split('T')[0],
-            endDate: selectedChallenge.endsAt?.split('T')[0],
-            description: selectedChallenge.description,
-            instructions: selectedChallenge.description, // You might want to add instructions field to the schema
-            assigned: Math.floor(Math.random() * 100) + 50, // Mock data - replace with real API call
-            completed: Math.floor(Math.random() * 80) + 20, // Mock data - replace with real API call
           } : undefined}
         />
       </div>

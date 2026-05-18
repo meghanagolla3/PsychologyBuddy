@@ -177,7 +177,6 @@ export class UserService {
             name: data.name.trim(), // Store trimmed name (preserve original case for display)
             phone: data.phone.replace(/\D/g, ''), // Store normalized phone
             email: data.email.toLowerCase().trim(), // Store email in lowercase
-            primaryAdminId: data.primaryAdminId,
           },
         });
 
@@ -203,17 +202,9 @@ export class UserService {
       const school = await prisma.school.findUnique({
         where: { id: result.id },
         include: {
-          primaryAdmin: {
-            select: {
-              id: true,
-              firstName: true,
-              lastName: true,
-              email: true,
-            }
-          },
           _count: {
             select: {
-              locations: true,
+              schoolLocations: true,
             },
           },
         },
@@ -522,7 +513,7 @@ export class UserService {
   }) {
     try {
       // Check if assignment already exists
-      const existingAssignment = await prisma.locationAdminAssignment.findUnique({
+      const existingAssignment = await (prisma as any).locationAdminAssignment.findUnique({
         where: {
           locationId_adminId: {
             locationId: data.locationId,
@@ -556,7 +547,7 @@ export class UserService {
       }
 
       // Create assignment
-      const assignment = await prisma.locationAdminAssignment.create({
+      const assignment = await (prisma as any).locationAdminAssignment.create({
         data: {
           locationId: data.locationId,
           adminId: data.adminId,
@@ -595,7 +586,7 @@ export class UserService {
   // Remove admin from location
   static async removeAdminFromLocation(locationId: string, adminId: string) {
     try {
-      const assignment = await prisma.locationAdminAssignment.findUnique({
+      const assignment = await (prisma as any).locationAdminAssignment.findUnique({
         where: {
           locationId_adminId: {
             locationId,
@@ -608,7 +599,7 @@ export class UserService {
         throw AuthError.notFound('Admin assignment not found');
       }
 
-      await prisma.locationAdminAssignment.delete({
+      await (prisma as any).locationAdminAssignment.delete({
         where: {
           locationId_adminId: {
             locationId,
@@ -626,7 +617,7 @@ export class UserService {
   // Get admins assigned to a location
   static async getLocationAdmins(locationId: string) {
     try {
-      const assignments = await prisma.locationAdminAssignment.findMany({
+      const assignments = await (prisma as any).locationAdminAssignment.findMany({
         where: { locationId },
         include: {
           admin: {
@@ -658,7 +649,7 @@ export class UserService {
   // Get locations assigned to an admin
   static async getAdminLocations(adminId: string) {
     try {
-      const assignments = await prisma.locationAdminAssignment.findMany({
+      const assignments = await (prisma as any).locationAdminAssignment.findMany({
         where: { adminId },
         include: {
           location: {

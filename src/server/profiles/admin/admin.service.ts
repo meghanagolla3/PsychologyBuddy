@@ -63,7 +63,7 @@ export class AdminService {
         where: {
           role: {
             name: {
-              in: ['ADMIN', 'SCHOOL_SUPERADMIN', 'SUPERADMIN', 'PARENT'],
+              in: ['ADMIN', 'SCHOOL_SUPERADMIN', 'SUPERADMIN'],
             },
           },
           ...(schoolId && schoolId !== 'all' && { schoolId }),

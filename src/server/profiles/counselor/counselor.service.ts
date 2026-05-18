@@ -192,7 +192,7 @@ export class CounselorService {
       // Check if counselor has active escalations or sessions
       const activeEscalations = await prisma.escalationAlert.count({
         where: {
-          assignedCounselorId: id,
+          assignedTo: id,
           status: 'ACTIVE'
         }
       });

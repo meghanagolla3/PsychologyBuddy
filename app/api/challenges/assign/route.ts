@@ -154,12 +154,12 @@ export const POST = withPermission({
       message: `Challenge assigned successfully to ${userChallenges.length} student(s)`
     });
 
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error assigning challenge:', error);
     
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { error: 'Validation failed', details: error.errors },
+        { error: 'Validation failed', details: (error as any).errors },
         { status: 400 }
       );
     }

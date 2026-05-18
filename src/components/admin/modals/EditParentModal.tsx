@@ -24,12 +24,21 @@ interface Parent {
   name: string;
   email: string;
   avatar?: string;
-  childName: string;
-  childClass: string;
+  childName?: string;
+  childClass?: string;
   status: "Active" | "Inactive";
   totalMeetings: number;
   firstName?: string;
   lastName?: string;
+  children?: Array<{
+    id: string;
+    studentId: string;
+    name: string;
+    email: string;
+    className: string;
+    grade: string;
+    section: string;
+  }>;
 }
 
 interface EditParentModalProps {
@@ -52,8 +61,8 @@ export function EditParentModal({ parent, onClose, onSuccess, onDelete }: EditPa
     lastName: parent.lastName || parent.name.split(" ").slice(1).join(" ") || "",
     email: parent.email,
     phone: "",
-    childName: parent.childName,
-    childClass: parent.childClass,
+    childName: parent.childName || parent.children?.[0]?.name || "",
+    childClass: parent.childClass || parent.children?.[0]?.className || "",
     status: parent.status === "Active" ? "ACTIVE" : "INACTIVE",
   });
   const [errors, setErrors] = useState<FormErrors>({});

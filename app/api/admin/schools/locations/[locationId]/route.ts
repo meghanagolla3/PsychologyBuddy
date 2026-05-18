@@ -6,7 +6,7 @@ import { handleError } from '@/src/utils/errors';
 export const GET = async (req: NextRequest, { params }: { params: Promise<{ locationId: string }> }) => {
   try {
     const { locationId } = await params;
-    const result = await SchoolLocationService.getLocationById(locationId);
+    const result = await SchoolLocationService.getLocationById(locationId) as any;
     return Response.json(result.data);
   } catch (error) {
     console.error('Get location error:', error);
@@ -21,7 +21,7 @@ export const PUT = async (req: NextRequest, { params }: { params: Promise<{ loca
     const { locationId } = await params;
     const body = await req.json();
 
-    const result = await SchoolLocationService.updateLocation(locationId, body);
+    const result = await SchoolLocationService.updateLocation(locationId, body) as any;
     return Response.json(result.data);
   } catch (error) {
     console.error('Update location error:', error);
@@ -34,7 +34,7 @@ export const PUT = async (req: NextRequest, { params }: { params: Promise<{ loca
 export const DELETE = async (req: NextRequest, { params }: { params: Promise<{ locationId: string }> }) => {
   try {
     const { locationId } = await params;
-    const result = await SchoolLocationService.deleteLocation(locationId);
+    const result = await SchoolLocationService.deleteLocation(locationId) as any;
     return Response.json(result.data);
   } catch (error) {
     console.error('Delete location error:', error);

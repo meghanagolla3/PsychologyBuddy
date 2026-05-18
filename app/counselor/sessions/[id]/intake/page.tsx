@@ -796,7 +796,7 @@ export default function IntakeSessionPage() {
       } else {
         throw new Error(result.message || 'Failed to submit intake');
       }
-      
+    } catch (err: any) {
       console.error('Submit intake error:', err);
       setError('Failed to submit intake');
     } finally {

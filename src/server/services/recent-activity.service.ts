@@ -509,7 +509,7 @@ export class RecentActivityService {
     // Alert resolved and active alerts
     if (!type || type === 'alert') {
       // Get all alerts (both active and resolved) - apply date filter
-      let allAlerts = [];
+      let allAlerts: any[] = [];
       try {
         allAlerts = await prisma.escalationAlert.findMany({
         where: {

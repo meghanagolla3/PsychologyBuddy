@@ -58,7 +58,7 @@ export const GET = withPermission({
               orderBy: { createdAt: 'desc' },
               take: 1
             },
-            counselingSessions: {
+            studentCounselingSessions: {
               orderBy: { createdAt: 'desc' },
               take: 1
             }

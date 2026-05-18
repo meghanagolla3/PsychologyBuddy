@@ -1,6 +1,7 @@
 import prisma from '@/src/prisma';
 import { BadgeService } from '../services/badge.service';
 
+// Trigger HMR recompilation after restoring schema fields
 export class StreakService {
   /**
    * Updates user's streak based on activity
