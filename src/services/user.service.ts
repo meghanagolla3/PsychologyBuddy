@@ -347,6 +347,7 @@ export class UserService {
                 }
               },
               classes: true,
+              schoolLocations: true,
             },
           },
         },
@@ -407,6 +408,7 @@ export class UserService {
           return {
             ...school,
             studentCount: school._count.users,
+            locationsCount: school._count.schoolLocations || 0,
             alertCount,
             checkInsToday
           };

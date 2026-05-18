@@ -132,7 +132,7 @@ async function fetchSchools({
   return {
     data: paginatedSchools.map((school: any) => ({
       ...school,
-      locationsCount: school.locations?.length || 0,
+      locationsCount: school.locationsCount ?? school.locations?.length ?? 0,
     })),
     pagination: {
       total: filteredSchools.length,

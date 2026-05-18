@@ -15,6 +15,13 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { SchoolSearch } from '@/src/components/admin/modals/SchoolSearch';
@@ -518,45 +525,27 @@ export function AddAdminModal({ onClose, onSuccess, schools }: AddAdminModalProp
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Role *
                 </label>
-                <Popover open={isRolePopoverOpen} onOpenChange={setIsRolePopoverOpen}>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant="outline"
-                      type="button"
-                      className={`w-full justify-between text-left font-normal ${
-                        errors.role ? 'border-red-500' : 'border-gray-300'
-                      }`}
-                    >
-                      {roleOptions.find(role => role.value === formData.role)?.label || 'Select role'}
-                      <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-full p-2 border z-10 bg-white shadow-xl rounded-[6px]" align="start">
-                    <div className="p-1">
-                      {roleOptions.map((role) => (
-                        <div
-                          key={role.value}
-                          className="flex items-center px-3 py-2 cursor-pointer hover:bg-gray-100 rounded-md"
-                          onClick={() => {
-                            handleInputChange('role', role.value);
-                            setIsRolePopoverOpen(false);
-                          }}
-                        >
-                          <div
-                            className={`h-4 w-4 border rounded-full flex items-center justify-center ${
-                              formData.role === role.value ? "bg-blue-500 border-blue-500" : "border-gray-300"
-                            }`}
-                          >
-                            {formData.role === role.value && (
-                              <Check className="h-3 w-3 text-white" />
-                            )}
-                          </div>
-                          <span className="ml-2">{role.label}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </PopoverContent>
-                </Popover>
+                <Select
+                  value={formData.role}
+                  onValueChange={(value: 'ADMIN' | 'SCHOOL_SUPERADMIN' | 'SUPERADMIN') => {
+                    handleInputChange('role', value);
+                  }}
+                >
+                  <SelectTrigger
+                    className={`w-full bg-[#FFFFFF] font-normal border ${
+                      errors.role ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-[#3B82F6]'
+                    }`}
+                  >
+                    <SelectValue placeholder="Select role" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-white border z-50">
+                    {roleOptions.map((role) => (
+                      <SelectItem key={role.value} value={role.value}>
+                        {role.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
                 {errors.role && (
                   <p className="mt-1 text-sm text-red-600">{errors.role}</p>
                 )}
@@ -584,45 +573,27 @@ export function AddAdminModal({ onClose, onSuccess, schools }: AddAdminModalProp
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Status *
                 </label>
-                <Popover open={isStatusPopoverOpen} onOpenChange={setIsStatusPopoverOpen}>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant="outline"
-                      type="button"
-                      className={`w-full justify-between text-left font-normal ${
-                        errors.status ? 'border-red-500' : 'border-gray-300'
-                      }`}
-                    >
-                      {statusOptions.find(status => status.value === formData.status)?.label || 'Select status'}
-                      <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-full p-2 border z-10 bg-white shadow-xl rounded-[6px]" align="start">
-                    <div className="p-1">
-                      {statusOptions.map((status) => (
-                        <div
-                          key={status.value}
-                          className="flex items-center px-3 py-2 cursor-pointer hover:bg-gray-100 rounded-md"
-                          onClick={() => {
-                            handleInputChange('status', status.value);
-                            setIsStatusPopoverOpen(false);
-                          }}
-                        >
-                          <div
-                            className={`h-4 w-4 border rounded-full flex items-center justify-center ${
-                              formData.status === status.value ? "bg-blue-500 border-blue-500" : "border-gray-300"
-                            }`}
-                          >
-                            {formData.status === status.value && (
-                              <Check className="h-3 w-3 text-white" />
-                            )}
-                          </div>
-                          <span className="ml-2">{status.label}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </PopoverContent>
-                </Popover>
+                <Select
+                  value={formData.status}
+                  onValueChange={(value: 'ACTIVE' | 'INACTIVE' | 'SUSPENDED') => {
+                    handleInputChange('status', value);
+                  }}
+                >
+                  <SelectTrigger
+                    className={`w-full bg-[#FFFFFF] font-normal border ${
+                      errors.status ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-[#3B82F6]'
+                    }`}
+                  >
+                    <SelectValue placeholder="Select status" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-white border z-50">
+                    {statusOptions.map((status) => (
+                      <SelectItem key={status.value} value={status.value}>
+                        {status.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
                 {errors.status && (
                   <p className="mt-1 text-sm text-red-600">{errors.status}</p>
                 )}
@@ -659,52 +630,35 @@ export function AddAdminModal({ onClose, onSuccess, schools }: AddAdminModalProp
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Location Assignment *
                   </label>
-                  <Popover open={isLocationPopoverOpen} onOpenChange={setIsLocationPopoverOpen}>
-                    <PopoverTrigger asChild>
-                      <Button
-                        variant="outline"
-                        type="button"
-                        className={`w-full justify-between text-left font-normal ${
-                          errors.locationId ? 'border-red-500' : 'border-gray-300'
-                        }`}
-                      >
-                        {selectedLocation ? selectedLocation.name : 'Select location'}
-                        <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-full p-2 border bg-white shadow-xl rounded-[6px]" align="start">
-                      <div className="p-1 max-h-60 overflow-y-auto">
-                        {locations.length === 0 ? (
-                          <div className="px-3 py-2 text-sm text-gray-500">
-                            No locations available
-                          </div>
-                        ) : (
-                          locations.map((location) => (
-                            <div
-                              key={location.id}
-                              className="flex items-center px-3 py-2 cursor-pointer hover:bg-gray-100 rounded-md"
-                              onClick={() => {
-                                setSelectedLocation(location);
-                                handleInputChange('locationId', location.id);
-                                setIsLocationPopoverOpen(false);
-                              }}
-                            >
-                              <div
-                                className={`h-4 w-4 border rounded-full flex items-center justify-center ${
-                                  formData.locationId === location.id ? "bg-blue-500 border-blue-500" : "border-gray-300"
-                                }`}
-                              >
-                                {formData.locationId === location.id && (
-                                  <Check className="h-3 w-3 text-white" />
-                                )}
-                              </div>
-                              <span className="ml-2">{location.name}</span>
-                            </div>
-                          ))
-                        )}
-                      </div>
-                    </PopoverContent>
-                  </Popover>
+                  <Select
+                    value={formData.locationId}
+                    onValueChange={(value: string) => {
+                      const location = locations.find((l) => l.id === value) || null;
+                      setSelectedLocation(location);
+                      handleInputChange('locationId', value);
+                    }}
+                  >
+                    <SelectTrigger
+                      className={`w-full bg-[#FFFFFF] font-normal border ${
+                        errors.locationId ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-[#3B82F6]'
+                      }`}
+                    >
+                      <SelectValue placeholder="Select location" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-white border z-50">
+                      {locations.length === 0 ? (
+                        <SelectItem value="_no_locations" disabled>
+                          No locations available
+                        </SelectItem>
+                      ) : (
+                        locations.map((location) => (
+                          <SelectItem key={location.id} value={location.id}>
+                            {location.name}
+                          </SelectItem>
+                        ))
+                      )}
+                    </SelectContent>
+                  </Select>
                   {errors.locationId && (
                     <p className="mt-1 text-sm text-red-600">{errors.locationId}</p>
                   )}
