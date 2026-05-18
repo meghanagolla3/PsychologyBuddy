@@ -3,8 +3,6 @@
 import { useState, useEffect, ReactNode } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { Calendar, Plus, ChevronUp, SquarePen, Check, X, Save, ArrowLeft, Download, Eye, BookOpen, Dumbbell, Lightbulb, Heart, Music } from 'lucide-react';
-import html2canvas from 'html2canvas';
-import jsPDF from 'jspdf';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { Input } from '@/components/ui/input';
@@ -799,7 +797,6 @@ export default function IntakeSessionPage() {
         throw new Error(result.message || 'Failed to submit intake');
       }
       
-    } catch (err) {
       console.error('Submit intake error:', err);
       setError('Failed to submit intake');
     } finally {
@@ -808,105 +805,87 @@ export default function IntakeSessionPage() {
   };
 
   const downloadPDF = async () => {
-  const originalMode = mode;
+    const originalMode = mode;
 
-  try {
-    setDownloading(true);
+    try {
+      setDownloading(true);
 
-    // Step 1: Save form data
-    await saveDraft();
-
-    // Small delay to ensure save completes
-    await new Promise((resolve) => setTimeout(resolve, 800));
-
-    // Step 2: Switch to preview mode
-    setMode("preview");
-
-    // Wait for DOM to fully render
-    await new Promise((resolve) => setTimeout(resolve, 1200));
-
-    const element = document.getElementById("intake-preview");
-
-    if (!element) {
-      throw new Error("Preview element not found");
-    }
-
-    // Ensure A4 layout BEFORE capture
-    element.style.width = "794px";   // A4 width (96 DPI)
-    element.style.minHeight = "1123px";
-    element.style.background = "#ffffff";
-    element.style.padding = "40px";
-    element.style.boxSizing = "border-box";
-
-    // Step 3: Capture canvas (NO manual width/height)
-    const canvas = await html2canvas(element, {
-      scale: 2, // High quality
-      useCORS: true,
-      backgroundColor: "#ffffff",
-      logging: false,
-    });
-
-    const imgData = canvas.toDataURL("image/jpeg", 1.0);
-
-    // Step 4: Create PDF
-    const pdf = new jsPDF("p", "mm", "a4");
-
-    const pdfWidth = 210;
-    const pdfHeight = 297;
-
-    const imgWidth = pdfWidth;
-    const imgHeight = (canvas.height * imgWidth) / canvas.width;
-
-    let position = 0;
-
-    // Step 5: Handle multi-page (IMPORTANT)
-    if (imgHeight <= pdfHeight) {
-      pdf.addImage(imgData, "JPEG", 0, 0, imgWidth, imgHeight);
-    } else {
-      let heightLeft = imgHeight;
-
-      pdf.addImage(imgData, "JPEG", 0, position, imgWidth, imgHeight);
-      heightLeft -= pdfHeight;
-
-      while (heightLeft > 0) {
-        position = heightLeft - imgHeight;
-        pdf.addPage();
-        pdf.addImage(imgData, "JPEG", 0, position, imgWidth, imgHeight);
-        heightLeft -= pdfHeight;
+      // Step 1: Save data first if in edit mode
+      if (mode === 'edit') {
+        await saveDraft();
       }
+
+      // Small delay to ensure save completes
+      await new Promise((resolve) => setTimeout(resolve, 800));
+
+      // Step 2: Switch to preview mode for capture
+      setMode("preview");
+
+      // Wait for DOM to fully render
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
+      // Step 3: Create a hidden iframe for printing
+      const iframe = document.createElement('iframe');
+      iframe.style.position = 'fixed';
+      iframe.style.right = '0';
+      iframe.style.bottom = '0';
+      iframe.style.width = '0';
+      iframe.style.height = '0';
+      iframe.style.border = '0';
+      document.body.appendChild(iframe);
+
+      const doc = iframe.contentWindow?.document;
+      if (!doc) throw new Error("Could not create print iframe");
+
+      // Step 4: Copy styles
+      const styles = document.querySelectorAll('style, link[rel="stylesheet"]');
+      styles.forEach(style => {
+        doc.head.appendChild(style.cloneNode(true));
+      });
+
+      // Step 5: Copy content
+      const content = document.getElementById("intake-preview");
+      if (!content) throw new Error("Content not found");
+      
+      const clone = content.cloneNode(true) as HTMLElement;
+      doc.body.appendChild(clone);
+
+      // Step 6: Add print-specific styles
+      const printStyle = doc.createElement('style');
+      printStyle.textContent = `
+        @page { size: A4; margin: 15mm; }
+        body { background: white !important; padding: 0 !important; margin: 0 !important; }
+        #intake-preview { width: 100% !important; border: none !important; box-shadow: none !important; margin: 0 !important; padding: 0 !important; }
+        .no-print { display: none !important; }
+        * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+      `;
+      doc.head.appendChild(printStyle);
+
+      // Step 7: Wait for resources and print
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      iframe.contentWindow?.focus();
+      iframe.contentWindow?.print();
+
+      // Step 8: Cleanup and restore mode
+      setTimeout(() => {
+        if (document.body.contains(iframe)) {
+          document.body.removeChild(iframe);
+        }
+        if (originalMode !== "preview") {
+          setMode(originalMode);
+        }
+      }, 2000);
+
+    } catch (error) {
+      console.error("PDF download error:", error);
+      alert("Failed to generate PDF. Please try again.");
+      if (originalMode !== "preview") {
+        setMode(originalMode);
+      }
+    } finally {
+      setDownloading(false);
     }
-
-    // Step 6: File name
-    const studentName =
-      session?.student?.firstName && session?.student?.lastName
-        ? `${session.student.firstName}_${session.student.lastName}`
-        : "student";
-
-    const date = new Date().toISOString().split("T")[0];
-
-    const filename = `intake_form_${studentName}_${date}.pdf`;
-
-    // Step 7: Download
-    pdf.save(filename);
-
-    // Restore mode
-    if (originalMode !== "preview") {
-      setTimeout(() => setMode(originalMode), 500);
-    }
-  } catch (error) {
-    console.error("PDF download error:", error);
-    const errorMessage =
-      error instanceof Error ? error.message : "Unknown error occurred";
-
-    setError(`Failed to download PDF: ${errorMessage}`);
-
-    if (originalMode !== "preview") {
-      setMode(originalMode);
-    }
-  } finally {
-    setDownloading(false);
-  }
-};
+  };
 
   
   if (loading) {
@@ -982,7 +961,7 @@ export default function IntakeSessionPage() {
               disabled={downloading}
               className="inline-flex items-center gap-1.5 rounded-[13px] border border-[#E2E8F0] bg-[#FFFFFF] px-4 py-2 text-[14px] font-medium text-[#1E293B] hover:bg-[#E2E8F0] disabled:opacity-50"
             >
-              <Download className="h-3.5 w-3.5" /> {downloading ? 'Downloading...' : 'Download'}
+              <Download className="h-3.5 w-3.5" /> {downloading ? 'Preparing...' : 'Download'}
             </button>
           </div>
         </div>

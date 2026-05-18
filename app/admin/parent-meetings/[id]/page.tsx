@@ -11,8 +11,7 @@ import React, {
 import { useRouter, useSearchParams } from 'next/navigation';
 import { AdminHeader } from '@/src/components/admin/layout/AdminHeader';
 import { cn } from '@/lib/utils';
-import html2canvas from 'html2canvas';
-import jsPDF from 'jspdf';
+
 
 import {
   Mail,
@@ -342,81 +341,60 @@ export default function AdminParentMeetingDetailsPage({
     try {
       setDownloading(true);
 
-      // Wait for DOM to fully render
-      await new Promise((resolve) => setTimeout(resolve, 800));
+      // Create a hidden iframe
+      const iframe = document.createElement('iframe');
+      iframe.style.position = 'fixed';
+      iframe.style.right = '0';
+      iframe.style.bottom = '0';
+      iframe.style.width = '0';
+      iframe.style.height = '0';
+      iframe.style.border = '0';
+      document.body.appendChild(iframe);
 
-      const element = document.getElementById("admin-meeting-content");
+      const doc = iframe.contentWindow?.document;
+      if (!doc) throw new Error("Could not create print iframe");
 
-      if (!element) {
-        throw new Error("Report element not found");
-      }
-
-      // Ensure A4 layout BEFORE capture
-      element.style.width = "794px";   // A4 width (96 DPI)
-      element.style.minHeight = "1123px";
-      element.style.background = "#ffffff";
-      element.style.padding = "40px";
-      element.style.boxSizing = "border-box";
-
-      // Capture canvas
-      const canvas = await html2canvas(element, {
-        scale: 2, // High quality
-        useCORS: true,
-        backgroundColor: "#ffffff",
-        logging: false,
-        onclone: (clonedDoc) => {
-          // IMPORTANT: html2canvas crashes on oklch/lab colors.
-          // We must strip them from the cloned document before it tries to parse them.
-          const styles = clonedDoc.querySelectorAll('style');
-          styles.forEach(style => {
-            if (style.textContent) {
-              // Remove variables and rules using oklch/lab/lch
-              style.textContent = style.textContent
-                .replace(/oklch\([^)]+\)/g, '#ffffff') 
-                .replace(/lab\([^)]+\)/g, '#ffffff')
-                .replace(/lch\([^)]+\)/g, '#ffffff');
-            }
-          });
-        }
+      // Copy styles
+      const styles = document.querySelectorAll('style, link[rel="stylesheet"]');
+      styles.forEach(style => {
+        doc.head.appendChild(style.cloneNode(true));
       });
 
-      const imgData = canvas.toDataURL("image/jpeg", 1.0);
+      // Copy content
+      const content = document.getElementById("admin-meeting-content");
+      if (!content) throw new Error("Content not found");
+      
+      const clone = content.cloneNode(true) as HTMLElement;
+      doc.body.appendChild(clone);
 
-      // Create PDF
-      const pdf = new jsPDF("p", "mm", "a4");
-      const pdfWidth = 210;
-      const pdfHeight = 297;
-      const imgWidth = pdfWidth;
-      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      // Add print-specific styles
+      const printStyle = doc.createElement('style');
+      printStyle.textContent = `
+        @page { size: A4; margin: 15mm; }
+        body { background: white !important; padding: 0 !important; margin: 0 !important; }
+        #admin-meeting-content { width: 100% !important; border: none !important; box-shadow: none !important; margin: 0 !important; padding: 0 !important; }
+        .no-print { display: none !important; }
+        * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+      `;
+      doc.head.appendChild(printStyle);
 
-      let position = 0;
+      // Wait for resources
+      await new Promise(resolve => setTimeout(resolve, 1000));
 
-      // Handle multi-page
-      if (imgHeight <= pdfHeight) {
-        pdf.addImage(imgData, "JPEG", 0, 0, imgWidth, imgHeight);
-      } else {
-        let heightLeft = imgHeight;
-        pdf.addImage(imgData, "JPEG", 0, position, imgWidth, imgHeight);
-        heightLeft -= pdfHeight;
+      // Print
+      iframe.contentWindow?.focus();
+      iframe.contentWindow?.print();
 
-        while (heightLeft > 0) {
-          position = heightLeft - imgHeight;
-          pdf.addPage();
-          pdf.addImage(imgData, "JPEG", 0, position, imgWidth, imgHeight);
-          heightLeft -= pdfHeight;
+      // Cleanup
+      setTimeout(() => {
+        if (document.body.contains(iframe)) {
+          document.body.removeChild(iframe);
         }
-      }
+      }, 2000);
 
-      // File name
-      const studentName = meeting?.studentName ? meeting.studentName.replace(/\s+/g, '_') : "student";
-      const date = new Date().toISOString().split("T")[0];
-      const filename = `meeting_report_${studentName}_${date}.pdf`;
-
-      // Download
-      pdf.save(filename);
     } catch (error) {
       console.error("PDF download error:", error);
-      alert("Failed to download PDF report");
+      alert("Failed to generate PDF. Please try again.");
     } finally {
       setDownloading(false);
     }
@@ -449,7 +427,7 @@ export default function AdminParentMeetingDetailsPage({
               {downloading ? (
                 <>
                   <div className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-[#1E293B] border-t-transparent" />
-                  Downloading...
+                  Preparing...
                 </>
               ) : (
                 <>

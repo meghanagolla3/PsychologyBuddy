@@ -66,7 +66,7 @@ export const GET = withPermission({
 // Update/Save Session Report
 export const PATCH = withPermission({
   module: 'COUNSELING_SESSIONS',
-  action: 'EDIT',
+  action: 'UPDATE',
 })(async (req: NextRequest, { params, user, userSchoolId }: any) => {
   try {
     const { id } = await params;
