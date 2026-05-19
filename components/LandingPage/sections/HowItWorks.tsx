@@ -67,16 +67,15 @@ const HowItWorks = () => {
       </div>
 
       {/* ===== Animated Behind-Line (Hides on mobile/tablets where cards are stacked) ===== */}
-      <div className="absolute top-[385px] left-[1400px] -translate-x-1/2 w-[120%] hidden lg:block z-0">
+      <div className="absolute top-[420px] left-[1050px] -translate-x-1/2 w-[120%] hidden lg:block z-0">
         <motion.div
           style={{ width: animatedWidth }}
           className="h-[3px] border-2 border-[#2DC8EF] drop-shadow-sm drop-shadow-[#2DC8EF] rounded-full"
         />
       </div>
 
-      {/* ===== Steps Container ===== */}
-      <div className="max-w-7xl mx-auto px-6 md:px-12 relative z-10">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-y-20 sm:gap-y-24 lg:gap-4 justify-items-center w-full">
+      {/* ===== Steps ===== */}
+      <div className="max-w-8xl mx-auto grid grid-cols-1 md:grid-cols-4 justify-between px-6 md:px-26 py-10 md:py-20 relative z-10 gap-12 md:gap-4 justify-items-center">
           {steps.map((step) => (
             <div key={step.key} className="flex flex-col items-center text-center">
               
@@ -89,13 +88,13 @@ const HowItWorks = () => {
                     src={step.image}
                     alt={step.label}
                     width={
-                      step.key === "chooseMood" ? 650 :
+                      step.key === "chooseMood" ? 750 :
                       step.key === "aiSupport" ? 275 :
                       step.key === "learnGrow" ? 330 :
                       280 // expertHelp
                     }
                     height={
-                      step.key === "chooseMood" ? 650 :
+                      step.key === "chooseMood" ? 750 :
                       step.key === "aiSupport" ? 125 :
                       step.key === "learnGrow" ? 175 :
                       240 // expertHelp
@@ -118,7 +117,6 @@ const HowItWorks = () => {
               </p>
             </div>
           ))}
-        </div>
       </div>
     </section>
   );
