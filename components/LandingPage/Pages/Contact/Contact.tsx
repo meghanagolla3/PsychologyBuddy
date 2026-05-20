@@ -299,7 +299,7 @@ const ContactPage = () => {
               Join over 4,000+ startups already growing with Untitled.
             </p>
             <Link
-              href="#"
+              href="/login"
               className="inline-flex items-center bg-[#1B9EE0] hover:bg-[#1589b8] text-white font-medium text-sm sm:text-[16px] px-6 py-2.5 rounded-full transition-colors duration-200 shadow-md"
             >
               Get started

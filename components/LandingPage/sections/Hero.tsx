@@ -33,7 +33,7 @@ const Hero: React.FC = () => {
   ];
 
   const handleExploreNow = () => {
-    router.push("/login");
+    router.push("/about");
   };
 
   return (

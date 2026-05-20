@@ -92,7 +92,7 @@ const WhatWeOffer = () => {
             learning environments.
           </p>
           <Link
-            href="#"
+            href="/student-login"
             className="inline-flex items-center gap-2 bg-[#1DA0E1] hover:bg-[#1589b8] text-white font-medium text-[10px] sm:text-[16px] px-5 py-2 rounded-full transition-colors duration-200 shadow-md"
           >
             Get Started Now

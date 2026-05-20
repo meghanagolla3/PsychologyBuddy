@@ -44,7 +44,7 @@ const HeroSection = () => {
 
         {/* CTA */}
         <Link
-          href="#"
+          href="/contact"
           className="inline-flex items-center bg-gradient-to-b from-[#4FC1F9] to-[#1B9EE0] hover:bg-[#1589b8] text-white font-medium text-xs sm:text-[16px] px-6 sm:px-7 py-2.5 sm:py-3 rounded-full transition-colors duration-200 shadow-md"
         >
           Request a Demo

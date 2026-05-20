@@ -35,13 +35,13 @@ const Navigation: React.FC = () => {
             height={45}
             className="w-[30px] h-[30px] sm:w-[35px] sm:h-[35px] object-contain"
           />
-          <span className="font-semibold text-[15px] sm:text-xl lg:text-[16px] text-[#2F3D43] leading-tight">
+          <span className="font-semibold text-[16px] sm:text-xl lg:text-[17px] bg-gradient-to-b from-[#00A7DA] to-[#0F71A1] bg-clip-text text-transparent leading-tight">
             Psychology Buddy
           </span>
         </Link>
 
         {/* Desktop Nav Links (Matching your design figure) */}
-        <div className="hidden md:flex items-center gap-8 text-[#01243C] text-[15px] font-medium">
+        <div className="hidden md:flex items-center gap-8 ml-auto text-[#01243C] text-[15px] font-medium">
           <Link href="/about" className="hover:text-[#1B9EE0] transition">
             About us
           </Link>
@@ -63,7 +63,7 @@ const Navigation: React.FC = () => {
               bg-gradient-to-b from-[#4FC1F9] to-[#1B9EE0]
               text-[15px] text-white
               px-[16px] py-[6px]
-              h-auto
+              h-auto ml-5
               rounded-[24px]
               font-medium
               hover:bg-[#1588c2]

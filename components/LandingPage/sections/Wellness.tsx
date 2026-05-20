@@ -1,8 +1,9 @@
-"use client";
-
+import React from "react";
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { Sparkles } from "lucide-react";
+import { useRouter } from "next/navigation";
+
 
 /* ── Badge data ── */
 const badges = [
@@ -56,6 +57,7 @@ const SparkleIcon = () => (
 
 export default function WellnessSection() {
   const [visible, setVisible] = useState(false);
+  const router = useRouter();
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -136,7 +138,7 @@ export default function WellnessSection() {
           Let&apos;s unlock your potential together.
         </p>
 
-        <button className="bg-white text-sky-500 font-medium px-6 py-2.5 sm:px-8 sm:py-3.5 rounded-[24px] text-xs xs:text-sm sm:text-base md:text-lg shadow-lg hover:shadow-xl hover:scale-105 active:scale-95 transition-all duration-200">
+        <button onClick={() => router.push("/forschools")} className="bg-white text-sky-500 font-medium px-6 py-2.5 sm:px-8 sm:py-3.5 rounded-[24px] text-xs xs:text-sm sm:text-base md:text-lg shadow-lg hover:shadow-xl hover:scale-105 active:scale-95 transition-all duration-200">
           Explore Now
         </button>
       </div>
