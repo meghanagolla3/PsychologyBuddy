@@ -7,14 +7,18 @@ export default function TermsAndConditions() {
   return (
     <div className="min-h-screen bg-white">
       {/* Hero Header */}
-      <div className="relative w-full h-[354px] overflow-hidden">
+      <div className="relative w-full h-[200px] sm:h-[304px] md:h-[304px] overflow-hidden">
                     {/* Background Image */}
                     <Image 
-                      src="/terms/1.svg" 
+                                             src="/terms/Frame 50126388 (2).svg"  
                       alt="Psychology Buddy Background" 
                       fill
                       className="object-cover"
                     />
+                    {/* Overlay text */}
+                    <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                      <span className="text-2xl sm:text-3xl md:text-4xl font-bold text-white">Terms and Conditions</span>
+                    </div>
                     
                   </div>
 
@@ -23,8 +27,8 @@ export default function TermsAndConditions() {
 
         {/* 1 */}
         <div>
-          <h2 className="text-[20px] font-semibold text-[#3A3A3A] mb-2">1. Acceptance of Terms</h2>
-          <p className="text-[16px] text-[#767676] leading-relaxed">
+                    <h2 className="text-sm sm:text-base md:text-lg font-semibold text-[#3A3A3A] mb-2">1. Acceptance of Terms</h2>
+                    <p className="text-sm sm:text-base text-[#767676] leading-relaxed">
             By accessing and using Psychology Buddy ("Platform", "Service"), you agree to be bound by these Terms & Conditions. If you do not agree to these terms, you may not use our Service. These terms apply to all users, including but not limited to students, parents, educators, and administrators.
           </p>
         </div>
@@ -51,24 +55,24 @@ export default function TermsAndConditions() {
 
         {/* 3 */}
         <div>
-          <h2 className="text-[20px] font-semibold text-[#3A3A3A] mb-2">3. User Eligibility & Accounts</h2>
-          <p className="text-[16px] text-[#767676] mb-1">
+                    <h2 className="text-sm sm:text-base md:text-lg font-semibold text-[#3A3A3A] mb-2">3. User Eligibility & Accounts</h2>
+                    <p className="text-sm sm:text-base text-[#767676] mb-1">
             <span className="font-semibold text-gray-800">Student Users:</span> Must be enrolled in a participating school. Students under 13 require parental consent and consent from their school. Students 13 and older may use the Platform with school consent.
           </p>
-          <p className="text-sm text-gray-600 mb-1">
+                    <p className="text-xs sm:text-sm text-gray-600 mb-1">
             <span className="font-semibold text-gray-800">Adult Users (Parents/Educators):</span> Must be at least 18 years old to create an account.
           </p>
-          <p className="text-sm text-gray-600 mb-3">
+                    <p className="text-xs sm:text-sm text-gray-600 mb-3">
             <span className="font-semibold text-gray-800">School Administrators:</span> Must be authorized representatives of their school district and comply with all institutional policies.
           </p>
-          <p className="text-sm text-gray-600 leading-relaxed">
+                    <p className="text-xs sm:text-sm text-gray-600 leading-relaxed">
             You are responsible for maintaining the confidentiality of your login credentials and for all activities under your account. You agree to notify us immediately of any unauthorized use of your account.
           </p>
         </div>
 
         {/* 4 */}
         <div>
-          <h2 className="text-[20px] font-semibold text-[#3A3A3A] mb-2">4. Privacy & Data Protection</h2>
+                    <h2 className="text-sm sm:text-base md:text-lg font-semibold text-[#3A3A3A] mb-2">4. Privacy & Data Protection</h2>
           <ul className="space-y-1.5">
             {[
               "DPDP Act, 2023 : Data privacy, consent, minors' protection.",
@@ -88,7 +92,7 @@ export default function TermsAndConditions() {
         {/* 5 */}
         <div>
           <h2 className="text-[20px] font-semibold text-[#3A3A3A] mb-2">5. Acceptable Use Policy</h2>
-          <p className="text-sm text-gray-600 mb-3">You agree not to:</p>
+                    <p className="text-xs sm:text-sm text-gray-600 mb-3">You agree not to:</p>
           <ul className="space-y-1.5">
             {[
               "Harass, threaten, or abuse other users",

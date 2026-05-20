@@ -19,7 +19,7 @@ const Navigation: React.FC = () => {
       <div
         className="
           flex items-center justify-between
-          px-2  rounded-full 
+          px-2 py-1 sm:px-4 sm:py-2  rounded-full 
           bg-white/40 border-[0.1px] border-white/40
           shadow-[0_4px_20px_rgba(0,0,0,0.08)]
           ring-1 ring-white/40
@@ -33,9 +33,9 @@ const Navigation: React.FC = () => {
             alt="Psychology Buddy Logo"
             width={45}
             height={45}
-            className="w-[30px] h-[30px] sm:w-[35px] sm:h-[42px] object-contain"
+            className="w-[30px] h-[30px] sm:w-[35px] sm:h-[35px] object-contain"
           />
-          <span className="font-semibold text-[15px] sm:text-xl lg:text-[21px] text-[#2F3D43] leading-tight">
+          <span className="font-semibold text-[15px] sm:text-xl lg:text-[16px] text-[#2F3D43] leading-tight">
             Psychology Buddy
           </span>
         </Link>
