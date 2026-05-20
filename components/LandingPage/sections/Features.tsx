@@ -44,7 +44,7 @@ const Features: React.FC = () => {
   ];
 
   return (
-    <div className="-py-2 sm:py-10 md:py-28 px-4 sm:px-6 bg-transparent">
+    <div className="-py-2 sm:py-10 md:pt-28 px-4 sm:px-6 bg-transparent">
       {/* 1. Ensure the outer container is centered with mx-auto */}
       <div className="max-w-7xl mx-auto flex flex-col items-center">
         

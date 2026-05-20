@@ -10,7 +10,7 @@ const steps = [
     label: "Choose Mood",
     sublabel: "Step 1",
     image: "/HIW/11.png",
-    className: "md:-ml-20 md:-mt-28 md:w-[400px] md:h-[250px] -ml-10 -mt-14 w-[200px] h-[125px]",
+    className: "md:-ml-46 md:-mt-28 md:w-[600px] md:h-[352px] -ml-16 -mt-20 w-[300px] h-[186px]",
     description: "Choose your mood in seconds no pressure, just honesty",
   },
   {
@@ -48,13 +48,14 @@ const HowItWorks = () => {
     offset: ["start 80%", "end 30%"],
   });
 
-  // Animate line width
-  const animatedWidth = useTransform(scrollYProgress, [0, 1], ["0%", "65%"]);
+  // Animate line width/height
+  const animatedWidth = useTransform(scrollYProgress, [0, 1], ["0%", "100%"]);
+  const animatedHeight = useTransform(scrollYProgress, [0, 1], ["0%", "100%"]);
 
   return (
     <section
       ref={sectionRef}
-      className="py-12 sm:py-16 md:py-20 bg-gradient-to-r from-[#f5f5f9] via-[#f3f3f4]/10 to-[#f5f5f9] relative overflow-hidden"
+      className="py-12 sm:py-16 md:py-5 bg-gradient-to-r from-[#f5f5f9] via-[#f3f3f4]/10 to-[#f5f5f9] relative overflow-hidden"
     >
       {/* Section Title */}
       <div className="text-center mb-10 md:mb-16 px-4">
@@ -66,21 +67,34 @@ const HowItWorks = () => {
         </p>
       </div>
 
-      {/* ===== Animated Behind-Line (Hides on mobile/tablets where cards are stacked) ===== */}
-      <div className="absolute top-[420px] left-[1050px] -translate-x-1/2 w-[120%] hidden lg:block z-0">
-        <motion.div
-          style={{ width: animatedWidth }}
-          className="h-[3px] border-2 border-[#2DC8EF] drop-shadow-sm drop-shadow-[#2DC8EF] rounded-full"
-        />
-      </div>
-
       {/* ===== Steps ===== */}
-      <div className="max-w-8xl mx-auto grid grid-cols-1 md:grid-cols-4 justify-between px-6 md:px-26 py-10 md:py-20 relative z-10 gap-12 md:gap-4 justify-items-center">
-          {steps.map((step) => (
-            <div key={step.key} className="flex flex-col items-center text-center">
+      <div className="max-w-8xl mx-auto grid grid-cols-1 md:grid-cols-4 justify-between px-6 md:px-26 py-10 md:py-20 relative z-10 gap-20 md:gap-12 justify-items-center">
+        
+        {/* ===== Animated Behind-Line (Desktop: horizontal, connecting card centers) ===== */}
+        <div className="absolute left-[12.5%] right-[12.5%] top-[202px] hidden md:block z-0">
+          <div className="w-full h-[3px] bg-[#2DC8EF]/20 rounded-full relative">
+            <motion.div
+              style={{ width: animatedWidth }}
+              className="absolute left-0 top-0 h-full bg-[#2DC8EF] drop-shadow-[0_0_8px_#2DC8EF] rounded-full"
+            />
+          </div>
+        </div>
+
+        {/* ===== Animated Behind-Line (Mobile: vertical, connecting card centers) ===== */}
+        <div className="absolute left-[99px] top-[80px] bottom-[80px] w-[3px] md:hidden z-0">
+          <div className="h-full bg-[#2DC8EF]/20 rounded-full relative">
+            <motion.div
+              style={{ height: animatedHeight }}
+              className="absolute left-0 top-0 w-full bg-[#2DC8EF] drop-shadow-[0_0_8px_#2DC8EF] rounded-full"
+            />
+          </div>
+        </div>
+
+        {steps.map((step) => (
+            <div key={step.key} className="flex flex-row md:flex-col items-center text-left md:text-center w-full md:w-auto gap-6 md:gap-0 relative">
               
               {/* White rounded card background wrapper */}
-              <div className="relative w-[217px] h-[117px] drop-shadow-xl drop-shadow-[#589EE626] rounded-[21px] bg-white mt-4 md:mt-16 flex-shrink-0">
+              <div className="relative w-[150px] h-[81px] md:w-[217px] md:h-[117px] drop-shadow-xl drop-shadow-[#589EE626] rounded-[15px] md:rounded-[21px] bg-white mt-0 md:mt-16 flex-shrink-0 z-10">
                 
                 {/* Overlapping Character Illustration (Handcrafted offsets and sizes) */}
                 <div className={`flex ${step.className} items-center justify-center relative z-10`}>
@@ -106,15 +120,18 @@ const HowItWorks = () => {
 
               </div>
 
-              {/* Step Title */}
-              <h3 className="mt-6 md:mt-16 text-[16px] sm:text-[20px] md:text-[24px] font-semibold md:font-medium text-[#2F3D43]">
-                {step.label}
-              </h3>
+              {/* Step Text Info */}
+              <div className="flex flex-col text-left md:text-center md:items-center justify-center">
+                {/* Step Title */}
+                <h3 className="mt-0 md:mt-16 text-[18px] sm:text-[20px] md:text-[24px] font-semibold md:font-medium text-[#2F3D43]">
+                  {step.label}
+                </h3>
 
-              {/* Step Description */}
-              <p className="text-[#767676] mt-2 w-[180px] sm:w-[210px] text-[11px] sm:text-sm md:text-[16px] leading-relaxed px-2">
-                {step.description}
-              </p>
+                {/* Step Description */}
+                <p className="text-[#767676] mt-1.5 md:mt-2 w-full max-w-[260px] md:w-[180px] sm:w-[210px] text-[12px] sm:text-sm md:text-[16px] leading-relaxed">
+                  {step.description}
+                </p>
+              </div>
             </div>
           ))}
       </div>
