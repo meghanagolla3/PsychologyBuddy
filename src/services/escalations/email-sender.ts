@@ -17,6 +17,7 @@ export class EmailSender {
     if (this.transporter) {
       return this.transporter
     }
+    
 
     // Check if email is enabled
     if (process.env.EMAIL_ENABLED !== 'true') {

@@ -20,6 +20,7 @@ export class SMSService {
       // Format phone number for Twilio API
       const twilioPhone = this.formatPhoneNumberForTwilio(phoneNumber);
 
+      
       const message = await this.client.messages.create({
         body: `Your Psychology Buddy verification code is: ${otp}. This code will expire in 5 minutes.`,
         from: this.config.fromNumber,
