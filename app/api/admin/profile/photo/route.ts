@@ -80,7 +80,7 @@ export const POST = withPermission({
         status: true,
         createdAt: true,
         updatedAt: true,
-                emailVerified: true,
+        emailVerified: true,
         roleId: true,
         schoolId: true,
         role: {
@@ -165,7 +165,7 @@ export const DELETE = withPermission({
         status: true,
         createdAt: true,
         updatedAt: true,
-                emailVerified: true,
+        emailVerified: true,
         roleId: true,
         schoolId: true,
         role: {

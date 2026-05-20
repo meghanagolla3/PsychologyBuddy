@@ -31,6 +31,8 @@ function Calendar({
     <DayPicker
       showOutsideDays={showOutsideDays}
       captionLayout={captionLayout}
+      startMonth={new Date(2020, 0)}
+      endMonth={new Date(2035, 11)}
       className={cn(
         "w-fit rounded-2xl border border-[#E5E7EB] bg-white p-4",
         className
@@ -74,6 +76,10 @@ function Calendar({
 
         dropdown:
           "absolute inset-0 opacity-0 cursor-pointer z-20",
+
+        // Table
+        month_grid:
+          "w-full border-collapse",
 
         weekdays:
           "flex justify-between mb-2",
@@ -163,8 +169,8 @@ function Calendar({
           </div>
         ),
 
-        Dropdown: ({ value, onChange, options }) => {
-          const selectedOption = options?.find((opt) => opt.value === value)
+        Dropdown: ({ value, onChange, options }: any) => {
+          const selectedOption = options?.find((opt: any) => opt.value === value)
           
           const handleChange = (val: string) => {
             const changeEvent = {
@@ -176,7 +182,7 @@ function Calendar({
           return (
             <div className="relative inline-flex items-center group px-1 py-0.5 rounded hover:bg-gray-100 transition-colors">
               <span className="text-[17px] font-medium text-[#4293FE]">
-                {selectedOption?.label || 'Select'}
+                {selectedOption?.label || value}
               </span>
               <ChevronDown className="h-4 w-4 ml-1 text-[#6B7280] group-hover:text-gray-900" />
               <select
@@ -184,7 +190,7 @@ function Calendar({
                 value={value}
                 onChange={(e) => handleChange(e.target.value)}
               >
-                {options?.map((option) => (
+                {options?.map((option: any) => (
                   <option
                     key={option.value}
                     value={option.value}

@@ -15,20 +15,34 @@ export const PUT = withPermission({
       schoolId: user?.schoolId,
     };
     
-    if (!userInfo.id || !userInfo.schoolId) {
+    if (!userInfo.id) {
       return NextResponse.json(
-        { success: false, message: 'User not authenticated or not assigned to a school' },
+        { success: false, message: 'User not authenticated' },
         { status: 401 }
       );
     }
 
+    const isSuperAdmin = userInfo.role === 'SUPERADMIN';
+    const isAdmin = userInfo.role === 'ADMIN' || userInfo.role === 'SCHOOL_SUPERADMIN';
+
+    // Check if meeting exists and belongs to user's school
+    const where: any = { id: id };
+    if (!isSuperAdmin) {
+      if (!userInfo.schoolId) {
+        return NextResponse.json(
+          { success: false, message: 'User not assigned to a school' },
+          { status: 401 }
+        );
+      }
+      where.schoolId = userInfo.schoolId;
+      if (!isAdmin) {
+        where.counselorId = userInfo.id;
+      }
+    }
+
     // Get meeting details
     const meeting = await prisma.parentMeeting.findFirst({
-      where: {
-        id: id,
-        counselorId: userInfo.id,
-        schoolId: userInfo.schoolId,
-      },
+      where,
       include: {
         counselor: {
           select: {
@@ -44,6 +58,11 @@ export const PUT = withPermission({
             firstName: true,
             lastName: true,
             email: true,
+            classRef: {
+              select: {
+                name: true,
+              }
+            }
           }
         }
       }
@@ -51,7 +70,7 @@ export const PUT = withPermission({
 
     if (!meeting) {
       return NextResponse.json(
-        { success: false, message: 'Meeting not found' },
+        { success: false, message: 'Meeting not found or access denied' },
         { status: 404 }
       );
     }
@@ -83,6 +102,11 @@ export const PUT = withPermission({
             firstName: true,
             lastName: true,
             email: true,
+            classRef: {
+              select: {
+                name: true,
+              }
+            }
           }
         }
       }
@@ -124,20 +148,34 @@ export const GET = withPermission({
       schoolId: user?.schoolId,
     };
     
-    if (!userInfo.id || !userInfo.schoolId) {
+    if (!userInfo.id) {
       return NextResponse.json(
-        { success: false, message: 'User not authenticated or not assigned to a school' },
+        { success: false, message: 'User not authenticated' },
         { status: 401 }
       );
     }
 
+    const isSuperAdmin = userInfo.role === 'SUPERADMIN';
+    const isAdmin = userInfo.role === 'ADMIN' || userInfo.role === 'SCHOOL_SUPERADMIN';
+
+    // Check if meeting exists and belongs to user's school
+    const where: any = { id: id };
+    if (!isSuperAdmin) {
+      if (!userInfo.schoolId) {
+        return NextResponse.json(
+          { success: false, message: 'User not assigned to a school' },
+          { status: 401 }
+        );
+      }
+      where.schoolId = userInfo.schoolId;
+      if (!isAdmin) {
+        where.counselorId = userInfo.id;
+      }
+    }
+
     // Get meeting details
     const meeting = await prisma.parentMeeting.findFirst({
-      where: {
-        id: id,
-        counselorId: userInfo.id,
-        schoolId: userInfo.schoolId,
-      },
+      where,
       include: {
         counselor: {
           select: {
@@ -153,6 +191,11 @@ export const GET = withPermission({
             firstName: true,
             lastName: true,
             email: true,
+            classRef: {
+              select: {
+                name: true,
+              }
+            }
           }
         }
       }
@@ -160,7 +203,7 @@ export const GET = withPermission({
 
     if (!meeting) {
       return NextResponse.json(
-        { success: false, message: 'Meeting not found' },
+        { success: false, message: 'Meeting not found or access denied' },
         { status: 404 }
       );
     }
@@ -172,8 +215,14 @@ export const GET = withPermission({
       counselorEmail: meeting.counselor.email,
       studentName: `${meeting.student.firstName} ${meeting.student.lastName}`,
       studentEmail: meeting.student.email,
-      parentName: meeting.parentName, // Already in the table
-      parentEmail: meeting.student.email, // Using student email as parent email for now
+      studentClass: meeting.student.classRef?.name || meeting.level || 'N/A',
+      parentName: meeting.parentName,
+      parentEmail: meeting.student.email,
+      date: meeting.date ? new Date(meeting.date).toLocaleDateString('en-US', {
+        month: 'long',
+        day: 'numeric',
+        year: 'numeric'
+      }) : 'N/A',
     };
     
     return NextResponse.json({

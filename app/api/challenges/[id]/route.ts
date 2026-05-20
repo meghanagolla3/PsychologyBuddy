@@ -24,6 +24,43 @@ export const GET = withPermission({
       // Super Admin can see any challenge from any school
       challenge = await prisma.challenge.findUnique({
         where: { id },
+        include: {
+          creator: {
+            select: {
+              firstName: true,
+              lastName: true,
+              role: {
+                select: {
+                  name: true,
+                }
+              }
+            }
+          },
+          school: {
+            select: {
+              name: true,
+            }
+          },
+          userChallenges: {
+            include: {
+              user: {
+                select: {
+                  firstName: true,
+                  lastName: true,
+                  classRef: {
+                    select: {
+                      grade: true,
+                      section: true,
+                    }
+                  }
+                }
+              }
+            },
+            orderBy: {
+              startedAt: 'desc'
+            }
+          }
+        }
       });
     } else if (user.role.name === 'SCHOOL_SUPERADMIN' || user.role.name === 'ADMIN' || user.role.name === 'COUNSELOR') {
       // School Super Admin, Regular Admin, and Counselor can only see challenges from their school
@@ -32,6 +69,43 @@ export const GET = withPermission({
           id,
           schoolId: user.schoolId
         },
+        include: {
+          creator: {
+            select: {
+              firstName: true,
+              lastName: true,
+              role: {
+                select: {
+                  name: true,
+                }
+              }
+            }
+          },
+          school: {
+            select: {
+              name: true,
+            }
+          },
+          userChallenges: {
+            include: {
+              user: {
+                select: {
+                  firstName: true,
+                  lastName: true,
+                  classRef: {
+                    select: {
+                      grade: true,
+                      section: true,
+                    }
+                  }
+                }
+              }
+            },
+            orderBy: {
+              startedAt: 'desc'
+            }
+          }
+        }
       });
     } else {
       // Other roles (should not reach here due to permission check)
@@ -49,6 +123,8 @@ export const GET = withPermission({
       id: challenge.id,
       name: challenge.name,
       description: challenge.description,
+      startsAt: challenge.startsAt,
+      endsAt: challenge.endsAt,
       instructions: challenge.instructions,
       category: challenge.category,
       isActive: challenge.isActive,
@@ -56,10 +132,21 @@ export const GET = withPermission({
       requiresMusic: challenge.requiresMusic,
       requiresPsychoeducation: challenge.requiresPsychoeducation,
       requiresJournaling: challenge.requiresJournaling,
-      createdBy: challenge.createdBy,
-      schoolId: challenge.schoolId,
-      startsAt: challenge.startsAt,
-      endsAt: challenge.endsAt,
+      createdBy: `${challenge.creator.firstName} ${challenge.creator.lastName}`,
+      creatorRole: challenge.creator.role.name,
+      schoolName: challenge.school?.name || 'Unknown School',
+      participantCount: challenge.userChallenges.length,
+      participants: challenge.userChallenges.map((uc: any) => ({
+        id: uc.id,
+        userId: uc.userId,
+        userName: `${uc.user.firstName} ${uc.user.lastName}`,
+        userClass: uc.user.classRef 
+          ? `Class ${uc.user.classRef.grade}-${uc.user.classRef.section}`
+          : 'N/A',
+        status: uc.status,
+        startedAt: uc.startedAt,
+        completedAt: uc.completedAt,
+      })),
       createdAt: challenge.createdAt,
       updatedAt: challenge.updatedAt,
     };

@@ -9,21 +9,18 @@ import React, {
 } from 'react';
 
 import { useRouter, useSearchParams } from 'next/navigation';
+import { ParentLayout } from '@/src/components/parent/layout/ParentLayout';
 
 import {
+  ChevronUp,
+  ChevronDown,
+  Download,
+  User,
   Mail,
   Calendar,
-  User,
-  GraduationCap,
   Clock,
-  ShieldCheck,
-  Send,
-  CheckCircle2,
+  GraduationCap,
   ArrowLeft,
-  Pencil,
-  Eye,
-  Save,
-  Download,
 } from 'lucide-react';
 
 type Mode = 'edit' | 'preview';
@@ -52,166 +49,103 @@ interface Meeting {
 
 type SectionKey = 'purpose' | 'discussion' | 'recommendations' | 'notes';
 
-const EditableList = memo(function EditableList({
-  items,
-  setItems,
-  draft,
-  setDraft,
-  color,
-  inputBorder,
-  inputBg,
-  ringColor,
-}: {
-  items: string[];
-  setItems: React.Dispatch<React.SetStateAction<string[]>>;
-  draft: string;
-  setDraft: React.Dispatch<React.SetStateAction<string>>;
-  color: string;
-  inputBorder: string;
-  inputBg: string;
-  ringColor: string;
-}) {
-  const handleAdd = useCallback(() => {
-    if (draft.trim()) {
-      setItems([...items, draft.trim()]);
-      setDraft('');
+const BulletList = memo(
+  ({ items, color }: { items: string[]; color: string }) => {
+    if (!items || items.length === 0) {
+      return <p className="text-sm text-slate-400 italic px-4">No details provided</p>;
     }
-  }, [draft, items, setItems, setDraft]);
-
-  const handleRemove = useCallback(
-    (index: number) => {
-      setItems(items.filter((_, i) => i !== index));
-    },
-    [items, setItems]
-  );
-
-  return (
-    <div className="space-y-2">
-      <div className="flex gap-2">
-        <input
-          type="text"
-          value={draft}
-          onChange={(e) => setDraft(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter') {
-              e.preventDefault();
-              handleAdd();
-            }
-          }}
-          className={`flex-1 px-3 py-2 rounded-lg border ${inputBorder} ${inputBg} text-sm focus:outline-none focus:ring-2 ${ringColor}`}
-          placeholder="Type and press Enter to add..."
-        />
-        <button
-          type="button"
-          onClick={handleAdd}
-          className={`px-4 py-2 rounded-lg ${color} text-white text-sm font-medium hover:opacity-90`}
-        >
-          Add
-        </button>
-      </div>
-      <ul className="space-y-1">
+    return (
+      <ul className="space-y-2 px-4">
         {items.map((item, index) => (
           <li
-            key={index}
-            className="flex items-center justify-between px-3 py-2 rounded-lg bg-white border border-slate-200"
+            key={`${item}-${index}`}
+            className="flex gap-2 p-1 text-sm text-slate-700"
           >
-            <span className="text-sm text-slate-700">{item}</span>
-            <button
-              type="button"
-              onClick={() => handleRemove(index)}
-              className="text-slate-400 hover:text-red-500"
-            >
-              ×
-            </button>
+            <span
+              className={`mt-1.5 w-1.5 h-1.5 rounded-full ${color} shrink-0`}
+            />
+
+            <span>{item}</span>
           </li>
         ))}
       </ul>
-    </div>
-  );
-});
-
-EditableList.displayName = 'EditableList';
-
-const BulletList = memo(function BulletList({
-  items,
-  color,
-}: {
-  items: string[];
-  color: string;
-}) {
-  if (!items || items.length === 0) {
-    return <p className="text-sm text-slate-400 italic">No items added</p>;
+    );
   }
-
-  return (
-    <ul className="space-y-1">
-      {items.map((item, index) => (
-        <li key={index} className="flex items-start gap-2">
-          <span className={`mt-1.5 w-1.5 h-1.5 rounded-full ${color} shrink-0`} />
-          <span className="text-sm text-slate-700">{item}</span>
-        </li>
-      ))}
-    </ul>
-  );
-});
+);
 
 BulletList.displayName = 'BulletList';
 
-const SectionShell = memo(function SectionShell({
-  k,
-  title,
-  isOpen,
-  onToggle,
-  number,
-  numberBg,
-  children,
-  icon,
-}: {
-  k: SectionKey;
-  title: string;
-  isOpen: boolean;
-  onToggle: (key: SectionKey) => void;
-  number?: number;
-  numberBg?: string;
-  children: React.ReactNode;
-  icon?: React.ReactNode;
-}) {
-  return (
-    <section className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-      <button
-        type="button"
-        onClick={() => onToggle(k)}
-        className="w-full px-4 py-3 flex items-center justify-between hover:bg-slate-50 transition-colors"
-      >
-        <div className="flex items-center gap-3">
-          {number && (
-            <span
-              className={`flex items-center justify-center w-6 h-6 rounded-full text-xs font-semibold text-white ${numberBg}`}
+
+const SectionShell = memo(
+  ({
+    k,
+    title,
+    isOpen,
+    onToggle,
+    number,
+    numberBg,
+    icon,
+    right,
+    children,
+  }: {
+    k: SectionKey;
+    title: string;
+    isOpen: boolean;
+    onToggle: (k: SectionKey) => void;
+    number?: number;
+    numberBg?: string;
+    icon?: React.ReactNode;
+    right?: React.ReactNode;
+    children: React.ReactNode;
+  }) => {
+    return (
+      <section className="bg-white rounded-[22px] border border-slate-200">
+        <header className="flex items-center justify-between px-8 py-6">
+          <div className="flex items-center gap-2.5">
+            {number !== undefined ? (
+              <span
+                className={`w-6 h-6 rounded-full ${numberBg} text-white text-xs font-semibold flex items-center justify-center`}
+              >
+                {number}
+              </span>
+            ) : (
+              icon
+            )}
+
+            <h2 className="text-[16px] font-medium text-[#3A3A3A]">
+              {title}
+            </h2>
+          </div>
+
+          <div className="flex items-center gap-2">
+            {right}
+
+            <button
+              type="button"
+              onClick={() => onToggle(k)}
+              className="p-1 rounded text-slate-400 hover:text-slate-600 hover:bg-slate-100"
             >
-              {number}
-            </span>
-          )}
-          {icon && <span>{icon}</span>}
-          <h2 className="text-sm font-semibold text-slate-800">{title}</h2>
-        </div>
-        <span className="text-slate-400">
-          {isOpen ? (
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
-            </svg>
-          ) : (
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-            </svg>
-          )}
-        </span>
-      </button>
-      {isOpen && <div className="px-4 pb-4 pt-2">{children}</div>}
-    </section>
-  );
-});
+              {isOpen ? (
+                <ChevronUp className="w-4 h-4" />
+              ) : (
+                <ChevronDown className="w-4 h-4" />
+              )}
+            </button>
+          </div>
+        </header>
+
+        {isOpen && (
+          <div className="px-7 pb-4">
+            {children}
+          </div>
+        )}
+      </section>
+    );
+  }
+);
 
 SectionShell.displayName = 'SectionShell';
+
 
 export default function ParentMeetingDetailsPage({
   params,
@@ -222,19 +156,10 @@ export default function ParentMeetingDetailsPage({
   const searchParams = useSearchParams();
 
   const [mounted, setMounted] = useState(false);
-
   const [loading, setLoading] = useState(true);
-
+  const [downloading, setDownloading] = useState(false);
   const [meeting, setMeeting] = useState<Meeting | null>(null);
 
-  const [mode, setMode] = useState<Mode>('edit');
-
-  useEffect(() => {
-    const modeParam = searchParams.get('mode');
-    if (modeParam === 'preview') {
-      setMode('preview');
-    }
-  }, [searchParams]);
 
   const [open, setOpen] = useState<
     Record<SectionKey, boolean>
@@ -256,10 +181,6 @@ export default function ParentMeetingDetailsPage({
   const [discussion, setDiscussion] = useState<string[]>([]);
   const [recommendations, setRecommendations] = useState<string[]>([]);
   const [notes, setNotes] = useState<string[]>([]);
-
-  const [draftDiscussion, setDraftDiscussion] = useState('');
-  const [draftRecommendation, setDraftRecommendation] = useState('');
-  const [draftNote, setDraftNote] = useState('');
 
   useEffect(() => {
     setMounted(true);
@@ -344,83 +265,105 @@ export default function ParentMeetingDetailsPage({
 
     return [
       {
-        label: 'Date',
-        value: meetingDate.toLocaleDateString('en-US', {
+        icon: <User className="w-4 h-4" />,
+        label: 'Parent Name',
+        value: meeting.parentName || 'N/A',
+      },
+      {
+        icon: <Mail className="w-4 h-4" />,
+        label: 'Email Id',
+        value: meeting.studentEmail || 'N/A',
+      },
+      {
+        icon: <Calendar className="w-4 h-4" />,
+        label: 'Meeting Date',
+        value: new Date(meeting.date).toLocaleDateString('en-US', {
           month: 'short',
           day: 'numeric',
           year: 'numeric',
         }),
-        icon: <Calendar className="w-4 h-4" />,
       },
       {
-        label: 'Time',
-        value: meeting.time,
         icon: <Clock className="w-4 h-4" />,
+        label: 'Meeting Time',
+        value: meeting.time,
       },
       {
-        label: 'Student',
-        value: meeting.studentName,
-        icon: <User className="w-4 h-4" />,
-      },
-      {
-        label: 'Counselor',
-        value: meeting.counselorName,
         icon: <GraduationCap className="w-4 h-4" />,
+        label: 'Student Name',
+        value: meeting.studentName,
       },
       {
+        icon: <Clock className="w-4 h-4" />,
         label: 'Duration',
         value: '30 mins',
       },
     ];
   }, [meeting]);
 
-  const handleDownload = useCallback(() => {
-    alert('Download functionality coming soon!');
-  }, []);
-
-  const handleSaveDraft = useCallback(async () => {
+  const handleDownload = async () => {
     try {
-      if (!meeting?.id) {
-        return;
-      }
+      setDownloading(true);
 
-      const response = await fetch(
-        `/api/parent/parent-meetings/${meeting.id}`,
-        {
-          method: 'PUT',
-          headers: {
-            'Content-Type':
-              'application/json',
-          },
-          body: JSON.stringify({
-            purpose,
-            discussion: discussion.join('\n'),
-            recommendations: recommendations.join('\n'),
-            notes: notes.join('\n'),
-          }),
+      // Create a hidden iframe
+      const iframe = document.createElement('iframe');
+      iframe.style.position = 'fixed';
+      iframe.style.right = '0';
+      iframe.style.bottom = '0';
+      iframe.style.width = '0';
+      iframe.style.height = '0';
+      iframe.style.border = '0';
+      document.body.appendChild(iframe);
+
+      const doc = iframe.contentWindow?.document;
+      if (!doc) throw new Error("Could not create print iframe");
+
+      // Copy styles
+      const styles = document.querySelectorAll('style, link[rel="stylesheet"]');
+      styles.forEach(style => {
+        doc.head.appendChild(style.cloneNode(true));
+      });
+
+      // Copy content
+      const content = document.getElementById("parent-meeting-content");
+      if (!content) throw new Error("Content not found");
+      
+      const clone = content.cloneNode(true) as HTMLElement;
+      doc.body.appendChild(clone);
+
+      // Add print-specific styles
+      const printStyle = doc.createElement('style');
+      printStyle.textContent = `
+        @page { size: A4; margin: 15mm; }
+        body { background: white !important; padding: 0 !important; margin: 0 !important; }
+        #parent-meeting-content { width: 100% !important; border: none !important; box-shadow: none !important; margin: 0 !important; padding: 0 !important; }
+        .no-print { display: none !important; }
+        * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+      `;
+      doc.head.appendChild(printStyle);
+
+      // Wait for resources
+      await new Promise(resolve => setTimeout(resolve, 1000));
+
+      // Print
+      iframe.contentWindow?.focus();
+      iframe.contentWindow?.print();
+
+      // Cleanup
+      setTimeout(() => {
+        if (document.body.contains(iframe)) {
+          document.body.removeChild(iframe);
         }
-      );
+      }, 2000);
 
-      const result = await response.json();
-
-      if (result.success) {
-        alert(
-          'Meeting details saved successfully'
-        );
-      } else {
-        alert('Failed to save: ' + result.message);
-      }
     } catch (error) {
-      console.error('Save error:', error);
-      alert('Could not save meeting details');
+      console.error("PDF download error:", error);
+      alert("Failed to generate PDF. Please try again.");
+    } finally {
+      setDownloading(false);
     }
-  }, [
-    meeting,
-    purpose,
-    discussion,
-    recommendations,
-    notes,
-  ]);
+  };
+
 
   if (!mounted) return null;
 
@@ -432,196 +375,123 @@ export default function ParentMeetingDetailsPage({
     );
   }
 
-  return (
-    <div className="min-h-screen bg-slate-50">
-      <header className="bg-white border-b border-slate-200 sticky top-0 z-10">
-        <div className="mx-auto max-w-2xl px-4 py-3 flex items-center gap-3">
-          <button
-            type="button"
-            onClick={() => router.back()}
-            className="p-2 rounded-lg hover:bg-slate-100"
-          >
-            <ArrowLeft className="w-5 h-5" />
-          </button>
-
-          <h1 className="text-base font-semibold text-slate-800 flex-1">
-            Parent - Meeting Details
-          </h1>
-        </div>
-
-        <div className="mx-auto max-w-2xl px-4 pb-3 flex flex-wrap items-center gap-2">
-              <button
-                type="button"
-                onClick={() => setMode('edit')}
-                className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium border ${
-                  mode === 'edit'
-                    ? 'bg-blue-600 text-white border-blue-600'
-                    : 'bg-white text-slate-700 border-slate-300'
-                }`}
-              >
-                <Pencil className="w-3.5 h-3.5" />
-                Edit
-              </button>
-
-              <button
-                type="button"
-                onClick={() =>
-                  setMode('preview')
-                }
-                className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium border ${
-                  mode === 'preview'
-                    ? 'bg-blue-600 text-white border-blue-600'
-                    : 'bg-white text-slate-700 border-slate-300'
-                }`}
-              >
-                <Eye className="w-3.5 h-3.5" />
-                Preview
-              </button>
-
-              <button
-                type="button"
-                onClick={handleSaveDraft}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium border bg-white text-slate-700 border-slate-300"
-              >
-                <Save className="w-3.5 h-3.5" />
-                Save
-              </button>
-
-              <button
-                type="button"
-                onClick={handleDownload}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium border bg-white text-slate-700 border-slate-300"
-              >
-                <Download className="w-3.5 h-3.5" />
-                Download
-              </button>
-        </div>
-      </header>
-
-      <main className={`mx-auto max-w-2xl px-4 py-4 space-y-3 ${mode === 'edit' ? 'pb-28' : 'pb-4'}`}>
-        <section className="bg-white rounded-xl border border-slate-200 p-4 shadow-sm">
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm">
-            {info.map((item) => (
-              <div key={item.label}>
-                <div className="flex items-center gap-1.5 text-xs text-slate-500 mb-1">
-                  <span className="text-slate-400">
-                    {item.icon}
-                  </span>
-
-                  {item.label}
-                </div>
-
-                <div className="text-sm font-medium text-slate-800">
-                  {item.value}
-                </div>
+  return (    <ParentLayout>
+      <div className="min-h-screen ">
+        <header className="mx-auto max-w-7xl px-4 py-8">
+          <div className="flex items-start justify-between gap-4 flex-wrap">
+            <div>
+              <h1 className="text-[32px] font-bold text-[#3A3A3A]">Meeting Details</h1>
+              <div className="mt-2 flex items-center gap-2 text-sm text-[#707D8F]">
+                <span>{meeting?.studentName}</span>
+                <span>·</span>
+                <span>{meeting?.studentEmail}</span>
               </div>
-            ))}
+            </div>
+            <button
+              type="button"
+              onClick={handleDownload}
+              disabled={downloading}
+              className="inline-flex items-center gap-2 bg-[#2D85F2] hover:bg-[#2D85F2]/90 text-white rounded-[12px] px-6 py-2.5 shadow-sm shadow-[#2D85F2]/20 text-sm font-semibold transition-all disabled:opacity-50"
+            >
+              {downloading ? (
+                <>
+                  <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                  Preparing...
+                </>
+              ) : (
+                <>
+                  <Download className="h-4 w-4" />
+                  Download Report
+                </>
+              )}
+            </button>
           </div>
-        </section>
+          
+          <button 
+            onClick={() => router.back()}
+            className="mt-6 inline-flex items-center gap-1.5 text-sm font-medium text-[#707D8F] hover:text-[#3A3A3A] transition-colors"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Back to Meetings
+          </button>
+        </header>
 
-        <SectionShell
-          k="purpose"
-          title="Meeting Purpose"
-          isOpen={open.purpose}
-          onToggle={toggle}
-          number={1}
-          numberBg="bg-emerald-500"
-        >
-          {mode === 'edit' ? (
-            <textarea
-              value={purpose}
-              onChange={(e) => setPurpose(e.target.value)}
-              className="w-full px-3 py-2 rounded-lg border border-emerald-200 bg-emerald-50/30 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-300"
-              rows={3}
-              placeholder="Enter the purpose of this meeting..."
-            />
-          ) : (
-            <p className="text-sm text-slate-700">{purpose || 'No purpose specified'}</p>
-          )}
-        </SectionShell>
+        <main id="parent-meeting-content" className="mx-auto max-w-7xl px-4 space-y-4 pb-20">
+          {/* Summary Card */}
+          <section className="bg-[#FEFEFE] rounded-[24px] border border-[#D5DAE0] p-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-8">
+              {info.map((item) => (
+                <div key={item.label} className="space-y-2">
+                  <div className="flex items-center gap-2 text-[#707D8F]">
+                    {item.icon}
+                    <span className="text-xs font-medium uppercase tracking-wider">{item.label}</span>
+                  </div>
+                  <div className="text-base font-semibold text-[#3A3A3A]">
+                    {item.value}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
 
-        <SectionShell
-          k="discussion"
-          title="Discussion Points"
-          isOpen={open.discussion}
-          onToggle={toggle}
-          number={2}
-          numberBg="bg-blue-500"
-        >
-          {mode === 'edit' ? (
-            <EditableList
-              items={discussion}
-              setItems={setDiscussion}
-              draft={draftDiscussion}
-              setDraft={setDraftDiscussion}
-              color="bg-blue-500"
-              inputBorder="border-blue-200"
-              inputBg="bg-blue-50/30"
-              ringColor="focus:ring-blue-300"
-            />
-          ) : (
+
+          <SectionShell
+            k="purpose"
+            title="Meeting Purpose"
+            isOpen={open.purpose}
+            onToggle={toggle}
+            number={1}
+            numberBg="bg-[#16A249]"
+          >
+            <div className="bg-[#EEFEF4] border border-[#B8D8C4] rounded-[16px] p-5">
+              <p className="text-sm text-slate-700">{purpose || 'No purpose specified'}</p>
+            </div>
+          </SectionShell>
+
+          <SectionShell
+            k="discussion"
+            title="Discussion Summary"
+            isOpen={open.discussion}
+            onToggle={toggle}
+            number={2}
+            numberBg="bg-[#3496D0]"
+          >
             <BulletList
               items={discussion}
-              color="bg-blue-500"
+              color="bg-[#3496D0]"
             />
-          )}
-        </SectionShell>
+          </SectionShell>
 
-        <SectionShell
-          k="recommendations"
-          title="Recommendations"
-          isOpen={open.recommendations}
-          onToggle={toggle}
-          number={3}
-          numberBg="bg-purple-500"
-        >
-          {mode === 'edit' ? (
-            <EditableList
-              items={recommendations}
-              setItems={setRecommendations}
-              draft={draftRecommendation}
-              setDraft={setDraftRecommendation}
-              color="bg-purple-500"
-              inputBorder="border-purple-200"
-              inputBg="bg-purple-50/30"
-              ringColor="focus:ring-purple-300"
-            />
-          ) : (
+          <SectionShell
+            k="recommendations"
+            title="Recommendations"
+            isOpen={open.recommendations}
+            onToggle={toggle}
+            number={3}
+            numberBg="bg-[#6A63E9]"
+          >
             <BulletList
               items={recommendations}
-              color="bg-purple-500"
+              color="bg-[#6A63E9]"
             />
-          )}
-        </SectionShell>
+          </SectionShell>
 
-        <SectionShell
-          k="notes"
-          title="Counselor Notes"
-          isOpen={open.notes}
-          onToggle={toggle}
-          number={4}
-          numberBg="bg-amber-500"
-        >
-          {mode === 'edit' ? (
-            <EditableList
-              items={notes}
-              setItems={setNotes}
-              draft={draftNote}
-              setDraft={setDraftNote}
-              color="bg-amber-500"
-              inputBorder="border-amber-200"
-              inputBg="bg-amber-50/30"
-              ringColor="focus:ring-amber-300"
-            />
-          ) : (
+          <SectionShell
+            k="notes"
+            title="Counselor Notes"
+            isOpen={open.notes}
+            onToggle={toggle}
+            number={4}
+            numberBg="bg-[#EB941A]"
+          >
             <BulletList
               items={notes}
-              color="bg-amber-500"
+              color="bg-[#EB941A]"
             />
-          )}
-        </SectionShell>
+          </SectionShell>
 
-      </main>
-    </div>
+        </main>
+      </div>
+    </ParentLayout>
   );
 }

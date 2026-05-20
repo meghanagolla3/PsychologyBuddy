@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { Bell, Menu, X } from "lucide-react";
 import { Sidebar } from './CounselorSidebar';
+import { CounselorNotifications } from './CounselorNotifications';
 import { Protected } from '@/src/components/Protected';
 import { cn } from '@/lib/utils';
 
@@ -54,13 +55,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             </button>
 
             <div className="flex items-center gap-4">
-              <button
-                className="relative flex h-10 w-10 items-center justify-center rounded-full text-foreground hover:bg-muted transition-colors"
-                aria-label="Notifications"
-              >
-                <Bell className="h-5 w-5 text-gray-600" strokeWidth={1.8} />
-                <span className="absolute right-2.5 top-2.5 h-2 w-2 rounded-full bg-red-500 ring-2 ring-white" />
-              </button>
+              <CounselorNotifications />
             </div>
           </header>
 

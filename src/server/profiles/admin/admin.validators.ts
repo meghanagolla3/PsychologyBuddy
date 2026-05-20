@@ -8,7 +8,7 @@ export const CreateAdminSchema = z.object({
     .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/, 'Password must contain uppercase, lowercase, and number'),
   firstName: z.string().min(2, 'First name must be at least 2 characters'),
   lastName: z.string().min(2, 'Last name must be at least 2 characters'),
-  role: z.enum(['ADMIN', 'SCHOOL_SUPERADMIN', 'SUPERADMIN', 'PARENT']),
+  role: z.enum(['ADMIN', 'SCHOOL_SUPERADMIN', 'SUPERADMIN']),
   status: z.enum(['ACTIVE', 'INACTIVE', 'SUSPENDED']).default('ACTIVE'),
   schoolId: z.string().optional(),
   locationId: z.string().optional(),
@@ -21,14 +21,14 @@ export const CreateAdminSchema = z.object({
     return data.schoolId && data.schoolId.trim().length > 0 && 
            data.locationId && data.locationId.trim().length > 0;
   }
-  // If role is SCHOOL_SUPERADMIN or PARENT, schoolId is required but locationId is not
-  if (data.role === 'SCHOOL_SUPERADMIN' || data.role === 'PARENT') {
+  // If role is SCHOOL_SUPERADMIN, schoolId is required but locationId is not
+  if (data.role === 'SCHOOL_SUPERADMIN') {
     return data.schoolId && data.schoolId.trim().length > 0;
   }
   // If role is SUPERADMIN, schoolId is not required
   return true;
 }, {
-  message: 'School ID is required for ADMIN, SCHOOL_SUPERADMIN, and PARENT roles, Location ID is required for ADMIN role',
+  message: 'School ID is required for ADMIN and SCHOOL_SUPERADMIN roles, Location ID is required for ADMIN role',
   path: ['schoolId']
 });
 

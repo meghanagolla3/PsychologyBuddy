@@ -57,6 +57,10 @@ export const GET = withPermission({
             escalationAlerts: {
               orderBy: { createdAt: 'desc' },
               take: 1
+            },
+            studentCounselingSessions: {
+              orderBy: { createdAt: 'desc' },
+              take: 1
             }
           }
         }

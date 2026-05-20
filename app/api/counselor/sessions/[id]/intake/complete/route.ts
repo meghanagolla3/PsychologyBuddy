@@ -80,7 +80,8 @@ export const POST = withPermission({
       await prisma.escalationAlert.update({
         where: { id: currentSession.escalationId },
         data: {
-          status: 'RESOLVED',
+          status: 'resolved',
+          notes: 'Intake session completed',
         },
       });
     }
@@ -110,7 +111,7 @@ export const POST = withPermission({
       },
     });
 
-    // Note: Schema doesn't have nextSessionId field, skipping this update
+    // The followUpSession already references the current session via previousSessionId, so the relation is established.
 
     return NextResponse.json({
       success: true,

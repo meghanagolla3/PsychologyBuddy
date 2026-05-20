@@ -440,46 +440,22 @@ export const StudentRepository = {
     try {
       const students = await prisma.user.findMany({
         where: {
-          studentProfile: {
-            user: {
-              parentProfile: {
-                userId: parentId
-              }
-            }
-          }
+          parentId: parentId,
+          role: { name: 'STUDENT' }
         },
         include: {
-          studentProfile: {
-            include: {
-              user: {
-                select: {
-                  id: true,
-                  studentId: true,
-                  firstName: true,
-                  lastName: true,
-                  classRef: {
-                    select: {
-                      id: true,
-                      name: true,
-                      grade: true,
-                      section: true
-                    }
-                  }
-                }
-              }
-            }
-          }
+          classRef: true
         }
       });
 
       return students.map(student => ({
         id: student.id,
-        studentId: student.studentProfile?.user?.studentId,
-        name: `${student.studentProfile?.user?.firstName} ${student.studentProfile?.user?.lastName}`,
+        studentId: student.studentId,
+        name: `${student.firstName} ${student.lastName}`,
         email: student.email,
-        className: student.studentProfile?.user?.classRef?.name,
-        grade: student.studentProfile?.user?.classRef?.grade,
-        section: student.studentProfile?.user?.classRef?.section
+        className: student.classRef?.name || null,
+        grade: student.classRef?.grade || null,
+        section: student.classRef?.section || null
       }));
     } catch (error) {
       console.error('Error getting students by parent ID:', error);

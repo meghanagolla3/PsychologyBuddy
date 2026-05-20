@@ -27,11 +27,7 @@ export const GET = withPermission({
   try {
     console.log('Fetching challenges for admin:', user.id, 'role:', user.role.name, 'schoolId:', user.schoolId);
 
-    let challenges = await prisma.challenge.findMany({
-      orderBy: {
-        createdAt: 'desc',
-      },
-    });
+    let challenges: any[];
 
     // Check user role and schoolId to determine scope
     if (user.role.name === 'SUPERADMIN') {
@@ -149,7 +145,7 @@ export const POST = withPermission({
     
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { success: false, message: 'Validation error', errors: error.issues },
+        { success: false, message: 'Validation error', errors: (error as any).errors },
         { status: 400 }
       );
     }
@@ -237,7 +233,7 @@ export const PUT = withPermission({
     
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { success: false, message: 'Validation error', errors: error.issues },
+        { success: false, message: 'Validation error', errors: (error as any).errors },
         { status: 400 }
       );
     }

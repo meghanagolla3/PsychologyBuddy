@@ -24,6 +24,8 @@ interface Challenge {
   status: string;
   tone: "warning" | "info" | "success";
   createdBy: string;
+  completedOn?: string;
+  daysTaken?: number;
 }
 
 interface ChallengesResponse {
@@ -109,9 +111,9 @@ function CompletedChallengeCard({
   title: string;
   category: string;
   description: string;
-  completedOn: string;
-  daysTaken: number;
-  tone: "success";
+  completedOn?: string;
+  daysTaken?: number;
+  tone: "warning" | "info" | "success";
   onViewDetails: () => void;
 }) {
   return (
@@ -125,13 +127,17 @@ function CompletedChallengeCard({
             <h3 className="text-[17px] font-bold text-[#1E293B] mb-1">{title}</h3>
             <div className="flex items-center gap-3 text-sm text-[#64748B]">
               <CategoryPill label={category} tone={tone} />
-              <div className="flex items-center gap-1">
-                <span>• {daysTaken} days</span>
-              </div>
-              <div className="flex items-center gap-1">
-                <Calendar className="h-3.5 w-3.5" />
-                <span>Completed {new Date(completedOn).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
-              </div>
+              {daysTaken !== undefined && (
+                <div className="flex items-center gap-1">
+                  <span>• {daysTaken} days</span>
+                </div>
+              )}
+              {completedOn && (
+                <div className="flex items-center gap-1">
+                  <Calendar className="h-3.5 w-3.5" />
+                  <span>Completed {new Date(completedOn).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
+                </div>
+              )}
             </div>
           </div>
         </div>

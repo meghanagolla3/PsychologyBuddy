@@ -11,7 +11,9 @@ import {
   User, 
   LogOut, 
   ChevronUp,
-  UserCircle
+  UserCircle,
+  TrendingUp,
+  UserRoundCheck
 } from 'lucide-react';
 
 type NavItem = {
@@ -24,8 +26,8 @@ type NavItem = {
 
 const navItems: NavItem[] = [
   { label: "Dashboard", icon: LayoutGrid, to: "/parent", match: (p) => p === "/parent" },
-  { label: "Activity", icon: Activity, to: "/parent/activity", match: (p) => p.startsWith("/parent/activity"), badge: 3 },
-  { label: "Meetings", icon: Users, to: "/parent/meetings", match: (p) => p.startsWith("/parent/meetings"), badge: 1 },
+  { label: "Activity", icon: TrendingUp, to: "/parent/activity", match: (p) => p.startsWith("/parent/activity"), badge: 3 },
+  { label: "Meetings", icon: UserRoundCheck, to: "/parent/meetings", match: (p) => p.startsWith("/parent/meetings"), badge: 1 },
 ];
 
 interface ParentSidebarProps {
@@ -49,7 +51,7 @@ export function ParentSidebar({ className, setSidebarOpen }: ParentSidebarProps)
   };
 
   const handleProfile = () => {
-    router.push('/parent');
+    router.push('/parent/profile');
   };
 
   const toggleUserMenu = () => {
@@ -73,7 +75,7 @@ export function ParentSidebar({ className, setSidebarOpen }: ParentSidebarProps)
 
   return (
     <aside className={cn(
-      'flex w-full sm:w-[240px] h-full shrink-0 flex-col border-r border-[#E2E8F0] bg-white',
+      'flex w-full sm:w-[260px] h-full shrink-0 flex-col border-r border-[#E2E8F0] bg-white',
       className
     )}>
       {/* Logo */}
@@ -100,7 +102,7 @@ export function ParentSidebar({ className, setSidebarOpen }: ParentSidebarProps)
                     setSidebarOpen?.(false); // Close mobile menu after navigation
                   }}
                   className={[
-                    "group flex w-full items-center gap-3 rounded-[12px] sm:rounded-[14px] px-3 py-2.5 text-[13px] sm:text-[14px] h-[40px] sm:h-[44px] font-medium transition-colors",
+                    "group flex w-full items-center gap-5 rounded-[12px] sm:rounded-[14px] px-3 py-2.5 m-1 text-[15px] sm:text-[16px] h-[40px] sm:h-[44px] font-normal transition-colors",
                     active
                       ? "bg-[#3c83f6] text-white shadow-sm"
                       : "text-[#65758b] hover:bg-[#F6F9FE] hover:text-[#3C83F6]",
@@ -108,11 +110,11 @@ export function ParentSidebar({ className, setSidebarOpen }: ParentSidebarProps)
                 >
                   <Icon className="h-[16px] sm:h-[18px] w-[16px] sm:w-[18px]" strokeWidth={1.8} />
                   <span className="flex-1 text-left">{item.label}</span>
-                  {item.badge !== undefined && (
+                  {/* {item.badge !== undefined && (
                     <span className="flex h-4 sm:h-5 min-w-4 sm:min-w-5 items-center justify-center rounded-full bg-[#EF4444] px-1 sm:px-1.5 text-[10px] sm:text-[11px] font-semibold text-white">
                       {item.badge}
                     </span>
-                  )}
+                  )} */}
                 </button>
               </li>
             );
@@ -121,7 +123,7 @@ export function ParentSidebar({ className, setSidebarOpen }: ParentSidebarProps)
       </nav>
 
       {/* Bottom: Profile/Logout */}
-      <div className="space-y-3 px-3 sm:px-4 pb-3 sm:pb-4 border-t border-[#E2E8F0] mt-auto">
+      <div className="space-y-3 px-3 sm:px-4 pb-3 sm:pb-4 mt-auto">
         <div className="relative">
           <button 
             onClick={toggleUserMenu}

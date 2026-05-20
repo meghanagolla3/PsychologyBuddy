@@ -115,7 +115,6 @@ export const PATCH = withPermission({
           },
         });
 
-        // Note: Schema doesn't have nextSessionId field, skipping this update
       }
 
       return NextResponse.json({

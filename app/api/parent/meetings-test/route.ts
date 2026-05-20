@@ -65,9 +65,11 @@ export const GET = withPermission({
       status: meeting.status,
       parentName: meeting.student.parent ? `${meeting.student.parent.firstName} ${meeting.student.parent.lastName}` : 'Unknown Parent',
       parentId: meeting.student.parentId,
-      studentClassGrade: meeting.student.classRef?.name || '',
+      studentClassGrade: meeting.student.classRef ? `${meeting.student.classRef.grade}-${meeting.student.classRef.section}` : '',
       requestedBy: meeting.requestedBy || 'COUNSELOR',
       notes: meeting.notes,
+      discussion: meeting.discussion,
+      recommendations: meeting.recommendations,
       createdAt: meeting.createdAt.toISOString(),
       updatedAt: meeting.updatedAt.toISOString()
     }));

@@ -25,7 +25,9 @@ export const GET = withPermission({
     const meeting = await prisma.parentMeeting.findFirst({
       where: {
         id: id,
-        studentId: userInfo.id,
+        student: {
+          parentId: userInfo.id,
+        },
         schoolId: userInfo.schoolId,
       },
       include: {
@@ -103,7 +105,9 @@ export const PUT = withPermission({
     const meeting = await prisma.parentMeeting.findFirst({
       where: {
         id: id,
-        studentId: userInfo.id,
+        student: {
+          parentId: userInfo.id,
+        },
         schoolId: userInfo.schoolId,
       },
     });

@@ -94,13 +94,16 @@ export function useAdminNotifications() {
         if (newNotification.type === 'escalation' && 
             (newNotification.priority === 'critical' || newNotification.priority === 'high')) {
           toast({
-            title: "🚨 Escalation Alert",
+            title: " Escalation Alert",
             description: newNotification.message,
             variant: "destructive"
           })
         }
         
-        setNotifications(prev => [newNotification, ...prev])
+        setNotifications(prev => {
+          if (prev.some(n => n.id === newNotification.id)) return prev;
+          return [newNotification, ...prev];
+        });
         setUnreadCount(prev => prev + 1)
       } catch (error) {
         console.error('Failed to parse notification:', error)

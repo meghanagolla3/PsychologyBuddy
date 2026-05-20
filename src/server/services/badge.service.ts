@@ -11,6 +11,7 @@ export class BadgeService {
       const activeBadges = await prisma.badge.findMany({
         where: { isActive: true },
       });
+      
 
       // Get user's current badges
       const userBadges = await prisma.userBadge.findMany({

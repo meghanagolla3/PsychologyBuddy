@@ -201,6 +201,13 @@ export class UserService {
 
       const school = await prisma.school.findUnique({
         where: { id: result.id },
+        include: {
+          _count: {
+            select: {
+              schoolLocations: true,
+            },
+          },
+        },
       });
 
       return ApiResponse.success(school, 'School created successfully');
@@ -340,6 +347,7 @@ export class UserService {
                 }
               },
               classes: true,
+              schoolLocations: true,
             },
           },
         },
@@ -400,6 +408,7 @@ export class UserService {
           return {
             ...school,
             studentCount: school._count.users,
+            locationsCount: school._count.schoolLocations || 0,
             alertCount,
             checkInsToday
           };
@@ -504,22 +513,171 @@ export class UserService {
     adminId: string;
     assignedBy: string;
   }) {
-    throw new AuthError('Location admin assignment feature is not available', 501);
+    try {
+      // Check if assignment already exists
+      const existingAssignment = await (prisma as any).locationAdminAssignment.findUnique({
+        where: {
+          locationId_adminId: {
+            locationId: data.locationId,
+            adminId: data.adminId,
+          }
+        }
+      });
+
+      if (existingAssignment) {
+        throw new AuthError('Admin is already assigned to this location', 409);
+      }
+
+      // Verify location exists
+      const location = await prisma.schoolLocation.findUnique({
+        where: { id: data.locationId },
+        include: { school: true }
+      });
+
+      if (!location) {
+        throw AuthError.notFound('Location not found');
+      }
+
+      // Verify admin exists and is an ADMIN role
+      const admin = await prisma.user.findUnique({
+        where: { id: data.adminId },
+        include: { role: true }
+      });
+
+      if (!admin || admin.role.name !== 'ADMIN') {
+        throw AuthError.notFound('Admin not found or invalid role');
+      }
+
+      // Create assignment
+      const assignment = await (prisma as any).locationAdminAssignment.create({
+        data: {
+          locationId: data.locationId,
+          adminId: data.adminId,
+          assignedBy: data.assignedBy,
+        },
+        include: {
+          location: {
+            select: {
+              id: true,
+              name: true,
+              school: {
+                select: {
+                  id: true,
+                  name: true,
+                }
+              }
+            }
+          },
+          admin: {
+            select: {
+              id: true,
+              firstName: true,
+              lastName: true,
+              email: true,
+            }
+          }
+        }
+      });
+
+      return ApiResponse.success(assignment, 'Admin assigned to location successfully');
+    } catch (error) {
+      throw error;
+    }
   }
 
-  // Remove admin from location - locationAdminAssignment model doesn't exist in schema
+  // Remove admin from location
   static async removeAdminFromLocation(locationId: string, adminId: string) {
-    throw new AuthError('Location admin assignment feature is not available', 501);
+    try {
+      const assignment = await (prisma as any).locationAdminAssignment.findUnique({
+        where: {
+          locationId_adminId: {
+            locationId,
+            adminId,
+          }
+        }
+      });
+
+      if (!assignment) {
+        throw AuthError.notFound('Admin assignment not found');
+      }
+
+      await (prisma as any).locationAdminAssignment.delete({
+        where: {
+          locationId_adminId: {
+            locationId,
+            adminId,
+          }
+        }
+      });
+
+      return ApiResponse.success(null, 'Admin removed from location successfully');
+    } catch (error) {
+      throw error;
+    }
   }
 
-  // Get admins assigned to a location - locationAdminAssignment model doesn't exist in schema
+  // Get admins assigned to a location
   static async getLocationAdmins(locationId: string) {
-    throw new AuthError('Location admin assignment feature is not available', 501);
+    try {
+      const assignments = await (prisma as any).locationAdminAssignment.findMany({
+        where: { locationId },
+        include: {
+          admin: {
+            select: {
+              id: true,
+              firstName: true,
+              lastName: true,
+              email: true,
+              phone: true,
+              createdAt: true,
+            }
+          },
+          assigner: {
+            select: {
+              firstName: true,
+              lastName: true,
+            }
+          }
+        },
+        orderBy: { assignedAt: 'desc' }
+      });
+
+      return ApiResponse.success(assignments, 'Location admins retrieved successfully');
+    } catch (error) {
+      throw error;
+    }
   }
 
-  // Get locations assigned to an admin - locationAdminAssignment model doesn't exist in schema
+  // Get locations assigned to an admin
   static async getAdminLocations(adminId: string) {
-    throw new AuthError('Location admin assignment feature is not available', 501);
+    try {
+      const assignments = await (prisma as any).locationAdminAssignment.findMany({
+        where: { adminId },
+        include: {
+          location: {
+            include: {
+              school: {
+                select: {
+                  id: true,
+                  name: true,
+                }
+              }
+            }
+          },
+          assigner: {
+            select: {
+              firstName: true,
+              lastName: true,
+            }
+          }
+        },
+        orderBy: { assignedAt: 'desc' }
+      });
+
+      return ApiResponse.success(assignments, 'Admin locations retrieved successfully');
+    } catch (error) {
+      throw error;
+    }
   }
 
   // ============================================

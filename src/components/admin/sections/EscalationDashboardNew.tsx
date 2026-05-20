@@ -700,6 +700,14 @@ export function EscalationDashboardNew() {
   const [schools, setSchools] = useState<Array<{ id: string; name: string }>>([])
   const [selectedSchool, setSelectedSchool] = useState('all')
   const [isMonitoring, setIsMonitoring] = useState(false)
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('')
+  
+  // Pagination states
+  const [page, setPage] = useState(1)
+  const [limit] = useState(10)
+  const [total, setTotal] = useState(0)
+  const [totalPages, setTotalPages] = useState(1)
+  const [stats, setStats] = useState({ openCount: 0, highCount: 0, resolvedCount: 0 })
   
   const { isSuperAdmin, userSchoolId } = usePermissions()
   const { timeFilter, dateRange } = useTimeFilter()
@@ -724,7 +732,7 @@ export function EscalationDashboardNew() {
   // Fetch alerts and schools
   useEffect(() => {
     fetchAlerts()
-  }, [selectedSchool, statusFilter, timeFilter, dateRange])
+  }, [selectedSchool, statusFilter, timeFilter, dateRange, page, priorityFilter, debouncedSearchTerm])
 
   const fetchSchools = async () => {
     try {
@@ -752,11 +760,22 @@ export function EscalationDashboardNew() {
       setLoading(true)
       setError(null)
 
+      const offset = (page - 1) * limit;
+
       // Build query parameters
       const params = new URLSearchParams({
         status: statusFilter,
-        limit: '100'
+        limit: String(limit),
+        offset: String(offset)
       })
+
+      if (debouncedSearchTerm) {
+        params.append('search', debouncedSearchTerm);
+      }
+
+      if (priorityFilter !== 'all') {
+        params.append('priority', priorityFilter);
+      }
       
       // Add school filter if not super admin or if specific school is selected
       if (selectedSchool !== 'all') {
@@ -780,22 +799,14 @@ export function EscalationDashboardNew() {
       
       const data = await response.json()
       
-      // Filter by search term and priority
-      const filteredAlerts = data.alerts.filter((alert: EscalationAlert) => {
-        const studentName = alert.studentName || '';
-        const studentEmail = alert.studentEmail || '';
-        const description = alert.description || '';
-        
-        const matchesSearch = studentName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                            studentEmail.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                            description.toLowerCase().includes(searchTerm.toLowerCase())
-        
-        const matchesPriority = priorityFilter === 'all' || alert.priority === priorityFilter
-        
-        return matchesSearch && matchesPriority
-      })
-
-      setAlerts(filteredAlerts)
+      setAlerts(data.alerts || [])
+      if (data.pagination) {
+        setTotal(data.pagination.total)
+        setTotalPages(Math.ceil(data.pagination.total / limit))
+      }
+      if (data.stats) {
+        setStats(data.stats)
+      }
 
     } catch (error) {
       console.error('Error fetching escalation data:', error)
@@ -806,8 +817,17 @@ export function EscalationDashboardNew() {
   }
 
   useEffect(() => {
-    fetchAlerts()
-  }, [statusFilter, priorityFilter, searchTerm, selectedSchool, timeFilter, dateRange])
+    // Debounce search
+    const timer = setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm)
+      setPage(1)
+    }, 500)
+    return () => clearTimeout(timer)
+  }, [searchTerm])
+
+  useEffect(() => {
+    setPage(1)
+  }, [statusFilter, priorityFilter, selectedSchool, timeFilter, dateRange])
 
   
   // Update alert status using real API
@@ -900,11 +920,10 @@ export function EscalationDashboardNew() {
   // Get unique classes from alerts
   const uniqueClasses = Array.from(new Set(alerts.map(a => a.studentClass).filter((cls): cls is string => Boolean(cls)))).sort();
 
-  // Calculate stats
-  const openCount = alerts.filter(a => a.status === 'open').length;
-  const highCount = alerts.filter(a => a.priority === 'high' && a.status !== 'resolved').length;
-  const criticalCount = alerts.filter(a => a.priority === 'resolved' && a.status !== 'resolved').length;
-  const resolvedCount = alerts.filter(a => a.status === 'resolved').length;
+  // Calculate stats from state
+  const { openCount, highCount, resolvedCount } = stats;
+  // Critical count is not explicitly tracked in the same way now, but we can add it if needed
+  // For now we'll stick to what the API returns
   
   const getTimeAgo = (timestamp: string) => {
     const now = new Date();
@@ -949,7 +968,7 @@ export function EscalationDashboardNew() {
       {/* Admin Header */}
       <AdminHeader 
         title="Escalation & Alerts"
-        subtitle={`${openCount} open alerts, ${highCount + criticalCount} high priority`}
+        subtitle={`${openCount} open alerts, ${highCount} high priority`}
         showTimeFilter={true}
         showSchoolFilter={isSuperAdmin}
         schoolFilterValue={selectedSchool}
@@ -1085,6 +1104,31 @@ export function EscalationDashboardNew() {
             })
           )}
         </div>
+
+        {/* Pagination */}
+        {total > 0 && (
+          <div className="flex items-center justify-between mt-4">
+            <Button
+              variant="outline"
+              disabled={page === 1 || loading}
+              onClick={() => setPage((p) => p - 1)}
+            >
+              Previous
+            </Button>
+
+            <p className="text-sm text-muted-foreground">
+              Page {page} of {totalPages}
+            </p>
+
+            <Button
+              variant="outline"
+              disabled={page === totalPages || loading}
+              onClick={() => setPage((p) => p + 1)}
+            >
+              Next
+            </Button>
+          </div>
+        )}
       </div>
 
       {/* Alert Detail Modal */}

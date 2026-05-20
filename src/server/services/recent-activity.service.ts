@@ -2,7 +2,7 @@ import prisma from '@/src/prisma';
 
 export interface ActivityItem {
   id: string;
-  type: 'mood' | 'journal' | 'meditation' | 'music' | 'badge' | 'streak' | 'session' | 'alert';
+  type: 'mood' | 'journal' | 'meditation' | 'music' | 'badge' | 'streak' | 'session' | 'alert' | 'meeting' | 'assignment';
   studentId: string;
   studentName: string;
   classSection?: string;
@@ -19,8 +19,10 @@ const typeDescriptions: Record<string, string> = {
   music: "Student music therapy session",
   badge: "Student earned badge",
   streak: "Student streak updated",
-  session: "Student chat with buddy",
+  session: "Student chat or counseling session",
   alert: "Student alert triggered",
+  meeting: "Parent-Counselor meeting",
+  assignment: "Counselor assignment update",
 };
 
 export class RecentActivityService {
@@ -559,6 +561,140 @@ export class RecentActivityService {
       activities.push(...alertActivities);
     }
 
+    // Parent Meetings
+    if (!type || type === 'meeting') {
+      const parentMeetings = await prisma.parentMeeting.findMany({
+        where: {
+          schoolId: adminSchoolId,
+          createdAt: dateFilter,
+          ...(search && {
+            OR: [
+              { parentName: { contains: search, mode: 'insensitive' } },
+              { student: { firstName: { contains: search, mode: 'insensitive' } } },
+              { student: { lastName: { contains: search, mode: 'insensitive' } } }
+            ]
+          })
+        },
+        include: {
+          student: {
+            include: {
+              classRef: true
+            }
+          },
+          counselor: true
+        },
+        orderBy: { createdAt: 'desc' },
+        take: limit,
+        skip: offset
+      });
+
+      activities.push(...parentMeetings.map((meeting: any) => ({
+        id: `meeting-${meeting.id}`,
+        type: 'meeting' as const,
+        studentId: meeting.studentId,
+        studentName: `${meeting.student.firstName} ${meeting.student.lastName}`,
+        classSection: meeting.student.classRef?.name,
+        description: `Meeting ${meeting.status.toLowerCase()}: ${meeting.parentName} with counselor`,
+        timestamp: meeting.createdAt,
+        metadata: { 
+          meetingId: meeting.id,
+          status: meeting.status,
+          requestedBy: meeting.requestedBy
+        }
+      })));
+    }
+
+    // Counselor Assignments
+    if (!type || type === 'assignment') {
+      const counselorAssignments = await prisma.counselorAssignment.findMany({
+        where: {
+          student: {
+            schoolId: adminSchoolId,
+            ...(classId && { classId })
+          },
+          createdAt: dateFilter,
+          ...(search && {
+            OR: [
+              { student: { firstName: { contains: search, mode: 'insensitive' } } },
+              { student: { lastName: { contains: search, mode: 'insensitive' } } },
+              { counselor: { firstName: { contains: search, mode: 'insensitive' } } },
+              { counselor: { lastName: { contains: search, mode: 'insensitive' } } }
+            ]
+          })
+        },
+        include: {
+          student: {
+            include: {
+              classRef: true
+            }
+          },
+          counselor: true
+        },
+        orderBy: { createdAt: 'desc' },
+        take: limit,
+        skip: offset
+      });
+
+      activities.push(...counselorAssignments.map((assignment: any) => ({
+        id: `assignment-${assignment.id}`,
+        type: 'assignment' as const,
+        studentId: assignment.studentId,
+        studentName: `${assignment.student.firstName} ${assignment.student.lastName}`,
+        classSection: assignment.student.classRef?.name,
+        description: `Assigned to counselor: ${assignment.counselor.firstName} ${assignment.counselor.lastName}`,
+        timestamp: assignment.createdAt,
+        metadata: { 
+          assignmentId: assignment.id,
+          counselorId: assignment.counselorId
+        }
+      })));
+    }
+
+    // Counseling Sessions
+    if (!type || type === 'session') {
+      const counselingSessions = await prisma.counselingSession.findMany({
+        where: {
+          schoolId: adminSchoolId,
+          ...(classId && { classId }),
+          createdAt: dateFilter,
+          ...(search && {
+            OR: [
+              { student: { firstName: { contains: search, mode: 'insensitive' } } },
+              { student: { lastName: { contains: search, mode: 'insensitive' } } },
+              { counselor: { firstName: { contains: search, mode: 'insensitive' } } },
+              { counselor: { lastName: { contains: search, mode: 'insensitive' } } }
+            ]
+          })
+        },
+        include: {
+          student: {
+            include: {
+              classRef: true
+            }
+          },
+          counselor: true
+        },
+        orderBy: { createdAt: 'desc' },
+        take: limit,
+        skip: offset
+      });
+
+      activities.push(...counselingSessions.map((session: any) => ({
+        id: `counsel-session-${session.id}`,
+        type: 'session' as const,
+        studentId: session.studentId,
+        studentName: `${session.student.firstName} ${session.student.lastName}`,
+        classSection: session.student.classRef?.name,
+        description: `Counseling session ${session.status.toLowerCase()}: ${session.sessionType}`,
+        timestamp: session.createdAt,
+        metadata: { 
+          sessionId: session.id,
+          status: session.status,
+          sessionType: session.sessionType
+        }
+      })));
+    }
+
     // Sort all activities by timestamp (most recent first)
     activities.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
 
@@ -607,11 +743,38 @@ export class RecentActivityService {
       })
     };
 
-    if (type && type !== 'mood') {
-      return 0; // Only count if type matches mood checkins
-    }
+    // Calculate total count by summing up all relevant tables
+    const [
+      moodCount,
+      writingCount,
+      audioCount,
+      artCount,
+      meditationCount,
+      badgeCount,
+      streakCount,
+      chatCount,
+      alertCount,
+      meetingCount,
+      assignmentCount,
+      sessionCount
+    ] = await Promise.all([
+      prisma.moodCheckin.count({ where: whereClause }),
+      prisma.writingJournal.count({ where: { user: userFilter, createdAt: dateFilter } }),
+      prisma.audioJournal.count({ where: { user: userFilter, createdAt: dateFilter } }),
+      prisma.artJournal.count({ where: { user: userFilter, createdAt: dateFilter } }),
+      prisma.meditationSave.count({ where: { createdAt: dateFilter } }), 
+      prisma.userBadge.count({ where: { user: userFilter, earnedAt: dateFilter } }),
+      prisma.streak.count({ where: { user: userFilter, lastActive: dateFilter } }),
+      prisma.chatSession.count({ where: { user: userFilter, startedAt: dateFilter } }),
+      prisma.escalationAlert.count({ where: { user: userFilter, createdAt: dateFilter } }),
+      prisma.parentMeeting.count({ where: { schoolId: adminSchoolId, createdAt: dateFilter } }),
+      prisma.counselorAssignment.count({ where: { student: { schoolId: adminSchoolId }, createdAt: dateFilter } }),
+      prisma.counselingSession.count({ where: { schoolId: adminSchoolId, createdAt: dateFilter } }),
+    ]);
 
-    return await prisma.moodCheckin.count({ where: whereClause });
+    return moodCount + writingCount + audioCount + artCount + meditationCount + 
+           badgeCount + streakCount + chatCount + alertCount + meetingCount + 
+           assignmentCount + sessionCount;
     } catch (error) {
       console.error('Error in countActivities:', error);
       return 0;

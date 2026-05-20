@@ -420,7 +420,7 @@ export class StudentService {
           streakDays: 0, // Default since not in schema
           joinDate: student.createdAt?.toISOString().split('T')[0],
         },
-        emergencyContact: {
+        emergencyContact: (student.studentProfile as any)?.emergencyContact || {
           name: "Not provided",
           phone: "Not provided",
           relationship: "Not specified"
@@ -841,7 +841,7 @@ export class StudentService {
           status: student.studentProfile?.status || 'ACTIVE',
           profileImage: student.studentProfile?.profileImage || null,
           memberSince: student.createdAt?.toLocaleDateString('en-US', { month: 'long', year: 'numeric' }) || 'Unknown',
-          emergencyContact: {
+          emergencyContact: (student.studentProfile as any)?.emergencyContact || {
             name: "Emergency Contact",
             phone: student.phone || '+91 0000000000'
           }

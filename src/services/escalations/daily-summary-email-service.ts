@@ -14,6 +14,7 @@ export interface DailySummaryData {
     critical: number[]
     high: number[]
   }
+  
   moodCheckins: {
     total: number
     averageMood: string

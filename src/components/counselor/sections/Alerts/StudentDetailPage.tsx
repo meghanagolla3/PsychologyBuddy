@@ -11,6 +11,8 @@ import {
   CircleAlert,
   CalendarDays,
 } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 
 interface StudentDetail {
   id: string;
@@ -73,13 +75,13 @@ function StatCard({
   badge?: { text: string; tone: "destructive" | "orange" | "success" };
 }) {
   return (
-    <div className="rounded-xl bg-white p-5 shadow-sm border border-gray-200">
+    <div className="rounded-[20px] bg-white p-5 border border-[#E1E1E1]/50">
       <div className="flex items-start justify-between">
-        <span className="text-[13px] font-medium text-gray-600">{label}</span>
-        {Icon && <Icon className={`h-5 w-5 ${iconColor}`} strokeWidth={2} />}
+        <span className="text-[18px] font-medium text-gray-600">{label}</span>
+        {Icon && <Icon className={`h-6 w-6 ${iconColor}`} strokeWidth={2} />}
       </div>
       {value && (
-        <div className="mt-3 text-[26px] font-bold leading-none tracking-tight text-gray-900">
+        <div className="mt-6 text-[32px] font-medium leading-none tracking-tight text-gray-900">
           {value}
         </div>
       )}
@@ -285,21 +287,21 @@ export default function StudentDetailPage() {
       </button>
 
       {/* Student header */}
-      <div className="rounded-xl bg-white p-6 shadow-sm border border-gray-200">
+      <div className="rounded-[24px] bg-white p-8 border border-[#E1E1E1]/50">
         <div className="flex items-start gap-4">
-          <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-blue-100 text-[14px] font-semibold text-blue-700">
+          <div className="flex h-[70px] w-[70px] shrink-0 items-center justify-center rounded-full bg-[#ECF4FF] text-[18px] mt-3 font-medium text[#3C83F6]">
             {initials}
           </div>
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-3">
-              <h1 className="text-[22px] font-bold tracking-tight text-gray-900">
+              <h1 className="text-[28px] font-medium tracking-tight text-gray-900">
                 {fullName}
               </h1>
               <span className="inline-flex h-6 items-center rounded-full bg-red-100 px-2.5 text-[11px] font-semibold text-red-700">
                 Level 01
               </span>
             </div>
-            <div className="mt-1 flex items-center gap-2 text-[13px] text-gray-600">
+            <div className="mt-1 flex items-center gap-2 text-[16px] text-[#767676]">
               <span>{student.email}</span>
               <span>•</span>
               <span>{student.classRef?.name || 'No class'}</span>
@@ -310,7 +312,7 @@ export default function StudentDetailPage() {
                 </>
               )}
             </div>
-            <div className="mt-1 text-[12px] text-gray-500">
+            <div className="mt-1 text-[16px] text-[#767676]">
               Last active: {student.lastActiveAt ? 
                 new Date(student.lastActiveAt).toLocaleString('en-US', {
                   month: 'short',
@@ -331,7 +333,7 @@ export default function StudentDetailPage() {
           label="Current Streak" 
           value={`${stats.currentStreak} days`} 
           icon={TrendingUp} 
-          iconColor="text-blue-600" 
+          iconColor="text-[#3C83F6]" 
         />
         <StatCard 
           label="Badges Earned" 
@@ -343,7 +345,7 @@ export default function StudentDetailPage() {
           label="Challenges Completion" 
           value={stats.challengesCompleted.toString()} 
           icon={CheckCircle2} 
-          iconColor="text-orange-600" 
+          iconColor="text-[#3C83F6]" 
         />
         <StatCard 
           label="Engagement Status" 
@@ -352,9 +354,9 @@ export default function StudentDetailPage() {
       </div>
 
       {/* Key Observations */}
-      <div className="mt-6 rounded-xl bg-white p-6 shadow-sm border border-gray-200">
-        <h2 className="text-[16px] font-semibold text-gray-900">Key Observations</h2>
-        <p className="mt-1 text-[12px] text-gray-600">
+      <div className="mt-6 rounded-[24px] bg-white p-8 border border-[#E1E1E1]/50">
+        <h2 className="text-[20px] font-medium text-gray-900">Key Observations</h2>
+        <p className="mb-3 text-[14px] text-[#868585]">
           Source: Latest Alerts • {new Date().toLocaleDateString('en-US', { 
             year: 'numeric', 
             month: 'short', 
@@ -372,87 +374,121 @@ export default function StudentDetailPage() {
       </div>
 
       {/* Previous Alerts */}
-      <div className="mt-6 rounded-xl bg-white p-6 shadow-sm border border-gray-200">
-        <h2 className="text-[16px] font-semibold text-gray-900">Previous Alerts</h2>
-        <ul className="mt-4 space-y-4">
-          {previousAlerts.map((alert) => (
-            <li key={alert.id} className="flex items-center gap-3">
-              {alert.severity === "destructive" ? (
-                <AlertTriangle className="h-4 w-4 shrink-0 text-red-600" strokeWidth={2} />
-              ) : alert.severity === "success" ? (
-                <CircleAlert className="h-4 w-4 shrink-0 text-green-600" strokeWidth={2} />
-              ) : (
-                <CircleAlert className="h-4 w-4 shrink-0 text-orange-600" strokeWidth={2} />
-              )}
-              <span
-                className={[
-                  "flex-1 text-[13px]",
-                  alert.status === "Resolved" ? "text-gray-600" : "text-gray-900",
-                ].join(" ")}
-              >
-                {alert.description}
-              </span>
-              <span
-                className={[
-                  "inline-flex h-6 items-center rounded-full px-2.5 text-[11px] font-semibold",
-                  alert.status === "Active"
-                    ? "bg-red-100 text-red-700"
-                    : "bg-green-100 text-green-700",
-                ].join(" ")}
-              >
-                {alert.status}
-              </span>
-              <span className="w-[80px] text-right text-[12px] text-gray-600">
-                {new Date(alert.createdAt).toLocaleDateString('en-US', { 
-                  month: 'short', 
-                  day: 'numeric', 
-                  year: 'numeric' 
-                })}
-              </span>
-            </li>
-          ))}
-        </ul>
+      <div className="mt-6 rounded-[24px] bg-white p-8 border border-[#E1E1E1]/50">
+        <h2 className="text-[20px] font-medium text-gray-900">Previous Alerts</h2>
+        <div className="mt-8 max-h-[380px] overflow-y-auto pr-4 custom-scrollbar">
+          <ul className="space-y-0 relative">
+            {/* Vertical Timeline Line */}
+            {previousAlerts.length > 1 && (
+              <div className="absolute left-[11px] top-6 bottom-6 w-[1px] bg-[#E1E1E1]" />
+            )}
+            
+            {previousAlerts.map((alert, index) => (
+              <li key={alert.id} className="relative flex items-center gap-6 pb-8 last:pb-0">
+                {/* Icon Wrapper */}
+                <div className="relative z-10 flex h-6 w-6 items-center justify-center bg-white rounded-full border-dashed border-gray-100">
+                  {alert.status === "Active" || alert.status === "open" ? (
+                    <CircleAlert className="h-[22px] w-[22px] shrink-0 text-[#F87171]" strokeWidth={2} />
+                  ) : (
+                    <CheckCircle2 
+                      className={cn(
+                        "h-[20px] w-[20px] shrink-0",
+                        alert.status === "Resolved" || alert.status === "resolved" 
+                          ? "text-[#22C55E]" 
+                          : "text-[#F59E0B]"
+                      )} 
+                      strokeWidth={2} 
+                    />
+                  )}
+                </div>
+
+                {/* Content Area */}
+                <div className="flex flex-1 items-center justify-between gap-4">
+                  <span
+                    className={cn(
+                      "text-[15px] flex-1",
+                      alert.status === "Resolved" || alert.status === "resolved" ? "text-[#868585]" : "text-[#1E293B] font-medium",
+                    )}
+                  >
+                    {alert.description}
+                  </span>
+
+                  <div className="flex items-center gap-8">
+                    {/* Status Badge */}
+                    <span
+                      className={cn(
+                        "inline-flex h-[26px] items-center rounded-full px-3 text-[12px] font-medium border",
+                        alert.status === "Active" || alert.status === "open"
+                          ? "bg-[#FFF1F1] text-[#F87171] border-[#FEE2E2]"
+                          : "bg-[#F1FDF5] text-[#22C55E] border-[#DCFCE7]",
+                      )}
+                    >
+                      {alert.status}
+                    </span>
+
+                    {/* Date */}
+                    <span className="text-[14px] text-[#767676] min-w-[100px] text-right">
+                      {new Date(alert.createdAt).toLocaleDateString('en-US', { 
+                        month: 'short', 
+                        day: 'numeric', 
+                        year: 'numeric' 
+                      })}
+                    </span>
+                  </div>
+                </div>
+              </li>
+            ))}
+          </ul>
+        </div>
       </div>
 
       {/* Counseling History */}
-      <div className="mt-6 rounded-xl bg-white p-6 shadow-sm border border-gray-200">
-        <h2 className="text-[16px] font-semibold text-gray-900">Counseling History</h2>
-        <ul className="mt-4 space-y-3">
+      <div className="mt-6 rounded-[24px] bg-white p-8 border border-[#E1E1E1]/50">
+        <h2 className="text-[20px] font-medium text-gray-900">Counseling History</h2>
+        <div className="mt-6 max-h-[380px] overflow-y-auto pr-4 custom-scrollbar">
+          <ul className="space-y-4">
           {counselingHistory.map((session) => (
             <li
               key={session.id}
-              className={[
-                "rounded-xl border p-4",
-                session.highlight ? "border-blue-400 bg-blue-50" : "border-gray-200 bg-white",
-              ].join(" ")}
+              className={cn(
+                "rounded-[20px] border p-2 transition-all",
+                session.highlight ? "border-[#3C83F6]/30 bg-[#F6F9FE]" : "border-[#E1E1E1]/50 bg-white hover:border-[#E1E1E1]",
+              )}
             >
-              <div className="flex items-start gap-3">
-                <CalendarDays className="mt-0.5 h-5 w-5 shrink-0 text-gray-600" strokeWidth={1.8} />
-                <div className="min-w-0 flex-1">
-                  <div className="flex items-center gap-2">
-                    <span className="text-[14px] font-semibold text-gray-900">{session.name}</span>
-                    {session.tags.map((tag) => (
-                      <span
-                        key={tag}
-                        className="inline-flex h-5 items-center rounded-full border border-gray-300 px-2 text-[10px] font-medium text-gray-600"
-                      >
-                        {tag}
-                      </span>
-                    ))}
-                  </div>
-                  <p className="mt-1 text-[13px] text-gray-600">{session.text}</p>
+              <div className="flex items-start gap-4">
+                <div className="mt-1 flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#ECF4FF] text-[#3C83F6]">
+                  <CalendarDays className="h-5 w-5" strokeWidth={2} />
                 </div>
-                <span className="shrink-0 text-[12px] text-gray-600">{session.date}</span>
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <span className="text-[18px] font-medium text-[#1E293B]">{session.name}</span>
+                      <div className="flex items-center gap-1.5">
+                        {session.tags.map((tag) => (
+                          <span
+                            key={tag}
+                            className="inline-flex h-[22px] items-center rounded-full border border-[#E1E1E1] bg-white px-2.5 text-[11px] font-medium text-[#767676]"
+                          >
+                            {tag}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                    <span className="text-[14px] text-[#767676]">{session.date}</span>
+                  </div>
+                  <p className="mt-2 text-[15px] leading-relaxed text-[#5A5A5A] line-clamp-2">{session.text}</p>
+                </div>
               </div>
             </li>
           ))}
         </ul>
       </div>
+    </div>
 
       {/* Platform Activity */}
-      <div className="mt-6 rounded-xl bg-white p-6 shadow-sm border border-gray-200">
-        <h2 className="text-[16px] font-semibold text-gray-900">Platform Activity</h2>
-        <div className="mt-6 flex gap-4">
+      <div className="mt-6 rounded-[24px] bg-white p-8 border border-[#E1E1E1]/50">
+        <h2 className="text-[20px] font-medium text-gray-900">Platform Activity</h2>
+        <div className="mt-8 flex gap-6">
           {/* Y-Axis */}
           <div className="flex flex-col justify-between h-[260px] pb-12 text-right pr-2">
             {[25, 20, 15, 10, 5, 0].map((tick) => (

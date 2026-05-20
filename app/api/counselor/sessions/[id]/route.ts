@@ -1,34 +1,28 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { withPermission } from '@/src/middleware/permission.middleware';
-import { CounselingService, updateSessionSchema, startSessionSchema, completeSessionSchema, cancelSessionSchema } from '@/src/server/counseling/counseling.service';
+import { CounselingService, updateSessionSchema } from '@/src/server/counseling/counseling.service';
 
 const counselingService = new CounselingService();
-
-// Helper to get user info from request
-function getUserFromRequest(req: NextRequest) {
-  return {
-    id: (req as any).user?.id,
-    role: (req as any).user?.role?.name,
-    schoolId: (req as any).user?.schoolId,
-  };
-}
 
 // Get Session Details
 export const GET = withPermission({
   module: 'COUNSELING_SESSIONS',
   action: 'VIEW',
-})(async (req: NextRequest, { params, user }: any) => {
+})(async (req: NextRequest, { params, user, userSchoolId }: any) => {
   try {
     const { id } = await params;
     
-    if (!user.id || !user.schoolId) {
+    const isSuperAdmin = user.role?.name === 'SUPERADMIN';
+    const schoolId = userSchoolId || user.schoolId;
+
+    if (!user.id || (!schoolId && !isSuperAdmin)) {
       return NextResponse.json(
         { success: false, message: 'User not authenticated or not assigned to a school' },
         { status: 401 }
       );
     }
 
-    const session = await counselingService.getSessionById(id, user.schoolId, user.id, user.role?.name);
+    const session = await counselingService.getSessionById(id, schoolId, user.id, user.role?.name);
     
     return NextResponse.json({
       success: true,
@@ -37,36 +31,28 @@ export const GET = withPermission({
   } catch (error: any) {
     console.error('Get session details error:', error);
     
-    if (error.message === 'Session not found') {
-      return NextResponse.json(
-        { success: false, message: error.message },
-        { status: 404 }
-      );
-    }
-
-    if (error.message === 'Access denied') {
-      return NextResponse.json(
-        { success: false, message: error.message },
-        { status: 403 }
-      );
-    }
+    const status = error.message.includes('Access denied') ? 403 : 
+                   error.message === 'Session not found' ? 404 : 500;
 
     return NextResponse.json(
-      { success: false, message: 'Failed to fetch session details' },
-      { status: 500 }
+      { success: false, message: error.message || 'Failed to fetch session details' },
+      { status }
     );
   }
 });
 
-// Update Session
+// Update Session (Minimal restoration)
 export const PATCH = withPermission({
   module: 'COUNSELING_SESSIONS',
   action: 'UPDATE',
-})(async (req: NextRequest, { params, user }: any) => {
+})(async (req: NextRequest, { params, user, userSchoolId }: any) => {
   try {
     const { id } = await params;
     
-    if (!user.id || !user.schoolId) {
+    const isSuperAdmin = user.role?.name === 'SUPERADMIN';
+    const schoolId = userSchoolId || user.schoolId;
+
+    if (!user.id || (!schoolId && !isSuperAdmin)) {
       return NextResponse.json(
         { success: false, message: 'User not authenticated or not assigned to a school' },
         { status: 401 }
@@ -78,9 +64,9 @@ export const PATCH = withPermission({
 
     const session = await counselingService.updateSession(
       id,
-      user.schoolId,
+      schoolId,
       user.id,
-      user.role,
+      user.role?.name,
       validatedData
     );
     
@@ -92,30 +78,13 @@ export const PATCH = withPermission({
   } catch (error: any) {
     console.error('Update session error:', error);
     
-    if (error.message === 'Session not found') {
-      return NextResponse.json(
-        { success: false, message: error.message },
-        { status: 404 }
-      );
-    }
-
-    if (error.message === 'Access denied') {
-      return NextResponse.json(
-        { success: false, message: error.message },
-        { status: 403 }
-      );
-    }
-
-    if (error.name === 'ZodError') {
-      return NextResponse.json(
-        { success: false, message: 'Invalid input data', errors: error.errors },
-        { status: 400 }
-      );
-    }
+    const status = error.message.includes('Access denied') ? 403 : 
+                   error.message === 'Session not found' ? 404 : 
+                   error.name === 'ZodError' ? 400 : 500;
 
     return NextResponse.json(
-      { success: false, message: 'Failed to update session' },
-      { status: 500 }
+      { success: false, message: error.message || 'Failed to update session' },
+      { status }
     );
   }
 });

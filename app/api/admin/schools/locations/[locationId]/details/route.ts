@@ -6,7 +6,7 @@ import { handleError } from '@/src/utils/errors';
 export const GET = async (req: NextRequest, { params }: { params: Promise<{ locationId: string }> }) => {
   try {
     const { locationId } = await params;
-    const result = await SchoolLocationService.getLocationDetails(locationId);
+    const result = await SchoolLocationService.getLocationDetails(locationId) as any;
     return Response.json(result.data);
   } catch (error) {
     console.error('Get location details error:', error);

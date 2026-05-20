@@ -10,7 +10,7 @@ export function SessionTabs({ activeTab, onTabChange }: SessionTabsProps) {
     { id: 'upcoming', label: 'Upcoming', count: 0 },
     { id: 'completed', label: 'Completed', count: 0 },
     { id: 'cancelled', label: 'Cancelled', count: 0 },
-  ];
+  ] as const;
 
   return (
     <div className="border-b border-gray-200 mb-6">

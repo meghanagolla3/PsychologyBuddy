@@ -78,7 +78,50 @@ export const POST = async (req: NextRequest, { params }: any) => {
         counselor: true
       }
     });
-    
+
+    // Create notification for the counselor
+    try {
+      await (prisma as any).counselorNotification.create({
+        data: {
+          userId: updatedMeeting.counselorId,
+          type: 'session',
+          message: `Meeting confirmed by parent: ${updatedMeeting.parentName} (for ${updatedMeeting.student.firstName})`,
+          severity: 'medium',
+          read: false
+        }
+      });
+    } catch (notifError) {
+      console.error('Failed to create counselor notification:', notifError);
+    }
+
+    // Create notification for school admins
+    try {
+      const admins = await prisma.user.findMany({
+        where: {
+          schoolId: userInfo.schoolId,
+          role: {
+            name: { in: ['ADMIN', 'SUPERADMIN'] }
+          }
+        }
+      });
+
+      if (admins.length > 0) {
+        await Promise.all(admins.map(admin => 
+          prisma.adminNotification.create({
+            data: {
+              userId: admin.id,
+              type: 'system',
+              message: `Meeting confirmed: ${updatedMeeting.parentName} with counselor (Student: ${updatedMeeting.student.firstName})`,
+              severity: 'medium',
+              read: false
+            }
+          })
+        ));
+      }
+    } catch (adminNotifError) {
+      console.error('Failed to create admin notifications:', adminNotifError);
+    }
+
     return NextResponse.json({
       success: true,
       data: updatedMeeting,

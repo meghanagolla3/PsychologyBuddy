@@ -715,27 +715,7 @@ Generate the summary:`;
 
       console.log(`[EscalationAlert] Resolved user ID: ${userId} for studentId: ${studentId}`);
 
-      // Check if student has had any completed sessions and get the most recent counselor's ID
-      const latestCompletedSession = await prisma.counselingSession.findFirst({
-        where: {
-          studentId: userId,
-          status: 'COMPLETED'
-        },
-        orderBy: { endedAt: 'desc' },
-        take: 1
-      });
-
-      console.log(`[EscalationAlert] Latest completed session for student ${studentId}:`, latestCompletedSession);
-
-      let assignedCounselorId: string | undefined;
-      if (latestCompletedSession && latestCompletedSession.counselorId) {
-        assignedCounselorId = latestCompletedSession.counselorId;
-        console.log(`[EscalationAlert] Student ${studentId} has completed sessions, will assign to previous counselor ${assignedCounselorId}`);
-      } else {
-        console.log(`[EscalationAlert] Student ${studentId} has no completed sessions, skipping auto-assignment`);
-      }
-
-      // Create alert record in database
+      // 1. Create alert record in database FIRST
       const alert = await prisma.escalationAlert.create({
         data: {
           studentId: userId, // Use the resolved user ID
@@ -756,11 +736,10 @@ Generate the summary:`;
           requiresImmediateAction: detection.level.requiresImmediateAction,
           status: 'open',
           priority: detection.level.level,
-          assignedTo: assignedCounselorId,
         }
       });
 
-      // Link the counseling session back to this escalation alert
+      // 2. Link the counseling session back to this escalation alert
       if (sessionId) {
         try {
           await prisma.counselingSession.update({
@@ -770,20 +749,7 @@ Generate the summary:`;
             },
           });
         } catch (linkError) {
-          // Don't throw error - alert creation is more important
-        }
-      }
-
-      // Create counselor assignment with escalation alert ID if we have a previous counselor
-      if (assignedCounselorId) {
-        try {
-          const { CounselorService } = await import('../../server/profiles/counselor/counselor.service');
-          console.log(`[EscalationAlert] Auto-assigning student ${studentId} to counselor ${assignedCounselorId} with alert ${alert.id}`);
-          const result = await CounselorService.assignStudents(assignedCounselorId, [userId], 'system', undefined, alert.id);
-          console.log(`[EscalationAlert] Auto-assignment successful:`, result);
-        } catch (error) {
-          console.error(`[EscalationAlert] Auto-assignment failed for student ${studentId}:`, error);
-          // Don't fail the alert creation if assignment fails
+          console.error(`[EscalationAlert] Failed to link session ${sessionId} to alert ${alert.id}`);
         }
       }
       
@@ -1028,7 +994,7 @@ Generate the summary:`;
       other: 'Concerning content'
     }
 
-    return `🚨 Escalation Alert: ${categoryDescriptions[category.type]} detected (${level.level} severity). Immediate attention required.`
+    return `Escalation Alert: ${categoryDescriptions[category.type]} detected (${level.level} severity). Immediate attention required.`
   }
 
   /**
@@ -1177,21 +1143,46 @@ Generate the summary:`;
         return; // Exit early if no staff users
       }
 
-      const notificationMessage = `🚨 ${detection.level.level.toUpperCase()} ESCALATION: ${detection.category.type.replace('_', ' ').toUpperCase()}`;
+      const notificationMessage = ` ${detection.level.level.toUpperCase()} ESCALATION: ${detection.category.type.replace('_', ' ').toUpperCase()}`;
 
-      for (const staff of staffUsers) {
-        console.log(`[EscalationAlert] Creating notification for staff ${staff.id} (${staff.role?.name})`);
-        
-        await prisma.adminNotification.create({
-          data: {
-            userId: staff.id,
-            alertId: alertId,
-            type: 'escalation',
-            message: notificationMessage,
-            severity: detection.level.level,
-            read: false
-          }
-        });
+      // Deduplicate staff users by ID
+      const uniqueStaff = staffUsers.filter((v, i, a) => a.findIndex(t => t.id === v.id) === i);
+
+      for (const staff of uniqueStaff) {
+        // Check if notification already exists for this staff and alert
+        if (staff.role?.name === 'COUNSELOR') {
+          const existing = await prisma.counselorNotification.findFirst({
+            where: { userId: staff.id, alertId: alertId }
+          });
+          if (existing) continue;
+
+          await prisma.counselorNotification.create({
+            data: {
+              userId: staff.id,
+              alertId: alertId,
+              type: 'escalation',
+              message: notificationMessage,
+              severity: detection.level.level,
+              read: false
+            }
+          });
+        } else {
+          const existing = await prisma.adminNotification.findFirst({
+            where: { userId: staff.id, alertId: alertId }
+          });
+          if (existing) continue;
+
+          await prisma.adminNotification.create({
+            data: {
+              userId: staff.id,
+              alertId: alertId,
+              type: 'escalation',
+              message: notificationMessage,
+              severity: detection.level.level,
+              read: false
+            }
+          });
+        }
       }
 
       console.log(`[EscalationAlert] Created ${staffUsers.length} admin notifications for ${detection.level.level} alert ${alertId}`);

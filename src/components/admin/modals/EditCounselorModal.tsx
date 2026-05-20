@@ -466,7 +466,7 @@ export function EditCounselorModal({ counselor, onClose, onSuccess, schools }: E
               </label>
               <LocationSearch
                 schoolId={formData.schoolId}
-                initialLocationId={counselor.locationId}
+                initialLocationId={counselor.locationId || counselor.location?.id}
                 onLocationSelect={(location) => handleInputChange('locationId', location?.id || '')}
               />
               {errors.locationId && (

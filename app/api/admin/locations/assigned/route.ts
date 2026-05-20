@@ -26,27 +26,59 @@ export const GET = withPermission({
       );
     }
 
-    // Get admin's assigned location based on their locationId
-    const assignedLocation = await prisma.schoolLocation.findFirst({
-      where: { id: user.locationId },
-      select: {
-        id: true,
-        name: true,
-        address: true,
-        city: true,
+    let assignedLocations: Array<{ locationId: string; name: string; address: string | null; city: string | null }> = [];
+
+    const prismaClient = prisma as any;
+    if (prismaClient.locationAdminAssignment) {
+      const assignments = await prismaClient.locationAdminAssignment.findMany({
+        where: { adminId: user.id },
+        include: {
+          location: {
+            select: {
+              id: true,
+              name: true,
+              address: true,
+              city: true,
+            }
+          }
+        }
+      });
+      assignedLocations = assignments.map((a: any) => ({
+        locationId: a.locationId,
+        name: a.location.name,
+        address: a.location.address,
+        city: a.location.city
+      }));
+    } else {
+      console.log('locationAdminAssignment model not found on prisma client, attempting raw postgres query fallback...');
+      try {
+        const rawAssignments = await prisma.$queryRaw<any[]>`
+          SELECT 
+            la."locationId",
+            sl.name as "locationName",
+            sl.address as "locationAddress",
+            sl.city as "locationCity"
+          FROM "LocationAdminAssignments" la
+          JOIN "SchoolLocations" sl ON la."locationId" = sl.id
+          WHERE la."adminId" = ${user.id}
+        `;
+        assignedLocations = rawAssignments.map((a: any) => ({
+          locationId: a.locationId,
+          name: a.locationName,
+          address: a.locationAddress,
+          city: a.locationCity
+        }));
+      } catch (rawError) {
+        console.error('Raw fallback query failed for location assignments:', rawError);
+        assignedLocations = [];
       }
-    });
+    }
 
     console.log('Found assigned location:', assignedLocation);
 
     return NextResponse.json({
       success: true,
-      data: assignedLocation ? [{
-        locationId: assignedLocation.id,
-        name: assignedLocation.name,
-        address: assignedLocation.address,
-        city: assignedLocation.city
-      }] : []
+      data: assignedLocations
     });
 
   } catch (error) {

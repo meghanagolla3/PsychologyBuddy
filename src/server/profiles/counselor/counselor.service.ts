@@ -189,7 +189,17 @@ export class CounselorService {
         throw AuthError.notFound('Counselor not found');
       }
 
-      // assignedCounselorId field doesn't exist in EscalationAlert schema, skipping escalation check
+      // Check if counselor has active escalations or sessions
+      const activeEscalations = await prisma.escalationAlert.count({
+        where: {
+          assignedTo: id,
+          status: 'ACTIVE'
+        }
+      });
+
+      if (activeEscalations > 0) {
+        throw new AuthError('Cannot delete counselor with active escalations. Please reassign or close escalations first.', 400);
+      }
 
       const deletedCounselor = await CounselorRepository.deleteCounselor(id);
 
@@ -250,6 +260,9 @@ export class CounselorService {
       let assignmentsUpdated = 0;
 
       for (const studentId of studentIds) {
+        const student = students.find(s => s.id === studentId);
+        const studentName = student ? `${student.firstName} ${student.lastName}` : "a student";
+        
         if (escalationAlertId) {
           // Check if an assignment for this specific alert already exists
           const existingAlertAssignment = await prisma.counselorAssignment.findFirst({
@@ -294,6 +307,18 @@ export class CounselorService {
             where: { id: escalationAlertId },
             data: { assignedTo: counselorId }
           });
+
+          // Create notification for the counselor
+          await prisma.counselorNotification.create({
+            data: {
+              userId: counselorId,
+              alertId: escalationAlertId,
+              type: 'escalation',
+              message: `New high-risk case assigned: ${studentName}`,
+              severity: level === 'critical' ? 'critical' : 'high',
+              read: false
+            }
+          });
         } else {
           // General assignment (no specific alert)
           // Always create a new record for history as requested by user
@@ -309,6 +334,17 @@ export class CounselorService {
           });
           assignmentsCreated++;
           console.log(`[CounselorService] Created new general assignment for student ${studentId}`);
+
+          // Create notification for the counselor
+          await prisma.counselorNotification.create({
+            data: {
+              userId: counselorId,
+              type: 'system',
+              message: `New student assigned: ${studentName}`,
+              severity: 'medium',
+              read: false
+            }
+          });
         }
       }
       

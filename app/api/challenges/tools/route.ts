@@ -44,6 +44,14 @@ export const GET = withPermission({
       orderBy: { title: 'asc' },
     });
 
+    // Map meditation resources to match the frontend expected structure
+    const meditationData = meditationResources.map((m) => ({
+      id: m.id,
+      title: m.title,
+      duration: m.durationSec,
+      description: m.description,
+    }));
+
     // Get music resources
     const musicResources = await prisma.musicResource.findMany({
       where: { schoolId },
@@ -64,9 +72,18 @@ export const GET = withPermission({
         id: true,
         title: true,
         description: true,
+        readTime: true,
       },
       orderBy: { title: 'asc' },
     });
+
+    // Map psychoeducation articles to match the frontend expected structure
+    const psychoeducationData = psychoeducationResources.map((a) => ({
+      id: a.id,
+      title: a.title,
+      summary: a.description,
+      estimatedReadTime: a.readTime,
+    }));
 
     // Get journaling configuration
     const journalingConfig = await prisma.journalingToolConfig.findUnique({
@@ -80,33 +97,46 @@ export const GET = withPermission({
     });
 
     const tools = {
-      meditation: meditationResources,
+      meditation: meditationData,
       music: musicResources,
-      psychoeducation: psychoeducationResources,
+      psychoeducation: psychoeducationData,
       journaling: {
         available: !!journalingConfig,
         config: journalingConfig ? {
-          enableWriting: journalingConfig.enableWriting,
-          enableAudio: journalingConfig.enableAudio,
-          enableArt: journalingConfig.enableArt,
+          writingEnabled: journalingConfig.enableWriting,
+          audioEnabled: journalingConfig.enableAudio,
+          artEnabled: journalingConfig.enableArt,
+          types: [] as any[]
         } : null
       }
     };
 
     // Add journaling types if enabled
     if (journalingConfig) {
-      const journalTypes: { type: string; name: string }[] = [];
+      const journalTypes = [];
       if (journalingConfig.enableWriting) {
-        journalTypes.push({ type: 'writing', name: 'Writing Journal' });
+        journalTypes.push({
+          type: 'writing',
+          name: 'Writing Journal',
+          prompts: [] as string[]
+        });
       }
       if (journalingConfig.enableAudio) {
-        journalTypes.push({ type: 'audio', name: 'Audio Journal' });
+        journalTypes.push({
+          type: 'audio',
+          name: 'Audio Journal',
+          prompts: [] as string[]
+        });
       }
       if (journalingConfig.enableArt) {
-        journalTypes.push({ type: 'art', name: 'Art Journal' });
+        journalTypes.push({
+          type: 'art',
+          name: 'Art Journal',
+          prompts: [] as string[]
+        });
       }
       if (tools.journaling.config) {
-        (tools.journaling.config as any).types = journalTypes;
+        tools.journaling.config.types = journalTypes;
       }
     }
 
