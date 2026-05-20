@@ -48,7 +48,7 @@ const badges = [
 
 /* ── Sparkle icon for CTA ── */
 const SparkleIcon = () => (
-  <svg viewBox="0 0 40 40" fill="none" className="w-10 h-10 mx-auto mb-4">
+  <svg viewBox="0 0 40 40" fill="none" className="w-8 h-8 sm:w-10 sm:h-10 mx-auto mb-3 sm:mb-4">
     <path d="M20 4 L22 16 L34 18 L22 20 L20 32 L18 20 L6 18 L18 16 Z" fill="white" opacity="0.9" />
     <path d="M32 6 L33 11 L38 12 L33 13 L32 18 L31 13 L26 12 L31 11 Z" fill="white" opacity="0.65" />
   </svg>
@@ -70,12 +70,12 @@ export default function WellnessSection() {
   return (
     <section
       ref={ref}
-      className="min-h-screen flex flex-col items-center justify-center px-6 py-10"
+      className="min-h-screen flex flex-col items-center justify-center px-4 py-16 xs:px-6 sm:px-8 sm:py-24 md:py-10"
       style={{ background: "linear-gradient(160deg, #eef4ff 0%, #e8f0ff 50%, #dde8ff 100%)" }}
     >
       {/* ── Top heading ── */}
       <div
-        className="text-center mb-14"
+        className="text-center mb-10 sm:mb-16 md:mb-10 max-w-3xl px-2"
         style={{
           opacity: visible ? 1 : 0,
           transform: visible ? "translateY(0)" : "translateY(24px)",
@@ -83,17 +83,17 @@ export default function WellnessSection() {
         }}
       >
         <h2
-          className="text-3xl sm:text-4xl font-bold text-slate-800 mb-3"
+          className="text-2xl xs:text-3xl sm:text-4xl md:text-5xl font-bold text-slate-800 mb-4 leading-tight"
         >
           Wellness is a Journey - Let&apos;s Make It Fun.
         </h2>
-        <p className="text-slate-500 text-sm sm:text-base">
+        <p className="text-slate-500 text-xs xs:text-sm sm:text-base md:text-lg max-w-xl mx-auto leading-relaxed">
           Earn badges and rewards for self-awareness and consistency
         </p>
       </div>
 
       {/* ── Badge grid ── */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-8 sm:gap-10 mb-20 w-full max-w-5xl">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 md:gap-8 lg:gap-10 mb-10 sm:mb-10 md:mb-16 w-full max-w-6xl justify-items-center px-2">
         {badges.map((badge, i) => (
           <BadgeCard key={badge.id} badge={badge} visible={visible} delay={i * 120} />
         ))}
@@ -101,10 +101,10 @@ export default function WellnessSection() {
 
       {/* ── CTA banner ── */}
       <div
-        className="w-full max-w-7xl rounded-[24px] px-8 py-14 text-center relative overflow-hidden bg-gradient-to-r
+        className="w-full max-w-5xl rounded-[24px] xs:rounded-[32px] px-4 py-10 xs:px-6 xs:py-12 sm:px-12 sm:py-16 md:py-9 text-center relative overflow-hidden bg-gradient-to-r
       from-[#0BA0EA]
       via-[#48C2FF]
-      to-[#0BA0EA] "
+      to-[#0BA0EA] mx-auto"
         style={{
           // background: "linear-gradient(135deg, #38c8f0 0%, #22aaee 40%, #2090e8 100%)",
           boxShadow: "0 20px 60px rgba(34,170,238,0.35)",
@@ -125,18 +125,18 @@ export default function WellnessSection() {
         <SparkleIcon/>
 
         <h3
-          className="text-2xl sm:text-[32px] font-semibold text-white mb-4"
+          className="text-xl xs:text-2xl sm:text-3xl md:text-4xl font-semibold text-white mb-4 sm:mb-6 leading-tight max-w-2xl mx-auto"
         >
           Start Your Wellness Journey Today
         </h3>
-        <p className="text-white text-sm sm:text-[16px] mb-2 max-w-3xl mx-auto leading-relaxed">
+        <p className="text-white text-xs xs:text-sm sm:text-base md:text-lg mb-2 max-w-2xl mx-auto leading-relaxed opacity-95">
           Every check-in, every lesson, every moment of reflection counts towards a healthier, happier you.
         </p>
-        <p className="text-white text-sm sm:text-[16px] mb-8">
+        <p className="text-white text-xs xs:text-sm sm:text-base md:text-lg mb-6 sm:mb-8 md:mb-10 opacity-95">
           Let&apos;s unlock your potential together.
         </p>
 
-        <button className="bg-white text-sky-500 font-medium px-8 py-3 rounded-[24px] text-sm sm:text-[16px] drop-shadow-xl drop-shadow-[#096DB24A] hover:shadow-xl hover:scale-105 active:scale-95 transition-all duration-200">
+        <button className="bg-white text-sky-500 font-medium px-6 py-2.5 sm:px-8 sm:py-3.5 rounded-[24px] text-xs xs:text-sm sm:text-base md:text-lg shadow-lg hover:shadow-xl hover:scale-105 active:scale-95 transition-all duration-200">
           Explore Now
         </button>
       </div>
@@ -155,6 +155,7 @@ function BadgeCard({
   delay: number;
 }) {
   const [hovered, setHovered] = useState(false);
+  const baseScale = badge.id === 1 ? 1 : 0.84;
 
   return (
     <div
@@ -167,7 +168,7 @@ function BadgeCard({
     >
       {/* Icon tile with image */}
       <div
-        className="w-[100px] h-[100px] sm:w-[200px] sm:h-[176px] rounded-[24px] flex items-center justify-center mb-4 cursor-pointer relative overflow-hidden"
+        className="w-full max-w-[200px] aspect-[200/176] rounded-[24px] flex items-center justify-center mb-4 cursor-pointer relative overflow-hidden"
         style={{
           // background: badge.bg,
           // boxShadow: hovered
@@ -183,17 +184,22 @@ function BadgeCard({
           src={badge.imageSrc}
           alt={badge.imageAlt}
           fill
-          className="object-contain "
+          className="object-contain transition-transform duration-300"
+          style={{
+            transform: hovered
+              ? `scale(${baseScale * 1.05}) rotate(6deg)`
+              : `scale(${baseScale}) rotate(0deg)`,
+          }}
         />
       </div>
 
       {/* Title */}
-      <p className="font-medium text-[#2F3D43] text-sm sm:text-[20px] mt-2 mb-1">
+      <p className="font-medium text-[#2F3D43] text-sm sm:text-base md:text-lg lg:text-[20px] mt-2 mb-1 px-2">
         {badge.title}
       </p>
 
       {/* Description */}
-      <p className="text-[#686D70] text-xs sm:text-[14px] max-w-[172px] leading-relaxed italic">
+      <p className="text-[#686D70] text-xs sm:text-sm max-w-[150px] xs:max-w-[172px] sm:max-w-[200px] leading-relaxed italic px-2">
         {badge.description}
       </p>
     </div>

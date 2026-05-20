@@ -125,7 +125,8 @@ export const ModelName = {
   CounselingSession: 'CounselingSession',
   SessionIntake: 'SessionIntake',
   SessionReport: 'SessionReport',
-  CounselorAssignment: 'CounselorAssignment'
+  CounselorAssignment: 'CounselorAssignment',
+  ContactMessage: 'ContactMessage'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -1130,6 +1131,19 @@ export const CounselorAssignmentScalarFieldEnum = {
 } as const
 
 export type CounselorAssignmentScalarFieldEnum = (typeof CounselorAssignmentScalarFieldEnum)[keyof typeof CounselorAssignmentScalarFieldEnum]
+
+
+export const ContactMessageScalarFieldEnum = {
+  id: 'id',
+  fullName: 'fullName',
+  schoolName: 'schoolName',
+  email: 'email',
+  phone: 'phone',
+  message: 'message',
+  createdAt: 'createdAt'
+} as const
+
+export type ContactMessageScalarFieldEnum = (typeof ContactMessageScalarFieldEnum)[keyof typeof ContactMessageScalarFieldEnum]
 
 
 export const SortOrder = {

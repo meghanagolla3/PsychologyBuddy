@@ -414,3 +414,8 @@ export type SessionReport = Prisma.SessionReportModel
  * 
  */
 export type CounselorAssignment = Prisma.CounselorAssignmentModel
+/**
+ * Model ContactMessage
+ * 
+ */
+export type ContactMessage = Prisma.ContactMessageModel

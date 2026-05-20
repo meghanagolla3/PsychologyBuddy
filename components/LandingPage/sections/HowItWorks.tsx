@@ -10,7 +10,7 @@ const steps = [
     label: "Choose Mood",
     sublabel: "Step 1",
     image: "/HIW/11.png",
-    className: "md:-ml-46 md:-mt-28 md:w-[600px] md:h-[352px] -ml-16 -mt-20 w-[300px] h-[186px]",
+    className: "md:-ml-46 md:-mt-38 md:w-[600px] md:h-[352px] -ml-23 -mt-21 w-[350px] h-[216px]",
     description: "Choose your mood in seconds no pressure, just honesty",
   },
   {
@@ -18,7 +18,7 @@ const steps = [
     label: "AI Support",
     sublabel: "Step 2",
     image: "/HIW/2.svg",
-    className: "md:-ml-19 md:-mt-39 md:w-[400px] md:h-[250px] -ml-10 -mt-20 w-[200px] h-[125px]",
+    className: "md:-ml-19 md:-mt-33.5 md:w-[400px] md:h-[250px] -ml-10 -mt-22 w-[230px] h-[170px]",
     description: "Psychology buddy helps you understand why you feel that way",
   },
   {
@@ -26,7 +26,7 @@ const steps = [
     label: "Learn & Grow",
     sublabel: "Step 3",
     image: "/HIW/3.svg",
-    className: "md:-ml-25 md:-mt-38 md:w-[400px] md:h-[250px] -ml-12 -mt-19 w-[200px] h-[125px]",
+    className: "md:-ml-25 md:-mt-33 md:w-[400px] md:h-[250px] -ml-10 -mt-22 w-[230px] h-[170px]",
     description: "Learn through Mind Space lessons and earn badges",
   },
   {
@@ -34,7 +34,7 @@ const steps = [
     label: "Get Expert Help",
     sublabel: "Step 4",
     image: "/HIW/4.svg",
-    className: "md:-ml-22.5 md:-mt-35 md:w-[400px] md:h-[250px] -ml-11 -mt-18 w-[200px] h-[125px]",
+    className: "md:-ml-22.5 md:-mt-33.5 md:w-[400px] md:h-[250px] -ml-11 -mt-25 w-[240px] h-[180px]",
     description: "In cases requiring further support, alerts enable school administrators to respond.",
   },
 ];
@@ -55,10 +55,10 @@ const HowItWorks = () => {
   return (
     <section
       ref={sectionRef}
-      className="py-12 sm:py-16 md:py-5 bg-gradient-to-r from-[#f5f5f9] via-[#f3f3f4]/10 to-[#f5f5f9] relative overflow-hidden"
+      className="py-2 sm:py-4 md:py-1 bg-gradient-to-r from-[#f5f5f9] via-[#f3f3f4]/10 to-[#f5f5f9] relative overflow-hidden"
     >
       {/* Section Title */}
-      <div className="text-center mb-10 md:mb-16 px-4">
+      <div className="text-center mb-5 md:mb-10 px-4">
         <h2 className="text-2xl sm:text-3xl md:text-[40px] font-semibold text-[#2F3D43]">
           How It Works
         </h2>

@@ -50,29 +50,29 @@ const WhatWeOffer = () => {
         </div>
 
         {/* Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+                    <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-2 sm:gap-6">
           {features.map((feature, i) => (
             <div
               key={i}
-              className="group rounded-[12.47px] border-[0.39px] p-6 flex flex-col gap-3 transition-all duration-200 bg-gray-50 text-gray-800 hover:shadow-md hover:bg-[#1DA0E1] hover:text-white hover:border-transparent border-[#D4D4D4]/50 drop-shadow-sm items-center"
+              className="group rounded-[12.47px] border-[0.39px] px-4 py-2 sm:p-6 flex flex-col gap-2 transition-all duration-200 bg-gray-50 text-gray-800 hover:shadow-md hover:bg-[#1DA0E1] hover:text-white hover:border-transparent border-[#D4D4D4]/50 drop-shadow-sm items-center justify-center"
             >
               <div
-                className="w-[63px] h-[63px] rounded-full overflow-hidden flex items-center justify-center bg-[#EAF8FF] transition-colors duration-200 group-hover:bg-white"
+                className="w-[43px] sm:w-[63px] h-[43px] sm:h-[63px] rounded-full overflow-hidden flex items-center justify-center bg-[#EAF8FF] transition-colors duration-200 group-hover:bg-white"
               >
                 <img
                   src={feature.image}
                   alt={feature.title}
-                  className="w-[36px] h-[36px] object-cover"
+                  className="w-[26px] sm:w-[36px] h-[26px] sm:h-[36px] object-cover"
                 />
               </div>
 
               <h3
-                className="font-medium text-[16px] text-[#2F3D43] transition-colors duration-200 group-hover:text-white"
+                className="font-semibold text-[11px] sm:text-[16px] text-[#2F3D43] transition-colors text-center duration-200 group-hover:text-white"
               >
                 {feature.title}
               </h3>
               <p
-                className="text-[#767676] leading-relaxed text-[14px] text-center transition-colors duration-200 group-hover:text-white/85"
+                className="text-[#767676] leading-relaxed text-[8px] sm:text-[14px] text-center transition-colors duration-200 group-hover:text-white/85"
               >
                 {feature.description}
               </p>
@@ -83,17 +83,17 @@ const WhatWeOffer = () => {
 
       {/* CTA Banner */}
       <div className="bg-[#FDFEFF] drop-shadow-xl mb-12">
-        <div className="max-w-3xl mx-auto px-6 py-14 text-center">
-          <h2 className="text-2xl md:text-[32px] font-bold text-[#1DA0E1] mb-3">
+        <div className="max-w-3xl mx-auto px-6 py-6 sm:py-14 text-center">
+          <h2 className="text-[16px] sm:text-[32px] font-bold text-[#1DA0E1] mb-3">
             Ready to Transform Student Wellbeing?
           </h2>
-          <p className="text-[#1DA0E1] text-sm md:text-[16px] mb-8 max-w-md mx-auto leading-relaxed">
+          <p className="text-[#1DA0E1] text-[10px] md:text-[16px] mb-8 max-w-md mx-auto leading-relaxed">
             Join schools across the country creating safer, more supportive
             learning environments.
           </p>
           <Link
             href="#"
-            className="inline-flex items-center gap-2 bg-[#1DA0E1] hover:bg-[#1589b8] text-white font-medium text-[16px] px-7 py-3 rounded-full transition-colors duration-200 shadow-md"
+            className="inline-flex items-center gap-2 bg-[#1DA0E1] hover:bg-[#1589b8] text-white font-medium text-[10px] sm:text-[16px] px-5 py-2 rounded-full transition-colors duration-200 shadow-md"
           >
             Get Started Now
           </Link>

@@ -16,7 +16,7 @@ const getPrisma = () => {
         return new PrismaClient({ adapter })
     }
 
-    if (!globalForPrisma.prisma) {
+    if (!globalForPrisma.prisma || !(globalForPrisma.prisma as any).contactMessage) {
         // Log connection string info (safely)
         const url = process.env.DATABASE_URL;
         console.log('[Prisma] Initializing pool. URL length:', url?.length || 0);

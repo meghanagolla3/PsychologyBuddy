@@ -1168,3 +1168,15 @@ enum SessionStatus {
   CANCELLED
   MISSED
 }
+
+model ContactMessage {
+  id          String   @id @default(uuid())
+  fullName    String
+  schoolName  String?
+  email       String
+  phone       String?
+  message     String
+  createdAt   DateTime @default(now())
+
+  @@map("ContactMessages")
+}

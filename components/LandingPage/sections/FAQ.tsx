@@ -4,7 +4,7 @@ import { useState } from "react";
 
 /* ─────────────────────────────────────────
    FAQ data — left column and right column
-───────────────────────────────────────── */
+   ───────────────────────────────────────── */
 const leftFaqs = [
   {
     id: 1,
@@ -74,7 +74,7 @@ const rightFaqs = [
 
 /* ─────────────────────────────────────────
    Single accordion item
-───────────────────────────────────────── */
+   ───────────────────────────────────────── */
 function FAQItem({
   question,
   answer,
@@ -98,9 +98,9 @@ function FAQItem({
       }}
       onClick={() => setOpen(!open)}
     >
-      <div className="flex items-center justify-between gap-4 px-5 py-4">
+      <div className="flex items-center justify-between gap-4 px-4 sm:px-5 py-3 sm:py-4">
         <span
-          className="text-[16px] font-medium text-[#2F3D43] leading-snug"
+          className="text-sm xs:text-base font-medium text-[#2F3D43] leading-snug"
         >
           {question}
         </span>
@@ -135,12 +135,12 @@ function FAQItem({
       {/* answer */}
       <div
         style={{
-          maxHeight: open ? "200px" : "0px",
+          maxHeight: open ? "400px" : "0px",
           overflow: "hidden",
           transition: "max-height 0.35s ease",
         }}
       >
-        <p className="px-5 pb-5 text-[16px] text-[#686D70] leading-relaxed">
+        <p className="px-4 sm:px-5 pb-4 sm:pb-5 text-xs xs:text-sm sm:text-[16px] text-[#686D70] leading-relaxed">
           {answer}
         </p>
       </div>
@@ -150,33 +150,32 @@ function FAQItem({
 
 /* ─────────────────────────────────────────
    Main FAQ Section
-───────────────────────────────────────── */
+   ───────────────────────────────────────── */
 export default function FAQSection() {
   return (
     <section
-      className="w-full px-6 py-20"
+      className="w-full px-4 xs:px-6 py-10 sm:py-24"
       style={{ background: "#f8f8f8" }}
     >
       <div className="max-w-7xl mx-auto">
 
         {/* Heading */}
-        <div className="text-center mb-12">
+        <div className="text-center mb-10 sm:mb-16">
           <h2
-            className="text-3xl sm:text-[40px] font-semibold text-[#2F3D43] mb-3"
-            
+            className="text-2xl xs:text-3xl sm:text-4xl md:text-[40px] font-semibold text-[#2F3D43] leading-tight mb-3"
           >
             Frequently Asked Questions
           </h2>
-          <p className="text-[#686D70] text-sm sm:text-[16px]">
+          <p className="text-[#686D70] text-xs xs:text-sm sm:text-[16px] max-w-xl mx-auto">
             Answers to common questions before you get started.
           </p>
         </div>
 
         {/* Two-column grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 items-start">
 
           {/* Left column */}
-          <div className="flex flex-col gap-6">
+          <div className="flex flex-col gap-4 sm:gap-6">
             {leftFaqs.map((faq) => (
               <FAQItem
                 key={faq.id}
@@ -188,7 +187,7 @@ export default function FAQSection() {
           </div>
 
           {/* Right column */}
-          <div className="flex flex-col gap-6">
+          <div className="flex flex-col gap-4 sm:gap-6">
             {rightFaqs.map((faq) => (
               <FAQItem
                 key={faq.id}
