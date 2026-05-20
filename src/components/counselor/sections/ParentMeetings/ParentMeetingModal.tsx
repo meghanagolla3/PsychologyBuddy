@@ -46,6 +46,7 @@ export function ParentMeetingModal({ open, onOpenChange, onMeetingCreated }: Par
   const [error, setError] = useState<string | null>(null);
   const [dropdowns, setDropdowns] = useState({
     student: false,
+    time: false,
   });
   const [students, setStudents] = useState<Student[]>([]);
   const [searchTerm, setSearchTerm] = useState('');

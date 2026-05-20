@@ -74,7 +74,7 @@ export const GET = withPermission({
       }
     }
 
-    console.log('Found assigned location:', assignedLocation);
+    console.log('Found assigned locations:', assignedLocations);
 
     return NextResponse.json({
       success: true,
