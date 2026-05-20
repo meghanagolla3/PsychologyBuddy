@@ -13,7 +13,7 @@ import { Button } from '@/components/ui/button';
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { format } from "date-fns";
-import { cn } from "@/src/lib/utils";
+import { cn } from "@/lib/utils";
 
 interface ParentMeetingModalProps {
   open: boolean;

@@ -43,7 +43,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { cn } from "@/src/lib/utils";
+import { cn } from "@/lib/utils";
 import { toast } from "@/components/ui/use-toast";
 import { AdminHeader } from "@/src/components/admin/layout/AdminHeader";
 import { usePermissions } from "@/src/hooks/usePermissions";

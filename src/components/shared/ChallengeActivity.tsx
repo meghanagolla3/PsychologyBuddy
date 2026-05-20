@@ -25,7 +25,7 @@ import {
   SelectValue 
 } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
-import { cn } from "@/src/lib/utils";
+import { cn } from "@/lib/utils";
 
 interface ActivityItem {
   id: string;

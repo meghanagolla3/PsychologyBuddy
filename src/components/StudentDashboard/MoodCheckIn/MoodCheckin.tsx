@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Calendar } from "lucide-react";
-import { cn } from "@/src/lib/cn";
+import { cn } from "@/lib/utils";
 import { SearchParamsUtils } from "@/src/lib/ai/search-params";
 import { getAuthHeaders } from "@/src/utils";
 import BackToDashboard from "../Layout/BackToDashboard";

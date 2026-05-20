@@ -20,7 +20,7 @@ import {
   CartesianGrid,
 } from "recharts";
 import { useAuth } from "@/src/contexts/AuthContext";
-import { cn } from "@/src/lib/utils";
+import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 
 const datasets: Record<string, { day: string; value: number }[]> = {
