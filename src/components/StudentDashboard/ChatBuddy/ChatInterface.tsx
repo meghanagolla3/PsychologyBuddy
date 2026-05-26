@@ -528,6 +528,7 @@ export default function ChatInterface({
 
   // Prevent duplicate quick reply API calls
   const isFetchingQuickRepliesRef = React.useRef(false);
+  const hasInitializedQuickRepliesRef = React.useRef(false);
 
   // Fetch dynamic quick replies based on AI response
   const fetchQuickReplies = useCallback(async (botMessage: string, currentMessages: any[]) => {
@@ -587,14 +588,18 @@ export default function ChatInterface({
 
   // Set initial quick replies based on mood when chat loads
   React.useEffect(() => {
-    const currentMood = mood || accessMood;
-    const currentTriggers = triggers || accessTriggers;
-    
-    console.log('Initial quick replies effect:', { currentMood, currentTriggers });
-    
-    // Always fetch dynamic replies, regardless of mood/triggers
-    fetchQuickReplies("", []);
-  }, [mood, accessMood, triggers, accessTriggers]);
+    // Only fetch once on mount
+    if (!hasInitializedQuickRepliesRef.current) {
+      hasInitializedQuickRepliesRef.current = true;
+      const currentMood = mood || accessMood;
+      const currentTriggers = triggers || accessTriggers;
+      
+      console.log('Initial quick replies effect:', { currentMood, currentTriggers });
+      
+      // Always fetch dynamic replies, regardless of mood/triggers
+      fetchQuickReplies("", []);
+    }
+  }, []);
   
   // Check URL parameters for import on mount
   React.useEffect(() => {
@@ -756,46 +761,10 @@ export default function ChatInterface({
     }
   }, [user?.id, messages.length, hookSessionId, hookIsLoading, initializeChat]);
 
-  // State for exercise suggestions - persisted across refreshes
-  const [showExerciseSuggestions, setShowExerciseSuggestions] = useState(() => {
-    if (typeof window !== 'undefined') {
-      return sessionStorage.getItem('showExerciseSuggestions') === 'true';
-    }
-    return false;
-  });
-  const [exerciseSuggestions, setExerciseSuggestions] = useState<any[]>(() => {
-    if (typeof window !== 'undefined') {
-      const saved = sessionStorage.getItem('exerciseSuggestions');
-      return saved ? JSON.parse(saved) : [];
-    }
-    return [];
-  });
-  const [studentMessageCount, setStudentMessageCount] = useState(() => {
-    if (typeof window !== 'undefined') {
-      const saved = sessionStorage.getItem('studentMessageCount');
-      return saved ? parseInt(saved, 10) : 0;
-    }
-    return 0;
-  });
-
-  // Persist exercise suggestions state to sessionStorage
-  React.useEffect(() => {
-    if (typeof window !== 'undefined') {
-      sessionStorage.setItem('showExerciseSuggestions', showExerciseSuggestions.toString());
-    }
-  }, [showExerciseSuggestions]);
-
-  React.useEffect(() => {
-    if (typeof window !== 'undefined') {
-      sessionStorage.setItem('exerciseSuggestions', JSON.stringify(exerciseSuggestions));
-    }
-  }, [exerciseSuggestions]);
-
-  React.useEffect(() => {
-    if (typeof window !== 'undefined') {
-      sessionStorage.setItem('studentMessageCount', studentMessageCount.toString());
-    }
-  }, [studentMessageCount]);
+  // State for exercise suggestions - not persisted, always starts hidden
+  const [showExerciseSuggestions, setShowExerciseSuggestions] = useState(false);
+  const [exerciseSuggestions, setExerciseSuggestions] = useState<any[]>([]);
+  const [studentMessageCount, setStudentMessageCount] = useState(0);
 
   // Track when user sends messages and count them - optimized to only run when last message changes
   React.useEffect(() => {
