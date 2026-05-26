@@ -255,11 +255,11 @@ export function AdminSidebar() {
   const SidebarContent = () => (
 
     <>
-    <div className="flex items-center gap-3 px-4 py-6 border-b border-sidebar-border">
+    <div className="flex items-center gap-3 px-4 py-[21px] border-b border-sidebar-border">
         <img 
           src="/logo1.png"
           alt="Psychology Buddy" 
-          className="h-12 w-auto"
+          className="h-11 w-auto"
         />
       </div>
       {/* <div className="flex items-center justify-between p-4 border-b"> */}
@@ -269,7 +269,7 @@ export function AdminSidebar() {
             {permissions.isSuperAdmin ? 'SuperAdmin' : 'Admin'}
             {user?.school && ` - ${user.school.name}`}
           </p>
-        </div> */}
+        </div> */} 
       
         <button
           onClick={() => setSidebarOpen(false)}

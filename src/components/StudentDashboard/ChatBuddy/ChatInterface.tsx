@@ -77,11 +77,6 @@ interface ChatInterfaceProps {
   notes?: string;
 }
 
-const DEFAULT_QUICK_REPLIES = [
-  "I'm feeling anxious",
-  "I need help with stress",
-  "I'm feeling sad",
-];
 
 // Chat Message Component - memoized to prevent unnecessary re-renders
 const ChatMessage = memo(function ChatMessage({ 
@@ -526,9 +521,80 @@ export default function ChatInterface({
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showSummaryImport, setShowSummaryImport] = useState(true);
+  const [quickReplies, setQuickReplies] = useState<string[]>([]);
   
   // Check if user is importing from reflections page
   const [isImportingFromReflections, setIsImportingFromReflections] = useState(false);
+
+  // Prevent duplicate quick reply API calls
+  const isFetchingQuickRepliesRef = React.useRef(false);
+
+  // Fetch dynamic quick replies based on AI response
+  const fetchQuickReplies = useCallback(async (botMessage: string, currentMessages: any[]) => {
+    const currentMood = mood || accessMood;
+    const currentTriggers = triggers || accessTriggers;
+    const currentNotes = notes || accessNotes;
+    
+    console.log('fetchQuickReplies called:', { currentMood, currentTriggers, botMessage });
+    
+    // Prevent multiple simultaneous calls
+    if (isFetchingQuickRepliesRef.current) {
+      console.log('Already fetching, skipping...');
+      return;
+    }
+
+    isFetchingQuickRepliesRef.current = true;
+    console.log('Fetching quick replies from API...');
+
+    try {
+      const response = await fetch('/api/students/chat/quick-replies', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          mood: currentMood,
+          triggers: currentTriggers,
+          notes: currentNotes,
+          botMessage, // Pass the bot's last message for context
+          lastMessages: currentMessages.slice(-3),
+          messageCount: currentMessages.length,
+        }),
+      });
+
+      console.log('API response status:', response.status);
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log('API response data:', data);
+        if (data.success && data.quickReplies) {
+          console.log('Setting quick replies:', data.quickReplies);
+          setQuickReplies(data.quickReplies);
+        } else {
+          console.log('API response missing quickReplies or success');
+        }
+      } else {
+        console.log('API response not OK:', response.status);
+      }
+    } catch (error) {
+      console.error('Error fetching quick replies:', error);
+      // Use fallback replies on error
+      setQuickReplies(["I'm feeling anxious", "I need help with stress", "I'm feeling sad"]);
+    } finally {
+      isFetchingQuickRepliesRef.current = false;
+    }
+  }, [mood, accessMood, triggers, accessTriggers, notes, accessNotes]);
+
+  // Set initial quick replies based on mood when chat loads
+  React.useEffect(() => {
+    const currentMood = mood || accessMood;
+    const currentTriggers = triggers || accessTriggers;
+    
+    console.log('Initial quick replies effect:', { currentMood, currentTriggers });
+    
+    // Always fetch dynamic replies, regardless of mood/triggers
+    fetchQuickReplies("", []);
+  }, [mood, accessMood, triggers, accessTriggers]);
   
   // Check URL parameters for import on mount
   React.useEffect(() => {
@@ -579,6 +645,27 @@ export default function ChatInterface({
     endChat,
     importConversation,
   } = chatHookResult;
+
+  // Track last bot message to prevent duplicate quick reply calls
+  const lastBotMessageIdRef = React.useRef<string | null>(null);
+
+  // Watch for new bot messages and fetch quick replies
+  React.useEffect(() => {
+    console.log('Bot message watcher effect:', { messagesLength: messages.length, lastBotMessageId: lastBotMessageIdRef.current });
+    
+    if (messages.length > 0) {
+      const lastMessage = messages[messages.length - 1];
+      console.log('Last message:', { sender: lastMessage?.sender, id: lastMessage?.id, content: lastMessage?.content?.substring(0, 50) });
+      
+      if (lastMessage && lastMessage.sender === 'bot' && lastMessage.id !== lastBotMessageIdRef.current) {
+        console.log('New bot message detected, fetching quick replies');
+        lastBotMessageIdRef.current = lastMessage.id;
+        fetchQuickReplies(lastMessage.content, messages);
+      } else {
+        console.log('Not a new bot message or already processed');
+      }
+    }
+  }, [messages]);
 
   // Only call summary hook when user is available
   const summaryHookResult = useChatSummary({ studentId: user?.studentId || user?.id || "" });
@@ -951,7 +1038,7 @@ export default function ChatInterface({
 
           {/* Quick Replies */}
           <QuickReplies
-            replies={DEFAULT_QUICK_REPLIES}
+            replies={quickReplies}
             onReplyClick={handleQuickReply}
           />
 

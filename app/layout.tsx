@@ -4,7 +4,11 @@ import { AuthProvider } from "@/src/contexts/AuthContext";
 import { Toaster } from "@/components/ui/toaster";
 import QueryProvider from "@/src/providers/QueryProvider"; 
 
-const inter = Inter({ subsets: ["latin"] });
+const inter = Inter({ 
+  subsets: ["latin"],
+  display: 'optional',
+  adjustFontFallback: false
+});
 
 export const metadata = {
   title: "Psychology Buddy",

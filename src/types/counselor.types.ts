@@ -67,6 +67,13 @@ export interface Counselor {
     scheduledAt: string;
     status: string;
   }>;
+
+  // Session statistics
+  sessionStats?: {
+    todayCounsels: number;
+    totalCounsels: number;
+    declinedCounsels: number;
+  };
 }
 
 export interface CreateCounselorRequest {

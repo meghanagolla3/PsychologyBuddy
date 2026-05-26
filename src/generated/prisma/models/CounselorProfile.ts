@@ -29,6 +29,8 @@ export type CounselorProfileMinAggregateOutputType = {
   userId: string | null
   department: string | null
   profileImageUrl: string | null
+  specialization: string | null
+  availability: string | null
 }
 
 export type CounselorProfileMaxAggregateOutputType = {
@@ -36,6 +38,8 @@ export type CounselorProfileMaxAggregateOutputType = {
   userId: string | null
   department: string | null
   profileImageUrl: string | null
+  specialization: string | null
+  availability: string | null
 }
 
 export type CounselorProfileCountAggregateOutputType = {
@@ -43,6 +47,8 @@ export type CounselorProfileCountAggregateOutputType = {
   userId: number
   department: number
   profileImageUrl: number
+  specialization: number
+  availability: number
   _all: number
 }
 
@@ -52,6 +58,8 @@ export type CounselorProfileMinAggregateInputType = {
   userId?: true
   department?: true
   profileImageUrl?: true
+  specialization?: true
+  availability?: true
 }
 
 export type CounselorProfileMaxAggregateInputType = {
@@ -59,6 +67,8 @@ export type CounselorProfileMaxAggregateInputType = {
   userId?: true
   department?: true
   profileImageUrl?: true
+  specialization?: true
+  availability?: true
 }
 
 export type CounselorProfileCountAggregateInputType = {
@@ -66,6 +76,8 @@ export type CounselorProfileCountAggregateInputType = {
   userId?: true
   department?: true
   profileImageUrl?: true
+  specialization?: true
+  availability?: true
   _all?: true
 }
 
@@ -146,6 +158,8 @@ export type CounselorProfileGroupByOutputType = {
   userId: string
   department: string
   profileImageUrl: string | null
+  specialization: string | null
+  availability: string | null
   _count: CounselorProfileCountAggregateOutputType | null
   _min: CounselorProfileMinAggregateOutputType | null
   _max: CounselorProfileMaxAggregateOutputType | null
@@ -174,6 +188,8 @@ export type CounselorProfileWhereInput = {
   userId?: Prisma.StringFilter<"CounselorProfile"> | string
   department?: Prisma.StringFilter<"CounselorProfile"> | string
   profileImageUrl?: Prisma.StringNullableFilter<"CounselorProfile"> | string | null
+  specialization?: Prisma.StringNullableFilter<"CounselorProfile"> | string | null
+  availability?: Prisma.StringNullableFilter<"CounselorProfile"> | string | null
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
 }
 
@@ -182,6 +198,8 @@ export type CounselorProfileOrderByWithRelationInput = {
   userId?: Prisma.SortOrder
   department?: Prisma.SortOrder
   profileImageUrl?: Prisma.SortOrderInput | Prisma.SortOrder
+  specialization?: Prisma.SortOrderInput | Prisma.SortOrder
+  availability?: Prisma.SortOrderInput | Prisma.SortOrder
   user?: Prisma.UserOrderByWithRelationInput
 }
 
@@ -193,6 +211,8 @@ export type CounselorProfileWhereUniqueInput = Prisma.AtLeast<{
   NOT?: Prisma.CounselorProfileWhereInput | Prisma.CounselorProfileWhereInput[]
   department?: Prisma.StringFilter<"CounselorProfile"> | string
   profileImageUrl?: Prisma.StringNullableFilter<"CounselorProfile"> | string | null
+  specialization?: Prisma.StringNullableFilter<"CounselorProfile"> | string | null
+  availability?: Prisma.StringNullableFilter<"CounselorProfile"> | string | null
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
 }, "id" | "userId">
 
@@ -201,6 +221,8 @@ export type CounselorProfileOrderByWithAggregationInput = {
   userId?: Prisma.SortOrder
   department?: Prisma.SortOrder
   profileImageUrl?: Prisma.SortOrderInput | Prisma.SortOrder
+  specialization?: Prisma.SortOrderInput | Prisma.SortOrder
+  availability?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.CounselorProfileCountOrderByAggregateInput
   _max?: Prisma.CounselorProfileMaxOrderByAggregateInput
   _min?: Prisma.CounselorProfileMinOrderByAggregateInput
@@ -214,12 +236,16 @@ export type CounselorProfileScalarWhereWithAggregatesInput = {
   userId?: Prisma.StringWithAggregatesFilter<"CounselorProfile"> | string
   department?: Prisma.StringWithAggregatesFilter<"CounselorProfile"> | string
   profileImageUrl?: Prisma.StringNullableWithAggregatesFilter<"CounselorProfile"> | string | null
+  specialization?: Prisma.StringNullableWithAggregatesFilter<"CounselorProfile"> | string | null
+  availability?: Prisma.StringNullableWithAggregatesFilter<"CounselorProfile"> | string | null
 }
 
 export type CounselorProfileCreateInput = {
   id?: string
   department?: string
   profileImageUrl?: string | null
+  specialization?: string | null
+  availability?: string | null
   user: Prisma.UserCreateNestedOneWithoutCounselorProfileInput
 }
 
@@ -228,12 +254,16 @@ export type CounselorProfileUncheckedCreateInput = {
   userId: string
   department?: string
   profileImageUrl?: string | null
+  specialization?: string | null
+  availability?: string | null
 }
 
 export type CounselorProfileUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   department?: Prisma.StringFieldUpdateOperationsInput | string
   profileImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  specialization?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  availability?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   user?: Prisma.UserUpdateOneRequiredWithoutCounselorProfileNestedInput
 }
 
@@ -242,6 +272,8 @@ export type CounselorProfileUncheckedUpdateInput = {
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   department?: Prisma.StringFieldUpdateOperationsInput | string
   profileImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  specialization?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  availability?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type CounselorProfileCreateManyInput = {
@@ -249,12 +281,16 @@ export type CounselorProfileCreateManyInput = {
   userId: string
   department?: string
   profileImageUrl?: string | null
+  specialization?: string | null
+  availability?: string | null
 }
 
 export type CounselorProfileUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   department?: Prisma.StringFieldUpdateOperationsInput | string
   profileImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  specialization?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  availability?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type CounselorProfileUncheckedUpdateManyInput = {
@@ -262,6 +298,8 @@ export type CounselorProfileUncheckedUpdateManyInput = {
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   department?: Prisma.StringFieldUpdateOperationsInput | string
   profileImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  specialization?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  availability?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type CounselorProfileNullableScalarRelationFilter = {
@@ -274,6 +312,8 @@ export type CounselorProfileCountOrderByAggregateInput = {
   userId?: Prisma.SortOrder
   department?: Prisma.SortOrder
   profileImageUrl?: Prisma.SortOrder
+  specialization?: Prisma.SortOrder
+  availability?: Prisma.SortOrder
 }
 
 export type CounselorProfileMaxOrderByAggregateInput = {
@@ -281,6 +321,8 @@ export type CounselorProfileMaxOrderByAggregateInput = {
   userId?: Prisma.SortOrder
   department?: Prisma.SortOrder
   profileImageUrl?: Prisma.SortOrder
+  specialization?: Prisma.SortOrder
+  availability?: Prisma.SortOrder
 }
 
 export type CounselorProfileMinOrderByAggregateInput = {
@@ -288,6 +330,8 @@ export type CounselorProfileMinOrderByAggregateInput = {
   userId?: Prisma.SortOrder
   department?: Prisma.SortOrder
   profileImageUrl?: Prisma.SortOrder
+  specialization?: Prisma.SortOrder
+  availability?: Prisma.SortOrder
 }
 
 export type CounselorProfileCreateNestedOneWithoutUserInput = {
@@ -326,12 +370,16 @@ export type CounselorProfileCreateWithoutUserInput = {
   id?: string
   department?: string
   profileImageUrl?: string | null
+  specialization?: string | null
+  availability?: string | null
 }
 
 export type CounselorProfileUncheckedCreateWithoutUserInput = {
   id?: string
   department?: string
   profileImageUrl?: string | null
+  specialization?: string | null
+  availability?: string | null
 }
 
 export type CounselorProfileCreateOrConnectWithoutUserInput = {
@@ -354,12 +402,16 @@ export type CounselorProfileUpdateWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   department?: Prisma.StringFieldUpdateOperationsInput | string
   profileImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  specialization?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  availability?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type CounselorProfileUncheckedUpdateWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   department?: Prisma.StringFieldUpdateOperationsInput | string
   profileImageUrl?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  specialization?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  availability?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 
@@ -369,6 +421,8 @@ export type CounselorProfileSelect<ExtArgs extends runtime.Types.Extensions.Inte
   userId?: boolean
   department?: boolean
   profileImageUrl?: boolean
+  specialization?: boolean
+  availability?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["counselorProfile"]>
 
@@ -377,6 +431,8 @@ export type CounselorProfileSelectCreateManyAndReturn<ExtArgs extends runtime.Ty
   userId?: boolean
   department?: boolean
   profileImageUrl?: boolean
+  specialization?: boolean
+  availability?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["counselorProfile"]>
 
@@ -385,6 +441,8 @@ export type CounselorProfileSelectUpdateManyAndReturn<ExtArgs extends runtime.Ty
   userId?: boolean
   department?: boolean
   profileImageUrl?: boolean
+  specialization?: boolean
+  availability?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["counselorProfile"]>
 
@@ -393,9 +451,11 @@ export type CounselorProfileSelectScalar = {
   userId?: boolean
   department?: boolean
   profileImageUrl?: boolean
+  specialization?: boolean
+  availability?: boolean
 }
 
-export type CounselorProfileOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "department" | "profileImageUrl", ExtArgs["result"]["counselorProfile"]>
+export type CounselorProfileOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "department" | "profileImageUrl" | "specialization" | "availability", ExtArgs["result"]["counselorProfile"]>
 export type CounselorProfileInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }
@@ -416,6 +476,8 @@ export type $CounselorProfilePayload<ExtArgs extends runtime.Types.Extensions.In
     userId: string
     department: string
     profileImageUrl: string | null
+    specialization: string | null
+    availability: string | null
   }, ExtArgs["result"]["counselorProfile"]>
   composites: {}
 }
@@ -844,6 +906,8 @@ export interface CounselorProfileFieldRefs {
   readonly userId: Prisma.FieldRef<"CounselorProfile", 'String'>
   readonly department: Prisma.FieldRef<"CounselorProfile", 'String'>
   readonly profileImageUrl: Prisma.FieldRef<"CounselorProfile", 'String'>
+  readonly specialization: Prisma.FieldRef<"CounselorProfile", 'String'>
+  readonly availability: Prisma.FieldRef<"CounselorProfile", 'String'>
 }
     
 

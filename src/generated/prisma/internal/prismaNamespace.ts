@@ -432,6 +432,7 @@ export const ModelName = {
   EscalationAlert: 'EscalationAlert',
   AdminNotification: 'AdminNotification',
   CounselorNotification: 'CounselorNotification',
+  ParentNotification: 'ParentNotification',
   MoodLabel: 'MoodLabel',
   GoalLabel: 'GoalLabel',
   CategoryLabel: 'CategoryLabel',
@@ -475,7 +476,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "studentProfile" | "adminProfile" | "counselorProfile" | "parentProfile" | "parentMeeting" | "school" | "schoolLocation" | "class" | "role" | "permission" | "rolePermission" | "adminPermission" | "chatSession" | "chatMessage" | "moodCheckin" | "triggerSelection" | "summary" | "journalingToolConfig" | "writingJournal" | "audioJournal" | "artJournal" | "journalingPrompt" | "musicTherapy" | "meditation" | "meditationMood" | "musicInstruction" | "meditationListeningInstruction" | "meditationMeditationCategory" | "meditationMeditationGoal" | "meditationCategory" | "meditationGoal" | "article" | "rating" | "savedArticle" | "articleCompletion" | "meditationSave" | "musicSave" | "articleMood" | "articleGoal" | "articleCategory" | "dailyLogin" | "resourceAccess" | "streak" | "highRiskAlert" | "escalationAlert" | "adminNotification" | "counselorNotification" | "moodLabel" | "goalLabel" | "categoryLabel" | "articleBlock" | "imageBlock" | "keyTakeawaysBlock" | "reflectionBlock" | "linkBlock" | "sectionBlock" | "bulletListBlock" | "session" | "musicMood" | "musicResourceMood" | "musicResource" | "musicCategory" | "musicResourceCategory" | "musicGoal" | "musicResourceGoal" | "badge" | "userBadge" | "challenge" | "userChallenge" | "challengeAssignment" | "counselingSession" | "sessionIntake" | "sessionReport" | "counselorAssignment" | "contactMessage"
+    modelProps: "user" | "studentProfile" | "adminProfile" | "counselorProfile" | "parentProfile" | "parentMeeting" | "school" | "schoolLocation" | "class" | "role" | "permission" | "rolePermission" | "adminPermission" | "chatSession" | "chatMessage" | "moodCheckin" | "triggerSelection" | "summary" | "journalingToolConfig" | "writingJournal" | "audioJournal" | "artJournal" | "journalingPrompt" | "musicTherapy" | "meditation" | "meditationMood" | "musicInstruction" | "meditationListeningInstruction" | "meditationMeditationCategory" | "meditationMeditationGoal" | "meditationCategory" | "meditationGoal" | "article" | "rating" | "savedArticle" | "articleCompletion" | "meditationSave" | "musicSave" | "articleMood" | "articleGoal" | "articleCategory" | "dailyLogin" | "resourceAccess" | "streak" | "highRiskAlert" | "escalationAlert" | "adminNotification" | "counselorNotification" | "parentNotification" | "moodLabel" | "goalLabel" | "categoryLabel" | "articleBlock" | "imageBlock" | "keyTakeawaysBlock" | "reflectionBlock" | "linkBlock" | "sectionBlock" | "bulletListBlock" | "session" | "musicMood" | "musicResourceMood" | "musicResource" | "musicCategory" | "musicResourceCategory" | "musicGoal" | "musicResourceGoal" | "badge" | "userBadge" | "challenge" | "userChallenge" | "challengeAssignment" | "counselingSession" | "sessionIntake" | "sessionReport" | "counselorAssignment" | "contactMessage"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -4031,6 +4032,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    ParentNotification: {
+      payload: Prisma.$ParentNotificationPayload<ExtArgs>
+      fields: Prisma.ParentNotificationFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.ParentNotificationFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ParentNotificationPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.ParentNotificationFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ParentNotificationPayload>
+        }
+        findFirst: {
+          args: Prisma.ParentNotificationFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ParentNotificationPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.ParentNotificationFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ParentNotificationPayload>
+        }
+        findMany: {
+          args: Prisma.ParentNotificationFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ParentNotificationPayload>[]
+        }
+        create: {
+          args: Prisma.ParentNotificationCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ParentNotificationPayload>
+        }
+        createMany: {
+          args: Prisma.ParentNotificationCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.ParentNotificationCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ParentNotificationPayload>[]
+        }
+        delete: {
+          args: Prisma.ParentNotificationDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ParentNotificationPayload>
+        }
+        update: {
+          args: Prisma.ParentNotificationUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ParentNotificationPayload>
+        }
+        deleteMany: {
+          args: Prisma.ParentNotificationDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.ParentNotificationUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.ParentNotificationUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ParentNotificationPayload>[]
+        }
+        upsert: {
+          args: Prisma.ParentNotificationUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ParentNotificationPayload>
+        }
+        aggregate: {
+          args: Prisma.ParentNotificationAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateParentNotification>
+        }
+        groupBy: {
+          args: Prisma.ParentNotificationGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ParentNotificationGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.ParentNotificationCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ParentNotificationCountAggregateOutputType> | number
+        }
+      }
+    }
     MoodLabel: {
       payload: Prisma.$MoodLabelPayload<ExtArgs>
       fields: Prisma.MoodLabelFieldRefs
@@ -6188,7 +6263,9 @@ export const CounselorProfileScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
   department: 'department',
-  profileImageUrl: 'profileImageUrl'
+  profileImageUrl: 'profileImageUrl',
+  specialization: 'specialization',
+  availability: 'availability'
 } as const
 
 export type CounselorProfileScalarFieldEnum = (typeof CounselorProfileScalarFieldEnum)[keyof typeof CounselorProfileScalarFieldEnum]
@@ -6759,6 +6836,23 @@ export const CounselorNotificationScalarFieldEnum = {
 } as const
 
 export type CounselorNotificationScalarFieldEnum = (typeof CounselorNotificationScalarFieldEnum)[keyof typeof CounselorNotificationScalarFieldEnum]
+
+
+export const ParentNotificationScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  type: 'type',
+  title: 'title',
+  message: 'message',
+  severity: 'severity',
+  read: 'read',
+  createdAt: 'createdAt',
+  readAt: 'readAt',
+  meetingId: 'meetingId',
+  relatedUserId: 'relatedUserId'
+} as const
+
+export type ParentNotificationScalarFieldEnum = (typeof ParentNotificationScalarFieldEnum)[keyof typeof ParentNotificationScalarFieldEnum]
 
 
 export const MoodLabelScalarFieldEnum = {
@@ -7478,6 +7572,7 @@ export type GlobalOmitConfig = {
   escalationAlert?: Prisma.EscalationAlertOmit
   adminNotification?: Prisma.AdminNotificationOmit
   counselorNotification?: Prisma.CounselorNotificationOmit
+  parentNotification?: Prisma.ParentNotificationOmit
   moodLabel?: Prisma.MoodLabelOmit
   goalLabel?: Prisma.GoalLabelOmit
   categoryLabel?: Prisma.CategoryLabelOmit

@@ -1,16 +1,25 @@
 ﻿import React, { useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Mail, Lock, Eye, EyeOff, Phone, GraduationCap, Heart, User, ShieldCheck, ShieldQuestion, FileText, HelpCircle, PhoneCall } from 'lucide-react';
+import Link from 'next/link';
 import { useAdminLogin } from '@/src/hooks/auth/useAdminLogin';
 import { AlertMessage } from '@/components/ui/AlertMessage';
 import { AdminLoadingProvider } from '@/src/contexts/AdminLoadingContext';
 import { PageIllustration } from '@/components/LandingPage/components/PageIllustration';
 import { Input } from '../ui/input';
+import Image from "next/image";
+
 
 export default function LoginPage() {
   return (
     <AdminLoadingProvider>
-      <LoginPageContent />
+      <React.Suspense fallback={
+        <div className="flex min-h-screen items-center justify-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-brand"></div>
+        </div>
+      }>
+        <LoginPageContent />
+      </React.Suspense>
     </AdminLoadingProvider>
   );
 }
@@ -65,15 +74,23 @@ function LoginPageContent() {
       
       {/* Right Side - New Design */}
       <div className="w-full lg:w-1/2 flex items-center justify-center p-4 sm:p-6 lg:p-8 bg-white relative z-10">
-        <div className="w-full max-w-md space-y-6">
+        <div className="w-full max-w-lg space-y-6">
           {/* Header */}
           <header className="flex flex-col items-center text-center">
             <div className="flex items-center gap-2">
-              <img src="/assets/logo-psybuddy.png" alt="Psychology Buddy mascot" width={48} height={48} className="h-12 w-12" />
-              <div className="text-left leading-tight">
-                <div className="text-lg font-extrabold tracking-tight">Psychology</div>
-                <div className="-mt-1 text-lg font-extrabold tracking-tight text-brand">Buddy</div>
-              </div>
+              <Link href="/" className="flex items-center gap-2">
+                <Image
+                  src="/Logo.png"
+                  alt="Psychology Buddy Logo"
+                  width={45}
+                  height={45}
+                  className="w-[30px] h-[30px] sm:w-[35px] sm:h-[35px] object-contain"
+                  priority
+                />
+                <span className="font-semibold text-[16px] sm:text-xl lg:text-[17px] bg-gradient-to-b from-[#00A7DA] to-[#0F71A1] bg-clip-text text-transparent leading-tight">
+                  Psychology Buddy
+                </span>
+              </Link>
             </div>
             <h1 className="mt-6 text-2xl font-extrabold tracking-tight">
               Welcome back! <span aria-hidden>👋</span>
@@ -97,8 +114,8 @@ function LoginPageContent() {
                     onClick={() => handleRoleChange(r.key)}
                     className={`group relative flex flex-col items-center rounded-2xl border bg-card p-2 transition-all ${
                       active
-                        ? 'border-brand ring-2 ring-brand/30 shadow-[var(--shadow-soft)]'
-                        : 'border-border hover:border-brand/40'
+                        ? 'border-brand focus:outline-none focus:ring-2 focus:ring-[#3B82F6] focus:ring-offset-2 shadow-[var(--shadow-soft)]'
+                        : 'border-border focus:ring-2 focus:ring-[#3B82F6] focus:ring-offset-2 hover:border-brand/40'
                     }`}
                     aria-pressed={active}
                   >
@@ -175,7 +192,8 @@ function LoginPageContent() {
               <button
                 type="submit"
                 disabled={loading}
-                className="h-12 w-full rounded-xl text-base font-bold text-brand-foreground shadow-[var(--shadow-card)] transition-transform active:scale-[0.99] disabled:opacity-50"
+                className="h-12 w-full rounded-xl text-base bg-gradient-to-b from-[#4FC1F9] to-[#1B9EE0]
+              text-[15px] text-white font-medium active:scale-[0.99] disabled:opacity-50 cursor-pointer"
                 style={{ backgroundImage: 'var(--gradient-brand)' }}
               >
                 {loading ? 'Signing in...' : 'Login'}
@@ -183,7 +201,8 @@ function LoginPageContent() {
 
               <button
                 type="button"
-                className="flex h-12 w-full items-center justify-center gap-2 rounded-xl border border-brand/30 bg-background text-sm font-semibold text-brand hover:bg-brand-soft"
+                onClick={() => router.push('/admin-login-phone')}
+                className="flex h-12 w-full items-center justify-center gap-2 rounded-xl border border-brand/30 bg-background text-sm font-semibold text-brand hover:bg-brand-soft cursor-pointer"
               >
                 <Phone className="h-4 w-4" />
                 Login with OTP

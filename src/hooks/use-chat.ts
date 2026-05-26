@@ -736,7 +736,7 @@ export function useChat({
 
   // Initialize chat on mount
   useEffect(() => {
-    const initializeChat = async () => {
+    const initializeChatOnMount = async () => {
       if (!isInitialized.current && studentId) {
         try {
           // Check for existing session for this specific student
@@ -753,37 +753,15 @@ export function useChat({
             // Fetch existing messages for this session (will also set session start time)
             const messageData = await fetchExistingMessages(savedSessionId)
             
-            // If no messages exist, add a welcome message
+            // If no messages exist, initialize with mood-aware opening message
             if (!messageData || messageData.messages.length === 0) {
-              const welcomeMessage: Message = {
-                id: crypto.randomUUID(),
-                sender: 'bot',
-                content: "Hello! I'm here to listen and support you. How are you feeling today?",
-                timestamp: new Date().toISOString(),
-                type: 'opening'
-              }
-              setState(prev => ({ ...prev, messages: [welcomeMessage] }))
-              console.log('Added welcome message to existing session')
+              console.log('No messages in existing session, initializing with mood data:', { mood, triggers, notes })
+              await initializeChat(mood, triggers, notes)
             }
           } else {
-            // Create new temporary session (no database record yet)
-            console.log('Creating new temporary session')
-            const tempSessionId = `temp_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
-            sessionIdRef.current = tempSessionId
-            setState(prev => ({ ...prev, sessionId: tempSessionId }))
-            isInitialized.current = true
-            console.log('Created new temporary session:', tempSessionId)
-            
-            // Add welcome message for new temporary session
-            const welcomeMessage: Message = {
-              id: crypto.randomUUID(),
-              sender: 'bot',
-              content: "Hello! I'm here to listen and support you. How are you feeling today?",
-              timestamp: new Date().toISOString(),
-              type: 'opening'
-            }
-            setState(prev => ({ ...prev, messages: [welcomeMessage] }))
-            console.log('Added welcome message to new temporary session')
+            // Create new session with mood-aware opening message
+            console.log('Creating new session with mood data:', { mood, triggers, notes })
+            await initializeChat(mood, triggers, notes)
           }
         } catch (error) {
           console.error('Failed to initialize chat:', error)
@@ -792,8 +770,8 @@ export function useChat({
       }
     }
 
-    initializeChat()
-  }, [studentId, onError]) // Removed fetchExistingMessages to prevent infinite re-renders
+    initializeChatOnMount()
+  }, [studentId, onError, initializeChat, mood, triggers, notes])
 
   // Import conversation messages from a previous session
   const importConversation = useCallback((messages: Message[], sessionId: string, sessionStartTime?: number) => {

@@ -94,6 +94,23 @@ export const POST = async (req: NextRequest, { params }: any) => {
       console.error('Failed to create counselor notification:', notifError);
     }
 
+    // Create notification for the parent (confirmation receipt)
+    try {
+      await (prisma as any).parentNotification.create({
+        data: {
+          userId: meeting.student.parentId,
+          type: 'meeting',
+          title: 'Meeting Confirmed',
+          message: `Your meeting with ${updatedMeeting.counselor.firstName} ${updatedMeeting.counselor.lastName} on ${new Date(updatedMeeting.date).toLocaleDateString()} at ${updatedMeeting.time} has been confirmed.`,
+          severity: 'low',
+          meetingId: updatedMeeting.id,
+          relatedUserId: updatedMeeting.studentId
+        }
+      });
+    } catch (parentNotifError) {
+      console.error('Failed to create parent notification:', parentNotifError);
+    }
+
     // Create notification for school admins
     try {
       const admins = await prisma.user.findMany({

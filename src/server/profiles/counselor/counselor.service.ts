@@ -209,6 +209,107 @@ export class CounselorService {
     }
   }
 
+  // Get session history for a counselor
+  static async getSessionHistory(counselorId: string, userSchoolId?: string, userRole?: string, page: number = 1, limit: number = 20) {
+    try {
+      // Verify counselor exists and user has access
+      const counselor = await CounselorRepository.getCounselorById(counselorId);
+      if (!counselor) {
+        throw AuthError.notFound('Counselor not found');
+      }
+
+      if (userRole !== 'SUPERADMIN' && counselor.schoolId !== userSchoolId) {
+        throw AuthError.forbidden('Access denied to this counselor');
+      }
+
+      const result = await CounselorRepository.getSessionHistory(counselorId, page, limit);
+      return ApiResponse.success(result, 'Session history retrieved successfully');
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  // Get sessions for a specific date
+  static async getSessionsByDate(counselorId: string, date: string, userSchoolId?: string, userRole?: string) {
+    try {
+      // Verify counselor exists and user has access
+      const counselor = await CounselorRepository.getCounselorById(counselorId);
+      if (!counselor) {
+        throw AuthError.notFound('Counselor not found');
+      }
+
+      if (userRole !== 'SUPERADMIN' && counselor.schoolId !== userSchoolId) {
+        throw AuthError.forbidden('Access denied to this counselor');
+      }
+
+      const sessionDate = new Date(date);
+      const sessions = await CounselorRepository.getSessionsByDate(counselorId, sessionDate);
+      return ApiResponse.success(sessions, 'Sessions retrieved successfully');
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  // Get sessions for a month (for calendar)
+  static async getSessionsByMonth(counselorId: string, year: number, month: number, userSchoolId?: string, userRole?: string) {
+    try {
+      // Verify counselor exists and user has access
+      const counselor = await CounselorRepository.getCounselorById(counselorId);
+      if (!counselor) {
+        throw AuthError.notFound('Counselor not found');
+      }
+
+      if (userRole !== 'SUPERADMIN' && counselor.schoolId !== userSchoolId) {
+        throw AuthError.forbidden('Access denied to this counselor');
+      }
+
+      const sessions = await CounselorRepository.getSessionsByMonth(counselorId, year, month);
+      return ApiResponse.success(sessions, 'Monthly sessions retrieved successfully');
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  // Get active challenges (escalation alerts)
+  static async getActiveChallenges(counselorId: string, userSchoolId?: string, userRole?: string) {
+    try {
+      // Verify counselor exists and user has access
+      const counselor = await CounselorRepository.getCounselorById(counselorId);
+      if (!counselor) {
+        throw AuthError.notFound('Counselor not found');
+      }
+
+      if (userRole !== 'SUPERADMIN' && counselor.schoolId !== userSchoolId) {
+        throw AuthError.forbidden('Access denied to this counselor');
+      }
+
+      const challenges = await CounselorRepository.getActiveChallenges(counselorId);
+      return ApiResponse.success(challenges, 'Challenges retrieved successfully');
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  // Get wellness challenges for a counselor
+  static async getWellnessChallenges(counselorId: string, userSchoolId?: string, userRole?: string) {
+    try {
+      // Verify counselor exists and user has access
+      const counselor = await CounselorRepository.getCounselorById(counselorId);
+      if (!counselor) {
+        throw AuthError.notFound('Counselor not found');
+      }
+
+      if (userRole !== 'SUPERADMIN' && counselor.schoolId !== userSchoolId) {
+        throw AuthError.forbidden('Access denied to this counselor');
+      }
+
+      const challenges = await CounselorRepository.getWellnessChallenges(counselorId);
+      return ApiResponse.success(challenges, 'Wellness challenges retrieved successfully');
+    } catch (error) {
+      throw error;
+    }
+  }
+
   static async assignStudents(counselorId: string, studentIds: string[], assignedBy: string, level?: string, escalationAlertId?: string) {
     try {
       // Verify counselor exists and is a COUNSELOR role

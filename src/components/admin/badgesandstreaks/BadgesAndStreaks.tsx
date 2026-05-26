@@ -36,7 +36,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { useAuth } from "@/src/contexts/AuthContext";
 import { useSchoolFilter } from "@/src/contexts/SchoolFilterContext";
 import { useAdminLoading, AdminActions } from "@/src/contexts/AdminLoadingContext";
-import { AdminLoader } from "../../ui/AdminLoader";
+import { AdminLoader } from "../ui/AdminLoader";
 
 // Emoji mappings for different badge types
 const BADGE_TYPE_EMOJIS = {

@@ -99,6 +99,7 @@ export const ModelName = {
   EscalationAlert: 'EscalationAlert',
   AdminNotification: 'AdminNotification',
   CounselorNotification: 'CounselorNotification',
+  ParentNotification: 'ParentNotification',
   MoodLabel: 'MoodLabel',
   GoalLabel: 'GoalLabel',
   CategoryLabel: 'CategoryLabel',
@@ -191,7 +192,9 @@ export const CounselorProfileScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
   department: 'department',
-  profileImageUrl: 'profileImageUrl'
+  profileImageUrl: 'profileImageUrl',
+  specialization: 'specialization',
+  availability: 'availability'
 } as const
 
 export type CounselorProfileScalarFieldEnum = (typeof CounselorProfileScalarFieldEnum)[keyof typeof CounselorProfileScalarFieldEnum]
@@ -762,6 +765,23 @@ export const CounselorNotificationScalarFieldEnum = {
 } as const
 
 export type CounselorNotificationScalarFieldEnum = (typeof CounselorNotificationScalarFieldEnum)[keyof typeof CounselorNotificationScalarFieldEnum]
+
+
+export const ParentNotificationScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  type: 'type',
+  title: 'title',
+  message: 'message',
+  severity: 'severity',
+  read: 'read',
+  createdAt: 'createdAt',
+  readAt: 'readAt',
+  meetingId: 'meetingId',
+  relatedUserId: 'relatedUserId'
+} as const
+
+export type ParentNotificationScalarFieldEnum = (typeof ParentNotificationScalarFieldEnum)[keyof typeof ParentNotificationScalarFieldEnum]
 
 
 export const MoodLabelScalarFieldEnum = {

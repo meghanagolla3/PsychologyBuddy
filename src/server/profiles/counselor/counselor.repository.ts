@@ -78,7 +78,309 @@ export const CounselorRepository = {
       take: limit,
     });
 
-    return counselors;
+    // Fetch session statistics for each counselor
+    const counselorsWithStats = await Promise.all(
+      counselors.map(async (counselor) => {
+        // Get today's date start and end
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const todayEnd = new Date(today);
+        todayEnd.setHours(23, 59, 59, 999);
+
+        // Count total completed sessions
+        const totalCounsels = await prisma.counselingSession.count({
+          where: {
+            counselorId: counselor.id,
+            status: 'COMPLETED',
+          },
+        });
+
+        // Count today's completed sessions
+        const todayCounsels = await prisma.counselingSession.count({
+          where: {
+            counselorId: counselor.id,
+            status: 'COMPLETED',
+            scheduledAt: {
+              gte: today,
+              lte: todayEnd,
+            },
+          },
+        });
+
+        // Count declined sessions (CANCELLED or MISSED)
+        const declinedCounsels = await prisma.counselingSession.count({
+          where: {
+            counselorId: counselor.id,
+            status: {
+              in: ['CANCELLED', 'MISSED'],
+            },
+          },
+        });
+
+        return {
+          ...counselor,
+          sessionStats: {
+            todayCounsels,
+            totalCounsels,
+            declinedCounsels,
+          },
+        };
+      })
+    );
+
+    return counselorsWithStats;
+  },
+
+  // Get session history for a counselor
+  getSessionHistory: async (counselorId: string, page: number = 1, limit: number = 20) => {
+    const skip = (page - 1) * limit;
+
+    const sessions = await prisma.counselingSession.findMany({
+      where: {
+        counselorId,
+        status: {
+          in: ['COMPLETED', 'CANCELLED', 'MISSED'],
+        },
+      },
+      include: {
+        student: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            email: true,
+            studentId: true,
+          },
+        },
+      },
+      orderBy: {
+        scheduledAt: 'desc',
+      },
+      skip,
+      take: limit,
+    });
+
+    const total = await prisma.counselingSession.count({
+      where: {
+        counselorId,
+        status: {
+          in: ['COMPLETED', 'CANCELLED', 'MISSED'],
+        },
+      },
+    });
+
+    return {
+      sessions,
+      pagination: {
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit),
+        hasNext: page < Math.ceil(total / limit),
+        hasPrev: page > 1,
+      },
+    };
+  },
+
+  // Get sessions for a specific date (for calendar)
+  getSessionsByDate: async (counselorId: string, date: Date) => {
+    const startOfDay = new Date(date);
+    startOfDay.setHours(0, 0, 0, 0);
+    const endOfDay = new Date(date);
+    endOfDay.setHours(23, 59, 59, 999);
+
+    const sessions = await prisma.counselingSession.findMany({
+      where: {
+        counselorId,
+        scheduledAt: {
+          gte: startOfDay,
+          lte: endOfDay,
+        },
+      },
+      include: {
+        student: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            studentId: true,
+          },
+        },
+      },
+      orderBy: {
+        scheduledAt: 'asc',
+      },
+    });
+
+    return sessions;
+  },
+
+  // Get all sessions for a month (for calendar markers)
+  getSessionsByMonth: async (counselorId: string, year: number, month: number) => {
+    const startOfMonth = new Date(year, month, 1);
+    const endOfMonth = new Date(year, month + 1, 0, 23, 59, 59, 999);
+
+    const sessions = await prisma.counselingSession.findMany({
+      where: {
+        counselorId,
+        scheduledAt: {
+          gte: startOfMonth,
+          lte: endOfMonth,
+        },
+      },
+      select: {
+        id: true,
+        scheduledAt: true,
+        status: true,
+      },
+    });
+
+    return sessions;
+  },
+
+  // Get active escalation alerts for a counselor (challenges)
+  getActiveChallenges: async (counselorId: string) => {
+    const alerts = await prisma.escalationAlert.findMany({
+      where: {
+        assignedTo: counselorId,
+        status: 'ACTIVE',
+      },
+      include: {
+        user: {
+          select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            studentId: true,
+            email: true,
+          },
+        },
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
+
+    return alerts;
+  },
+
+  // Get wellness challenges for a counselor
+  getWellnessChallenges: async (counselorId: string) => {
+    // Get challenges created by the counselor
+    const createdChallenges = await prisma.challenge.findMany({
+      where: {
+        createdBy: counselorId,
+        isActive: true,
+      },
+      include: {
+        userChallenges: {
+          include: {
+            user: {
+              select: {
+                id: true,
+                firstName: true,
+                lastName: true,
+                studentId: true,
+                classRef: {
+                  select: {
+                    name: true,
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
+
+    // Get challenges assigned to the counselor's students
+    const counselor = await prisma.user.findUnique({
+      where: { id: counselorId },
+      include: {
+        studentAssignments: {
+          include: {
+            student: true,
+          },
+        },
+      },
+    });
+
+    const studentIds = counselor?.studentAssignments.map((assignment) => assignment.studentId) || [];
+
+    const assignedChallenges = await prisma.challenge.findMany({
+      where: {
+        isActive: true,
+        userChallenges: {
+          some: {
+            userId: { in: studentIds },
+          },
+        },
+      },
+      include: {
+        userChallenges: {
+          where: {
+            userId: { in: studentIds },
+          },
+          include: {
+            user: {
+              select: {
+                id: true,
+                firstName: true,
+                lastName: true,
+                studentId: true,
+                classRef: {
+                  select: {
+                    name: true,
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+      orderBy: {
+        createdAt: 'desc',
+      },
+    });
+
+    // Combine and deduplicate challenges
+    const allChallenges = [...createdChallenges, ...assignedChallenges];
+    const uniqueChallenges = Array.from(
+      new Map(allChallenges.map((c) => [c.id, c])).values()
+    );
+
+    // Transform to the expected format
+    return uniqueChallenges.map((challenge) => {
+      const students = challenge.userChallenges.map((uc) => ({
+        id: uc.user.id,
+        name: `${uc.user.firstName} ${uc.user.lastName}`,
+        className: uc.user.classRef?.name || 'Unknown Class',
+        status: uc.completedAt ? 'Completed' : 'In progress',
+      }));
+
+      const completedCount = students.filter((s) => s.status === 'Completed').length;
+      const totalCount = students.length;
+      const days = Math.ceil(
+        (new Date(challenge.endsAt).getTime() - new Date(challenge.startsAt).getTime()) /
+          (1000 * 60 * 60 * 24)
+      );
+
+      return {
+        id: challenge.id,
+        title: challenge.name,
+        active: challenge.isActive,
+        days,
+        studentCount: totalCount,
+        completionPct: totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0,
+        start: challenge.startsAt.toISOString().split('T')[0],
+        end: challenge.endsAt.toISOString().split('T')[0],
+        completedRatio: `${completedCount}/${totalCount}`,
+        students,
+      };
+    });
   },
 
   // Get counselor by ID
@@ -202,6 +504,39 @@ export const CounselorRepository = {
       name: `${assignment.student.firstName} ${assignment.student.lastName}`
     }));
 
+    // Calculate session statistics
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const todayEnd = new Date(today);
+    todayEnd.setHours(23, 59, 59, 999);
+
+    const totalCounsels = await prisma.counselingSession.count({
+      where: {
+        counselorId: id,
+        status: 'COMPLETED',
+      },
+    });
+
+    const todayCounsels = await prisma.counselingSession.count({
+      where: {
+        counselorId: id,
+        status: 'COMPLETED',
+        scheduledAt: {
+          gte: today,
+          lte: todayEnd,
+        },
+      },
+    });
+
+    const declinedCounsels = await prisma.counselingSession.count({
+      where: {
+        counselorId: id,
+        status: {
+          in: ['CANCELLED', 'MISSED'],
+        },
+      },
+    });
+
     return {
       ...counselor,
       escalationAlerts,
@@ -209,11 +544,31 @@ export const CounselorRepository = {
       assignedStudents,
       activeEscalations: escalationAlerts,
       scheduledSessions: counselingSessions,
+      sessionStats: {
+        todayCounsels,
+        totalCounsels,
+        declinedCounsels,
+      },
     };
   },
 
   // Update counselor
   updateCounselor: async (id: string, data: UpdateCounselorRequest) => {
+    // Check if counselor profile exists
+    const existingCounselor = await prisma.user.findUnique({
+      where: { id },
+      include: { counselorProfile: true },
+    });
+
+    if (!existingCounselor) {
+      throw new Error('Counselor not found');
+    }
+
+    const counselorProfileData: any = {};
+    if (data.department) counselorProfileData.department = data.department;
+    if (data.specialization !== undefined) counselorProfileData.specialization = data.specialization;
+    if (data.availability !== undefined) counselorProfileData.availability = data.availability;
+
     const updatedCounselor = await prisma.user.update({
       where: {
         id,
@@ -229,13 +584,15 @@ export const CounselorRepository = {
         ...(data.status && { status: data.status }),
         ...(data.schoolId && { schoolId: data.schoolId }),
         ...(data.locationId !== undefined && { locationId: data.locationId }),
-        counselorProfile: {
-          update: {
-            ...(data.department && { department: data.department }),
-            ...(data.specialization !== undefined && { specialization: data.specialization }),
-            ...(data.availability !== undefined && { availability: data.availability }),
-                      },
-        },
+        ...(Object.keys(counselorProfileData).length > 0 && {
+          counselorProfile: existingCounselor.counselorProfile
+            ? {
+                update: counselorProfileData,
+              }
+            : {
+                create: counselorProfileData,
+              },
+        }),
       },
       include: {
         role: true,

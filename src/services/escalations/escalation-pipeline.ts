@@ -180,12 +180,16 @@ export class EscalationPipeline {
       const alert = await prisma.escalationAlert.create({
         data: {
           studentId: user.id,
+          studentName: `${user.firstName} ${user.lastName}`,
           sessionId,
           category,
           level: detection.riskAssessment.overallRiskLevel.toUpperCase(),
           severity: detection.riskAssessment.riskScore,
+          confidence: detection.riskAssessment.confidence || 0.8,
           requiresImmediateAction: detection.riskAssessment.requiresImmediateAction,
           messageContent,
+          messageTimestamp: new Date().toISOString(),
+          description: detection.riskAssessment.escalationReason.join('; ') || 'Risk detected in conversation',
           detectionMethod: 'AI_ANALYSIS',
           context: JSON.stringify({
             conversationAnalysis: detection.conversationAnalysis,
@@ -230,16 +234,13 @@ export class EscalationPipeline {
       // Send email notifications
       if (threshold.notificationChannels.includes('email')) {
         try {
-          await this.emailService.sendEscalationNotification(
-            studentId,
-            sessionId,
-            detection.riskAssessment.overallRiskLevel,
-            detection.riskAssessment.escalationReason,
-            detection.riskAssessment.recommendedActions,
-            alertId
-          );
-          channels.push('email');
-          console.log('[EscalationPipeline] Email notification sent');
+          if (alertId) {
+            await EscalationEmailService.sendEscalationEmails(alertId);
+            channels.push('email');
+            console.log('[EscalationPipeline] Email notification sent');
+          } else {
+            console.warn('[EscalationPipeline] Cannot send email notification: alertId is missing');
+          }
         } catch (error) {
           console.error('[EscalationPipeline] Email notification failed:', error);
           errors.push(`Email notification failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
@@ -405,8 +406,8 @@ export class EscalationPipeline {
         requiresImmediateAction: alert.requiresImmediateAction,
         messageContent: alert.messageContent,
         conversationContext: alert.context || '',
-        escalationReason: alert.recommendation.split('; '),
-        recommendedActions: alert.recommendation.split('; '),
+        escalationReason: alert.recommendation?.split('; ') || [],
+        recommendedActions: alert.recommendation?.split('; ') || [],
         status: alert.status as any,
         assignedTo: alert.assignedTo || undefined,
         createdAt: alert.createdAt,
