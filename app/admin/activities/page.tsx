@@ -3,3 +3,5 @@ import RecentActivitySection from "@/src/components/admin/sections/RecentActivit
 export default function RecentActivity() {
   return <RecentActivitySection />;
 }
+
+
