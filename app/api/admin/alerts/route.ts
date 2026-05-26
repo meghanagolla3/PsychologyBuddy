@@ -8,6 +8,7 @@ export const GET = withPermission({
 })(async (request: NextRequest, { user }: any) => {
   console.log('API: /api/admin/alerts called', { userId: user.id, url: request.url });
   
+  
   try {
     // Parse query parameters
     const { searchParams } = new URL(request.url);
