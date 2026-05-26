@@ -741,7 +741,27 @@ export function useChat({
         try {
           // Check for existing session for this specific student
           const studentSessionKey = `chatSessionId_${studentId}`
-          const savedSessionId = sessionStorage.getItem(studentSessionKey)
+          let savedSessionId = sessionStorage.getItem(studentSessionKey)
+          
+          // If no session ID in sessionStorage, check database for an active session
+          if (!savedSessionId) {
+            console.log('No session ID in sessionStorage, checking database for active session for student:', studentId)
+            try {
+              const activeSessionResponse = await fetch(`/api/students/chat/active-session?studentId=${studentId}`)
+              if (activeSessionResponse.ok) {
+                const activeSessionData = await activeSessionResponse.json()
+                if (activeSessionData.success && activeSessionData.activeSession) {
+                  savedSessionId = activeSessionData.activeSession.id
+                  if (savedSessionId) {
+                    sessionStorage.setItem(studentSessionKey, savedSessionId)
+                  }
+                  console.log('Found active session in database, restoring:', savedSessionId)
+                }
+              }
+            } catch (activeSessionError) {
+              console.error('Failed to fetch active session from database:', activeSessionError)
+            }
+          }
           
           if (savedSessionId && !savedSessionId.startsWith('temp_')) {
             // Continue existing session
