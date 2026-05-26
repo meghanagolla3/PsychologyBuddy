@@ -105,6 +105,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   useEffect(() => {
+    // Skip auth check on landing pages
+    const landingPages = ['/', '/about', '/contact', '/forschools', '/termsandconditions'];
+    if (typeof window !== 'undefined' && landingPages.includes(window.location.pathname)) {
+      setLoading(false);
+      return;
+    }
     refreshUser();
   }, []);
 

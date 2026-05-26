@@ -790,59 +790,107 @@ export default function MeditationTools({
     }
   };
 
-  const handleThumbnailUpload = (
-    e: React.ChangeEvent<HTMLInputElement>,
-    type: string,
-  ) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        if (type === "meditation") {
-          setMeditationForm((prev) => ({
-            ...prev,
-            thumbnailUrl: reader.result as string,
-          }));
-        }
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
-  const handleAudioUpload = (
-    e: React.ChangeEvent<HTMLInputElement>,
-    type: string,
-  ) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        if (type === "meditation") {
-          const url = reader.result as string;
-
-          // Get actual duration for audio files
-          if (file.type.startsWith("audio/")) {
-            const audio = new Audio(url);
-            audio.addEventListener("loadedmetadata", () => {
-              const duration = Math.floor(audio.duration);
-              const minutes = Math.floor(duration / 60);
-              const seconds = duration % 60;
-              const durationString = `${minutes}:${seconds.toString().padStart(2, "0")}`;
-
-              setMeditationForm((prev) => ({
-                ...prev,
-                audioUrl: url,
-                videoUrl: url,
-                duration: durationString,
-              }));
-              toast({
-                title: "File Uploaded",
-                description: `${meditationForm.format.toLowerCase()} file "${file.name}" uploaded successfully`,
-              });
+  const handleThumbnailUpload = async (
+  e: React.ChangeEvent<HTMLInputElement>,
+  type: string,
+) => {
+  const file = e.target.files?.[0];
+  if (file) {
+    const reader = new FileReader();
+    reader.onloadend = async () => {
+      if (type === "meditation") {
+        const base64 = reader.result as string;
+        try {
+          const resp = await fetch('/api/admin/upload', {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ base64, name: `meditation_thumb_${file.name}` }),
+          });
+          const data = await resp.json();
+          if (data.success) {
+            setMeditationForm((prev) => ({
+              ...prev,
+              thumbnailUrl: data.url,
+            }));
+            toast({
+              title: "Thumbnail uploaded",
+              description: `File "${file.name}" uploaded successfully`,
             });
+          } else {
+            toast({
+              title: "Upload error",
+              description: data.message || "Failed to upload thumbnail",
+              variant: "destructive",
+            });
+          }
+        } catch (err) {
+          console.error("Thumbnail upload error:", err);
+          toast({
+            title: "Upload error",
+            description: "Failed to upload thumbnail",
+            variant: "destructive",
+          });
+        }
+      }
+    };
+    reader.readAsDataURL(file);
+  }
+};
 
-            audio.addEventListener("error", () => {
-              // Fallback to file size estimate if audio metadata fails
+const handleAudioUpload = async (
+  e: React.ChangeEvent<HTMLInputElement>,
+  type: string,
+) => {
+  const file = e.target.files?.[0];
+  if (file) {
+    const reader = new FileReader();
+    reader.onloadend = async () => {
+      if (type === "meditation") {
+        const base64 = reader.result as string;
+        try {
+          const resp = await fetch('/api/admin/upload', {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ base64, name: `meditation_media_${file.name}` }),
+          });
+          const data = await resp.json();
+          if (data.success) {
+            const url = data.url;
+            // Determine duration for audio files
+            if (file.type.startsWith("audio/")) {
+              const audio = new Audio(url);
+              audio.addEventListener("loadedmetadata", () => {
+                const duration = Math.floor(audio.duration);
+                const minutes = Math.floor(duration / 60);
+                const seconds = duration % 60;
+                const durationString = `${minutes}:${seconds
+                  .toString()
+                  .padStart(2, "0")}`;
+                setMeditationForm((prev) => ({
+                  ...prev,
+                  audioUrl: url,
+                  videoUrl: url,
+                  duration: durationString,
+                }));
+                toast({
+                  title: "File Uploaded",
+                  description: `${meditationForm.format.toLowerCase()} file "${file.name}" uploaded successfully`,
+                });
+              });
+              audio.addEventListener("error", () => {
+                const durationString = `${Math.floor(file.size / 100000)}s`;
+                setMeditationForm((prev) => ({
+                  ...prev,
+                  audioUrl: url,
+                  videoUrl: url,
+                  duration: durationString,
+                }));
+                toast({
+                  title: "File Uploaded",
+                  description: `${meditationForm.format.toLowerCase()} file "${file.name}" uploaded successfully`,
+                });
+              });
+            } else {
               const durationString = `${Math.floor(file.size / 100000)}s`;
               setMeditationForm((prev) => ({
                 ...prev,
@@ -854,26 +902,27 @@ export default function MeditationTools({
                 title: "File Uploaded",
                 description: `${meditationForm.format.toLowerCase()} file "${file.name}" uploaded successfully`,
               });
-            });
+            }
           } else {
-            // For non-audio files, use file size estimate
-            const durationString = `${Math.floor(file.size / 100000)}s`;
-            setMeditationForm((prev) => ({
-              ...prev,
-              audioUrl: url,
-              videoUrl: url,
-              duration: durationString,
-            }));
             toast({
-              title: "File Uploaded",
-              description: `${meditationForm.format.toLowerCase()} file "${file.name}" uploaded successfully`,
+              title: "Upload error",
+              description: data.message || "Failed to upload file",
+              variant: "destructive",
             });
           }
+        } catch (err) {
+          console.error("Media upload error:", err);
+          toast({
+            title: "Upload error",
+            description: "Failed to upload file",
+            variant: "destructive",
+          });
         }
-      };
-      reader.readAsDataURL(file);
-    }
-  };
+      }
+    };
+    reader.readAsDataURL(file);
+  }
+};
 
   // Load data on component mount and when school filter changes
   useEffect(() => {

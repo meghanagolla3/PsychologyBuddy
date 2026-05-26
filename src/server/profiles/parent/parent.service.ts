@@ -138,6 +138,92 @@ export class ParentService {
     }
   }
 
+  // Get notifications for a parent
+  static async getNotifications(userId: string, filters?: { unreadOnly?: boolean; limit?: number }) {
+    try {
+      const notifications = await ParentRepository.getNotifications(userId, filters);
+      return ApiResponse.success(notifications, 'Notifications retrieved successfully');
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  // Get unread notification count for a parent
+  static async getUnreadCount(userId: string) {
+    try {
+      const count = await ParentRepository.getUnreadCount(userId);
+      return ApiResponse.success({ count }, 'Unread count retrieved successfully');
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  // Create a notification for a parent
+  static async createNotification(data: {
+    userId: string;
+    type: string;
+    title: string;
+    message: string;
+    severity: string;
+    meetingId?: string;
+    relatedUserId?: string;
+  }) {
+    try {
+      const notification = await ParentRepository.createNotification(data);
+      return ApiResponse.success(notification, 'Notification created successfully');
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  // Mark notification as read
+  static async markAsRead(notificationId: string, userId: string) {
+    try {
+      // Verify the notification belongs to the user
+      const notification = await prisma.parentNotification.findUnique({
+        where: { id: notificationId },
+      });
+
+      if (!notification || notification.userId !== userId) {
+        throw AuthError.forbidden('Notification not found or access denied');
+      }
+
+      const updated = await ParentRepository.markAsRead(notificationId);
+      return ApiResponse.success(updated, 'Notification marked as read');
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  // Mark all notifications as read for a parent
+  static async markAllAsRead(userId: string) {
+    try {
+      await ParentRepository.markAllAsRead(userId);
+      return ApiResponse.success(null, 'All notifications marked as read');
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  // Delete notification
+  static async deleteNotification(notificationId: string, userId: string) {
+    try {
+      // Verify the notification belongs to the user
+      const notification = await prisma.parentNotification.findUnique({
+        where: { id: notificationId },
+      });
+
+      if (!notification || notification.userId !== userId) {
+        throw AuthError.forbidden('Notification not found or access denied');
+      }
+
+      await ParentRepository.deleteNotification(notificationId);
+      return ApiResponse.success(null, 'Notification deleted successfully');
+    } catch (error) {
+      throw error;
+    }
+  }
+
   private static generateDefaultPassword(): string {
     const lowercase = 'abcdefghijklmnopqrstuvwxyz';
     const uppercase = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';

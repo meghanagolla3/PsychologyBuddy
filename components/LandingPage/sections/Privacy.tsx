@@ -16,7 +16,7 @@ const features = [
   {
     id: 2,
     title: "Privacy First",
-    imageSrc: "/Privacy/2.svg",
+    imageSrc: "/Privacy/3.svg",
     imageAlt: "Calm Champion badge",
     description:
       "Your thoughts stay private. School teams can see only overall trends,never your chats or journal entries. Personal data is never shared with third parties.",
@@ -24,7 +24,7 @@ const features = [
   {
     id: 3,
     title: "Expert-Designed",
-    imageSrc: "/Privacy/3.svg",
+    imageSrc: "/Privacy/2.svg",
     imageAlt: "Calm Champion badge",
     description:
       "Built with schools and psychologists to protect student well-being. Every feature is reviewed by mental health professionals.",
@@ -98,47 +98,51 @@ export default function TrustSection() {
   return (
     <section
       ref={ref}
-      className="relative py-24 px-6 bg-[#F3FAFE] overflow-hidden"
+      className="relative py-5 px-4 xs:px-6 sm:py-16 md:py-20 bg-[#F3FAFE] overflow-hidden"
     >
       <div className="max-w-7xl mx-auto">
 
         {/* Heading */}
-        <div className="text-center mb-16" style={fade()}>
-          <div className="inline-flex items-center bg-white px-4 py-2 rounded-full border mb-5 drop-shadow-xl text-[12px] text-[#3A3A3A]">
-            <Shield className="w-[12px] h-[14px] text-[#1FA1E2]"></Shield>
+        <div className="text-center mb-2 sm:mb-16 md:mb-20" style={fade()}>
+          <div className="inline-flex items-center bg-white px-3 py-1 rounded-full border mb-5 drop-shadow-xl text-[8px] text-[#3A3A3A]">
+            <Shield className="w-[10px] h-[12px] text-[#1FA1E2]"></Shield>
             Safe. Private. Supported.
           </div>
 
-          <h2 className="text-[40px] font-semibold text-[#2F3D43]">
+          <h2 className="text-[16px] xs:text-3xl sm:text-4xl md:text-[40px] font-semibold text-[#2F3D43] leading-tight">
             Your Trust is Our Priority
           </h2>
         </div>
 
-        <div className="flex flex-col lg:flex-row items-center gap-6">
+        <div className="flex flex-row items-center justify-center gap-4 sm:gap-6 md:gap-8 lg:gap-8 xl:gap-12 w-full relative min-h-[500px] sm:min-h-[800px] md:min-h-[600px] lg:min-h-0">
 
-          {/* Illustration */}
-          <div className="w-full lg:w-[620px]" style={fade(200)}>
+          {/* Column 1: Illustration (Watermark on Mobile, Interactive Column on Desktop) */}
+          <div className="absolute lg:relative -left-20 xs:-left-16 sm:left-0 md:left-4 lg:left-auto top-40 sm:top-36 md:top-32 lg:top-auto w-[240px] xs:w-[280px] sm:w-[320px] md:w-[400px] lg:w-[500px] xl:w-[620px] opacity-25 sm:opacity-30 md:opacity-40 lg:opacity-100 flex justify-center pointer-events-none lg:pointer-events-auto z-0" style={fade(200)}>
             <Image
               src="/LandingPage/1.svg"
               alt="Laptop security"
               width={674.4769287109375}
               height={440.00042724609375}
-              className="object-contain"
+              className="w-full h-auto max-w-[450px] sm:max-w-[500px] md:max-w-[550px] xl:max-w-[620px] object-contain"
             />
           </div>
 
-          {/* Cards */}
-          <div className="relative w-full lg:w-[320px] flex flex-col gap-6">
+          {/* Cards Container */}
+          <div className="w-full lg:w-auto ml-auto lg:ml-0 relative z-10 max-w-[185px] xs:max-w-[220px] sm:max-w-[240px] md:max-w-[280px] lg:max-w-none grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-8 justify-items-center items-center">
 
-            {/* Card 1 */}
-            <Card feature={features[0]} icon={1} delay={300} />
+            {/* Card 1 Wrapper (Always Supported) */}
+            <div style={fade(300)} className="w-full flex justify-center order-1 lg:col-start-1 lg:row-start-1">
+              <Card feature={features[0]} icon={1} delay={300} />
+            </div>
 
-            {/* Card 2 */}
-            <Card feature={features[1]} icon={2} delay={400} />
-
-            {/* Floating Card */}
-            <div className="lg:absolute lg:-right-90 w-[320px] lg:top-1/2 lg:-translate-y-1/2">
+            {/* Card 3 Wrapper (Expert-Designed) */}
+            <div style={fade(500)} className="w-full flex justify-center order-2 lg:col-start-2 lg:row-start-1 lg:row-span-2 lg:h-full lg:items-center">
               <Card feature={features[2]} icon={3} delay={500} />
+            </div>
+
+            {/* Card 2 Wrapper (Privacy First) */}
+            <div style={fade(400)} className="w-full flex justify-center order-3 lg:col-start-1 lg:row-start-2">
+              <Card feature={features[1]} icon={2} delay={400} />
             </div>
 
           </div>
@@ -168,24 +172,25 @@ function Card({
           ? "0 12px 40px rgba(0,0,0,0.08)"
           : "0 4px 18px rgba(0,0,0,0.05)",
       }}
-      className="bg-[#FFFFFF1A] rounded-2xl p-6 text-center w-[337px] h-[236.8009490966797px] border-1 border-[#E2E2E2] drop-shadow-2xl drop-shadow-[#0980D226]"
+      className="bg-[#FFFFFF1A] rounded-2xl p-3 sm:p-5 md:p-6 text-center w-full max-w-[185px] xs:max-w-[220px] md:max-w-[280px] lg:max-w-[300px] min-h-[140px] xs:min-h-[160px] sm:min-h-[220px] md:min-h-[250px] flex flex-col items-center justify-center border border-[#E2E2E2] drop-shadow-2xl drop-shadow-[#0980D226] mx-auto backdrop-blur-sm z-10"
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
     >
-      <div className="w-[54px] h-[49px] flex items-center justify-center rounded-xl bg-[#FFFFFF1A] mx-auto mb-3">
-<Image
+      <div className="w-[34px] h-[30px] sm:w-[48px] sm:h-[43px] md:w-[56px] md:h-[50px] flex items-center justify-center rounded-lg sm:rounded-xl bg-[#FFFFFF1A] mx-auto mb-1.5 sm:mb-3 md:mb-4">
+        <Image
           src={feature.imageSrc}
           alt={feature.imageAlt}
           width={54}
           height={49}
-          className="object-contain "
-        />      </div>
+          className="object-contain w-full h-full"
+        />
+      </div>
 
-      <h3 className="font-medium text-[21px] text-[#2F3D43] mb-2">
+      <h3 className="font-medium text-xs xs:text-sm sm:text-[18px] md:text-[20px] text-[#2F3D43] mb-0.5 sm:mb-2 md:mb-3">
         {feature.title}
       </h3>
 
-      <p className="text-[14px] text-[#686D70] leading-relaxed">
+      <p className="text-[9.5px] xs:text-[11px] sm:text-[13px] md:text-[15px] text-[#686D70] leading-normal sm:leading-relaxed md:leading-relaxed">
         {feature.description}
       </p>
     </div>

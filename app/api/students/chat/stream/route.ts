@@ -4,6 +4,9 @@ import OpenAI from "openai";
 import { PSYCHOLOGY_BUDDY_SYSTEM_PROMPT } from "@/src/lib/ai/prompts/system-prompt";
 import { ContentEscalationDetector } from "@/src/services/escalations/content-escalation-detector";
 import { EscalationAlertService } from "@/src/services/escalations/escalation-alert-service";
+import { EscalationPipeline } from "@/src/services/escalations/escalation-pipeline";
+import { AISafetyGuardrails } from "@/src/lib/ai/safety-guardrails";
+import { buildConversationContext, formatMessagesForAI, estimateTokens, countMessageTokens } from "@/src/lib/ai/context-manager";
 
 // Initialize OpenAI with error handling
 let openai: OpenAI;
@@ -72,7 +75,7 @@ export async function POST(req: Request) {
       );
     }
 
-    // Get conversation history for context (last 10 messages to stay within token limits)
+    // Get conversation history for context (all messages, will be managed by context window)
     const conversationHistory = await prisma.chatMessage.findMany({
       where: {
         sessionId: sessionId
@@ -80,7 +83,6 @@ export async function POST(req: Request) {
       orderBy: {
         createdAt: 'asc'
       },
-      take: 10, // Limit to last 10 messages for context
     });
 
     console.log('Conversation history loaded:', conversationHistory.length, 'messages');
@@ -96,98 +98,65 @@ export async function POST(req: Request) {
     });
     console.log('Student message saved:', studentMessage.id);
 
-    // Check for escalation indicators in the student's message
-    console.log('[EscalationCheck] Analyzing message for escalation indicators');
-    try {
-      // Get conversation context for better analysis
-      const recentMessages = await prisma.chatMessage.findMany({
-        where: { sessionId },
-        orderBy: { createdAt: 'desc' },
-        take: 5,
-        select: { content: true, senderType: true }
-      });
+    // Format conversation context for escalation detection (reuse existing data)
+    const conversationContext = conversationHistory
+      .filter(msg => msg.senderType === 'STUDENT')
+      .map(msg => msg.content);
 
-      const conversationContext = recentMessages
-        .reverse()
-        .slice(0, -1) // Exclude the current message
-        .map(msg => msg.senderType === 'STUDENT' ? msg.content : `Bot: ${msg.content}`);
+    // Run escalation detection asynchronously (fire and forget) to not block response
+    console.log('[EscalationCheck] Running escalation detection asynchronously');
+    (async () => {
+      try {
+        // Use AI-powered escalation pipeline
+        const pipeline = new EscalationPipeline();
+        const pipelineResult = await pipeline.executePipeline(
+          message,
+          conversationContext,
+          studentId,
+          sessionId
+        );
 
-      // Analyze the message for escalation indicators
-      const detection = await ContentEscalationDetector.analyzeMessage(
-        message,
-        studentId,
-        sessionId,
-        conversationContext
-      );
-
-      console.log('[EscalationCheck] Detection result:', {
-        isEscalation: detection.isEscalation,
-        category: detection.category.type,
-        level: detection.level.level,
-        severity: detection.level.severity,
-        confidence: detection.category.confidence
-      });
-
-      // If this is a valid escalation, create an alert
-      if (ContentEscalationDetector.isValidEscalation(detection)) {
-        console.log('[EscalationCheck] Valid escalation detected, checking for existing alerts');
-        console.log('[EscalationCheck] Detection details:', {
-          isEscalation: detection.isEscalation,
-          category: detection.category.type,
-          level: detection.level.level,
-          severity: detection.level.severity,
-          confidence: detection.category.confidence,
-          detectedPhrases: detection.detectedPhrases
+        console.log('[EscalationCheck] AI Pipeline result:', {
+          success: pipelineResult.success,
+          isEscalation: pipelineResult.detection?.isEscalation,
+          riskLevel: pipelineResult.detection?.riskAssessment.overallRiskLevel,
+          riskScore: pipelineResult.detection?.riskAssessment.riskScore,
+          alertCreated: pipelineResult.alertCreated,
+          notificationsSent: pipelineResult.notificationsSent
         });
-        
-        try {
-          // Check if an alert already exists for this student with the same message content
-          // Use a more robust deduplication strategy across all sessions
-          const existingAlert = await prisma.escalationAlert.findFirst({
-            where: {
-              studentId: user.id, // Use the resolved user ID instead of studentId
-              messageContent: message,
-              createdAt: {
-                gte: new Date(Date.now() - 5 * 60 * 1000) // Within last 5 minutes
-              }
-            },
-            orderBy: { createdAt: 'desc' }
-          });
 
-          if (existingAlert) {
-            console.log('[EscalationCheck] Alert already exists for this student with similar message, skipping creation:', existingAlert.id);
-            console.log('[EscalationCheck] Existing alert details:', {
-              sessionId: existingAlert.sessionId,
-              messageContent: existingAlert.messageContent,
-              createdAt: existingAlert.createdAt
-            });
-          } else {
-            console.log('[EscalationCheck] Creating new escalation alert...');
-            const alert = await EscalationAlertService.createEscalationAlert(
-              studentId,
-              sessionId,
-              detection,
-              message,
-              studentMessage.createdAt.toISOString()
-            );
+        // If AI pipeline failed, fall back to keyword-based detection
+        if (!pipelineResult.success) {
+          console.log('[EscalationCheck] AI pipeline failed, falling back to keyword detection');
+          const keywordDetection = await ContentEscalationDetector.analyzeMessage(
+            message,
+            studentId,
+            sessionId,
+            conversationContext
+          );
 
-            console.log('[EscalationCheck] Alert created successfully:', alert.id);
-            console.log('[EscalationCheck] Alert should now appear in admin notifications');
+          if (ContentEscalationDetector.isValidEscalation(keywordDetection)) {
+            console.log('[EscalationCheck] Keyword-based escalation detected');
+            // Create alert using existing service
+            try {
+              const alert = await EscalationAlertService.createEscalationAlert(
+                studentId,
+                sessionId,
+                keywordDetection,
+                message,
+                studentMessage.createdAt.toISOString()
+              );
+              console.log('[EscalationCheck] Fallback alert created:', alert.id);
+            } catch (error) {
+              console.error('[EscalationCheck] Failed to create fallback alert:', error);
+            }
           }
-          
-          // If immediate action is required, we might want to modify the AI response
-          if (detection.level.requiresImmediateAction) {
-            console.log('[EscalationCheck] Immediate action required - will provide supportive response');
-          }
-        } catch (error) {
-          console.error('[EscalationCheck] Failed to create escalation alert:', error);
-          // Don't fail the chat request if alert creation fails
         }
+      } catch (error) {
+        console.error('[EscalationCheck] Error in AI escalation detection:', error);
+        // Don't fail the chat request if escalation detection fails
       }
-    } catch (error) {
-      console.error('[EscalationCheck] Error in escalation detection:', error);
-      // Don't fail the chat request if escalation detection fails
-    }
+    })();
 
     // Try to get AI response with retry logic
     let retryCount = 0;
@@ -195,25 +164,19 @@ export async function POST(req: Request) {
     
     while (retryCount < maxRetries) {
       try {
-        // Build conversation context for AI
-        const messagesForAI: any[] = [
-          {
-            role: "system",
-            content: PSYCHOLOGY_BUDDY_SYSTEM_PROMPT
-          },
-          // Add conversation history (excluding the current message that was already saved)
-          ...conversationHistory.map(msg => ({
-            role: msg.senderType === "STUDENT" ? "user" : "assistant",
-            content: msg.content
-          })),
-          // Add current message
-          {
-            role: "user",
-            content: message
-          }
-        ];
+        // Format conversation history for AI
+        const formattedHistory = formatMessagesForAI(conversationHistory);
+        
+        // Build conversation context with smart memory management
+        const messagesForAI = await buildConversationContext(
+          PSYCHOLOGY_BUDDY_SYSTEM_PROMPT,
+          formattedHistory,
+          message,
+          openai
+        );
 
         console.log('Sending to AI with context:', messagesForAI.length, 'messages');
+        console.log('Total estimated tokens:', estimateTokens(PSYCHOLOGY_BUDDY_SYSTEM_PROMPT) + countMessageTokens(formattedHistory) + estimateTokens(message));
 
         const stream = await openai.chat.completions.create({
           model: "gpt-3.5-turbo",
@@ -229,29 +192,34 @@ export async function POST(req: Request) {
             try {
               let rawResponse = "";
               
-              // Collect the full response first
+              // Stream chunks in real-time instead of collecting all first
               for await (const chunk of stream) {
                 const content = chunk.choices[0]?.delta?.content || "";
                 if (content) {
                   rawResponse += content;
+                  // Send chunk immediately for real-time streaming
+                  controller.enqueue(new TextEncoder().encode(content));
                 }
               }
 
-              console.log('AI response:', rawResponse);
+              console.log('AI response complete:', rawResponse);
               
-              // Send the response directly (no structured formatting needed)
-              controller.enqueue(new TextEncoder().encode(rawResponse));
-              
-              // Save bot reply message
-              console.log('Saving bot message for session:', sessionId);
-              const botMessage = await prisma.chatMessage.create({
-                data: {
-                  sessionId,
-                  senderType: "BOT",
-                  content: rawResponse,
-                },
-              });
-              console.log('Bot message saved:', botMessage.id);
+              // Save bot reply message asynchronously after streaming is complete
+              (async () => {
+                try {
+                  console.log('Saving bot message for session:', sessionId);
+                  const botMessage = await prisma.chatMessage.create({
+                    data: {
+                      sessionId,
+                      senderType: "BOT",
+                      content: rawResponse,
+                    },
+                  });
+                  console.log('Bot message saved:', botMessage.id);
+                } catch (error) {
+                  console.error('Failed to save bot message:', error);
+                }
+              })();
               
               controller.close();
             } catch (error) {

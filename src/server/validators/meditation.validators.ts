@@ -8,10 +8,10 @@ import { z } from "zod";
 const BaseMeditationResourceSchema = z.object({
   title: z.string().min(1, "Title is required"),
   description: z.string().min(1, "Description is required"),
-  thumbnailUrl: z.string().url().optional().nullable(),
+  thumbnailUrl: z.string().optional().nullable(),
   format: z.enum(["AUDIO", "VIDEO", "TEXT"]),
-  audioUrl: z.string().url().optional().nullable(),
-  videoUrl: z.string().url().optional().nullable(),
+  audioUrl: z.string().optional().nullable(),
+  videoUrl: z.string().optional().nullable(),
   durationSec: z.number().int().positive().optional().nullable(),
   instructor: z.string().optional().nullable(),
   type: z.enum(["GUIDED", "MUSIC", "BREATHING", "BODY_SCAN"]).default("GUIDED"),

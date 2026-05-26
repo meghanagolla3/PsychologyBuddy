@@ -127,4 +127,70 @@ export class ParentController {
       return NextResponse.json(errorResponse, { status: errorResponse.error?.code || 500 });
     }
   });
+
+  // GET /api/parent/notifications - Get notifications for parent
+  static getNotifications = async (req: NextRequest, ctx: any) => {
+    try {
+      const { searchParams } = new URL(req.url);
+      const unreadOnly = searchParams.get('unreadOnly') === 'true';
+      const limit = parseInt(searchParams.get('limit') || '50');
+
+      const result = await ParentService.getNotifications(ctx.user.id, { unreadOnly, limit });
+      return NextResponse.json(result);
+    } catch (error) {
+      console.error('Get notifications error:', error);
+      const errorResponse = handleError(error);
+      return NextResponse.json(errorResponse, { status: errorResponse.error?.code || 500 });
+    }
+  };
+
+  // GET /api/parent/notifications/unread-count - Get unread notification count
+  static getUnreadCount = async (req: NextRequest, ctx: any) => {
+    try {
+      const result = await ParentService.getUnreadCount(ctx.user.id);
+      return NextResponse.json(result);
+    } catch (error) {
+      console.error('Get unread count error:', error);
+      const errorResponse = handleError(error);
+      return NextResponse.json(errorResponse, { status: errorResponse.error?.code || 500 });
+    }
+  };
+
+  // PATCH /api/parent/notifications/[id]/read - Mark notification as read
+  static markAsRead = async (req: NextRequest, ctx: any) => {
+    try {
+      const { id } = await ctx.params;
+      const result = await ParentService.markAsRead(id, ctx.user.id);
+      return NextResponse.json(result);
+    } catch (error) {
+      console.error('Mark as read error:', error);
+      const errorResponse = handleError(error);
+      return NextResponse.json(errorResponse, { status: errorResponse.error?.code || 500 });
+    }
+  };
+
+  // PATCH /api/parent/notifications/read-all - Mark all notifications as read
+  static markAllAsRead = async (req: NextRequest, ctx: any) => {
+    try {
+      const result = await ParentService.markAllAsRead(ctx.user.id);
+      return NextResponse.json(result);
+    } catch (error) {
+      console.error('Mark all as read error:', error);
+      const errorResponse = handleError(error);
+      return NextResponse.json(errorResponse, { status: errorResponse.error?.code || 500 });
+    }
+  };
+
+  // DELETE /api/parent/notifications/[id] - Delete notification
+  static deleteNotification = async (req: NextRequest, ctx: any) => {
+    try {
+      const { id } = await ctx.params;
+      const result = await ParentService.deleteNotification(id, ctx.user.id);
+      return NextResponse.json(result);
+    } catch (error) {
+      console.error('Delete notification error:', error);
+      const errorResponse = handleError(error);
+      return NextResponse.json(errorResponse, { status: errorResponse.error?.code || 500 });
+    }
+  };
 }

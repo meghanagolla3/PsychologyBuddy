@@ -88,7 +88,7 @@ export function EditAdminModal({ admin, onClose, onSuccess, schools }: EditAdmin
   const [selectedLocation, setSelectedLocation] = useState<Location | null>(null);
 
   const { user } = useAuth();
-  const { executeWithLoading } = useAdminLoading();
+  const { executeWithLoading, isLoading } = useAdminLoading();
   const { toast } = useToast();
 
   // Check phone number uniqueness
@@ -826,6 +826,7 @@ export function EditAdminModal({ admin, onClose, onSuccess, schools }: EditAdmin
             </LoadingButton>
             <LoadingButton
               type="submit"
+              isLoading={isLoading(AdminActions.EDIT_ADMIN)}
               loadingText="Updating..."
               className="gap-2 text-white"
             >

@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/src/contexts/AuthContext';
+import { useAdminLoading } from '@/src/contexts/AdminLoadingContext';
 
 interface StudentLoginData {
   studentId: string;
@@ -40,11 +41,11 @@ export function useStudentLogin() {
     studentId: '',
     password: '',
   });
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const router = useRouter();
   const { login } = useAuth();
+  const { executeWithLoading, setLoading } = useAdminLoading();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -68,29 +69,31 @@ export function useStudentLogin() {
       return;
     }
 
-    setLoading(true);
     setError(null);
 
     try {
-      const response = await fetch('/api/auth/student-login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData),
-      });
-
-      const data: StudentLoginResponse = await response.json();
+      const data = await executeWithLoading(
+        'student_login',
+        fetch('/api/auth/student-login', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(formData),
+        }).then(res => res.json()),
+        'Logging in...'
+      );
 
       if (data.success && data.data?.user) {
-        setSuccess('Login successful!');
-        
         // Login user in context with required adminProfile (empty for students)
         const userWithProfile = {
           ...data.data?.user,
           adminProfile: {} // Students don't have adminProfile but it's required by User interface
         };
         login(userWithProfile);
+        
+        // Keep loader active during redirect
+        setLoading('student_login', true, 'Redirecting...');
         
         // Check if mood checkin is already done today
         setTimeout(async () => {
@@ -151,14 +154,12 @@ export function useStudentLogin() {
     } catch (err) {
       console.error('Student login error:', err);
       setError('Network error. Please check your connection and try again.');
-    } finally {
-      setLoading(false);
     }
   };
 
   return {
     formData,
-    loading,
+    loading: false,
     error,
     success,
     handleChange,

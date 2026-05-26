@@ -26,6 +26,7 @@ model User {
   parentId                    String?
   adminNotifications          AdminNotification[]
   counselorNotifications      CounselorNotification[]
+  parentNotifications         ParentNotification[]
   adminProfile                AdminProfile?
   artJournals                 ArtJournal[]
   completions                 ArticleCompletion[]              @relation("UserCompletions")
@@ -99,6 +100,8 @@ model CounselorProfile {
   userId          String  @unique
   department      String  @default("Student Counseling")
   profileImageUrl String?
+  specialization   String?
+  availability    String?
   user            User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("CounselorProfiles")
@@ -736,6 +739,23 @@ model CounselorNotification {
   @@map("CounselorNotifications")
 }
 
+model ParentNotification {
+  id              String         @id @default(uuid())
+  userId          String
+  type            String         // 'meeting', 'system', 'alert'
+  title           String
+  message         String
+  severity        String         // 'low', 'medium', 'high'
+  read            Boolean        @default(false)
+  createdAt       DateTime       @default(now())
+  readAt          DateTime?
+  meetingId       String?
+  relatedUserId   String?        // Student ID for parent notifications
+  user            User           @relation(fields: [userId], references: [id])
+
+  @@map("ParentNotifications")
+}
+
 model MoodLabel {
   id         String           @id @default(uuid())
   name       String           @unique
@@ -1167,4 +1187,16 @@ enum SessionStatus {
   COMPLETED
   CANCELLED
   MISSED
+}
+
+model ContactMessage {
+  id          String   @id @default(uuid())
+  fullName    String
+  schoolName  String?
+  email       String
+  phone       String?
+  message     String
+  createdAt   DateTime @default(now())
+
+  @@map("ContactMessages")
 }

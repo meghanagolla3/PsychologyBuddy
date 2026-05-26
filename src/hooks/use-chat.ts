@@ -223,28 +223,8 @@ export function useChat({
         sessionStorage.setItem("lastSummaryId", data.data.id);
         console.log(`[AutoTermination] Summary generated successfully, ID: ${data.data.id}`);
         
-        // Instead of redirecting to summary page, start a new chat session
-        console.log(`[AutoTermination] Starting new chat session after summary generation`);
-        
-        // Clear current session for this student
-        const studentSessionKey = `chatSessionId_${studentId}`
-        sessionStorage.removeItem(studentSessionKey);
-        sessionIdRef.current = null;
-        sessionStartTimeRef.current = null;
-        isInitialized.current = false;
-        isTerminatingRef.current = false;
-        
-        // Reset state for new chat
-        setState({
-          messages: [],
-          input: '',
-          isLoading: false,
-          sessionId: null,
-          sessionStartTime: null
-        });
-        
-        // Initialize new chat session
-        await initializeChat();
+        // Don't clear session here - let handleAutomaticTermination handle it after redirect
+        console.log(`[AutoTermination] Summary stored, session will be cleared after redirect`);
         
       } else {
         console.error(`[AutoTermination] Summary generation failed:`, data);
@@ -295,7 +275,34 @@ export function useChat({
       
       // Redirect to reflections page to show the new summary
       console.log(`[AutoTermination] Redirecting to reflections page...`);
-      router.push('/students/reflections');
+      // Only redirect if summary was successfully generated
+      const lastSummaryId = sessionStorage.getItem("lastSummaryId");
+      if (lastSummaryId) {
+        console.log(`[AutoTermination] Summary ID found (${lastSummaryId}), redirecting to reflections`);
+        
+        // Clear current session for this student before redirect
+        const studentSessionKey = `chatSessionId_${studentId}`;
+        sessionStorage.removeItem(studentSessionKey);
+        sessionIdRef.current = null;
+        sessionStartTimeRef.current = null;
+        isInitialized.current = false;
+        isTerminatingRef.current = false;
+        
+        // Reset state for new chat
+        setState({
+          messages: [],
+          input: '',
+          isLoading: false,
+          sessionId: null,
+          sessionStartTime: null
+        });
+        
+        router.push('/students/reflections');
+      } else {
+        console.log(`[AutoTermination] No summary ID found, skipping redirect and starting new chat`);
+        // Start new chat without redirect
+        await initializeChat();
+      }
       
     } catch (error) {
       console.error('Error during automatic termination:', error);
@@ -729,12 +736,32 @@ export function useChat({
 
   // Initialize chat on mount
   useEffect(() => {
-    const initializeChat = async () => {
+    const initializeChatOnMount = async () => {
       if (!isInitialized.current && studentId) {
         try {
           // Check for existing session for this specific student
           const studentSessionKey = `chatSessionId_${studentId}`
-          const savedSessionId = sessionStorage.getItem(studentSessionKey)
+          let savedSessionId = sessionStorage.getItem(studentSessionKey)
+          
+          // If no session ID in sessionStorage, check database for an active session
+          if (!savedSessionId) {
+            console.log('No session ID in sessionStorage, checking database for active session for student:', studentId)
+            try {
+              const activeSessionResponse = await fetch(`/api/students/chat/active-session?studentId=${studentId}`)
+              if (activeSessionResponse.ok) {
+                const activeSessionData = await activeSessionResponse.json()
+                if (activeSessionData.success && activeSessionData.activeSession) {
+                  savedSessionId = activeSessionData.activeSession.id
+                  if (savedSessionId) {
+                    sessionStorage.setItem(studentSessionKey, savedSessionId)
+                  }
+                  console.log('Found active session in database, restoring:', savedSessionId)
+                }
+              }
+            } catch (activeSessionError) {
+              console.error('Failed to fetch active session from database:', activeSessionError)
+            }
+          }
           
           if (savedSessionId && !savedSessionId.startsWith('temp_')) {
             // Continue existing session
@@ -746,37 +773,15 @@ export function useChat({
             // Fetch existing messages for this session (will also set session start time)
             const messageData = await fetchExistingMessages(savedSessionId)
             
-            // If no messages exist, add a welcome message
+            // If no messages exist, initialize with mood-aware opening message
             if (!messageData || messageData.messages.length === 0) {
-              const welcomeMessage: Message = {
-                id: crypto.randomUUID(),
-                sender: 'bot',
-                content: "Hello! I'm here to listen and support you. How are you feeling today?",
-                timestamp: new Date().toISOString(),
-                type: 'opening'
-              }
-              setState(prev => ({ ...prev, messages: [welcomeMessage] }))
-              console.log('Added welcome message to existing session')
+              console.log('No messages in existing session, initializing with mood data:', { mood, triggers, notes })
+              await initializeChat(mood, triggers, notes)
             }
           } else {
-            // Create new temporary session (no database record yet)
-            console.log('Creating new temporary session')
-            const tempSessionId = `temp_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
-            sessionIdRef.current = tempSessionId
-            setState(prev => ({ ...prev, sessionId: tempSessionId }))
-            isInitialized.current = true
-            console.log('Created new temporary session:', tempSessionId)
-            
-            // Add welcome message for new temporary session
-            const welcomeMessage: Message = {
-              id: crypto.randomUUID(),
-              sender: 'bot',
-              content: "Hello! I'm here to listen and support you. How are you feeling today?",
-              timestamp: new Date().toISOString(),
-              type: 'opening'
-            }
-            setState(prev => ({ ...prev, messages: [welcomeMessage] }))
-            console.log('Added welcome message to new temporary session')
+            // Create new session with mood-aware opening message
+            console.log('Creating new session with mood data:', { mood, triggers, notes })
+            await initializeChat(mood, triggers, notes)
           }
         } catch (error) {
           console.error('Failed to initialize chat:', error)
@@ -785,8 +790,8 @@ export function useChat({
       }
     }
 
-    initializeChat()
-  }, [studentId, onError]) // Removed fetchExistingMessages to prevent infinite re-renders
+    initializeChatOnMount()
+  }, [studentId, onError, initializeChat, mood, triggers, notes])
 
   // Import conversation messages from a previous session
   const importConversation = useCallback((messages: Message[], sessionId: string, sessionStartTime?: number) => {

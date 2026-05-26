@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import { Building2, Bell, Shield, Palette, Database, Key } from "lucide-react";
+import { Building2, Bell, Shield, Palette, Database, Key, Mail, Search, Clock, ChevronRight } from "lucide-react";
 import { AdminHeader } from '../layout/AdminHeader';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,6 +11,8 @@ import { Switch } from "@/components/ui/switch";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
+import { Badge } from "@/components/ui/badge";
+import { cn } from "@/lib/utils";
 import {
   Select,
   SelectContent,
@@ -21,6 +23,7 @@ import {
 import { useToast } from "@/components/ui/use-toast";
 import { useAuth } from "@/src/contexts/AuthContext";
 import { useSchoolFilter } from "@/src/contexts/SchoolFilterContext";
+import ContactMessageModal from '../modals/ContactMessageModal';
 
 interface OrganizationData {
   id: string;
@@ -57,6 +60,60 @@ export default function SettingsSection() {
   
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
+
+  interface ContactMessage {
+    id: string;
+    fullName: string;
+    schoolName?: string;
+    email: string;
+    message: string;
+    createdAt: string;
+  }
+
+  const isSuperAdminUser = user?.role?.name === 'SUPERADMIN';
+  const [contactMessages, setContactMessages] = useState<ContactMessage[]>([]);
+  const [loadingMessages, setLoadingMessages] = useState(false);
+  const [selectedMessage, setSelectedMessage] = useState<ContactMessage | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [showMessageModal, setShowMessageModal] = useState(false);
+
+  const getTimeAgo = (timestamp: string) => {
+    const now = new Date();
+    const alertTime = new Date(timestamp);
+    const diffMs = now.getTime() - alertTime.getTime();
+    const diffMins = Math.floor(diffMs / 60000);
+    
+    if (diffMins < 1) return `just now`;
+    if (diffMins < 60) return `${diffMins} min ago`;
+    if (diffMins < 1440) return `${Math.floor(diffMins / 60)} hours ago`;
+    return `${Math.floor(diffMins / 1440)} days ago`;
+  };
+
+  const fetchContactMessages = async () => {
+    try {
+      setLoadingMessages(true);
+      const res = await fetch('/api/admin/contact-messages');
+      const data = await res.json();
+      if (data.success) {
+        setContactMessages(data.data);
+        if (data.data.length > 0) {
+          setSelectedMessage(data.data[0]);
+        } else {
+          setSelectedMessage(null);
+        }
+      }
+    } catch (err) {
+      console.error("Failed to fetch contact messages", err);
+    } finally {
+      setLoadingMessages(false);
+    }
+  };
+
+  useEffect(() => {
+    if (isSuperAdminUser) {
+      fetchContactMessages();
+    }
+  }, [user]);
 
   // Initialize organization data based on user role
   useEffect(() => {
@@ -215,7 +272,7 @@ export default function SettingsSection() {
       
       <div className="flex-1 overflow-auto p-6 animate-fade-in">
         <Tabs defaultValue="organization" className="space-y-6">
-          <TabsList className={`grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 w-full lg:w-auto bg-[#edf0f3]`}>
+          <TabsList className={`grid ${isSuperAdminUser ? 'grid-cols-2 sm:grid-cols-4 lg:grid-cols-4' : 'grid-cols-2 sm:grid-cols-3 lg:grid-cols-3'} w-full lg:w-auto bg-[#edf0f3]`}>
             <TabsTrigger value="organization" className="gap-2 data-[state=active]:bg-[#f9fafb] text-[#65758b] hover:text-gray-900 data-[state=active]:text-black">
               <Building2 className="h-4 w-4" />
               <span className="hidden sm:inline">Organization</span>
@@ -240,6 +297,12 @@ export default function SettingsSection() {
               <Key className="h-4 w-4" />
               <span className="hidden sm:inline">Security</span>
             </TabsTrigger>
+            {isSuperAdminUser && (
+              <TabsTrigger value="contact-messages" className="gap-2 data-[state=active]:bg-[#f9fafb] text-[#65758b] hover:text-gray-900 data-[state=active]:text-black">
+                <Mail className="h-4 w-4" />
+                <span className="hidden sm:inline">Contact Messages</span>
+              </TabsTrigger>
+            )}
           </TabsList>
 
           <TabsContent value="organization">
@@ -557,6 +620,156 @@ export default function SettingsSection() {
               </CardContent>
             </Card>
           </TabsContent>
+
+{isSuperAdminUser && (
+  <TabsContent value="contact-messages" className="space-y-6">
+    {(() => {
+      const filteredMessages = contactMessages.filter(
+        (msg) =>
+          msg.fullName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          (msg.schoolName && msg.schoolName.toLowerCase().includes(searchQuery.toLowerCase())) ||
+          msg.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          msg.message.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+
+      return (
+        <Card className="border-0 shadow-none bg-transparent space-y-6">
+          {/* Header */}
+          <div className="flex flex-row items-center justify-between pb-2">
+            <div>
+              <CardTitle className="text-xl font-bold text-slate-800">
+                Contact Inquiries
+              </CardTitle>
+              <CardDescription>
+                View and manage client feedback and support messages
+              </CardDescription>
+            </div>
+          </div>
+
+          {/* Search & Action Bar */}
+          <div className="flex flex-col sm:flex-row gap-4">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#64748B]" />
+              <Input
+                placeholder="Search by sender name, school, email, or message..."
+                className="pl-9 bg-white border-slate-200"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+            </div>
+            <Button
+              variant="outline"
+              onClick={fetchContactMessages}
+              disabled={loadingMessages}
+              className="bg-white hover:bg-slate-50 text-slate-700 border-slate-200 gap-2 flex-shrink-0"
+            >
+              {loadingMessages ? "Refreshing..." : "Refresh"}
+            </Button>
+          </div>
+
+          {/* Message List matching the Escalation list style exactly */}
+          <div className="space-y-3">
+            {loadingMessages ? (
+              <div className="flex flex-col items-center justify-center py-12 text-slate-400 gap-2">
+                <svg
+                  className="animate-spin h-6 w-6 text-[#1B9EE0]"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  />
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                  />
+                </svg>
+                <span className="text-xs">Loading inquiries...</span>
+              </div>
+            ) : filteredMessages.length === 0 ? (
+              <div className="text-center py-12 border border-dashed rounded-xl bg-white text-slate-400 text-sm">
+                No contact inquiries found.
+              </div>
+            ) : (
+              filteredMessages.map((msg) => {
+                const isSelected = selectedMessage?.id === msg.id;
+                return (
+                  <div
+                    key={msg.id}
+                    onClick={() => {
+                      setSelectedMessage(msg);
+                      setShowMessageModal(true);
+                    }}
+                    className={cn(
+                      "flex items-center justify-between rounded-xl border bg-card p-4 cursor-pointer transition-all hover:shadow-md bg-white border-slate-200",
+                      isSelected && "border-[#3B82F6] bg-[#3B82F6]/5"
+                    )}
+                  >
+                    <div className="flex items-center gap-4 min-w-0 flex-1">
+                      <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-[#3B82F6]/10 text-[#3B82F6] flex-shrink-0">
+                        <Mail className="h-5 w-5" />
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center gap-2">
+                          <p className="font-semibold text-slate-800 text-sm sm:text-base truncate">
+                            {msg.fullName}
+                          </p>
+                          {msg.schoolName && (
+                            <span className="text-xs text-[#64748B] truncate">
+                              • {msg.schoolName}
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-sm text-[#64748B] line-clamp-1 pr-4">
+                          {msg.message}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-4 flex-shrink-0">
+                      <div className="hidden md:flex flex-col items-end gap-1">
+                        <div className="flex items-center gap-1 text-xs text-[#64748B]">
+                          <Clock className="h-3 w-3" />
+                          {getTimeAgo(msg.createdAt)}
+                        </div>
+                        <span className="text-xs text-muted-foreground">
+                          {new Date(msg.createdAt).toLocaleDateString()}
+                        </span>
+                      </div>
+
+                      <Badge
+                        variant="outline"
+                        className="text-xs bg-[#3B82F6]/10 text-[#3B82F6] border-[#3B82F6]/30 hidden sm:inline-flex"
+                      >
+                        {msg.email}
+                      </Badge>
+
+                      <ChevronRight className="h-5 w-5 text-muted-foreground" />
+                    </div>
+                  </div>
+                );
+              })
+            )}
+          </div>
+
+          {/* Modal that displays the selected message */}
+          <ContactMessageModal
+            message={selectedMessage}
+            open={showMessageModal}
+            onClose={() => setShowMessageModal(false)}
+          />
+        </Card>
+      );
+    })()}
+  </TabsContent>
+)}
+
         </Tabs>
       </div>
     </div>

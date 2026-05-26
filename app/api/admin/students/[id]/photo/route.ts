@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from "@/src/prisma";
+import { uploadToS3, deleteFromS3 } from '@/src/utils/s3';
 
 export async function POST(
   request: NextRequest,
@@ -78,17 +79,35 @@ export async function POST(
       );
     }
 
-    // Convert file to base64
+    // Convert file to buffer
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
-    const base64 = buffer.toString('base64');
-    const dataUrl = `data:${file.type};base64,${base64}`;
 
-    // Update student profile with new image
     // First check if student profile exists, if not create it
     const existingProfile = await prisma.studentProfile.findUnique({
       where: { userId: studentId },
+      select: { id: true, profileImage: true }
     });
+
+    // Upload using centralized S3 utility (handles validation internally)
+    let dataUrl: string;
+    try {
+      dataUrl = await uploadToS3(buffer, file.name, file.type);
+    } catch (validationError: any) {
+      return NextResponse.json(
+        { success: false, error: { message: validationError.message } },
+        { status: 400 }
+      );
+    }
+
+    // Delete old profile image from S3 if it exists (prevents orphans)
+    if (existingProfile?.profileImage && (existingProfile.profileImage.startsWith('http://') || existingProfile.profileImage.startsWith('https://'))) {
+      try {
+        await deleteFromS3(existingProfile.profileImage);
+      } catch (delError) {
+        console.warn('Failed to delete old student image from S3:', delError);
+      }
+    }
 
     let updatedProfile;
     if (existingProfile) {

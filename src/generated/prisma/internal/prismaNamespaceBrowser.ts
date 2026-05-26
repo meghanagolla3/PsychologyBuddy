@@ -99,6 +99,7 @@ export const ModelName = {
   EscalationAlert: 'EscalationAlert',
   AdminNotification: 'AdminNotification',
   CounselorNotification: 'CounselorNotification',
+  ParentNotification: 'ParentNotification',
   MoodLabel: 'MoodLabel',
   GoalLabel: 'GoalLabel',
   CategoryLabel: 'CategoryLabel',
@@ -125,7 +126,8 @@ export const ModelName = {
   CounselingSession: 'CounselingSession',
   SessionIntake: 'SessionIntake',
   SessionReport: 'SessionReport',
-  CounselorAssignment: 'CounselorAssignment'
+  CounselorAssignment: 'CounselorAssignment',
+  ContactMessage: 'ContactMessage'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -190,7 +192,9 @@ export const CounselorProfileScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
   department: 'department',
-  profileImageUrl: 'profileImageUrl'
+  profileImageUrl: 'profileImageUrl',
+  specialization: 'specialization',
+  availability: 'availability'
 } as const
 
 export type CounselorProfileScalarFieldEnum = (typeof CounselorProfileScalarFieldEnum)[keyof typeof CounselorProfileScalarFieldEnum]
@@ -763,6 +767,23 @@ export const CounselorNotificationScalarFieldEnum = {
 export type CounselorNotificationScalarFieldEnum = (typeof CounselorNotificationScalarFieldEnum)[keyof typeof CounselorNotificationScalarFieldEnum]
 
 
+export const ParentNotificationScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  type: 'type',
+  title: 'title',
+  message: 'message',
+  severity: 'severity',
+  read: 'read',
+  createdAt: 'createdAt',
+  readAt: 'readAt',
+  meetingId: 'meetingId',
+  relatedUserId: 'relatedUserId'
+} as const
+
+export type ParentNotificationScalarFieldEnum = (typeof ParentNotificationScalarFieldEnum)[keyof typeof ParentNotificationScalarFieldEnum]
+
+
 export const MoodLabelScalarFieldEnum = {
   id: 'id',
   name: 'name',
@@ -1130,6 +1151,19 @@ export const CounselorAssignmentScalarFieldEnum = {
 } as const
 
 export type CounselorAssignmentScalarFieldEnum = (typeof CounselorAssignmentScalarFieldEnum)[keyof typeof CounselorAssignmentScalarFieldEnum]
+
+
+export const ContactMessageScalarFieldEnum = {
+  id: 'id',
+  fullName: 'fullName',
+  schoolName: 'schoolName',
+  email: 'email',
+  phone: 'phone',
+  message: 'message',
+  createdAt: 'createdAt'
+} as const
+
+export type ContactMessageScalarFieldEnum = (typeof ContactMessageScalarFieldEnum)[keyof typeof ContactMessageScalarFieldEnum]
 
 
 export const SortOrder = {

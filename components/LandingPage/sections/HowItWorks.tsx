@@ -10,7 +10,7 @@ const steps = [
     label: "Choose Mood",
     sublabel: "Step 1",
     image: "/HIW/11.png",
-    className: "md:-ml-46 md:-mt-28 md:w-[600px] md:h-[352px] -ml-16 -mt-20 w-[300px] h-[186px]",
+    className: "md:-ml-46 md:-mt-40 md:w-[600px] md:h-[352px] lg:-ml-46 lg:-mt-38 lg:w-[600px] lg:h-[352px] -ml-23 -mt-21 w-[350px] h-[216px]",
     description: "Choose your mood in seconds no pressure, just honesty",
   },
   {
@@ -18,7 +18,7 @@ const steps = [
     label: "AI Support",
     sublabel: "Step 2",
     image: "/HIW/2.svg",
-    className: "md:-ml-19 md:-mt-39 md:w-[400px] md:h-[250px] -ml-10 -mt-20 w-[200px] h-[125px]",
+    className: "md:-ml-19 md:-mt-35.5 md:w-[400px] md:h-[250px] lg:-ml-19 lg:-mt-33.5 lg:w-[400px] lg:h-[250px] -ml-10 -mt-22 w-[230px] h-[170px]",
     description: "Psychology buddy helps you understand why you feel that way",
   },
   {
@@ -26,7 +26,7 @@ const steps = [
     label: "Learn & Grow",
     sublabel: "Step 3",
     image: "/HIW/3.svg",
-    className: "md:-ml-25 md:-mt-38 md:w-[400px] md:h-[250px] -ml-12 -mt-19 w-[200px] h-[125px]",
+    className: "md:-ml-25 md:-mt-35 md:w-[400px] md:h-[250px] lg:-ml-25 lg:-mt-33 lg:w-[400px] lg:h-[250px] -ml-10 -mt-22 w-[230px] h-[170px]",
     description: "Learn through Mind Space lessons and earn badges",
   },
   {
@@ -34,7 +34,7 @@ const steps = [
     label: "Get Expert Help",
     sublabel: "Step 4",
     image: "/HIW/4.svg",
-    className: "md:-ml-22.5 md:-mt-35 md:w-[400px] md:h-[250px] -ml-11 -mt-18 w-[200px] h-[125px]",
+    className: "md:-ml-25 md:-mt-35.5 md:w-[400px] md:h-[250px] lg:-ml-22.5 lg:-mt-33.5 lg:w-[400px] lg:h-[250px] -ml-11 -mt-25 w-[240px] h-[180px]",
     description: "In cases requiring further support, alerts enable school administrators to respond.",
   },
 ];
@@ -55,10 +55,10 @@ const HowItWorks = () => {
   return (
     <section
       ref={sectionRef}
-      className="py-12 sm:py-16 md:py-5 bg-gradient-to-r from-[#f5f5f9] via-[#f3f3f4]/10 to-[#f5f5f9] relative overflow-hidden"
+      className="py-2 sm:py-4 md:py-1 bg-gradient-to-r from-[#f5f5f9] via-[#f3f3f4]/10 to-[#f5f5f9] relative overflow-hidden"
     >
       {/* Section Title */}
-      <div className="text-center mb-10 md:mb-16 px-4">
+      <div className="text-center mb-5 md:mb-10 px-4">
         <h2 className="text-2xl sm:text-3xl md:text-[40px] font-semibold text-[#2F3D43]">
           How It Works
         </h2>
@@ -68,10 +68,10 @@ const HowItWorks = () => {
       </div>
 
       {/* ===== Steps ===== */}
-      <div className="max-w-8xl mx-auto grid grid-cols-1 md:grid-cols-4 justify-between px-6 md:px-26 py-10 md:py-20 relative z-10 gap-20 md:gap-12 justify-items-center">
+      <div className="max-w-8xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 justify-between px-6 md:px-12 lg:px-26 py-10 md:py-16 lg:py-20 relative z-10 gap-20 md:gap-14 lg:gap-12 justify-items-center">
         
         {/* ===== Animated Behind-Line (Desktop: horizontal, connecting card centers) ===== */}
-        <div className="absolute left-[12.5%] right-[12.5%] top-[202px] hidden md:block z-0">
+        <div className="absolute left-[12.5%] right-[12.5%] top-[202px] hidden lg:block z-0">
           <div className="w-full h-[3px] bg-[#2DC8EF]/20 rounded-full relative">
             <motion.div
               style={{ width: animatedWidth }}
@@ -94,7 +94,7 @@ const HowItWorks = () => {
             <div key={step.key} className="flex flex-row md:flex-col items-center text-left md:text-center w-full md:w-auto gap-6 md:gap-0 relative">
               
               {/* White rounded card background wrapper */}
-              <div className="relative w-[150px] h-[81px] md:w-[217px] md:h-[117px] drop-shadow-xl drop-shadow-[#589EE626] rounded-[15px] md:rounded-[21px] bg-white mt-0 md:mt-16 flex-shrink-0 z-10">
+              <div className="relative w-[150px] h-[81px] md:w-[200px] md:h-[108px] lg:w-[217px] lg:h-[117px] drop-shadow-xl drop-shadow-[#589EE626] rounded-[15px] md:rounded-[18px] lg:rounded-[21px] bg-white mt-0 md:mt-12 lg:mt-16 flex-shrink-0 z-10">
                 
                 {/* Overlapping Character Illustration (Handcrafted offsets and sizes) */}
                 <div className={`flex ${step.className} items-center justify-center relative z-10`}>
@@ -123,12 +123,12 @@ const HowItWorks = () => {
               {/* Step Text Info */}
               <div className="flex flex-col text-left md:text-center md:items-center justify-center">
                 {/* Step Title */}
-                <h3 className="mt-0 md:mt-16 text-[18px] sm:text-[20px] md:text-[24px] font-semibold md:font-medium text-[#2F3D43]">
+                <h3 className="mt-0 md:mt-12 lg:mt-16 text-[18px] sm:text-[20px] md:text-[22px] lg:text-[24px] font-semibold md:font-medium text-[#2F3D43]">
                   {step.label}
                 </h3>
 
                 {/* Step Description */}
-                <p className="text-[#767676] mt-1.5 md:mt-2 w-full max-w-[260px] md:w-[180px] sm:w-[210px] text-[12px] sm:text-sm md:text-[16px] leading-relaxed">
+                <p className="text-[#767676] mt-1.5 md:mt-2 w-full max-w-[260px] md:w-[200px] lg:w-[180px] sm:w-[210px] text-[12px] sm:text-sm md:text-[14px] lg:text-[16px] leading-relaxed">
                   {step.description}
                 </p>
               </div>

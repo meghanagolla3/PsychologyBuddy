@@ -34,7 +34,7 @@ export function OTPLoginForm({ onBack }: OTPLoginFormProps) {
   } = useAdminPhoneLogin();
 
   const handleEmailLoginRedirect = () => {
-    router.push('/admin-login');
+    router.push('/login');
   };
 
   const handleSubmit = (e: React.FormEvent) => {

@@ -172,4 +172,78 @@ export const ParentRepository = {
       },
     });
   },
+
+  // Get notifications for a parent
+  getNotifications: async (userId: string, filters?: { unreadOnly?: boolean; limit?: number }) => {
+    const whereCondition: any = { userId };
+
+    if (filters?.unreadOnly) {
+      whereCondition.read = false;
+    }
+
+    const limit = filters?.limit || 50;
+
+    return prisma.parentNotification.findMany({
+      where: whereCondition,
+      orderBy: { createdAt: 'desc' },
+      take: limit,
+    });
+  },
+
+  // Get unread notification count for a parent
+  getUnreadCount: async (userId: string) => {
+    return prisma.parentNotification.count({
+      where: {
+        userId,
+        read: false,
+      },
+    });
+  },
+
+  // Create a notification for a parent
+  createNotification: async (data: {
+    userId: string;
+    type: string;
+    title: string;
+    message: string;
+    severity: string;
+    meetingId?: string;
+    relatedUserId?: string;
+  }) => {
+    return prisma.parentNotification.create({
+      data,
+    });
+  },
+
+  // Mark notification as read
+  markAsRead: async (notificationId: string) => {
+    return prisma.parentNotification.update({
+      where: { id: notificationId },
+      data: {
+        read: true,
+        readAt: new Date(),
+      },
+    });
+  },
+
+  // Mark all notifications as read for a parent
+  markAllAsRead: async (userId: string) => {
+    return prisma.parentNotification.updateMany({
+      where: {
+        userId,
+        read: false,
+      },
+      data: {
+        read: true,
+        readAt: new Date(),
+      },
+    });
+  },
+
+  // Delete notification
+  deleteNotification: async (notificationId: string) => {
+    return prisma.parentNotification.delete({
+      where: { id: notificationId },
+    });
+  },
 };

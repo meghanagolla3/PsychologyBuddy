@@ -79,7 +79,7 @@ interface SchoolLocation {
 export function AddCounselorModal({ onClose, onSuccess, schools }: AddCounselorModalProps) {
   const { toast } = useToast();
   const { user } = useAuth();
-  const { executeWithLoading } = useAdminLoading();
+  const { executeWithLoading, isLoading } = useAdminLoading();
 
   const [formData, setFormData] = useState<FormData>({
     firstName: '',
@@ -704,6 +704,7 @@ export function AddCounselorModal({ onClose, onSuccess, schools }: AddCounselorM
             </Button>
             <LoadingButton
               type="submit"
+              isLoading={isLoading(AdminActions.ADD_ADMIN)}
               loadingText="Creating..."
             >
               Create Counselor

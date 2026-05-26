@@ -1,6 +1,7 @@
 import { prisma } from './prisma';
 import { AuthError } from '@/src/utils/errors';
 import { CreateArticleData, UpdateArticleData } from './library.validators';
+import { uploadBase64ToS3, deleteFromS3 } from '@/src/utils/s3';
 
 export class LibraryService {
   // Create new article
@@ -16,6 +17,11 @@ export class LibraryService {
 
       if (existingArticle) {
         throw AuthError.conflict('An article with this title already exists');
+      }
+
+      const titleSlug = data.title.toLowerCase().replace(/[^a-z0-9]/g, "_");
+      if (data.thumbnailUrl && data.thumbnailUrl.startsWith("data:")) {
+        data.thumbnailUrl = await uploadBase64ToS3(data.thumbnailUrl, `article_thumb_${titleSlug}`) || "";
       }
 
       const article = await prisma.article.create({
@@ -324,6 +330,15 @@ export class LibraryService {
 
         if (duplicateArticle) {
           throw AuthError.conflict('An article with this title already exists');
+        }
+      }
+
+      const titleSlug = (data.title || existingArticle.title).toLowerCase().replace(/[^a-z0-9]/g, "_");
+      if (data.thumbnailUrl && data.thumbnailUrl.startsWith("data:")) {
+        const oldUrl = existingArticle.thumbnailUrl;
+        data.thumbnailUrl = await uploadBase64ToS3(data.thumbnailUrl, `article_thumb_${titleSlug}`) || "";
+        if (oldUrl && (oldUrl.startsWith("http:") || oldUrl.startsWith("https:"))) {
+          await deleteFromS3(oldUrl);
         }
       }
 

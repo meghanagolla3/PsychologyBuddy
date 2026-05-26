@@ -272,6 +272,7 @@ export type UserWhereInput = {
   parentId?: Prisma.StringNullableFilter<"User"> | string | null
   adminNotifications?: Prisma.AdminNotificationListRelationFilter
   counselorNotifications?: Prisma.CounselorNotificationListRelationFilter
+  parentNotifications?: Prisma.ParentNotificationListRelationFilter
   adminProfile?: Prisma.XOR<Prisma.AdminProfileNullableScalarRelationFilter, Prisma.AdminProfileWhereInput> | null
   artJournals?: Prisma.ArtJournalListRelationFilter
   completions?: Prisma.ArticleCompletionListRelationFilter
@@ -336,6 +337,7 @@ export type UserOrderByWithRelationInput = {
   parentId?: Prisma.SortOrderInput | Prisma.SortOrder
   adminNotifications?: Prisma.AdminNotificationOrderByRelationAggregateInput
   counselorNotifications?: Prisma.CounselorNotificationOrderByRelationAggregateInput
+  parentNotifications?: Prisma.ParentNotificationOrderByRelationAggregateInput
   adminProfile?: Prisma.AdminProfileOrderByWithRelationInput
   artJournals?: Prisma.ArtJournalOrderByRelationAggregateInput
   completions?: Prisma.ArticleCompletionOrderByRelationAggregateInput
@@ -403,6 +405,7 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   parentId?: Prisma.StringNullableFilter<"User"> | string | null
   adminNotifications?: Prisma.AdminNotificationListRelationFilter
   counselorNotifications?: Prisma.CounselorNotificationListRelationFilter
+  parentNotifications?: Prisma.ParentNotificationListRelationFilter
   adminProfile?: Prisma.XOR<Prisma.AdminProfileNullableScalarRelationFilter, Prisma.AdminProfileWhereInput> | null
   artJournals?: Prisma.ArtJournalListRelationFilter
   completions?: Prisma.ArticleCompletionListRelationFilter
@@ -506,6 +509,7 @@ export type UserCreateInput = {
   studentId?: string | null
   adminNotifications?: Prisma.AdminNotificationCreateNestedManyWithoutUserInput
   counselorNotifications?: Prisma.CounselorNotificationCreateNestedManyWithoutUserInput
+  parentNotifications?: Prisma.ParentNotificationCreateNestedManyWithoutUserInput
   adminProfile?: Prisma.AdminProfileCreateNestedOneWithoutUserInput
   artJournals?: Prisma.ArtJournalCreateNestedManyWithoutUserInput
   completions?: Prisma.ArticleCompletionCreateNestedManyWithoutStudentInput
@@ -570,6 +574,7 @@ export type UserUncheckedCreateInput = {
   parentId?: string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedCreateNestedManyWithoutUserInput
   counselorNotifications?: Prisma.CounselorNotificationUncheckedCreateNestedManyWithoutUserInput
+  parentNotifications?: Prisma.ParentNotificationUncheckedCreateNestedManyWithoutUserInput
   adminProfile?: Prisma.AdminProfileUncheckedCreateNestedOneWithoutUserInput
   artJournals?: Prisma.ArtJournalUncheckedCreateNestedManyWithoutUserInput
   completions?: Prisma.ArticleCompletionUncheckedCreateNestedManyWithoutStudentInput
@@ -624,6 +629,7 @@ export type UserUpdateInput = {
   studentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUpdateManyWithoutUserNestedInput
   counselorNotifications?: Prisma.CounselorNotificationUpdateManyWithoutUserNestedInput
+  parentNotifications?: Prisma.ParentNotificationUpdateManyWithoutUserNestedInput
   adminProfile?: Prisma.AdminProfileUpdateOneWithoutUserNestedInput
   artJournals?: Prisma.ArtJournalUpdateManyWithoutUserNestedInput
   completions?: Prisma.ArticleCompletionUpdateManyWithoutStudentNestedInput
@@ -688,6 +694,7 @@ export type UserUncheckedUpdateInput = {
   parentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedUpdateManyWithoutUserNestedInput
   counselorNotifications?: Prisma.CounselorNotificationUncheckedUpdateManyWithoutUserNestedInput
+  parentNotifications?: Prisma.ParentNotificationUncheckedUpdateManyWithoutUserNestedInput
   adminProfile?: Prisma.AdminProfileUncheckedUpdateOneWithoutUserNestedInput
   artJournals?: Prisma.ArtJournalUncheckedUpdateManyWithoutUserNestedInput
   completions?: Prisma.ArticleCompletionUncheckedUpdateManyWithoutStudentNestedInput
@@ -1499,6 +1506,20 @@ export type UserUpdateOneRequiredWithoutCounselorNotificationsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutCounselorNotificationsInput, Prisma.UserUpdateWithoutCounselorNotificationsInput>, Prisma.UserUncheckedUpdateWithoutCounselorNotificationsInput>
 }
 
+export type UserCreateNestedOneWithoutParentNotificationsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutParentNotificationsInput, Prisma.UserUncheckedCreateWithoutParentNotificationsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutParentNotificationsInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutParentNotificationsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutParentNotificationsInput, Prisma.UserUncheckedCreateWithoutParentNotificationsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutParentNotificationsInput
+  upsert?: Prisma.UserUpsertWithoutParentNotificationsInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutParentNotificationsInput, Prisma.UserUpdateWithoutParentNotificationsInput>, Prisma.UserUncheckedUpdateWithoutParentNotificationsInput>
+}
+
 export type UserCreateNestedOneWithoutSessionsInput = {
   create?: Prisma.XOR<Prisma.UserCreateWithoutSessionsInput, Prisma.UserUncheckedCreateWithoutSessionsInput>
   connectOrCreate?: Prisma.UserCreateOrConnectWithoutSessionsInput
@@ -1669,6 +1690,7 @@ export type UserCreateWithoutChildrenInput = {
   studentId?: string | null
   adminNotifications?: Prisma.AdminNotificationCreateNestedManyWithoutUserInput
   counselorNotifications?: Prisma.CounselorNotificationCreateNestedManyWithoutUserInput
+  parentNotifications?: Prisma.ParentNotificationCreateNestedManyWithoutUserInput
   adminProfile?: Prisma.AdminProfileCreateNestedOneWithoutUserInput
   artJournals?: Prisma.ArtJournalCreateNestedManyWithoutUserInput
   completions?: Prisma.ArticleCompletionCreateNestedManyWithoutStudentInput
@@ -1732,6 +1754,7 @@ export type UserUncheckedCreateWithoutChildrenInput = {
   parentId?: string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedCreateNestedManyWithoutUserInput
   counselorNotifications?: Prisma.CounselorNotificationUncheckedCreateNestedManyWithoutUserInput
+  parentNotifications?: Prisma.ParentNotificationUncheckedCreateNestedManyWithoutUserInput
   adminProfile?: Prisma.AdminProfileUncheckedCreateNestedOneWithoutUserInput
   artJournals?: Prisma.ArtJournalUncheckedCreateNestedManyWithoutUserInput
   completions?: Prisma.ArticleCompletionUncheckedCreateNestedManyWithoutStudentInput
@@ -1790,6 +1813,7 @@ export type UserCreateWithoutParentInput = {
   studentId?: string | null
   adminNotifications?: Prisma.AdminNotificationCreateNestedManyWithoutUserInput
   counselorNotifications?: Prisma.CounselorNotificationCreateNestedManyWithoutUserInput
+  parentNotifications?: Prisma.ParentNotificationCreateNestedManyWithoutUserInput
   adminProfile?: Prisma.AdminProfileCreateNestedOneWithoutUserInput
   artJournals?: Prisma.ArtJournalCreateNestedManyWithoutUserInput
   completions?: Prisma.ArticleCompletionCreateNestedManyWithoutStudentInput
@@ -1852,6 +1876,7 @@ export type UserUncheckedCreateWithoutParentInput = {
   studentId?: string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedCreateNestedManyWithoutUserInput
   counselorNotifications?: Prisma.CounselorNotificationUncheckedCreateNestedManyWithoutUserInput
+  parentNotifications?: Prisma.ParentNotificationUncheckedCreateNestedManyWithoutUserInput
   adminProfile?: Prisma.AdminProfileUncheckedCreateNestedOneWithoutUserInput
   artJournals?: Prisma.ArtJournalUncheckedCreateNestedManyWithoutUserInput
   completions?: Prisma.ArticleCompletionUncheckedCreateNestedManyWithoutStudentInput
@@ -1927,6 +1952,7 @@ export type UserUpdateWithoutChildrenInput = {
   studentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUpdateManyWithoutUserNestedInput
   counselorNotifications?: Prisma.CounselorNotificationUpdateManyWithoutUserNestedInput
+  parentNotifications?: Prisma.ParentNotificationUpdateManyWithoutUserNestedInput
   adminProfile?: Prisma.AdminProfileUpdateOneWithoutUserNestedInput
   artJournals?: Prisma.ArtJournalUpdateManyWithoutUserNestedInput
   completions?: Prisma.ArticleCompletionUpdateManyWithoutStudentNestedInput
@@ -1990,6 +2016,7 @@ export type UserUncheckedUpdateWithoutChildrenInput = {
   parentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedUpdateManyWithoutUserNestedInput
   counselorNotifications?: Prisma.CounselorNotificationUncheckedUpdateManyWithoutUserNestedInput
+  parentNotifications?: Prisma.ParentNotificationUncheckedUpdateManyWithoutUserNestedInput
   adminProfile?: Prisma.AdminProfileUncheckedUpdateOneWithoutUserNestedInput
   artJournals?: Prisma.ArtJournalUncheckedUpdateManyWithoutUserNestedInput
   completions?: Prisma.ArticleCompletionUncheckedUpdateManyWithoutStudentNestedInput
@@ -2081,6 +2108,7 @@ export type UserCreateWithoutStudentProfileInput = {
   studentId?: string | null
   adminNotifications?: Prisma.AdminNotificationCreateNestedManyWithoutUserInput
   counselorNotifications?: Prisma.CounselorNotificationCreateNestedManyWithoutUserInput
+  parentNotifications?: Prisma.ParentNotificationCreateNestedManyWithoutUserInput
   adminProfile?: Prisma.AdminProfileCreateNestedOneWithoutUserInput
   artJournals?: Prisma.ArtJournalCreateNestedManyWithoutUserInput
   completions?: Prisma.ArticleCompletionCreateNestedManyWithoutStudentInput
@@ -2144,6 +2172,7 @@ export type UserUncheckedCreateWithoutStudentProfileInput = {
   parentId?: string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedCreateNestedManyWithoutUserInput
   counselorNotifications?: Prisma.CounselorNotificationUncheckedCreateNestedManyWithoutUserInput
+  parentNotifications?: Prisma.ParentNotificationUncheckedCreateNestedManyWithoutUserInput
   adminProfile?: Prisma.AdminProfileUncheckedCreateNestedOneWithoutUserInput
   artJournals?: Prisma.ArtJournalUncheckedCreateNestedManyWithoutUserInput
   completions?: Prisma.ArticleCompletionUncheckedCreateNestedManyWithoutStudentInput
@@ -2213,6 +2242,7 @@ export type UserUpdateWithoutStudentProfileInput = {
   studentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUpdateManyWithoutUserNestedInput
   counselorNotifications?: Prisma.CounselorNotificationUpdateManyWithoutUserNestedInput
+  parentNotifications?: Prisma.ParentNotificationUpdateManyWithoutUserNestedInput
   adminProfile?: Prisma.AdminProfileUpdateOneWithoutUserNestedInput
   artJournals?: Prisma.ArtJournalUpdateManyWithoutUserNestedInput
   completions?: Prisma.ArticleCompletionUpdateManyWithoutStudentNestedInput
@@ -2276,6 +2306,7 @@ export type UserUncheckedUpdateWithoutStudentProfileInput = {
   parentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedUpdateManyWithoutUserNestedInput
   counselorNotifications?: Prisma.CounselorNotificationUncheckedUpdateManyWithoutUserNestedInput
+  parentNotifications?: Prisma.ParentNotificationUncheckedUpdateManyWithoutUserNestedInput
   adminProfile?: Prisma.AdminProfileUncheckedUpdateOneWithoutUserNestedInput
   artJournals?: Prisma.ArtJournalUncheckedUpdateManyWithoutUserNestedInput
   completions?: Prisma.ArticleCompletionUncheckedUpdateManyWithoutStudentNestedInput
@@ -2329,6 +2360,7 @@ export type UserCreateWithoutAdminProfileInput = {
   studentId?: string | null
   adminNotifications?: Prisma.AdminNotificationCreateNestedManyWithoutUserInput
   counselorNotifications?: Prisma.CounselorNotificationCreateNestedManyWithoutUserInput
+  parentNotifications?: Prisma.ParentNotificationCreateNestedManyWithoutUserInput
   artJournals?: Prisma.ArtJournalCreateNestedManyWithoutUserInput
   completions?: Prisma.ArticleCompletionCreateNestedManyWithoutStudentInput
   articles?: Prisma.ArticleCreateNestedManyWithoutAdminInput
@@ -2392,6 +2424,7 @@ export type UserUncheckedCreateWithoutAdminProfileInput = {
   parentId?: string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedCreateNestedManyWithoutUserInput
   counselorNotifications?: Prisma.CounselorNotificationUncheckedCreateNestedManyWithoutUserInput
+  parentNotifications?: Prisma.ParentNotificationUncheckedCreateNestedManyWithoutUserInput
   artJournals?: Prisma.ArtJournalUncheckedCreateNestedManyWithoutUserInput
   completions?: Prisma.ArticleCompletionUncheckedCreateNestedManyWithoutStudentInput
   articles?: Prisma.ArticleUncheckedCreateNestedManyWithoutAdminInput
@@ -2461,6 +2494,7 @@ export type UserUpdateWithoutAdminProfileInput = {
   studentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUpdateManyWithoutUserNestedInput
   counselorNotifications?: Prisma.CounselorNotificationUpdateManyWithoutUserNestedInput
+  parentNotifications?: Prisma.ParentNotificationUpdateManyWithoutUserNestedInput
   artJournals?: Prisma.ArtJournalUpdateManyWithoutUserNestedInput
   completions?: Prisma.ArticleCompletionUpdateManyWithoutStudentNestedInput
   articles?: Prisma.ArticleUpdateManyWithoutAdminNestedInput
@@ -2524,6 +2558,7 @@ export type UserUncheckedUpdateWithoutAdminProfileInput = {
   parentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedUpdateManyWithoutUserNestedInput
   counselorNotifications?: Prisma.CounselorNotificationUncheckedUpdateManyWithoutUserNestedInput
+  parentNotifications?: Prisma.ParentNotificationUncheckedUpdateManyWithoutUserNestedInput
   artJournals?: Prisma.ArtJournalUncheckedUpdateManyWithoutUserNestedInput
   completions?: Prisma.ArticleCompletionUncheckedUpdateManyWithoutStudentNestedInput
   articles?: Prisma.ArticleUncheckedUpdateManyWithoutAdminNestedInput
@@ -2577,6 +2612,7 @@ export type UserCreateWithoutCounselorProfileInput = {
   studentId?: string | null
   adminNotifications?: Prisma.AdminNotificationCreateNestedManyWithoutUserInput
   counselorNotifications?: Prisma.CounselorNotificationCreateNestedManyWithoutUserInput
+  parentNotifications?: Prisma.ParentNotificationCreateNestedManyWithoutUserInput
   adminProfile?: Prisma.AdminProfileCreateNestedOneWithoutUserInput
   artJournals?: Prisma.ArtJournalCreateNestedManyWithoutUserInput
   completions?: Prisma.ArticleCompletionCreateNestedManyWithoutStudentInput
@@ -2640,6 +2676,7 @@ export type UserUncheckedCreateWithoutCounselorProfileInput = {
   parentId?: string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedCreateNestedManyWithoutUserInput
   counselorNotifications?: Prisma.CounselorNotificationUncheckedCreateNestedManyWithoutUserInput
+  parentNotifications?: Prisma.ParentNotificationUncheckedCreateNestedManyWithoutUserInput
   adminProfile?: Prisma.AdminProfileUncheckedCreateNestedOneWithoutUserInput
   artJournals?: Prisma.ArtJournalUncheckedCreateNestedManyWithoutUserInput
   completions?: Prisma.ArticleCompletionUncheckedCreateNestedManyWithoutStudentInput
@@ -2709,6 +2746,7 @@ export type UserUpdateWithoutCounselorProfileInput = {
   studentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUpdateManyWithoutUserNestedInput
   counselorNotifications?: Prisma.CounselorNotificationUpdateManyWithoutUserNestedInput
+  parentNotifications?: Prisma.ParentNotificationUpdateManyWithoutUserNestedInput
   adminProfile?: Prisma.AdminProfileUpdateOneWithoutUserNestedInput
   artJournals?: Prisma.ArtJournalUpdateManyWithoutUserNestedInput
   completions?: Prisma.ArticleCompletionUpdateManyWithoutStudentNestedInput
@@ -2772,6 +2810,7 @@ export type UserUncheckedUpdateWithoutCounselorProfileInput = {
   parentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedUpdateManyWithoutUserNestedInput
   counselorNotifications?: Prisma.CounselorNotificationUncheckedUpdateManyWithoutUserNestedInput
+  parentNotifications?: Prisma.ParentNotificationUncheckedUpdateManyWithoutUserNestedInput
   adminProfile?: Prisma.AdminProfileUncheckedUpdateOneWithoutUserNestedInput
   artJournals?: Prisma.ArtJournalUncheckedUpdateManyWithoutUserNestedInput
   completions?: Prisma.ArticleCompletionUncheckedUpdateManyWithoutStudentNestedInput
@@ -2825,6 +2864,7 @@ export type UserCreateWithoutParentProfileInput = {
   studentId?: string | null
   adminNotifications?: Prisma.AdminNotificationCreateNestedManyWithoutUserInput
   counselorNotifications?: Prisma.CounselorNotificationCreateNestedManyWithoutUserInput
+  parentNotifications?: Prisma.ParentNotificationCreateNestedManyWithoutUserInput
   adminProfile?: Prisma.AdminProfileCreateNestedOneWithoutUserInput
   artJournals?: Prisma.ArtJournalCreateNestedManyWithoutUserInput
   completions?: Prisma.ArticleCompletionCreateNestedManyWithoutStudentInput
@@ -2888,6 +2928,7 @@ export type UserUncheckedCreateWithoutParentProfileInput = {
   parentId?: string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedCreateNestedManyWithoutUserInput
   counselorNotifications?: Prisma.CounselorNotificationUncheckedCreateNestedManyWithoutUserInput
+  parentNotifications?: Prisma.ParentNotificationUncheckedCreateNestedManyWithoutUserInput
   adminProfile?: Prisma.AdminProfileUncheckedCreateNestedOneWithoutUserInput
   artJournals?: Prisma.ArtJournalUncheckedCreateNestedManyWithoutUserInput
   completions?: Prisma.ArticleCompletionUncheckedCreateNestedManyWithoutStudentInput
@@ -2957,6 +2998,7 @@ export type UserUpdateWithoutParentProfileInput = {
   studentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUpdateManyWithoutUserNestedInput
   counselorNotifications?: Prisma.CounselorNotificationUpdateManyWithoutUserNestedInput
+  parentNotifications?: Prisma.ParentNotificationUpdateManyWithoutUserNestedInput
   adminProfile?: Prisma.AdminProfileUpdateOneWithoutUserNestedInput
   artJournals?: Prisma.ArtJournalUpdateManyWithoutUserNestedInput
   completions?: Prisma.ArticleCompletionUpdateManyWithoutStudentNestedInput
@@ -3020,6 +3062,7 @@ export type UserUncheckedUpdateWithoutParentProfileInput = {
   parentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedUpdateManyWithoutUserNestedInput
   counselorNotifications?: Prisma.CounselorNotificationUncheckedUpdateManyWithoutUserNestedInput
+  parentNotifications?: Prisma.ParentNotificationUncheckedUpdateManyWithoutUserNestedInput
   adminProfile?: Prisma.AdminProfileUncheckedUpdateOneWithoutUserNestedInput
   artJournals?: Prisma.ArtJournalUncheckedUpdateManyWithoutUserNestedInput
   completions?: Prisma.ArticleCompletionUncheckedUpdateManyWithoutStudentNestedInput
@@ -3073,6 +3116,7 @@ export type UserCreateWithoutCounselorParentMeetingsInput = {
   studentId?: string | null
   adminNotifications?: Prisma.AdminNotificationCreateNestedManyWithoutUserInput
   counselorNotifications?: Prisma.CounselorNotificationCreateNestedManyWithoutUserInput
+  parentNotifications?: Prisma.ParentNotificationCreateNestedManyWithoutUserInput
   adminProfile?: Prisma.AdminProfileCreateNestedOneWithoutUserInput
   artJournals?: Prisma.ArtJournalCreateNestedManyWithoutUserInput
   completions?: Prisma.ArticleCompletionCreateNestedManyWithoutStudentInput
@@ -3136,6 +3180,7 @@ export type UserUncheckedCreateWithoutCounselorParentMeetingsInput = {
   parentId?: string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedCreateNestedManyWithoutUserInput
   counselorNotifications?: Prisma.CounselorNotificationUncheckedCreateNestedManyWithoutUserInput
+  parentNotifications?: Prisma.ParentNotificationUncheckedCreateNestedManyWithoutUserInput
   adminProfile?: Prisma.AdminProfileUncheckedCreateNestedOneWithoutUserInput
   artJournals?: Prisma.ArtJournalUncheckedCreateNestedManyWithoutUserInput
   completions?: Prisma.ArticleCompletionUncheckedCreateNestedManyWithoutStudentInput
@@ -3194,6 +3239,7 @@ export type UserCreateWithoutStudentParentMeetingsInput = {
   studentId?: string | null
   adminNotifications?: Prisma.AdminNotificationCreateNestedManyWithoutUserInput
   counselorNotifications?: Prisma.CounselorNotificationCreateNestedManyWithoutUserInput
+  parentNotifications?: Prisma.ParentNotificationCreateNestedManyWithoutUserInput
   adminProfile?: Prisma.AdminProfileCreateNestedOneWithoutUserInput
   artJournals?: Prisma.ArtJournalCreateNestedManyWithoutUserInput
   completions?: Prisma.ArticleCompletionCreateNestedManyWithoutStudentInput
@@ -3257,6 +3303,7 @@ export type UserUncheckedCreateWithoutStudentParentMeetingsInput = {
   parentId?: string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedCreateNestedManyWithoutUserInput
   counselorNotifications?: Prisma.CounselorNotificationUncheckedCreateNestedManyWithoutUserInput
+  parentNotifications?: Prisma.ParentNotificationUncheckedCreateNestedManyWithoutUserInput
   adminProfile?: Prisma.AdminProfileUncheckedCreateNestedOneWithoutUserInput
   artJournals?: Prisma.ArtJournalUncheckedCreateNestedManyWithoutUserInput
   completions?: Prisma.ArticleCompletionUncheckedCreateNestedManyWithoutStudentInput
@@ -3326,6 +3373,7 @@ export type UserUpdateWithoutCounselorParentMeetingsInput = {
   studentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUpdateManyWithoutUserNestedInput
   counselorNotifications?: Prisma.CounselorNotificationUpdateManyWithoutUserNestedInput
+  parentNotifications?: Prisma.ParentNotificationUpdateManyWithoutUserNestedInput
   adminProfile?: Prisma.AdminProfileUpdateOneWithoutUserNestedInput
   artJournals?: Prisma.ArtJournalUpdateManyWithoutUserNestedInput
   completions?: Prisma.ArticleCompletionUpdateManyWithoutStudentNestedInput
@@ -3389,6 +3437,7 @@ export type UserUncheckedUpdateWithoutCounselorParentMeetingsInput = {
   parentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedUpdateManyWithoutUserNestedInput
   counselorNotifications?: Prisma.CounselorNotificationUncheckedUpdateManyWithoutUserNestedInput
+  parentNotifications?: Prisma.ParentNotificationUncheckedUpdateManyWithoutUserNestedInput
   adminProfile?: Prisma.AdminProfileUncheckedUpdateOneWithoutUserNestedInput
   artJournals?: Prisma.ArtJournalUncheckedUpdateManyWithoutUserNestedInput
   completions?: Prisma.ArticleCompletionUncheckedUpdateManyWithoutStudentNestedInput
@@ -3453,6 +3502,7 @@ export type UserUpdateWithoutStudentParentMeetingsInput = {
   studentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUpdateManyWithoutUserNestedInput
   counselorNotifications?: Prisma.CounselorNotificationUpdateManyWithoutUserNestedInput
+  parentNotifications?: Prisma.ParentNotificationUpdateManyWithoutUserNestedInput
   adminProfile?: Prisma.AdminProfileUpdateOneWithoutUserNestedInput
   artJournals?: Prisma.ArtJournalUpdateManyWithoutUserNestedInput
   completions?: Prisma.ArticleCompletionUpdateManyWithoutStudentNestedInput
@@ -3516,6 +3566,7 @@ export type UserUncheckedUpdateWithoutStudentParentMeetingsInput = {
   parentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedUpdateManyWithoutUserNestedInput
   counselorNotifications?: Prisma.CounselorNotificationUncheckedUpdateManyWithoutUserNestedInput
+  parentNotifications?: Prisma.ParentNotificationUncheckedUpdateManyWithoutUserNestedInput
   adminProfile?: Prisma.AdminProfileUncheckedUpdateOneWithoutUserNestedInput
   artJournals?: Prisma.ArtJournalUncheckedUpdateManyWithoutUserNestedInput
   completions?: Prisma.ArticleCompletionUncheckedUpdateManyWithoutStudentNestedInput
@@ -3569,6 +3620,7 @@ export type UserCreateWithoutSchoolInput = {
   studentId?: string | null
   adminNotifications?: Prisma.AdminNotificationCreateNestedManyWithoutUserInput
   counselorNotifications?: Prisma.CounselorNotificationCreateNestedManyWithoutUserInput
+  parentNotifications?: Prisma.ParentNotificationCreateNestedManyWithoutUserInput
   adminProfile?: Prisma.AdminProfileCreateNestedOneWithoutUserInput
   artJournals?: Prisma.ArtJournalCreateNestedManyWithoutUserInput
   completions?: Prisma.ArticleCompletionCreateNestedManyWithoutStudentInput
@@ -3631,6 +3683,7 @@ export type UserUncheckedCreateWithoutSchoolInput = {
   parentId?: string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedCreateNestedManyWithoutUserInput
   counselorNotifications?: Prisma.CounselorNotificationUncheckedCreateNestedManyWithoutUserInput
+  parentNotifications?: Prisma.ParentNotificationUncheckedCreateNestedManyWithoutUserInput
   adminProfile?: Prisma.AdminProfileUncheckedCreateNestedOneWithoutUserInput
   artJournals?: Prisma.ArtJournalUncheckedCreateNestedManyWithoutUserInput
   completions?: Prisma.ArticleCompletionUncheckedCreateNestedManyWithoutStudentInput
@@ -3711,6 +3764,7 @@ export type UserCreateWithoutLocationInput = {
   studentId?: string | null
   adminNotifications?: Prisma.AdminNotificationCreateNestedManyWithoutUserInput
   counselorNotifications?: Prisma.CounselorNotificationCreateNestedManyWithoutUserInput
+  parentNotifications?: Prisma.ParentNotificationCreateNestedManyWithoutUserInput
   adminProfile?: Prisma.AdminProfileCreateNestedOneWithoutUserInput
   artJournals?: Prisma.ArtJournalCreateNestedManyWithoutUserInput
   completions?: Prisma.ArticleCompletionCreateNestedManyWithoutStudentInput
@@ -3773,6 +3827,7 @@ export type UserUncheckedCreateWithoutLocationInput = {
   parentId?: string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedCreateNestedManyWithoutUserInput
   counselorNotifications?: Prisma.CounselorNotificationUncheckedCreateNestedManyWithoutUserInput
+  parentNotifications?: Prisma.ParentNotificationUncheckedCreateNestedManyWithoutUserInput
   adminProfile?: Prisma.AdminProfileUncheckedCreateNestedOneWithoutUserInput
   artJournals?: Prisma.ArtJournalUncheckedCreateNestedManyWithoutUserInput
   completions?: Prisma.ArticleCompletionUncheckedCreateNestedManyWithoutStudentInput
@@ -3853,6 +3908,7 @@ export type UserCreateWithoutClassRefInput = {
   studentId?: string | null
   adminNotifications?: Prisma.AdminNotificationCreateNestedManyWithoutUserInput
   counselorNotifications?: Prisma.CounselorNotificationCreateNestedManyWithoutUserInput
+  parentNotifications?: Prisma.ParentNotificationCreateNestedManyWithoutUserInput
   adminProfile?: Prisma.AdminProfileCreateNestedOneWithoutUserInput
   artJournals?: Prisma.ArtJournalCreateNestedManyWithoutUserInput
   completions?: Prisma.ArticleCompletionCreateNestedManyWithoutStudentInput
@@ -3915,6 +3971,7 @@ export type UserUncheckedCreateWithoutClassRefInput = {
   parentId?: string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedCreateNestedManyWithoutUserInput
   counselorNotifications?: Prisma.CounselorNotificationUncheckedCreateNestedManyWithoutUserInput
+  parentNotifications?: Prisma.ParentNotificationUncheckedCreateNestedManyWithoutUserInput
   adminProfile?: Prisma.AdminProfileUncheckedCreateNestedOneWithoutUserInput
   artJournals?: Prisma.ArtJournalUncheckedCreateNestedManyWithoutUserInput
   completions?: Prisma.ArticleCompletionUncheckedCreateNestedManyWithoutStudentInput
@@ -3995,6 +4052,7 @@ export type UserCreateWithoutRoleInput = {
   studentId?: string | null
   adminNotifications?: Prisma.AdminNotificationCreateNestedManyWithoutUserInput
   counselorNotifications?: Prisma.CounselorNotificationCreateNestedManyWithoutUserInput
+  parentNotifications?: Prisma.ParentNotificationCreateNestedManyWithoutUserInput
   adminProfile?: Prisma.AdminProfileCreateNestedOneWithoutUserInput
   artJournals?: Prisma.ArtJournalCreateNestedManyWithoutUserInput
   completions?: Prisma.ArticleCompletionCreateNestedManyWithoutStudentInput
@@ -4057,6 +4115,7 @@ export type UserUncheckedCreateWithoutRoleInput = {
   parentId?: string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedCreateNestedManyWithoutUserInput
   counselorNotifications?: Prisma.CounselorNotificationUncheckedCreateNestedManyWithoutUserInput
+  parentNotifications?: Prisma.ParentNotificationUncheckedCreateNestedManyWithoutUserInput
   adminProfile?: Prisma.AdminProfileUncheckedCreateNestedOneWithoutUserInput
   artJournals?: Prisma.ArtJournalUncheckedCreateNestedManyWithoutUserInput
   completions?: Prisma.ArticleCompletionUncheckedCreateNestedManyWithoutStudentInput
@@ -4137,6 +4196,7 @@ export type UserCreateWithoutChatSessionsInput = {
   studentId?: string | null
   adminNotifications?: Prisma.AdminNotificationCreateNestedManyWithoutUserInput
   counselorNotifications?: Prisma.CounselorNotificationCreateNestedManyWithoutUserInput
+  parentNotifications?: Prisma.ParentNotificationCreateNestedManyWithoutUserInput
   adminProfile?: Prisma.AdminProfileCreateNestedOneWithoutUserInput
   artJournals?: Prisma.ArtJournalCreateNestedManyWithoutUserInput
   completions?: Prisma.ArticleCompletionCreateNestedManyWithoutStudentInput
@@ -4200,6 +4260,7 @@ export type UserUncheckedCreateWithoutChatSessionsInput = {
   parentId?: string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedCreateNestedManyWithoutUserInput
   counselorNotifications?: Prisma.CounselorNotificationUncheckedCreateNestedManyWithoutUserInput
+  parentNotifications?: Prisma.ParentNotificationUncheckedCreateNestedManyWithoutUserInput
   adminProfile?: Prisma.AdminProfileUncheckedCreateNestedOneWithoutUserInput
   artJournals?: Prisma.ArtJournalUncheckedCreateNestedManyWithoutUserInput
   completions?: Prisma.ArticleCompletionUncheckedCreateNestedManyWithoutStudentInput
@@ -4269,6 +4330,7 @@ export type UserUpdateWithoutChatSessionsInput = {
   studentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUpdateManyWithoutUserNestedInput
   counselorNotifications?: Prisma.CounselorNotificationUpdateManyWithoutUserNestedInput
+  parentNotifications?: Prisma.ParentNotificationUpdateManyWithoutUserNestedInput
   adminProfile?: Prisma.AdminProfileUpdateOneWithoutUserNestedInput
   artJournals?: Prisma.ArtJournalUpdateManyWithoutUserNestedInput
   completions?: Prisma.ArticleCompletionUpdateManyWithoutStudentNestedInput
@@ -4332,6 +4394,7 @@ export type UserUncheckedUpdateWithoutChatSessionsInput = {
   parentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedUpdateManyWithoutUserNestedInput
   counselorNotifications?: Prisma.CounselorNotificationUncheckedUpdateManyWithoutUserNestedInput
+  parentNotifications?: Prisma.ParentNotificationUncheckedUpdateManyWithoutUserNestedInput
   adminProfile?: Prisma.AdminProfileUncheckedUpdateOneWithoutUserNestedInput
   artJournals?: Prisma.ArtJournalUncheckedUpdateManyWithoutUserNestedInput
   completions?: Prisma.ArticleCompletionUncheckedUpdateManyWithoutStudentNestedInput
@@ -4385,6 +4448,7 @@ export type UserCreateWithoutMoodCheckinsInput = {
   studentId?: string | null
   adminNotifications?: Prisma.AdminNotificationCreateNestedManyWithoutUserInput
   counselorNotifications?: Prisma.CounselorNotificationCreateNestedManyWithoutUserInput
+  parentNotifications?: Prisma.ParentNotificationCreateNestedManyWithoutUserInput
   adminProfile?: Prisma.AdminProfileCreateNestedOneWithoutUserInput
   artJournals?: Prisma.ArtJournalCreateNestedManyWithoutUserInput
   completions?: Prisma.ArticleCompletionCreateNestedManyWithoutStudentInput
@@ -4448,6 +4512,7 @@ export type UserUncheckedCreateWithoutMoodCheckinsInput = {
   parentId?: string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedCreateNestedManyWithoutUserInput
   counselorNotifications?: Prisma.CounselorNotificationUncheckedCreateNestedManyWithoutUserInput
+  parentNotifications?: Prisma.ParentNotificationUncheckedCreateNestedManyWithoutUserInput
   adminProfile?: Prisma.AdminProfileUncheckedCreateNestedOneWithoutUserInput
   artJournals?: Prisma.ArtJournalUncheckedCreateNestedManyWithoutUserInput
   completions?: Prisma.ArticleCompletionUncheckedCreateNestedManyWithoutStudentInput
@@ -4517,6 +4582,7 @@ export type UserUpdateWithoutMoodCheckinsInput = {
   studentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUpdateManyWithoutUserNestedInput
   counselorNotifications?: Prisma.CounselorNotificationUpdateManyWithoutUserNestedInput
+  parentNotifications?: Prisma.ParentNotificationUpdateManyWithoutUserNestedInput
   adminProfile?: Prisma.AdminProfileUpdateOneWithoutUserNestedInput
   artJournals?: Prisma.ArtJournalUpdateManyWithoutUserNestedInput
   completions?: Prisma.ArticleCompletionUpdateManyWithoutStudentNestedInput
@@ -4580,6 +4646,7 @@ export type UserUncheckedUpdateWithoutMoodCheckinsInput = {
   parentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedUpdateManyWithoutUserNestedInput
   counselorNotifications?: Prisma.CounselorNotificationUncheckedUpdateManyWithoutUserNestedInput
+  parentNotifications?: Prisma.ParentNotificationUncheckedUpdateManyWithoutUserNestedInput
   adminProfile?: Prisma.AdminProfileUncheckedUpdateOneWithoutUserNestedInput
   artJournals?: Prisma.ArtJournalUncheckedUpdateManyWithoutUserNestedInput
   completions?: Prisma.ArticleCompletionUncheckedUpdateManyWithoutStudentNestedInput
@@ -4633,6 +4700,7 @@ export type UserCreateWithoutTriggerSelectionsInput = {
   studentId?: string | null
   adminNotifications?: Prisma.AdminNotificationCreateNestedManyWithoutUserInput
   counselorNotifications?: Prisma.CounselorNotificationCreateNestedManyWithoutUserInput
+  parentNotifications?: Prisma.ParentNotificationCreateNestedManyWithoutUserInput
   adminProfile?: Prisma.AdminProfileCreateNestedOneWithoutUserInput
   artJournals?: Prisma.ArtJournalCreateNestedManyWithoutUserInput
   completions?: Prisma.ArticleCompletionCreateNestedManyWithoutStudentInput
@@ -4696,6 +4764,7 @@ export type UserUncheckedCreateWithoutTriggerSelectionsInput = {
   parentId?: string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedCreateNestedManyWithoutUserInput
   counselorNotifications?: Prisma.CounselorNotificationUncheckedCreateNestedManyWithoutUserInput
+  parentNotifications?: Prisma.ParentNotificationUncheckedCreateNestedManyWithoutUserInput
   adminProfile?: Prisma.AdminProfileUncheckedCreateNestedOneWithoutUserInput
   artJournals?: Prisma.ArtJournalUncheckedCreateNestedManyWithoutUserInput
   completions?: Prisma.ArticleCompletionUncheckedCreateNestedManyWithoutStudentInput
@@ -4765,6 +4834,7 @@ export type UserUpdateWithoutTriggerSelectionsInput = {
   studentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUpdateManyWithoutUserNestedInput
   counselorNotifications?: Prisma.CounselorNotificationUpdateManyWithoutUserNestedInput
+  parentNotifications?: Prisma.ParentNotificationUpdateManyWithoutUserNestedInput
   adminProfile?: Prisma.AdminProfileUpdateOneWithoutUserNestedInput
   artJournals?: Prisma.ArtJournalUpdateManyWithoutUserNestedInput
   completions?: Prisma.ArticleCompletionUpdateManyWithoutStudentNestedInput
@@ -4828,6 +4898,7 @@ export type UserUncheckedUpdateWithoutTriggerSelectionsInput = {
   parentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedUpdateManyWithoutUserNestedInput
   counselorNotifications?: Prisma.CounselorNotificationUncheckedUpdateManyWithoutUserNestedInput
+  parentNotifications?: Prisma.ParentNotificationUncheckedUpdateManyWithoutUserNestedInput
   adminProfile?: Prisma.AdminProfileUncheckedUpdateOneWithoutUserNestedInput
   artJournals?: Prisma.ArtJournalUncheckedUpdateManyWithoutUserNestedInput
   completions?: Prisma.ArticleCompletionUncheckedUpdateManyWithoutStudentNestedInput
@@ -4881,6 +4952,7 @@ export type UserCreateWithoutSummariesInput = {
   studentId?: string | null
   adminNotifications?: Prisma.AdminNotificationCreateNestedManyWithoutUserInput
   counselorNotifications?: Prisma.CounselorNotificationCreateNestedManyWithoutUserInput
+  parentNotifications?: Prisma.ParentNotificationCreateNestedManyWithoutUserInput
   adminProfile?: Prisma.AdminProfileCreateNestedOneWithoutUserInput
   artJournals?: Prisma.ArtJournalCreateNestedManyWithoutUserInput
   completions?: Prisma.ArticleCompletionCreateNestedManyWithoutStudentInput
@@ -4944,6 +5016,7 @@ export type UserUncheckedCreateWithoutSummariesInput = {
   parentId?: string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedCreateNestedManyWithoutUserInput
   counselorNotifications?: Prisma.CounselorNotificationUncheckedCreateNestedManyWithoutUserInput
+  parentNotifications?: Prisma.ParentNotificationUncheckedCreateNestedManyWithoutUserInput
   adminProfile?: Prisma.AdminProfileUncheckedCreateNestedOneWithoutUserInput
   artJournals?: Prisma.ArtJournalUncheckedCreateNestedManyWithoutUserInput
   completions?: Prisma.ArticleCompletionUncheckedCreateNestedManyWithoutStudentInput
@@ -5013,6 +5086,7 @@ export type UserUpdateWithoutSummariesInput = {
   studentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUpdateManyWithoutUserNestedInput
   counselorNotifications?: Prisma.CounselorNotificationUpdateManyWithoutUserNestedInput
+  parentNotifications?: Prisma.ParentNotificationUpdateManyWithoutUserNestedInput
   adminProfile?: Prisma.AdminProfileUpdateOneWithoutUserNestedInput
   artJournals?: Prisma.ArtJournalUpdateManyWithoutUserNestedInput
   completions?: Prisma.ArticleCompletionUpdateManyWithoutStudentNestedInput
@@ -5076,6 +5150,7 @@ export type UserUncheckedUpdateWithoutSummariesInput = {
   parentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedUpdateManyWithoutUserNestedInput
   counselorNotifications?: Prisma.CounselorNotificationUncheckedUpdateManyWithoutUserNestedInput
+  parentNotifications?: Prisma.ParentNotificationUncheckedUpdateManyWithoutUserNestedInput
   adminProfile?: Prisma.AdminProfileUncheckedUpdateOneWithoutUserNestedInput
   artJournals?: Prisma.ArtJournalUncheckedUpdateManyWithoutUserNestedInput
   completions?: Prisma.ArticleCompletionUncheckedUpdateManyWithoutStudentNestedInput
@@ -5129,6 +5204,7 @@ export type UserCreateWithoutWritingJournalsInput = {
   studentId?: string | null
   adminNotifications?: Prisma.AdminNotificationCreateNestedManyWithoutUserInput
   counselorNotifications?: Prisma.CounselorNotificationCreateNestedManyWithoutUserInput
+  parentNotifications?: Prisma.ParentNotificationCreateNestedManyWithoutUserInput
   adminProfile?: Prisma.AdminProfileCreateNestedOneWithoutUserInput
   artJournals?: Prisma.ArtJournalCreateNestedManyWithoutUserInput
   completions?: Prisma.ArticleCompletionCreateNestedManyWithoutStudentInput
@@ -5192,6 +5268,7 @@ export type UserUncheckedCreateWithoutWritingJournalsInput = {
   parentId?: string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedCreateNestedManyWithoutUserInput
   counselorNotifications?: Prisma.CounselorNotificationUncheckedCreateNestedManyWithoutUserInput
+  parentNotifications?: Prisma.ParentNotificationUncheckedCreateNestedManyWithoutUserInput
   adminProfile?: Prisma.AdminProfileUncheckedCreateNestedOneWithoutUserInput
   artJournals?: Prisma.ArtJournalUncheckedCreateNestedManyWithoutUserInput
   completions?: Prisma.ArticleCompletionUncheckedCreateNestedManyWithoutStudentInput
@@ -5261,6 +5338,7 @@ export type UserUpdateWithoutWritingJournalsInput = {
   studentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUpdateManyWithoutUserNestedInput
   counselorNotifications?: Prisma.CounselorNotificationUpdateManyWithoutUserNestedInput
+  parentNotifications?: Prisma.ParentNotificationUpdateManyWithoutUserNestedInput
   adminProfile?: Prisma.AdminProfileUpdateOneWithoutUserNestedInput
   artJournals?: Prisma.ArtJournalUpdateManyWithoutUserNestedInput
   completions?: Prisma.ArticleCompletionUpdateManyWithoutStudentNestedInput
@@ -5324,6 +5402,7 @@ export type UserUncheckedUpdateWithoutWritingJournalsInput = {
   parentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedUpdateManyWithoutUserNestedInput
   counselorNotifications?: Prisma.CounselorNotificationUncheckedUpdateManyWithoutUserNestedInput
+  parentNotifications?: Prisma.ParentNotificationUncheckedUpdateManyWithoutUserNestedInput
   adminProfile?: Prisma.AdminProfileUncheckedUpdateOneWithoutUserNestedInput
   artJournals?: Prisma.ArtJournalUncheckedUpdateManyWithoutUserNestedInput
   completions?: Prisma.ArticleCompletionUncheckedUpdateManyWithoutStudentNestedInput
@@ -5377,6 +5456,7 @@ export type UserCreateWithoutAudioJournalsInput = {
   studentId?: string | null
   adminNotifications?: Prisma.AdminNotificationCreateNestedManyWithoutUserInput
   counselorNotifications?: Prisma.CounselorNotificationCreateNestedManyWithoutUserInput
+  parentNotifications?: Prisma.ParentNotificationCreateNestedManyWithoutUserInput
   adminProfile?: Prisma.AdminProfileCreateNestedOneWithoutUserInput
   artJournals?: Prisma.ArtJournalCreateNestedManyWithoutUserInput
   completions?: Prisma.ArticleCompletionCreateNestedManyWithoutStudentInput
@@ -5440,6 +5520,7 @@ export type UserUncheckedCreateWithoutAudioJournalsInput = {
   parentId?: string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedCreateNestedManyWithoutUserInput
   counselorNotifications?: Prisma.CounselorNotificationUncheckedCreateNestedManyWithoutUserInput
+  parentNotifications?: Prisma.ParentNotificationUncheckedCreateNestedManyWithoutUserInput
   adminProfile?: Prisma.AdminProfileUncheckedCreateNestedOneWithoutUserInput
   artJournals?: Prisma.ArtJournalUncheckedCreateNestedManyWithoutUserInput
   completions?: Prisma.ArticleCompletionUncheckedCreateNestedManyWithoutStudentInput
@@ -5509,6 +5590,7 @@ export type UserUpdateWithoutAudioJournalsInput = {
   studentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUpdateManyWithoutUserNestedInput
   counselorNotifications?: Prisma.CounselorNotificationUpdateManyWithoutUserNestedInput
+  parentNotifications?: Prisma.ParentNotificationUpdateManyWithoutUserNestedInput
   adminProfile?: Prisma.AdminProfileUpdateOneWithoutUserNestedInput
   artJournals?: Prisma.ArtJournalUpdateManyWithoutUserNestedInput
   completions?: Prisma.ArticleCompletionUpdateManyWithoutStudentNestedInput
@@ -5572,6 +5654,7 @@ export type UserUncheckedUpdateWithoutAudioJournalsInput = {
   parentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedUpdateManyWithoutUserNestedInput
   counselorNotifications?: Prisma.CounselorNotificationUncheckedUpdateManyWithoutUserNestedInput
+  parentNotifications?: Prisma.ParentNotificationUncheckedUpdateManyWithoutUserNestedInput
   adminProfile?: Prisma.AdminProfileUncheckedUpdateOneWithoutUserNestedInput
   artJournals?: Prisma.ArtJournalUncheckedUpdateManyWithoutUserNestedInput
   completions?: Prisma.ArticleCompletionUncheckedUpdateManyWithoutStudentNestedInput
@@ -5625,6 +5708,7 @@ export type UserCreateWithoutArtJournalsInput = {
   studentId?: string | null
   adminNotifications?: Prisma.AdminNotificationCreateNestedManyWithoutUserInput
   counselorNotifications?: Prisma.CounselorNotificationCreateNestedManyWithoutUserInput
+  parentNotifications?: Prisma.ParentNotificationCreateNestedManyWithoutUserInput
   adminProfile?: Prisma.AdminProfileCreateNestedOneWithoutUserInput
   completions?: Prisma.ArticleCompletionCreateNestedManyWithoutStudentInput
   articles?: Prisma.ArticleCreateNestedManyWithoutAdminInput
@@ -5688,6 +5772,7 @@ export type UserUncheckedCreateWithoutArtJournalsInput = {
   parentId?: string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedCreateNestedManyWithoutUserInput
   counselorNotifications?: Prisma.CounselorNotificationUncheckedCreateNestedManyWithoutUserInput
+  parentNotifications?: Prisma.ParentNotificationUncheckedCreateNestedManyWithoutUserInput
   adminProfile?: Prisma.AdminProfileUncheckedCreateNestedOneWithoutUserInput
   completions?: Prisma.ArticleCompletionUncheckedCreateNestedManyWithoutStudentInput
   articles?: Prisma.ArticleUncheckedCreateNestedManyWithoutAdminInput
@@ -5757,6 +5842,7 @@ export type UserUpdateWithoutArtJournalsInput = {
   studentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUpdateManyWithoutUserNestedInput
   counselorNotifications?: Prisma.CounselorNotificationUpdateManyWithoutUserNestedInput
+  parentNotifications?: Prisma.ParentNotificationUpdateManyWithoutUserNestedInput
   adminProfile?: Prisma.AdminProfileUpdateOneWithoutUserNestedInput
   completions?: Prisma.ArticleCompletionUpdateManyWithoutStudentNestedInput
   articles?: Prisma.ArticleUpdateManyWithoutAdminNestedInput
@@ -5820,6 +5906,7 @@ export type UserUncheckedUpdateWithoutArtJournalsInput = {
   parentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedUpdateManyWithoutUserNestedInput
   counselorNotifications?: Prisma.CounselorNotificationUncheckedUpdateManyWithoutUserNestedInput
+  parentNotifications?: Prisma.ParentNotificationUncheckedUpdateManyWithoutUserNestedInput
   adminProfile?: Prisma.AdminProfileUncheckedUpdateOneWithoutUserNestedInput
   completions?: Prisma.ArticleCompletionUncheckedUpdateManyWithoutStudentNestedInput
   articles?: Prisma.ArticleUncheckedUpdateManyWithoutAdminNestedInput
@@ -5873,6 +5960,7 @@ export type UserCreateWithoutMusicTherapyInput = {
   studentId?: string | null
   adminNotifications?: Prisma.AdminNotificationCreateNestedManyWithoutUserInput
   counselorNotifications?: Prisma.CounselorNotificationCreateNestedManyWithoutUserInput
+  parentNotifications?: Prisma.ParentNotificationCreateNestedManyWithoutUserInput
   adminProfile?: Prisma.AdminProfileCreateNestedOneWithoutUserInput
   artJournals?: Prisma.ArtJournalCreateNestedManyWithoutUserInput
   completions?: Prisma.ArticleCompletionCreateNestedManyWithoutStudentInput
@@ -5936,6 +6024,7 @@ export type UserUncheckedCreateWithoutMusicTherapyInput = {
   parentId?: string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedCreateNestedManyWithoutUserInput
   counselorNotifications?: Prisma.CounselorNotificationUncheckedCreateNestedManyWithoutUserInput
+  parentNotifications?: Prisma.ParentNotificationUncheckedCreateNestedManyWithoutUserInput
   adminProfile?: Prisma.AdminProfileUncheckedCreateNestedOneWithoutUserInput
   artJournals?: Prisma.ArtJournalUncheckedCreateNestedManyWithoutUserInput
   completions?: Prisma.ArticleCompletionUncheckedCreateNestedManyWithoutStudentInput
@@ -6005,6 +6094,7 @@ export type UserUpdateWithoutMusicTherapyInput = {
   studentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUpdateManyWithoutUserNestedInput
   counselorNotifications?: Prisma.CounselorNotificationUpdateManyWithoutUserNestedInput
+  parentNotifications?: Prisma.ParentNotificationUpdateManyWithoutUserNestedInput
   adminProfile?: Prisma.AdminProfileUpdateOneWithoutUserNestedInput
   artJournals?: Prisma.ArtJournalUpdateManyWithoutUserNestedInput
   completions?: Prisma.ArticleCompletionUpdateManyWithoutStudentNestedInput
@@ -6068,6 +6158,7 @@ export type UserUncheckedUpdateWithoutMusicTherapyInput = {
   parentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedUpdateManyWithoutUserNestedInput
   counselorNotifications?: Prisma.CounselorNotificationUncheckedUpdateManyWithoutUserNestedInput
+  parentNotifications?: Prisma.ParentNotificationUncheckedUpdateManyWithoutUserNestedInput
   adminProfile?: Prisma.AdminProfileUncheckedUpdateOneWithoutUserNestedInput
   artJournals?: Prisma.ArtJournalUncheckedUpdateManyWithoutUserNestedInput
   completions?: Prisma.ArticleCompletionUncheckedUpdateManyWithoutStudentNestedInput
@@ -6121,6 +6212,7 @@ export type UserCreateWithoutMeditationsInput = {
   studentId?: string | null
   adminNotifications?: Prisma.AdminNotificationCreateNestedManyWithoutUserInput
   counselorNotifications?: Prisma.CounselorNotificationCreateNestedManyWithoutUserInput
+  parentNotifications?: Prisma.ParentNotificationCreateNestedManyWithoutUserInput
   adminProfile?: Prisma.AdminProfileCreateNestedOneWithoutUserInput
   artJournals?: Prisma.ArtJournalCreateNestedManyWithoutUserInput
   completions?: Prisma.ArticleCompletionCreateNestedManyWithoutStudentInput
@@ -6184,6 +6276,7 @@ export type UserUncheckedCreateWithoutMeditationsInput = {
   parentId?: string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedCreateNestedManyWithoutUserInput
   counselorNotifications?: Prisma.CounselorNotificationUncheckedCreateNestedManyWithoutUserInput
+  parentNotifications?: Prisma.ParentNotificationUncheckedCreateNestedManyWithoutUserInput
   adminProfile?: Prisma.AdminProfileUncheckedCreateNestedOneWithoutUserInput
   artJournals?: Prisma.ArtJournalUncheckedCreateNestedManyWithoutUserInput
   completions?: Prisma.ArticleCompletionUncheckedCreateNestedManyWithoutStudentInput
@@ -6253,6 +6346,7 @@ export type UserUpdateWithoutMeditationsInput = {
   studentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUpdateManyWithoutUserNestedInput
   counselorNotifications?: Prisma.CounselorNotificationUpdateManyWithoutUserNestedInput
+  parentNotifications?: Prisma.ParentNotificationUpdateManyWithoutUserNestedInput
   adminProfile?: Prisma.AdminProfileUpdateOneWithoutUserNestedInput
   artJournals?: Prisma.ArtJournalUpdateManyWithoutUserNestedInput
   completions?: Prisma.ArticleCompletionUpdateManyWithoutStudentNestedInput
@@ -6316,6 +6410,7 @@ export type UserUncheckedUpdateWithoutMeditationsInput = {
   parentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedUpdateManyWithoutUserNestedInput
   counselorNotifications?: Prisma.CounselorNotificationUncheckedUpdateManyWithoutUserNestedInput
+  parentNotifications?: Prisma.ParentNotificationUncheckedUpdateManyWithoutUserNestedInput
   adminProfile?: Prisma.AdminProfileUncheckedUpdateOneWithoutUserNestedInput
   artJournals?: Prisma.ArtJournalUncheckedUpdateManyWithoutUserNestedInput
   completions?: Prisma.ArticleCompletionUncheckedUpdateManyWithoutStudentNestedInput
@@ -6369,6 +6464,7 @@ export type UserCreateWithoutMusicInstructionsInput = {
   studentId?: string | null
   adminNotifications?: Prisma.AdminNotificationCreateNestedManyWithoutUserInput
   counselorNotifications?: Prisma.CounselorNotificationCreateNestedManyWithoutUserInput
+  parentNotifications?: Prisma.ParentNotificationCreateNestedManyWithoutUserInput
   adminProfile?: Prisma.AdminProfileCreateNestedOneWithoutUserInput
   artJournals?: Prisma.ArtJournalCreateNestedManyWithoutUserInput
   completions?: Prisma.ArticleCompletionCreateNestedManyWithoutStudentInput
@@ -6432,6 +6528,7 @@ export type UserUncheckedCreateWithoutMusicInstructionsInput = {
   parentId?: string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedCreateNestedManyWithoutUserInput
   counselorNotifications?: Prisma.CounselorNotificationUncheckedCreateNestedManyWithoutUserInput
+  parentNotifications?: Prisma.ParentNotificationUncheckedCreateNestedManyWithoutUserInput
   adminProfile?: Prisma.AdminProfileUncheckedCreateNestedOneWithoutUserInput
   artJournals?: Prisma.ArtJournalUncheckedCreateNestedManyWithoutUserInput
   completions?: Prisma.ArticleCompletionUncheckedCreateNestedManyWithoutStudentInput
@@ -6501,6 +6598,7 @@ export type UserUpdateWithoutMusicInstructionsInput = {
   studentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUpdateManyWithoutUserNestedInput
   counselorNotifications?: Prisma.CounselorNotificationUpdateManyWithoutUserNestedInput
+  parentNotifications?: Prisma.ParentNotificationUpdateManyWithoutUserNestedInput
   adminProfile?: Prisma.AdminProfileUpdateOneWithoutUserNestedInput
   artJournals?: Prisma.ArtJournalUpdateManyWithoutUserNestedInput
   completions?: Prisma.ArticleCompletionUpdateManyWithoutStudentNestedInput
@@ -6564,6 +6662,7 @@ export type UserUncheckedUpdateWithoutMusicInstructionsInput = {
   parentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedUpdateManyWithoutUserNestedInput
   counselorNotifications?: Prisma.CounselorNotificationUncheckedUpdateManyWithoutUserNestedInput
+  parentNotifications?: Prisma.ParentNotificationUncheckedUpdateManyWithoutUserNestedInput
   adminProfile?: Prisma.AdminProfileUncheckedUpdateOneWithoutUserNestedInput
   artJournals?: Prisma.ArtJournalUncheckedUpdateManyWithoutUserNestedInput
   completions?: Prisma.ArticleCompletionUncheckedUpdateManyWithoutStudentNestedInput
@@ -6617,6 +6716,7 @@ export type UserCreateWithoutMeditationInstructionsInput = {
   studentId?: string | null
   adminNotifications?: Prisma.AdminNotificationCreateNestedManyWithoutUserInput
   counselorNotifications?: Prisma.CounselorNotificationCreateNestedManyWithoutUserInput
+  parentNotifications?: Prisma.ParentNotificationCreateNestedManyWithoutUserInput
   adminProfile?: Prisma.AdminProfileCreateNestedOneWithoutUserInput
   artJournals?: Prisma.ArtJournalCreateNestedManyWithoutUserInput
   completions?: Prisma.ArticleCompletionCreateNestedManyWithoutStudentInput
@@ -6680,6 +6780,7 @@ export type UserUncheckedCreateWithoutMeditationInstructionsInput = {
   parentId?: string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedCreateNestedManyWithoutUserInput
   counselorNotifications?: Prisma.CounselorNotificationUncheckedCreateNestedManyWithoutUserInput
+  parentNotifications?: Prisma.ParentNotificationUncheckedCreateNestedManyWithoutUserInput
   adminProfile?: Prisma.AdminProfileUncheckedCreateNestedOneWithoutUserInput
   artJournals?: Prisma.ArtJournalUncheckedCreateNestedManyWithoutUserInput
   completions?: Prisma.ArticleCompletionUncheckedCreateNestedManyWithoutStudentInput
@@ -6749,6 +6850,7 @@ export type UserUpdateWithoutMeditationInstructionsInput = {
   studentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUpdateManyWithoutUserNestedInput
   counselorNotifications?: Prisma.CounselorNotificationUpdateManyWithoutUserNestedInput
+  parentNotifications?: Prisma.ParentNotificationUpdateManyWithoutUserNestedInput
   adminProfile?: Prisma.AdminProfileUpdateOneWithoutUserNestedInput
   artJournals?: Prisma.ArtJournalUpdateManyWithoutUserNestedInput
   completions?: Prisma.ArticleCompletionUpdateManyWithoutStudentNestedInput
@@ -6812,6 +6914,7 @@ export type UserUncheckedUpdateWithoutMeditationInstructionsInput = {
   parentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedUpdateManyWithoutUserNestedInput
   counselorNotifications?: Prisma.CounselorNotificationUncheckedUpdateManyWithoutUserNestedInput
+  parentNotifications?: Prisma.ParentNotificationUncheckedUpdateManyWithoutUserNestedInput
   adminProfile?: Prisma.AdminProfileUncheckedUpdateOneWithoutUserNestedInput
   artJournals?: Prisma.ArtJournalUncheckedUpdateManyWithoutUserNestedInput
   completions?: Prisma.ArticleCompletionUncheckedUpdateManyWithoutStudentNestedInput
@@ -6865,6 +6968,7 @@ export type UserCreateWithoutArticlesInput = {
   studentId?: string | null
   adminNotifications?: Prisma.AdminNotificationCreateNestedManyWithoutUserInput
   counselorNotifications?: Prisma.CounselorNotificationCreateNestedManyWithoutUserInput
+  parentNotifications?: Prisma.ParentNotificationCreateNestedManyWithoutUserInput
   adminProfile?: Prisma.AdminProfileCreateNestedOneWithoutUserInput
   artJournals?: Prisma.ArtJournalCreateNestedManyWithoutUserInput
   completions?: Prisma.ArticleCompletionCreateNestedManyWithoutStudentInput
@@ -6928,6 +7032,7 @@ export type UserUncheckedCreateWithoutArticlesInput = {
   parentId?: string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedCreateNestedManyWithoutUserInput
   counselorNotifications?: Prisma.CounselorNotificationUncheckedCreateNestedManyWithoutUserInput
+  parentNotifications?: Prisma.ParentNotificationUncheckedCreateNestedManyWithoutUserInput
   adminProfile?: Prisma.AdminProfileUncheckedCreateNestedOneWithoutUserInput
   artJournals?: Prisma.ArtJournalUncheckedCreateNestedManyWithoutUserInput
   completions?: Prisma.ArticleCompletionUncheckedCreateNestedManyWithoutStudentInput
@@ -6997,6 +7102,7 @@ export type UserUpdateWithoutArticlesInput = {
   studentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUpdateManyWithoutUserNestedInput
   counselorNotifications?: Prisma.CounselorNotificationUpdateManyWithoutUserNestedInput
+  parentNotifications?: Prisma.ParentNotificationUpdateManyWithoutUserNestedInput
   adminProfile?: Prisma.AdminProfileUpdateOneWithoutUserNestedInput
   artJournals?: Prisma.ArtJournalUpdateManyWithoutUserNestedInput
   completions?: Prisma.ArticleCompletionUpdateManyWithoutStudentNestedInput
@@ -7060,6 +7166,7 @@ export type UserUncheckedUpdateWithoutArticlesInput = {
   parentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedUpdateManyWithoutUserNestedInput
   counselorNotifications?: Prisma.CounselorNotificationUncheckedUpdateManyWithoutUserNestedInput
+  parentNotifications?: Prisma.ParentNotificationUncheckedUpdateManyWithoutUserNestedInput
   adminProfile?: Prisma.AdminProfileUncheckedUpdateOneWithoutUserNestedInput
   artJournals?: Prisma.ArtJournalUncheckedUpdateManyWithoutUserNestedInput
   completions?: Prisma.ArticleCompletionUncheckedUpdateManyWithoutStudentNestedInput
@@ -7113,6 +7220,7 @@ export type UserCreateWithoutRatingsInput = {
   studentId?: string | null
   adminNotifications?: Prisma.AdminNotificationCreateNestedManyWithoutUserInput
   counselorNotifications?: Prisma.CounselorNotificationCreateNestedManyWithoutUserInput
+  parentNotifications?: Prisma.ParentNotificationCreateNestedManyWithoutUserInput
   adminProfile?: Prisma.AdminProfileCreateNestedOneWithoutUserInput
   artJournals?: Prisma.ArtJournalCreateNestedManyWithoutUserInput
   completions?: Prisma.ArticleCompletionCreateNestedManyWithoutStudentInput
@@ -7176,6 +7284,7 @@ export type UserUncheckedCreateWithoutRatingsInput = {
   parentId?: string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedCreateNestedManyWithoutUserInput
   counselorNotifications?: Prisma.CounselorNotificationUncheckedCreateNestedManyWithoutUserInput
+  parentNotifications?: Prisma.ParentNotificationUncheckedCreateNestedManyWithoutUserInput
   adminProfile?: Prisma.AdminProfileUncheckedCreateNestedOneWithoutUserInput
   artJournals?: Prisma.ArtJournalUncheckedCreateNestedManyWithoutUserInput
   completions?: Prisma.ArticleCompletionUncheckedCreateNestedManyWithoutStudentInput
@@ -7245,6 +7354,7 @@ export type UserUpdateWithoutRatingsInput = {
   studentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUpdateManyWithoutUserNestedInput
   counselorNotifications?: Prisma.CounselorNotificationUpdateManyWithoutUserNestedInput
+  parentNotifications?: Prisma.ParentNotificationUpdateManyWithoutUserNestedInput
   adminProfile?: Prisma.AdminProfileUpdateOneWithoutUserNestedInput
   artJournals?: Prisma.ArtJournalUpdateManyWithoutUserNestedInput
   completions?: Prisma.ArticleCompletionUpdateManyWithoutStudentNestedInput
@@ -7308,6 +7418,7 @@ export type UserUncheckedUpdateWithoutRatingsInput = {
   parentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedUpdateManyWithoutUserNestedInput
   counselorNotifications?: Prisma.CounselorNotificationUncheckedUpdateManyWithoutUserNestedInput
+  parentNotifications?: Prisma.ParentNotificationUncheckedUpdateManyWithoutUserNestedInput
   adminProfile?: Prisma.AdminProfileUncheckedUpdateOneWithoutUserNestedInput
   artJournals?: Prisma.ArtJournalUncheckedUpdateManyWithoutUserNestedInput
   completions?: Prisma.ArticleCompletionUncheckedUpdateManyWithoutStudentNestedInput
@@ -7361,6 +7472,7 @@ export type UserCreateWithoutSavedArticlesInput = {
   studentId?: string | null
   adminNotifications?: Prisma.AdminNotificationCreateNestedManyWithoutUserInput
   counselorNotifications?: Prisma.CounselorNotificationCreateNestedManyWithoutUserInput
+  parentNotifications?: Prisma.ParentNotificationCreateNestedManyWithoutUserInput
   adminProfile?: Prisma.AdminProfileCreateNestedOneWithoutUserInput
   artJournals?: Prisma.ArtJournalCreateNestedManyWithoutUserInput
   completions?: Prisma.ArticleCompletionCreateNestedManyWithoutStudentInput
@@ -7424,6 +7536,7 @@ export type UserUncheckedCreateWithoutSavedArticlesInput = {
   parentId?: string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedCreateNestedManyWithoutUserInput
   counselorNotifications?: Prisma.CounselorNotificationUncheckedCreateNestedManyWithoutUserInput
+  parentNotifications?: Prisma.ParentNotificationUncheckedCreateNestedManyWithoutUserInput
   adminProfile?: Prisma.AdminProfileUncheckedCreateNestedOneWithoutUserInput
   artJournals?: Prisma.ArtJournalUncheckedCreateNestedManyWithoutUserInput
   completions?: Prisma.ArticleCompletionUncheckedCreateNestedManyWithoutStudentInput
@@ -7493,6 +7606,7 @@ export type UserUpdateWithoutSavedArticlesInput = {
   studentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUpdateManyWithoutUserNestedInput
   counselorNotifications?: Prisma.CounselorNotificationUpdateManyWithoutUserNestedInput
+  parentNotifications?: Prisma.ParentNotificationUpdateManyWithoutUserNestedInput
   adminProfile?: Prisma.AdminProfileUpdateOneWithoutUserNestedInput
   artJournals?: Prisma.ArtJournalUpdateManyWithoutUserNestedInput
   completions?: Prisma.ArticleCompletionUpdateManyWithoutStudentNestedInput
@@ -7556,6 +7670,7 @@ export type UserUncheckedUpdateWithoutSavedArticlesInput = {
   parentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedUpdateManyWithoutUserNestedInput
   counselorNotifications?: Prisma.CounselorNotificationUncheckedUpdateManyWithoutUserNestedInput
+  parentNotifications?: Prisma.ParentNotificationUncheckedUpdateManyWithoutUserNestedInput
   adminProfile?: Prisma.AdminProfileUncheckedUpdateOneWithoutUserNestedInput
   artJournals?: Prisma.ArtJournalUncheckedUpdateManyWithoutUserNestedInput
   completions?: Prisma.ArticleCompletionUncheckedUpdateManyWithoutStudentNestedInput
@@ -7609,6 +7724,7 @@ export type UserCreateWithoutCompletionsInput = {
   studentId?: string | null
   adminNotifications?: Prisma.AdminNotificationCreateNestedManyWithoutUserInput
   counselorNotifications?: Prisma.CounselorNotificationCreateNestedManyWithoutUserInput
+  parentNotifications?: Prisma.ParentNotificationCreateNestedManyWithoutUserInput
   adminProfile?: Prisma.AdminProfileCreateNestedOneWithoutUserInput
   artJournals?: Prisma.ArtJournalCreateNestedManyWithoutUserInput
   articles?: Prisma.ArticleCreateNestedManyWithoutAdminInput
@@ -7672,6 +7788,7 @@ export type UserUncheckedCreateWithoutCompletionsInput = {
   parentId?: string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedCreateNestedManyWithoutUserInput
   counselorNotifications?: Prisma.CounselorNotificationUncheckedCreateNestedManyWithoutUserInput
+  parentNotifications?: Prisma.ParentNotificationUncheckedCreateNestedManyWithoutUserInput
   adminProfile?: Prisma.AdminProfileUncheckedCreateNestedOneWithoutUserInput
   artJournals?: Prisma.ArtJournalUncheckedCreateNestedManyWithoutUserInput
   articles?: Prisma.ArticleUncheckedCreateNestedManyWithoutAdminInput
@@ -7741,6 +7858,7 @@ export type UserUpdateWithoutCompletionsInput = {
   studentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUpdateManyWithoutUserNestedInput
   counselorNotifications?: Prisma.CounselorNotificationUpdateManyWithoutUserNestedInput
+  parentNotifications?: Prisma.ParentNotificationUpdateManyWithoutUserNestedInput
   adminProfile?: Prisma.AdminProfileUpdateOneWithoutUserNestedInput
   artJournals?: Prisma.ArtJournalUpdateManyWithoutUserNestedInput
   articles?: Prisma.ArticleUpdateManyWithoutAdminNestedInput
@@ -7804,6 +7922,7 @@ export type UserUncheckedUpdateWithoutCompletionsInput = {
   parentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedUpdateManyWithoutUserNestedInput
   counselorNotifications?: Prisma.CounselorNotificationUncheckedUpdateManyWithoutUserNestedInput
+  parentNotifications?: Prisma.ParentNotificationUncheckedUpdateManyWithoutUserNestedInput
   adminProfile?: Prisma.AdminProfileUncheckedUpdateOneWithoutUserNestedInput
   artJournals?: Prisma.ArtJournalUncheckedUpdateManyWithoutUserNestedInput
   articles?: Prisma.ArticleUncheckedUpdateManyWithoutAdminNestedInput
@@ -7857,6 +7976,7 @@ export type UserCreateWithoutDailyLoginsInput = {
   studentId?: string | null
   adminNotifications?: Prisma.AdminNotificationCreateNestedManyWithoutUserInput
   counselorNotifications?: Prisma.CounselorNotificationCreateNestedManyWithoutUserInput
+  parentNotifications?: Prisma.ParentNotificationCreateNestedManyWithoutUserInput
   adminProfile?: Prisma.AdminProfileCreateNestedOneWithoutUserInput
   artJournals?: Prisma.ArtJournalCreateNestedManyWithoutUserInput
   completions?: Prisma.ArticleCompletionCreateNestedManyWithoutStudentInput
@@ -7920,6 +8040,7 @@ export type UserUncheckedCreateWithoutDailyLoginsInput = {
   parentId?: string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedCreateNestedManyWithoutUserInput
   counselorNotifications?: Prisma.CounselorNotificationUncheckedCreateNestedManyWithoutUserInput
+  parentNotifications?: Prisma.ParentNotificationUncheckedCreateNestedManyWithoutUserInput
   adminProfile?: Prisma.AdminProfileUncheckedCreateNestedOneWithoutUserInput
   artJournals?: Prisma.ArtJournalUncheckedCreateNestedManyWithoutUserInput
   completions?: Prisma.ArticleCompletionUncheckedCreateNestedManyWithoutStudentInput
@@ -7989,6 +8110,7 @@ export type UserUpdateWithoutDailyLoginsInput = {
   studentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUpdateManyWithoutUserNestedInput
   counselorNotifications?: Prisma.CounselorNotificationUpdateManyWithoutUserNestedInput
+  parentNotifications?: Prisma.ParentNotificationUpdateManyWithoutUserNestedInput
   adminProfile?: Prisma.AdminProfileUpdateOneWithoutUserNestedInput
   artJournals?: Prisma.ArtJournalUpdateManyWithoutUserNestedInput
   completions?: Prisma.ArticleCompletionUpdateManyWithoutStudentNestedInput
@@ -8052,6 +8174,7 @@ export type UserUncheckedUpdateWithoutDailyLoginsInput = {
   parentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedUpdateManyWithoutUserNestedInput
   counselorNotifications?: Prisma.CounselorNotificationUncheckedUpdateManyWithoutUserNestedInput
+  parentNotifications?: Prisma.ParentNotificationUncheckedUpdateManyWithoutUserNestedInput
   adminProfile?: Prisma.AdminProfileUncheckedUpdateOneWithoutUserNestedInput
   artJournals?: Prisma.ArtJournalUncheckedUpdateManyWithoutUserNestedInput
   completions?: Prisma.ArticleCompletionUncheckedUpdateManyWithoutStudentNestedInput
@@ -8105,6 +8228,7 @@ export type UserCreateWithoutResourceAccessInput = {
   studentId?: string | null
   adminNotifications?: Prisma.AdminNotificationCreateNestedManyWithoutUserInput
   counselorNotifications?: Prisma.CounselorNotificationCreateNestedManyWithoutUserInput
+  parentNotifications?: Prisma.ParentNotificationCreateNestedManyWithoutUserInput
   adminProfile?: Prisma.AdminProfileCreateNestedOneWithoutUserInput
   artJournals?: Prisma.ArtJournalCreateNestedManyWithoutUserInput
   completions?: Prisma.ArticleCompletionCreateNestedManyWithoutStudentInput
@@ -8168,6 +8292,7 @@ export type UserUncheckedCreateWithoutResourceAccessInput = {
   parentId?: string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedCreateNestedManyWithoutUserInput
   counselorNotifications?: Prisma.CounselorNotificationUncheckedCreateNestedManyWithoutUserInput
+  parentNotifications?: Prisma.ParentNotificationUncheckedCreateNestedManyWithoutUserInput
   adminProfile?: Prisma.AdminProfileUncheckedCreateNestedOneWithoutUserInput
   artJournals?: Prisma.ArtJournalUncheckedCreateNestedManyWithoutUserInput
   completions?: Prisma.ArticleCompletionUncheckedCreateNestedManyWithoutStudentInput
@@ -8237,6 +8362,7 @@ export type UserUpdateWithoutResourceAccessInput = {
   studentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUpdateManyWithoutUserNestedInput
   counselorNotifications?: Prisma.CounselorNotificationUpdateManyWithoutUserNestedInput
+  parentNotifications?: Prisma.ParentNotificationUpdateManyWithoutUserNestedInput
   adminProfile?: Prisma.AdminProfileUpdateOneWithoutUserNestedInput
   artJournals?: Prisma.ArtJournalUpdateManyWithoutUserNestedInput
   completions?: Prisma.ArticleCompletionUpdateManyWithoutStudentNestedInput
@@ -8300,6 +8426,7 @@ export type UserUncheckedUpdateWithoutResourceAccessInput = {
   parentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedUpdateManyWithoutUserNestedInput
   counselorNotifications?: Prisma.CounselorNotificationUncheckedUpdateManyWithoutUserNestedInput
+  parentNotifications?: Prisma.ParentNotificationUncheckedUpdateManyWithoutUserNestedInput
   adminProfile?: Prisma.AdminProfileUncheckedUpdateOneWithoutUserNestedInput
   artJournals?: Prisma.ArtJournalUncheckedUpdateManyWithoutUserNestedInput
   completions?: Prisma.ArticleCompletionUncheckedUpdateManyWithoutStudentNestedInput
@@ -8353,6 +8480,7 @@ export type UserCreateWithoutStreaksInput = {
   studentId?: string | null
   adminNotifications?: Prisma.AdminNotificationCreateNestedManyWithoutUserInput
   counselorNotifications?: Prisma.CounselorNotificationCreateNestedManyWithoutUserInput
+  parentNotifications?: Prisma.ParentNotificationCreateNestedManyWithoutUserInput
   adminProfile?: Prisma.AdminProfileCreateNestedOneWithoutUserInput
   artJournals?: Prisma.ArtJournalCreateNestedManyWithoutUserInput
   completions?: Prisma.ArticleCompletionCreateNestedManyWithoutStudentInput
@@ -8416,6 +8544,7 @@ export type UserUncheckedCreateWithoutStreaksInput = {
   parentId?: string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedCreateNestedManyWithoutUserInput
   counselorNotifications?: Prisma.CounselorNotificationUncheckedCreateNestedManyWithoutUserInput
+  parentNotifications?: Prisma.ParentNotificationUncheckedCreateNestedManyWithoutUserInput
   adminProfile?: Prisma.AdminProfileUncheckedCreateNestedOneWithoutUserInput
   artJournals?: Prisma.ArtJournalUncheckedCreateNestedManyWithoutUserInput
   completions?: Prisma.ArticleCompletionUncheckedCreateNestedManyWithoutStudentInput
@@ -8485,6 +8614,7 @@ export type UserUpdateWithoutStreaksInput = {
   studentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUpdateManyWithoutUserNestedInput
   counselorNotifications?: Prisma.CounselorNotificationUpdateManyWithoutUserNestedInput
+  parentNotifications?: Prisma.ParentNotificationUpdateManyWithoutUserNestedInput
   adminProfile?: Prisma.AdminProfileUpdateOneWithoutUserNestedInput
   artJournals?: Prisma.ArtJournalUpdateManyWithoutUserNestedInput
   completions?: Prisma.ArticleCompletionUpdateManyWithoutStudentNestedInput
@@ -8548,6 +8678,7 @@ export type UserUncheckedUpdateWithoutStreaksInput = {
   parentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedUpdateManyWithoutUserNestedInput
   counselorNotifications?: Prisma.CounselorNotificationUncheckedUpdateManyWithoutUserNestedInput
+  parentNotifications?: Prisma.ParentNotificationUncheckedUpdateManyWithoutUserNestedInput
   adminProfile?: Prisma.AdminProfileUncheckedUpdateOneWithoutUserNestedInput
   artJournals?: Prisma.ArtJournalUncheckedUpdateManyWithoutUserNestedInput
   completions?: Prisma.ArticleCompletionUncheckedUpdateManyWithoutStudentNestedInput
@@ -8601,6 +8732,7 @@ export type UserCreateWithoutHighRiskAlertsInput = {
   studentId?: string | null
   adminNotifications?: Prisma.AdminNotificationCreateNestedManyWithoutUserInput
   counselorNotifications?: Prisma.CounselorNotificationCreateNestedManyWithoutUserInput
+  parentNotifications?: Prisma.ParentNotificationCreateNestedManyWithoutUserInput
   adminProfile?: Prisma.AdminProfileCreateNestedOneWithoutUserInput
   artJournals?: Prisma.ArtJournalCreateNestedManyWithoutUserInput
   completions?: Prisma.ArticleCompletionCreateNestedManyWithoutStudentInput
@@ -8664,6 +8796,7 @@ export type UserUncheckedCreateWithoutHighRiskAlertsInput = {
   parentId?: string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedCreateNestedManyWithoutUserInput
   counselorNotifications?: Prisma.CounselorNotificationUncheckedCreateNestedManyWithoutUserInput
+  parentNotifications?: Prisma.ParentNotificationUncheckedCreateNestedManyWithoutUserInput
   adminProfile?: Prisma.AdminProfileUncheckedCreateNestedOneWithoutUserInput
   artJournals?: Prisma.ArtJournalUncheckedCreateNestedManyWithoutUserInput
   completions?: Prisma.ArticleCompletionUncheckedCreateNestedManyWithoutStudentInput
@@ -8733,6 +8866,7 @@ export type UserUpdateWithoutHighRiskAlertsInput = {
   studentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUpdateManyWithoutUserNestedInput
   counselorNotifications?: Prisma.CounselorNotificationUpdateManyWithoutUserNestedInput
+  parentNotifications?: Prisma.ParentNotificationUpdateManyWithoutUserNestedInput
   adminProfile?: Prisma.AdminProfileUpdateOneWithoutUserNestedInput
   artJournals?: Prisma.ArtJournalUpdateManyWithoutUserNestedInput
   completions?: Prisma.ArticleCompletionUpdateManyWithoutStudentNestedInput
@@ -8796,6 +8930,7 @@ export type UserUncheckedUpdateWithoutHighRiskAlertsInput = {
   parentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedUpdateManyWithoutUserNestedInput
   counselorNotifications?: Prisma.CounselorNotificationUncheckedUpdateManyWithoutUserNestedInput
+  parentNotifications?: Prisma.ParentNotificationUncheckedUpdateManyWithoutUserNestedInput
   adminProfile?: Prisma.AdminProfileUncheckedUpdateOneWithoutUserNestedInput
   artJournals?: Prisma.ArtJournalUncheckedUpdateManyWithoutUserNestedInput
   completions?: Prisma.ArticleCompletionUncheckedUpdateManyWithoutStudentNestedInput
@@ -8849,6 +8984,7 @@ export type UserCreateWithoutEscalationAlertsInput = {
   studentId?: string | null
   adminNotifications?: Prisma.AdminNotificationCreateNestedManyWithoutUserInput
   counselorNotifications?: Prisma.CounselorNotificationCreateNestedManyWithoutUserInput
+  parentNotifications?: Prisma.ParentNotificationCreateNestedManyWithoutUserInput
   adminProfile?: Prisma.AdminProfileCreateNestedOneWithoutUserInput
   artJournals?: Prisma.ArtJournalCreateNestedManyWithoutUserInput
   completions?: Prisma.ArticleCompletionCreateNestedManyWithoutStudentInput
@@ -8912,6 +9048,7 @@ export type UserUncheckedCreateWithoutEscalationAlertsInput = {
   parentId?: string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedCreateNestedManyWithoutUserInput
   counselorNotifications?: Prisma.CounselorNotificationUncheckedCreateNestedManyWithoutUserInput
+  parentNotifications?: Prisma.ParentNotificationUncheckedCreateNestedManyWithoutUserInput
   adminProfile?: Prisma.AdminProfileUncheckedCreateNestedOneWithoutUserInput
   artJournals?: Prisma.ArtJournalUncheckedCreateNestedManyWithoutUserInput
   completions?: Prisma.ArticleCompletionUncheckedCreateNestedManyWithoutStudentInput
@@ -8981,6 +9118,7 @@ export type UserUpdateWithoutEscalationAlertsInput = {
   studentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUpdateManyWithoutUserNestedInput
   counselorNotifications?: Prisma.CounselorNotificationUpdateManyWithoutUserNestedInput
+  parentNotifications?: Prisma.ParentNotificationUpdateManyWithoutUserNestedInput
   adminProfile?: Prisma.AdminProfileUpdateOneWithoutUserNestedInput
   artJournals?: Prisma.ArtJournalUpdateManyWithoutUserNestedInput
   completions?: Prisma.ArticleCompletionUpdateManyWithoutStudentNestedInput
@@ -9044,6 +9182,7 @@ export type UserUncheckedUpdateWithoutEscalationAlertsInput = {
   parentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedUpdateManyWithoutUserNestedInput
   counselorNotifications?: Prisma.CounselorNotificationUncheckedUpdateManyWithoutUserNestedInput
+  parentNotifications?: Prisma.ParentNotificationUncheckedUpdateManyWithoutUserNestedInput
   adminProfile?: Prisma.AdminProfileUncheckedUpdateOneWithoutUserNestedInput
   artJournals?: Prisma.ArtJournalUncheckedUpdateManyWithoutUserNestedInput
   completions?: Prisma.ArticleCompletionUncheckedUpdateManyWithoutStudentNestedInput
@@ -9096,6 +9235,7 @@ export type UserCreateWithoutAdminNotificationsInput = {
   status?: string
   studentId?: string | null
   counselorNotifications?: Prisma.CounselorNotificationCreateNestedManyWithoutUserInput
+  parentNotifications?: Prisma.ParentNotificationCreateNestedManyWithoutUserInput
   adminProfile?: Prisma.AdminProfileCreateNestedOneWithoutUserInput
   artJournals?: Prisma.ArtJournalCreateNestedManyWithoutUserInput
   completions?: Prisma.ArticleCompletionCreateNestedManyWithoutStudentInput
@@ -9159,6 +9299,7 @@ export type UserUncheckedCreateWithoutAdminNotificationsInput = {
   studentId?: string | null
   parentId?: string | null
   counselorNotifications?: Prisma.CounselorNotificationUncheckedCreateNestedManyWithoutUserInput
+  parentNotifications?: Prisma.ParentNotificationUncheckedCreateNestedManyWithoutUserInput
   adminProfile?: Prisma.AdminProfileUncheckedCreateNestedOneWithoutUserInput
   artJournals?: Prisma.ArtJournalUncheckedCreateNestedManyWithoutUserInput
   completions?: Prisma.ArticleCompletionUncheckedCreateNestedManyWithoutStudentInput
@@ -9228,6 +9369,7 @@ export type UserUpdateWithoutAdminNotificationsInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
   studentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   counselorNotifications?: Prisma.CounselorNotificationUpdateManyWithoutUserNestedInput
+  parentNotifications?: Prisma.ParentNotificationUpdateManyWithoutUserNestedInput
   adminProfile?: Prisma.AdminProfileUpdateOneWithoutUserNestedInput
   artJournals?: Prisma.ArtJournalUpdateManyWithoutUserNestedInput
   completions?: Prisma.ArticleCompletionUpdateManyWithoutStudentNestedInput
@@ -9291,6 +9433,7 @@ export type UserUncheckedUpdateWithoutAdminNotificationsInput = {
   studentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   parentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   counselorNotifications?: Prisma.CounselorNotificationUncheckedUpdateManyWithoutUserNestedInput
+  parentNotifications?: Prisma.ParentNotificationUncheckedUpdateManyWithoutUserNestedInput
   adminProfile?: Prisma.AdminProfileUncheckedUpdateOneWithoutUserNestedInput
   artJournals?: Prisma.ArtJournalUncheckedUpdateManyWithoutUserNestedInput
   completions?: Prisma.ArticleCompletionUncheckedUpdateManyWithoutStudentNestedInput
@@ -9344,6 +9487,7 @@ export type UserCreateWithoutCounselorNotificationsInput = {
   status?: string
   studentId?: string | null
   adminNotifications?: Prisma.AdminNotificationCreateNestedManyWithoutUserInput
+  parentNotifications?: Prisma.ParentNotificationCreateNestedManyWithoutUserInput
   adminProfile?: Prisma.AdminProfileCreateNestedOneWithoutUserInput
   artJournals?: Prisma.ArtJournalCreateNestedManyWithoutUserInput
   completions?: Prisma.ArticleCompletionCreateNestedManyWithoutStudentInput
@@ -9407,6 +9551,7 @@ export type UserUncheckedCreateWithoutCounselorNotificationsInput = {
   studentId?: string | null
   parentId?: string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedCreateNestedManyWithoutUserInput
+  parentNotifications?: Prisma.ParentNotificationUncheckedCreateNestedManyWithoutUserInput
   adminProfile?: Prisma.AdminProfileUncheckedCreateNestedOneWithoutUserInput
   artJournals?: Prisma.ArtJournalUncheckedCreateNestedManyWithoutUserInput
   completions?: Prisma.ArticleCompletionUncheckedCreateNestedManyWithoutStudentInput
@@ -9476,6 +9621,7 @@ export type UserUpdateWithoutCounselorNotificationsInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
   studentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUpdateManyWithoutUserNestedInput
+  parentNotifications?: Prisma.ParentNotificationUpdateManyWithoutUserNestedInput
   adminProfile?: Prisma.AdminProfileUpdateOneWithoutUserNestedInput
   artJournals?: Prisma.ArtJournalUpdateManyWithoutUserNestedInput
   completions?: Prisma.ArticleCompletionUpdateManyWithoutStudentNestedInput
@@ -9539,6 +9685,259 @@ export type UserUncheckedUpdateWithoutCounselorNotificationsInput = {
   studentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   parentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedUpdateManyWithoutUserNestedInput
+  parentNotifications?: Prisma.ParentNotificationUncheckedUpdateManyWithoutUserNestedInput
+  adminProfile?: Prisma.AdminProfileUncheckedUpdateOneWithoutUserNestedInput
+  artJournals?: Prisma.ArtJournalUncheckedUpdateManyWithoutUserNestedInput
+  completions?: Prisma.ArticleCompletionUncheckedUpdateManyWithoutStudentNestedInput
+  articles?: Prisma.ArticleUncheckedUpdateManyWithoutAdminNestedInput
+  audioJournals?: Prisma.AudioJournalUncheckedUpdateManyWithoutUserNestedInput
+  createdBadges?: Prisma.BadgeUncheckedUpdateManyWithoutAdminNestedInput
+  challengeAssignments?: Prisma.ChallengeAssignmentUncheckedUpdateManyWithoutAssignerNestedInput
+  challengeTargetAssignments?: Prisma.ChallengeAssignmentUncheckedUpdateManyWithoutTargetUserNestedInput
+  createdChallenges?: Prisma.ChallengeUncheckedUpdateManyWithoutCreatorNestedInput
+  chatSessions?: Prisma.ChatSessionUncheckedUpdateManyWithoutUserNestedInput
+  counselorCounselingSessions?: Prisma.CounselingSessionUncheckedUpdateManyWithoutCounselorNestedInput
+  studentCounselingSessions?: Prisma.CounselingSessionUncheckedUpdateManyWithoutStudentNestedInput
+  counselorAssignments?: Prisma.CounselorAssignmentUncheckedUpdateManyWithoutCounselorNestedInput
+  studentAssignments?: Prisma.CounselorAssignmentUncheckedUpdateManyWithoutStudentNestedInput
+  counselorProfile?: Prisma.CounselorProfileUncheckedUpdateOneWithoutUserNestedInput
+  dailyLogins?: Prisma.DailyLoginUncheckedUpdateManyWithoutUserNestedInput
+  escalationAlerts?: Prisma.EscalationAlertUncheckedUpdateManyWithoutUserNestedInput
+  highRiskAlerts?: Prisma.HighRiskAlertUncheckedUpdateManyWithoutUserNestedInput
+  meditations?: Prisma.MeditationUncheckedUpdateManyWithoutAdminNestedInput
+  meditationInstructions?: Prisma.MeditationListeningInstructionUncheckedUpdateManyWithoutCreatorNestedInput
+  moodCheckins?: Prisma.MoodCheckinUncheckedUpdateManyWithoutUserNestedInput
+  musicInstructions?: Prisma.MusicInstructionUncheckedUpdateManyWithoutCreatorNestedInput
+  musicTherapy?: Prisma.MusicTherapyUncheckedUpdateManyWithoutAdminNestedInput
+  counselorParentMeetings?: Prisma.ParentMeetingUncheckedUpdateManyWithoutCounselorNestedInput
+  studentParentMeetings?: Prisma.ParentMeetingUncheckedUpdateManyWithoutStudentNestedInput
+  parentProfile?: Prisma.ParentProfileUncheckedUpdateOneWithoutUserNestedInput
+  ratings?: Prisma.RatingUncheckedUpdateManyWithoutStudentNestedInput
+  resourceAccess?: Prisma.ResourceAccessUncheckedUpdateManyWithoutUserNestedInput
+  savedArticles?: Prisma.SavedArticleUncheckedUpdateManyWithoutStudentNestedInput
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  streaks?: Prisma.StreakUncheckedUpdateOneWithoutUserNestedInput
+  studentProfile?: Prisma.StudentProfileUncheckedUpdateOneWithoutUserNestedInput
+  summaries?: Prisma.SummaryUncheckedUpdateManyWithoutUserNestedInput
+  triggerSelections?: Prisma.TriggerSelectionUncheckedUpdateManyWithoutUserNestedInput
+  userBadges?: Prisma.UserBadgeUncheckedUpdateManyWithoutUserNestedInput
+  userChallenges?: Prisma.UserChallengeUncheckedUpdateManyWithoutUserNestedInput
+  children?: Prisma.UserUncheckedUpdateManyWithoutParentNestedInput
+  writingJournals?: Prisma.WritingJournalUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserCreateWithoutParentNotificationsInput = {
+  id?: string
+  firstName: string
+  lastName: string
+  email: string
+  phone?: string | null
+  password?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  emailVerified?: boolean
+  status?: string
+  studentId?: string | null
+  adminNotifications?: Prisma.AdminNotificationCreateNestedManyWithoutUserInput
+  counselorNotifications?: Prisma.CounselorNotificationCreateNestedManyWithoutUserInput
+  adminProfile?: Prisma.AdminProfileCreateNestedOneWithoutUserInput
+  artJournals?: Prisma.ArtJournalCreateNestedManyWithoutUserInput
+  completions?: Prisma.ArticleCompletionCreateNestedManyWithoutStudentInput
+  articles?: Prisma.ArticleCreateNestedManyWithoutAdminInput
+  audioJournals?: Prisma.AudioJournalCreateNestedManyWithoutUserInput
+  createdBadges?: Prisma.BadgeCreateNestedManyWithoutAdminInput
+  challengeAssignments?: Prisma.ChallengeAssignmentCreateNestedManyWithoutAssignerInput
+  challengeTargetAssignments?: Prisma.ChallengeAssignmentCreateNestedManyWithoutTargetUserInput
+  createdChallenges?: Prisma.ChallengeCreateNestedManyWithoutCreatorInput
+  chatSessions?: Prisma.ChatSessionCreateNestedManyWithoutUserInput
+  counselorCounselingSessions?: Prisma.CounselingSessionCreateNestedManyWithoutCounselorInput
+  studentCounselingSessions?: Prisma.CounselingSessionCreateNestedManyWithoutStudentInput
+  counselorAssignments?: Prisma.CounselorAssignmentCreateNestedManyWithoutCounselorInput
+  studentAssignments?: Prisma.CounselorAssignmentCreateNestedManyWithoutStudentInput
+  counselorProfile?: Prisma.CounselorProfileCreateNestedOneWithoutUserInput
+  dailyLogins?: Prisma.DailyLoginCreateNestedManyWithoutUserInput
+  escalationAlerts?: Prisma.EscalationAlertCreateNestedManyWithoutUserInput
+  highRiskAlerts?: Prisma.HighRiskAlertCreateNestedManyWithoutUserInput
+  meditations?: Prisma.MeditationCreateNestedManyWithoutAdminInput
+  meditationInstructions?: Prisma.MeditationListeningInstructionCreateNestedManyWithoutCreatorInput
+  moodCheckins?: Prisma.MoodCheckinCreateNestedManyWithoutUserInput
+  musicInstructions?: Prisma.MusicInstructionCreateNestedManyWithoutCreatorInput
+  musicTherapy?: Prisma.MusicTherapyCreateNestedManyWithoutAdminInput
+  counselorParentMeetings?: Prisma.ParentMeetingCreateNestedManyWithoutCounselorInput
+  studentParentMeetings?: Prisma.ParentMeetingCreateNestedManyWithoutStudentInput
+  parentProfile?: Prisma.ParentProfileCreateNestedOneWithoutUserInput
+  ratings?: Prisma.RatingCreateNestedManyWithoutStudentInput
+  resourceAccess?: Prisma.ResourceAccessCreateNestedManyWithoutUserInput
+  savedArticles?: Prisma.SavedArticleCreateNestedManyWithoutStudentInput
+  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  streaks?: Prisma.StreakCreateNestedOneWithoutUserInput
+  studentProfile?: Prisma.StudentProfileCreateNestedOneWithoutUserInput
+  summaries?: Prisma.SummaryCreateNestedManyWithoutUserInput
+  triggerSelections?: Prisma.TriggerSelectionCreateNestedManyWithoutUserInput
+  userBadges?: Prisma.UserBadgeCreateNestedManyWithoutUserInput
+  userChallenges?: Prisma.UserChallengeCreateNestedManyWithoutUserInput
+  classRef?: Prisma.ClassCreateNestedOneWithoutUsersInput
+  location?: Prisma.SchoolLocationCreateNestedOneWithoutUsersInput
+  parent?: Prisma.UserCreateNestedOneWithoutChildrenInput
+  children?: Prisma.UserCreateNestedManyWithoutParentInput
+  role: Prisma.RoleCreateNestedOneWithoutUsersInput
+  school?: Prisma.SchoolCreateNestedOneWithoutUsersInput
+  writingJournals?: Prisma.WritingJournalCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutParentNotificationsInput = {
+  id?: string
+  firstName: string
+  lastName: string
+  email: string
+  phone?: string | null
+  password?: string | null
+  schoolId?: string | null
+  locationId?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  emailVerified?: boolean
+  classId?: string | null
+  roleId: string
+  status?: string
+  studentId?: string | null
+  parentId?: string | null
+  adminNotifications?: Prisma.AdminNotificationUncheckedCreateNestedManyWithoutUserInput
+  counselorNotifications?: Prisma.CounselorNotificationUncheckedCreateNestedManyWithoutUserInput
+  adminProfile?: Prisma.AdminProfileUncheckedCreateNestedOneWithoutUserInput
+  artJournals?: Prisma.ArtJournalUncheckedCreateNestedManyWithoutUserInput
+  completions?: Prisma.ArticleCompletionUncheckedCreateNestedManyWithoutStudentInput
+  articles?: Prisma.ArticleUncheckedCreateNestedManyWithoutAdminInput
+  audioJournals?: Prisma.AudioJournalUncheckedCreateNestedManyWithoutUserInput
+  createdBadges?: Prisma.BadgeUncheckedCreateNestedManyWithoutAdminInput
+  challengeAssignments?: Prisma.ChallengeAssignmentUncheckedCreateNestedManyWithoutAssignerInput
+  challengeTargetAssignments?: Prisma.ChallengeAssignmentUncheckedCreateNestedManyWithoutTargetUserInput
+  createdChallenges?: Prisma.ChallengeUncheckedCreateNestedManyWithoutCreatorInput
+  chatSessions?: Prisma.ChatSessionUncheckedCreateNestedManyWithoutUserInput
+  counselorCounselingSessions?: Prisma.CounselingSessionUncheckedCreateNestedManyWithoutCounselorInput
+  studentCounselingSessions?: Prisma.CounselingSessionUncheckedCreateNestedManyWithoutStudentInput
+  counselorAssignments?: Prisma.CounselorAssignmentUncheckedCreateNestedManyWithoutCounselorInput
+  studentAssignments?: Prisma.CounselorAssignmentUncheckedCreateNestedManyWithoutStudentInput
+  counselorProfile?: Prisma.CounselorProfileUncheckedCreateNestedOneWithoutUserInput
+  dailyLogins?: Prisma.DailyLoginUncheckedCreateNestedManyWithoutUserInput
+  escalationAlerts?: Prisma.EscalationAlertUncheckedCreateNestedManyWithoutUserInput
+  highRiskAlerts?: Prisma.HighRiskAlertUncheckedCreateNestedManyWithoutUserInput
+  meditations?: Prisma.MeditationUncheckedCreateNestedManyWithoutAdminInput
+  meditationInstructions?: Prisma.MeditationListeningInstructionUncheckedCreateNestedManyWithoutCreatorInput
+  moodCheckins?: Prisma.MoodCheckinUncheckedCreateNestedManyWithoutUserInput
+  musicInstructions?: Prisma.MusicInstructionUncheckedCreateNestedManyWithoutCreatorInput
+  musicTherapy?: Prisma.MusicTherapyUncheckedCreateNestedManyWithoutAdminInput
+  counselorParentMeetings?: Prisma.ParentMeetingUncheckedCreateNestedManyWithoutCounselorInput
+  studentParentMeetings?: Prisma.ParentMeetingUncheckedCreateNestedManyWithoutStudentInput
+  parentProfile?: Prisma.ParentProfileUncheckedCreateNestedOneWithoutUserInput
+  ratings?: Prisma.RatingUncheckedCreateNestedManyWithoutStudentInput
+  resourceAccess?: Prisma.ResourceAccessUncheckedCreateNestedManyWithoutUserInput
+  savedArticles?: Prisma.SavedArticleUncheckedCreateNestedManyWithoutStudentInput
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  streaks?: Prisma.StreakUncheckedCreateNestedOneWithoutUserInput
+  studentProfile?: Prisma.StudentProfileUncheckedCreateNestedOneWithoutUserInput
+  summaries?: Prisma.SummaryUncheckedCreateNestedManyWithoutUserInput
+  triggerSelections?: Prisma.TriggerSelectionUncheckedCreateNestedManyWithoutUserInput
+  userBadges?: Prisma.UserBadgeUncheckedCreateNestedManyWithoutUserInput
+  userChallenges?: Prisma.UserChallengeUncheckedCreateNestedManyWithoutUserInput
+  children?: Prisma.UserUncheckedCreateNestedManyWithoutParentInput
+  writingJournals?: Prisma.WritingJournalUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutParentNotificationsInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutParentNotificationsInput, Prisma.UserUncheckedCreateWithoutParentNotificationsInput>
+}
+
+export type UserUpsertWithoutParentNotificationsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutParentNotificationsInput, Prisma.UserUncheckedUpdateWithoutParentNotificationsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutParentNotificationsInput, Prisma.UserUncheckedCreateWithoutParentNotificationsInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutParentNotificationsInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutParentNotificationsInput, Prisma.UserUncheckedUpdateWithoutParentNotificationsInput>
+}
+
+export type UserUpdateWithoutParentNotificationsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  lastName?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  studentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  adminNotifications?: Prisma.AdminNotificationUpdateManyWithoutUserNestedInput
+  counselorNotifications?: Prisma.CounselorNotificationUpdateManyWithoutUserNestedInput
+  adminProfile?: Prisma.AdminProfileUpdateOneWithoutUserNestedInput
+  artJournals?: Prisma.ArtJournalUpdateManyWithoutUserNestedInput
+  completions?: Prisma.ArticleCompletionUpdateManyWithoutStudentNestedInput
+  articles?: Prisma.ArticleUpdateManyWithoutAdminNestedInput
+  audioJournals?: Prisma.AudioJournalUpdateManyWithoutUserNestedInput
+  createdBadges?: Prisma.BadgeUpdateManyWithoutAdminNestedInput
+  challengeAssignments?: Prisma.ChallengeAssignmentUpdateManyWithoutAssignerNestedInput
+  challengeTargetAssignments?: Prisma.ChallengeAssignmentUpdateManyWithoutTargetUserNestedInput
+  createdChallenges?: Prisma.ChallengeUpdateManyWithoutCreatorNestedInput
+  chatSessions?: Prisma.ChatSessionUpdateManyWithoutUserNestedInput
+  counselorCounselingSessions?: Prisma.CounselingSessionUpdateManyWithoutCounselorNestedInput
+  studentCounselingSessions?: Prisma.CounselingSessionUpdateManyWithoutStudentNestedInput
+  counselorAssignments?: Prisma.CounselorAssignmentUpdateManyWithoutCounselorNestedInput
+  studentAssignments?: Prisma.CounselorAssignmentUpdateManyWithoutStudentNestedInput
+  counselorProfile?: Prisma.CounselorProfileUpdateOneWithoutUserNestedInput
+  dailyLogins?: Prisma.DailyLoginUpdateManyWithoutUserNestedInput
+  escalationAlerts?: Prisma.EscalationAlertUpdateManyWithoutUserNestedInput
+  highRiskAlerts?: Prisma.HighRiskAlertUpdateManyWithoutUserNestedInput
+  meditations?: Prisma.MeditationUpdateManyWithoutAdminNestedInput
+  meditationInstructions?: Prisma.MeditationListeningInstructionUpdateManyWithoutCreatorNestedInput
+  moodCheckins?: Prisma.MoodCheckinUpdateManyWithoutUserNestedInput
+  musicInstructions?: Prisma.MusicInstructionUpdateManyWithoutCreatorNestedInput
+  musicTherapy?: Prisma.MusicTherapyUpdateManyWithoutAdminNestedInput
+  counselorParentMeetings?: Prisma.ParentMeetingUpdateManyWithoutCounselorNestedInput
+  studentParentMeetings?: Prisma.ParentMeetingUpdateManyWithoutStudentNestedInput
+  parentProfile?: Prisma.ParentProfileUpdateOneWithoutUserNestedInput
+  ratings?: Prisma.RatingUpdateManyWithoutStudentNestedInput
+  resourceAccess?: Prisma.ResourceAccessUpdateManyWithoutUserNestedInput
+  savedArticles?: Prisma.SavedArticleUpdateManyWithoutStudentNestedInput
+  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  streaks?: Prisma.StreakUpdateOneWithoutUserNestedInput
+  studentProfile?: Prisma.StudentProfileUpdateOneWithoutUserNestedInput
+  summaries?: Prisma.SummaryUpdateManyWithoutUserNestedInput
+  triggerSelections?: Prisma.TriggerSelectionUpdateManyWithoutUserNestedInput
+  userBadges?: Prisma.UserBadgeUpdateManyWithoutUserNestedInput
+  userChallenges?: Prisma.UserChallengeUpdateManyWithoutUserNestedInput
+  classRef?: Prisma.ClassUpdateOneWithoutUsersNestedInput
+  location?: Prisma.SchoolLocationUpdateOneWithoutUsersNestedInput
+  parent?: Prisma.UserUpdateOneWithoutChildrenNestedInput
+  children?: Prisma.UserUpdateManyWithoutParentNestedInput
+  role?: Prisma.RoleUpdateOneRequiredWithoutUsersNestedInput
+  school?: Prisma.SchoolUpdateOneWithoutUsersNestedInput
+  writingJournals?: Prisma.WritingJournalUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutParentNotificationsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  firstName?: Prisma.StringFieldUpdateOperationsInput | string
+  lastName?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  phone?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  password?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  schoolId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  locationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  classId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  roleId?: Prisma.StringFieldUpdateOperationsInput | string
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  studentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  parentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  adminNotifications?: Prisma.AdminNotificationUncheckedUpdateManyWithoutUserNestedInput
+  counselorNotifications?: Prisma.CounselorNotificationUncheckedUpdateManyWithoutUserNestedInput
   adminProfile?: Prisma.AdminProfileUncheckedUpdateOneWithoutUserNestedInput
   artJournals?: Prisma.ArtJournalUncheckedUpdateManyWithoutUserNestedInput
   completions?: Prisma.ArticleCompletionUncheckedUpdateManyWithoutStudentNestedInput
@@ -9593,6 +9992,7 @@ export type UserCreateWithoutSessionsInput = {
   studentId?: string | null
   adminNotifications?: Prisma.AdminNotificationCreateNestedManyWithoutUserInput
   counselorNotifications?: Prisma.CounselorNotificationCreateNestedManyWithoutUserInput
+  parentNotifications?: Prisma.ParentNotificationCreateNestedManyWithoutUserInput
   adminProfile?: Prisma.AdminProfileCreateNestedOneWithoutUserInput
   artJournals?: Prisma.ArtJournalCreateNestedManyWithoutUserInput
   completions?: Prisma.ArticleCompletionCreateNestedManyWithoutStudentInput
@@ -9656,6 +10056,7 @@ export type UserUncheckedCreateWithoutSessionsInput = {
   parentId?: string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedCreateNestedManyWithoutUserInput
   counselorNotifications?: Prisma.CounselorNotificationUncheckedCreateNestedManyWithoutUserInput
+  parentNotifications?: Prisma.ParentNotificationUncheckedCreateNestedManyWithoutUserInput
   adminProfile?: Prisma.AdminProfileUncheckedCreateNestedOneWithoutUserInput
   artJournals?: Prisma.ArtJournalUncheckedCreateNestedManyWithoutUserInput
   completions?: Prisma.ArticleCompletionUncheckedCreateNestedManyWithoutStudentInput
@@ -9725,6 +10126,7 @@ export type UserUpdateWithoutSessionsInput = {
   studentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUpdateManyWithoutUserNestedInput
   counselorNotifications?: Prisma.CounselorNotificationUpdateManyWithoutUserNestedInput
+  parentNotifications?: Prisma.ParentNotificationUpdateManyWithoutUserNestedInput
   adminProfile?: Prisma.AdminProfileUpdateOneWithoutUserNestedInput
   artJournals?: Prisma.ArtJournalUpdateManyWithoutUserNestedInput
   completions?: Prisma.ArticleCompletionUpdateManyWithoutStudentNestedInput
@@ -9788,6 +10190,7 @@ export type UserUncheckedUpdateWithoutSessionsInput = {
   parentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedUpdateManyWithoutUserNestedInput
   counselorNotifications?: Prisma.CounselorNotificationUncheckedUpdateManyWithoutUserNestedInput
+  parentNotifications?: Prisma.ParentNotificationUncheckedUpdateManyWithoutUserNestedInput
   adminProfile?: Prisma.AdminProfileUncheckedUpdateOneWithoutUserNestedInput
   artJournals?: Prisma.ArtJournalUncheckedUpdateManyWithoutUserNestedInput
   completions?: Prisma.ArticleCompletionUncheckedUpdateManyWithoutStudentNestedInput
@@ -9841,6 +10244,7 @@ export type UserCreateWithoutCreatedBadgesInput = {
   studentId?: string | null
   adminNotifications?: Prisma.AdminNotificationCreateNestedManyWithoutUserInput
   counselorNotifications?: Prisma.CounselorNotificationCreateNestedManyWithoutUserInput
+  parentNotifications?: Prisma.ParentNotificationCreateNestedManyWithoutUserInput
   adminProfile?: Prisma.AdminProfileCreateNestedOneWithoutUserInput
   artJournals?: Prisma.ArtJournalCreateNestedManyWithoutUserInput
   completions?: Prisma.ArticleCompletionCreateNestedManyWithoutStudentInput
@@ -9904,6 +10308,7 @@ export type UserUncheckedCreateWithoutCreatedBadgesInput = {
   parentId?: string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedCreateNestedManyWithoutUserInput
   counselorNotifications?: Prisma.CounselorNotificationUncheckedCreateNestedManyWithoutUserInput
+  parentNotifications?: Prisma.ParentNotificationUncheckedCreateNestedManyWithoutUserInput
   adminProfile?: Prisma.AdminProfileUncheckedCreateNestedOneWithoutUserInput
   artJournals?: Prisma.ArtJournalUncheckedCreateNestedManyWithoutUserInput
   completions?: Prisma.ArticleCompletionUncheckedCreateNestedManyWithoutStudentInput
@@ -9973,6 +10378,7 @@ export type UserUpdateWithoutCreatedBadgesInput = {
   studentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUpdateManyWithoutUserNestedInput
   counselorNotifications?: Prisma.CounselorNotificationUpdateManyWithoutUserNestedInput
+  parentNotifications?: Prisma.ParentNotificationUpdateManyWithoutUserNestedInput
   adminProfile?: Prisma.AdminProfileUpdateOneWithoutUserNestedInput
   artJournals?: Prisma.ArtJournalUpdateManyWithoutUserNestedInput
   completions?: Prisma.ArticleCompletionUpdateManyWithoutStudentNestedInput
@@ -10036,6 +10442,7 @@ export type UserUncheckedUpdateWithoutCreatedBadgesInput = {
   parentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedUpdateManyWithoutUserNestedInput
   counselorNotifications?: Prisma.CounselorNotificationUncheckedUpdateManyWithoutUserNestedInput
+  parentNotifications?: Prisma.ParentNotificationUncheckedUpdateManyWithoutUserNestedInput
   adminProfile?: Prisma.AdminProfileUncheckedUpdateOneWithoutUserNestedInput
   artJournals?: Prisma.ArtJournalUncheckedUpdateManyWithoutUserNestedInput
   completions?: Prisma.ArticleCompletionUncheckedUpdateManyWithoutStudentNestedInput
@@ -10089,6 +10496,7 @@ export type UserCreateWithoutUserBadgesInput = {
   studentId?: string | null
   adminNotifications?: Prisma.AdminNotificationCreateNestedManyWithoutUserInput
   counselorNotifications?: Prisma.CounselorNotificationCreateNestedManyWithoutUserInput
+  parentNotifications?: Prisma.ParentNotificationCreateNestedManyWithoutUserInput
   adminProfile?: Prisma.AdminProfileCreateNestedOneWithoutUserInput
   artJournals?: Prisma.ArtJournalCreateNestedManyWithoutUserInput
   completions?: Prisma.ArticleCompletionCreateNestedManyWithoutStudentInput
@@ -10152,6 +10560,7 @@ export type UserUncheckedCreateWithoutUserBadgesInput = {
   parentId?: string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedCreateNestedManyWithoutUserInput
   counselorNotifications?: Prisma.CounselorNotificationUncheckedCreateNestedManyWithoutUserInput
+  parentNotifications?: Prisma.ParentNotificationUncheckedCreateNestedManyWithoutUserInput
   adminProfile?: Prisma.AdminProfileUncheckedCreateNestedOneWithoutUserInput
   artJournals?: Prisma.ArtJournalUncheckedCreateNestedManyWithoutUserInput
   completions?: Prisma.ArticleCompletionUncheckedCreateNestedManyWithoutStudentInput
@@ -10221,6 +10630,7 @@ export type UserUpdateWithoutUserBadgesInput = {
   studentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUpdateManyWithoutUserNestedInput
   counselorNotifications?: Prisma.CounselorNotificationUpdateManyWithoutUserNestedInput
+  parentNotifications?: Prisma.ParentNotificationUpdateManyWithoutUserNestedInput
   adminProfile?: Prisma.AdminProfileUpdateOneWithoutUserNestedInput
   artJournals?: Prisma.ArtJournalUpdateManyWithoutUserNestedInput
   completions?: Prisma.ArticleCompletionUpdateManyWithoutStudentNestedInput
@@ -10284,6 +10694,7 @@ export type UserUncheckedUpdateWithoutUserBadgesInput = {
   parentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedUpdateManyWithoutUserNestedInput
   counselorNotifications?: Prisma.CounselorNotificationUncheckedUpdateManyWithoutUserNestedInput
+  parentNotifications?: Prisma.ParentNotificationUncheckedUpdateManyWithoutUserNestedInput
   adminProfile?: Prisma.AdminProfileUncheckedUpdateOneWithoutUserNestedInput
   artJournals?: Prisma.ArtJournalUncheckedUpdateManyWithoutUserNestedInput
   completions?: Prisma.ArticleCompletionUncheckedUpdateManyWithoutStudentNestedInput
@@ -10337,6 +10748,7 @@ export type UserCreateWithoutCreatedChallengesInput = {
   studentId?: string | null
   adminNotifications?: Prisma.AdminNotificationCreateNestedManyWithoutUserInput
   counselorNotifications?: Prisma.CounselorNotificationCreateNestedManyWithoutUserInput
+  parentNotifications?: Prisma.ParentNotificationCreateNestedManyWithoutUserInput
   adminProfile?: Prisma.AdminProfileCreateNestedOneWithoutUserInput
   artJournals?: Prisma.ArtJournalCreateNestedManyWithoutUserInput
   completions?: Prisma.ArticleCompletionCreateNestedManyWithoutStudentInput
@@ -10400,6 +10812,7 @@ export type UserUncheckedCreateWithoutCreatedChallengesInput = {
   parentId?: string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedCreateNestedManyWithoutUserInput
   counselorNotifications?: Prisma.CounselorNotificationUncheckedCreateNestedManyWithoutUserInput
+  parentNotifications?: Prisma.ParentNotificationUncheckedCreateNestedManyWithoutUserInput
   adminProfile?: Prisma.AdminProfileUncheckedCreateNestedOneWithoutUserInput
   artJournals?: Prisma.ArtJournalUncheckedCreateNestedManyWithoutUserInput
   completions?: Prisma.ArticleCompletionUncheckedCreateNestedManyWithoutStudentInput
@@ -10469,6 +10882,7 @@ export type UserUpdateWithoutCreatedChallengesInput = {
   studentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUpdateManyWithoutUserNestedInput
   counselorNotifications?: Prisma.CounselorNotificationUpdateManyWithoutUserNestedInput
+  parentNotifications?: Prisma.ParentNotificationUpdateManyWithoutUserNestedInput
   adminProfile?: Prisma.AdminProfileUpdateOneWithoutUserNestedInput
   artJournals?: Prisma.ArtJournalUpdateManyWithoutUserNestedInput
   completions?: Prisma.ArticleCompletionUpdateManyWithoutStudentNestedInput
@@ -10532,6 +10946,7 @@ export type UserUncheckedUpdateWithoutCreatedChallengesInput = {
   parentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedUpdateManyWithoutUserNestedInput
   counselorNotifications?: Prisma.CounselorNotificationUncheckedUpdateManyWithoutUserNestedInput
+  parentNotifications?: Prisma.ParentNotificationUncheckedUpdateManyWithoutUserNestedInput
   adminProfile?: Prisma.AdminProfileUncheckedUpdateOneWithoutUserNestedInput
   artJournals?: Prisma.ArtJournalUncheckedUpdateManyWithoutUserNestedInput
   completions?: Prisma.ArticleCompletionUncheckedUpdateManyWithoutStudentNestedInput
@@ -10585,6 +11000,7 @@ export type UserCreateWithoutUserChallengesInput = {
   studentId?: string | null
   adminNotifications?: Prisma.AdminNotificationCreateNestedManyWithoutUserInput
   counselorNotifications?: Prisma.CounselorNotificationCreateNestedManyWithoutUserInput
+  parentNotifications?: Prisma.ParentNotificationCreateNestedManyWithoutUserInput
   adminProfile?: Prisma.AdminProfileCreateNestedOneWithoutUserInput
   artJournals?: Prisma.ArtJournalCreateNestedManyWithoutUserInput
   completions?: Prisma.ArticleCompletionCreateNestedManyWithoutStudentInput
@@ -10648,6 +11064,7 @@ export type UserUncheckedCreateWithoutUserChallengesInput = {
   parentId?: string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedCreateNestedManyWithoutUserInput
   counselorNotifications?: Prisma.CounselorNotificationUncheckedCreateNestedManyWithoutUserInput
+  parentNotifications?: Prisma.ParentNotificationUncheckedCreateNestedManyWithoutUserInput
   adminProfile?: Prisma.AdminProfileUncheckedCreateNestedOneWithoutUserInput
   artJournals?: Prisma.ArtJournalUncheckedCreateNestedManyWithoutUserInput
   completions?: Prisma.ArticleCompletionUncheckedCreateNestedManyWithoutStudentInput
@@ -10717,6 +11134,7 @@ export type UserUpdateWithoutUserChallengesInput = {
   studentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUpdateManyWithoutUserNestedInput
   counselorNotifications?: Prisma.CounselorNotificationUpdateManyWithoutUserNestedInput
+  parentNotifications?: Prisma.ParentNotificationUpdateManyWithoutUserNestedInput
   adminProfile?: Prisma.AdminProfileUpdateOneWithoutUserNestedInput
   artJournals?: Prisma.ArtJournalUpdateManyWithoutUserNestedInput
   completions?: Prisma.ArticleCompletionUpdateManyWithoutStudentNestedInput
@@ -10780,6 +11198,7 @@ export type UserUncheckedUpdateWithoutUserChallengesInput = {
   parentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedUpdateManyWithoutUserNestedInput
   counselorNotifications?: Prisma.CounselorNotificationUncheckedUpdateManyWithoutUserNestedInput
+  parentNotifications?: Prisma.ParentNotificationUncheckedUpdateManyWithoutUserNestedInput
   adminProfile?: Prisma.AdminProfileUncheckedUpdateOneWithoutUserNestedInput
   artJournals?: Prisma.ArtJournalUncheckedUpdateManyWithoutUserNestedInput
   completions?: Prisma.ArticleCompletionUncheckedUpdateManyWithoutStudentNestedInput
@@ -10833,6 +11252,7 @@ export type UserCreateWithoutChallengeAssignmentsInput = {
   studentId?: string | null
   adminNotifications?: Prisma.AdminNotificationCreateNestedManyWithoutUserInput
   counselorNotifications?: Prisma.CounselorNotificationCreateNestedManyWithoutUserInput
+  parentNotifications?: Prisma.ParentNotificationCreateNestedManyWithoutUserInput
   adminProfile?: Prisma.AdminProfileCreateNestedOneWithoutUserInput
   artJournals?: Prisma.ArtJournalCreateNestedManyWithoutUserInput
   completions?: Prisma.ArticleCompletionCreateNestedManyWithoutStudentInput
@@ -10896,6 +11316,7 @@ export type UserUncheckedCreateWithoutChallengeAssignmentsInput = {
   parentId?: string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedCreateNestedManyWithoutUserInput
   counselorNotifications?: Prisma.CounselorNotificationUncheckedCreateNestedManyWithoutUserInput
+  parentNotifications?: Prisma.ParentNotificationUncheckedCreateNestedManyWithoutUserInput
   adminProfile?: Prisma.AdminProfileUncheckedCreateNestedOneWithoutUserInput
   artJournals?: Prisma.ArtJournalUncheckedCreateNestedManyWithoutUserInput
   completions?: Prisma.ArticleCompletionUncheckedCreateNestedManyWithoutStudentInput
@@ -10954,6 +11375,7 @@ export type UserCreateWithoutChallengeTargetAssignmentsInput = {
   studentId?: string | null
   adminNotifications?: Prisma.AdminNotificationCreateNestedManyWithoutUserInput
   counselorNotifications?: Prisma.CounselorNotificationCreateNestedManyWithoutUserInput
+  parentNotifications?: Prisma.ParentNotificationCreateNestedManyWithoutUserInput
   adminProfile?: Prisma.AdminProfileCreateNestedOneWithoutUserInput
   artJournals?: Prisma.ArtJournalCreateNestedManyWithoutUserInput
   completions?: Prisma.ArticleCompletionCreateNestedManyWithoutStudentInput
@@ -11017,6 +11439,7 @@ export type UserUncheckedCreateWithoutChallengeTargetAssignmentsInput = {
   parentId?: string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedCreateNestedManyWithoutUserInput
   counselorNotifications?: Prisma.CounselorNotificationUncheckedCreateNestedManyWithoutUserInput
+  parentNotifications?: Prisma.ParentNotificationUncheckedCreateNestedManyWithoutUserInput
   adminProfile?: Prisma.AdminProfileUncheckedCreateNestedOneWithoutUserInput
   artJournals?: Prisma.ArtJournalUncheckedCreateNestedManyWithoutUserInput
   completions?: Prisma.ArticleCompletionUncheckedCreateNestedManyWithoutStudentInput
@@ -11086,6 +11509,7 @@ export type UserUpdateWithoutChallengeAssignmentsInput = {
   studentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUpdateManyWithoutUserNestedInput
   counselorNotifications?: Prisma.CounselorNotificationUpdateManyWithoutUserNestedInput
+  parentNotifications?: Prisma.ParentNotificationUpdateManyWithoutUserNestedInput
   adminProfile?: Prisma.AdminProfileUpdateOneWithoutUserNestedInput
   artJournals?: Prisma.ArtJournalUpdateManyWithoutUserNestedInput
   completions?: Prisma.ArticleCompletionUpdateManyWithoutStudentNestedInput
@@ -11149,6 +11573,7 @@ export type UserUncheckedUpdateWithoutChallengeAssignmentsInput = {
   parentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedUpdateManyWithoutUserNestedInput
   counselorNotifications?: Prisma.CounselorNotificationUncheckedUpdateManyWithoutUserNestedInput
+  parentNotifications?: Prisma.ParentNotificationUncheckedUpdateManyWithoutUserNestedInput
   adminProfile?: Prisma.AdminProfileUncheckedUpdateOneWithoutUserNestedInput
   artJournals?: Prisma.ArtJournalUncheckedUpdateManyWithoutUserNestedInput
   completions?: Prisma.ArticleCompletionUncheckedUpdateManyWithoutStudentNestedInput
@@ -11213,6 +11638,7 @@ export type UserUpdateWithoutChallengeTargetAssignmentsInput = {
   studentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUpdateManyWithoutUserNestedInput
   counselorNotifications?: Prisma.CounselorNotificationUpdateManyWithoutUserNestedInput
+  parentNotifications?: Prisma.ParentNotificationUpdateManyWithoutUserNestedInput
   adminProfile?: Prisma.AdminProfileUpdateOneWithoutUserNestedInput
   artJournals?: Prisma.ArtJournalUpdateManyWithoutUserNestedInput
   completions?: Prisma.ArticleCompletionUpdateManyWithoutStudentNestedInput
@@ -11276,6 +11702,7 @@ export type UserUncheckedUpdateWithoutChallengeTargetAssignmentsInput = {
   parentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedUpdateManyWithoutUserNestedInput
   counselorNotifications?: Prisma.CounselorNotificationUncheckedUpdateManyWithoutUserNestedInput
+  parentNotifications?: Prisma.ParentNotificationUncheckedUpdateManyWithoutUserNestedInput
   adminProfile?: Prisma.AdminProfileUncheckedUpdateOneWithoutUserNestedInput
   artJournals?: Prisma.ArtJournalUncheckedUpdateManyWithoutUserNestedInput
   completions?: Prisma.ArticleCompletionUncheckedUpdateManyWithoutStudentNestedInput
@@ -11329,6 +11756,7 @@ export type UserCreateWithoutCounselorCounselingSessionsInput = {
   studentId?: string | null
   adminNotifications?: Prisma.AdminNotificationCreateNestedManyWithoutUserInput
   counselorNotifications?: Prisma.CounselorNotificationCreateNestedManyWithoutUserInput
+  parentNotifications?: Prisma.ParentNotificationCreateNestedManyWithoutUserInput
   adminProfile?: Prisma.AdminProfileCreateNestedOneWithoutUserInput
   artJournals?: Prisma.ArtJournalCreateNestedManyWithoutUserInput
   completions?: Prisma.ArticleCompletionCreateNestedManyWithoutStudentInput
@@ -11392,6 +11820,7 @@ export type UserUncheckedCreateWithoutCounselorCounselingSessionsInput = {
   parentId?: string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedCreateNestedManyWithoutUserInput
   counselorNotifications?: Prisma.CounselorNotificationUncheckedCreateNestedManyWithoutUserInput
+  parentNotifications?: Prisma.ParentNotificationUncheckedCreateNestedManyWithoutUserInput
   adminProfile?: Prisma.AdminProfileUncheckedCreateNestedOneWithoutUserInput
   artJournals?: Prisma.ArtJournalUncheckedCreateNestedManyWithoutUserInput
   completions?: Prisma.ArticleCompletionUncheckedCreateNestedManyWithoutStudentInput
@@ -11450,6 +11879,7 @@ export type UserCreateWithoutStudentCounselingSessionsInput = {
   studentId?: string | null
   adminNotifications?: Prisma.AdminNotificationCreateNestedManyWithoutUserInput
   counselorNotifications?: Prisma.CounselorNotificationCreateNestedManyWithoutUserInput
+  parentNotifications?: Prisma.ParentNotificationCreateNestedManyWithoutUserInput
   adminProfile?: Prisma.AdminProfileCreateNestedOneWithoutUserInput
   artJournals?: Prisma.ArtJournalCreateNestedManyWithoutUserInput
   completions?: Prisma.ArticleCompletionCreateNestedManyWithoutStudentInput
@@ -11513,6 +11943,7 @@ export type UserUncheckedCreateWithoutStudentCounselingSessionsInput = {
   parentId?: string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedCreateNestedManyWithoutUserInput
   counselorNotifications?: Prisma.CounselorNotificationUncheckedCreateNestedManyWithoutUserInput
+  parentNotifications?: Prisma.ParentNotificationUncheckedCreateNestedManyWithoutUserInput
   adminProfile?: Prisma.AdminProfileUncheckedCreateNestedOneWithoutUserInput
   artJournals?: Prisma.ArtJournalUncheckedCreateNestedManyWithoutUserInput
   completions?: Prisma.ArticleCompletionUncheckedCreateNestedManyWithoutStudentInput
@@ -11582,6 +12013,7 @@ export type UserUpdateWithoutCounselorCounselingSessionsInput = {
   studentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUpdateManyWithoutUserNestedInput
   counselorNotifications?: Prisma.CounselorNotificationUpdateManyWithoutUserNestedInput
+  parentNotifications?: Prisma.ParentNotificationUpdateManyWithoutUserNestedInput
   adminProfile?: Prisma.AdminProfileUpdateOneWithoutUserNestedInput
   artJournals?: Prisma.ArtJournalUpdateManyWithoutUserNestedInput
   completions?: Prisma.ArticleCompletionUpdateManyWithoutStudentNestedInput
@@ -11645,6 +12077,7 @@ export type UserUncheckedUpdateWithoutCounselorCounselingSessionsInput = {
   parentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedUpdateManyWithoutUserNestedInput
   counselorNotifications?: Prisma.CounselorNotificationUncheckedUpdateManyWithoutUserNestedInput
+  parentNotifications?: Prisma.ParentNotificationUncheckedUpdateManyWithoutUserNestedInput
   adminProfile?: Prisma.AdminProfileUncheckedUpdateOneWithoutUserNestedInput
   artJournals?: Prisma.ArtJournalUncheckedUpdateManyWithoutUserNestedInput
   completions?: Prisma.ArticleCompletionUncheckedUpdateManyWithoutStudentNestedInput
@@ -11709,6 +12142,7 @@ export type UserUpdateWithoutStudentCounselingSessionsInput = {
   studentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUpdateManyWithoutUserNestedInput
   counselorNotifications?: Prisma.CounselorNotificationUpdateManyWithoutUserNestedInput
+  parentNotifications?: Prisma.ParentNotificationUpdateManyWithoutUserNestedInput
   adminProfile?: Prisma.AdminProfileUpdateOneWithoutUserNestedInput
   artJournals?: Prisma.ArtJournalUpdateManyWithoutUserNestedInput
   completions?: Prisma.ArticleCompletionUpdateManyWithoutStudentNestedInput
@@ -11772,6 +12206,7 @@ export type UserUncheckedUpdateWithoutStudentCounselingSessionsInput = {
   parentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedUpdateManyWithoutUserNestedInput
   counselorNotifications?: Prisma.CounselorNotificationUncheckedUpdateManyWithoutUserNestedInput
+  parentNotifications?: Prisma.ParentNotificationUncheckedUpdateManyWithoutUserNestedInput
   adminProfile?: Prisma.AdminProfileUncheckedUpdateOneWithoutUserNestedInput
   artJournals?: Prisma.ArtJournalUncheckedUpdateManyWithoutUserNestedInput
   completions?: Prisma.ArticleCompletionUncheckedUpdateManyWithoutStudentNestedInput
@@ -11825,6 +12260,7 @@ export type UserCreateWithoutCounselorAssignmentsInput = {
   studentId?: string | null
   adminNotifications?: Prisma.AdminNotificationCreateNestedManyWithoutUserInput
   counselorNotifications?: Prisma.CounselorNotificationCreateNestedManyWithoutUserInput
+  parentNotifications?: Prisma.ParentNotificationCreateNestedManyWithoutUserInput
   adminProfile?: Prisma.AdminProfileCreateNestedOneWithoutUserInput
   artJournals?: Prisma.ArtJournalCreateNestedManyWithoutUserInput
   completions?: Prisma.ArticleCompletionCreateNestedManyWithoutStudentInput
@@ -11888,6 +12324,7 @@ export type UserUncheckedCreateWithoutCounselorAssignmentsInput = {
   parentId?: string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedCreateNestedManyWithoutUserInput
   counselorNotifications?: Prisma.CounselorNotificationUncheckedCreateNestedManyWithoutUserInput
+  parentNotifications?: Prisma.ParentNotificationUncheckedCreateNestedManyWithoutUserInput
   adminProfile?: Prisma.AdminProfileUncheckedCreateNestedOneWithoutUserInput
   artJournals?: Prisma.ArtJournalUncheckedCreateNestedManyWithoutUserInput
   completions?: Prisma.ArticleCompletionUncheckedCreateNestedManyWithoutStudentInput
@@ -11946,6 +12383,7 @@ export type UserCreateWithoutStudentAssignmentsInput = {
   studentId?: string | null
   adminNotifications?: Prisma.AdminNotificationCreateNestedManyWithoutUserInput
   counselorNotifications?: Prisma.CounselorNotificationCreateNestedManyWithoutUserInput
+  parentNotifications?: Prisma.ParentNotificationCreateNestedManyWithoutUserInput
   adminProfile?: Prisma.AdminProfileCreateNestedOneWithoutUserInput
   artJournals?: Prisma.ArtJournalCreateNestedManyWithoutUserInput
   completions?: Prisma.ArticleCompletionCreateNestedManyWithoutStudentInput
@@ -12009,6 +12447,7 @@ export type UserUncheckedCreateWithoutStudentAssignmentsInput = {
   parentId?: string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedCreateNestedManyWithoutUserInput
   counselorNotifications?: Prisma.CounselorNotificationUncheckedCreateNestedManyWithoutUserInput
+  parentNotifications?: Prisma.ParentNotificationUncheckedCreateNestedManyWithoutUserInput
   adminProfile?: Prisma.AdminProfileUncheckedCreateNestedOneWithoutUserInput
   artJournals?: Prisma.ArtJournalUncheckedCreateNestedManyWithoutUserInput
   completions?: Prisma.ArticleCompletionUncheckedCreateNestedManyWithoutStudentInput
@@ -12078,6 +12517,7 @@ export type UserUpdateWithoutCounselorAssignmentsInput = {
   studentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUpdateManyWithoutUserNestedInput
   counselorNotifications?: Prisma.CounselorNotificationUpdateManyWithoutUserNestedInput
+  parentNotifications?: Prisma.ParentNotificationUpdateManyWithoutUserNestedInput
   adminProfile?: Prisma.AdminProfileUpdateOneWithoutUserNestedInput
   artJournals?: Prisma.ArtJournalUpdateManyWithoutUserNestedInput
   completions?: Prisma.ArticleCompletionUpdateManyWithoutStudentNestedInput
@@ -12141,6 +12581,7 @@ export type UserUncheckedUpdateWithoutCounselorAssignmentsInput = {
   parentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedUpdateManyWithoutUserNestedInput
   counselorNotifications?: Prisma.CounselorNotificationUncheckedUpdateManyWithoutUserNestedInput
+  parentNotifications?: Prisma.ParentNotificationUncheckedUpdateManyWithoutUserNestedInput
   adminProfile?: Prisma.AdminProfileUncheckedUpdateOneWithoutUserNestedInput
   artJournals?: Prisma.ArtJournalUncheckedUpdateManyWithoutUserNestedInput
   completions?: Prisma.ArticleCompletionUncheckedUpdateManyWithoutStudentNestedInput
@@ -12205,6 +12646,7 @@ export type UserUpdateWithoutStudentAssignmentsInput = {
   studentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUpdateManyWithoutUserNestedInput
   counselorNotifications?: Prisma.CounselorNotificationUpdateManyWithoutUserNestedInput
+  parentNotifications?: Prisma.ParentNotificationUpdateManyWithoutUserNestedInput
   adminProfile?: Prisma.AdminProfileUpdateOneWithoutUserNestedInput
   artJournals?: Prisma.ArtJournalUpdateManyWithoutUserNestedInput
   completions?: Prisma.ArticleCompletionUpdateManyWithoutStudentNestedInput
@@ -12268,6 +12710,7 @@ export type UserUncheckedUpdateWithoutStudentAssignmentsInput = {
   parentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedUpdateManyWithoutUserNestedInput
   counselorNotifications?: Prisma.CounselorNotificationUncheckedUpdateManyWithoutUserNestedInput
+  parentNotifications?: Prisma.ParentNotificationUncheckedUpdateManyWithoutUserNestedInput
   adminProfile?: Prisma.AdminProfileUncheckedUpdateOneWithoutUserNestedInput
   artJournals?: Prisma.ArtJournalUncheckedUpdateManyWithoutUserNestedInput
   completions?: Prisma.ArticleCompletionUncheckedUpdateManyWithoutStudentNestedInput
@@ -12339,6 +12782,7 @@ export type UserUpdateWithoutParentInput = {
   studentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUpdateManyWithoutUserNestedInput
   counselorNotifications?: Prisma.CounselorNotificationUpdateManyWithoutUserNestedInput
+  parentNotifications?: Prisma.ParentNotificationUpdateManyWithoutUserNestedInput
   adminProfile?: Prisma.AdminProfileUpdateOneWithoutUserNestedInput
   artJournals?: Prisma.ArtJournalUpdateManyWithoutUserNestedInput
   completions?: Prisma.ArticleCompletionUpdateManyWithoutStudentNestedInput
@@ -12401,6 +12845,7 @@ export type UserUncheckedUpdateWithoutParentInput = {
   studentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedUpdateManyWithoutUserNestedInput
   counselorNotifications?: Prisma.CounselorNotificationUncheckedUpdateManyWithoutUserNestedInput
+  parentNotifications?: Prisma.ParentNotificationUncheckedUpdateManyWithoutUserNestedInput
   adminProfile?: Prisma.AdminProfileUncheckedUpdateOneWithoutUserNestedInput
   artJournals?: Prisma.ArtJournalUncheckedUpdateManyWithoutUserNestedInput
   completions?: Prisma.ArticleCompletionUncheckedUpdateManyWithoutStudentNestedInput
@@ -12491,6 +12936,7 @@ export type UserUpdateWithoutSchoolInput = {
   studentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUpdateManyWithoutUserNestedInput
   counselorNotifications?: Prisma.CounselorNotificationUpdateManyWithoutUserNestedInput
+  parentNotifications?: Prisma.ParentNotificationUpdateManyWithoutUserNestedInput
   adminProfile?: Prisma.AdminProfileUpdateOneWithoutUserNestedInput
   artJournals?: Prisma.ArtJournalUpdateManyWithoutUserNestedInput
   completions?: Prisma.ArticleCompletionUpdateManyWithoutStudentNestedInput
@@ -12553,6 +12999,7 @@ export type UserUncheckedUpdateWithoutSchoolInput = {
   parentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedUpdateManyWithoutUserNestedInput
   counselorNotifications?: Prisma.CounselorNotificationUncheckedUpdateManyWithoutUserNestedInput
+  parentNotifications?: Prisma.ParentNotificationUncheckedUpdateManyWithoutUserNestedInput
   adminProfile?: Prisma.AdminProfileUncheckedUpdateOneWithoutUserNestedInput
   artJournals?: Prisma.ArtJournalUncheckedUpdateManyWithoutUserNestedInput
   completions?: Prisma.ArticleCompletionUncheckedUpdateManyWithoutStudentNestedInput
@@ -12643,6 +13090,7 @@ export type UserUpdateWithoutLocationInput = {
   studentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUpdateManyWithoutUserNestedInput
   counselorNotifications?: Prisma.CounselorNotificationUpdateManyWithoutUserNestedInput
+  parentNotifications?: Prisma.ParentNotificationUpdateManyWithoutUserNestedInput
   adminProfile?: Prisma.AdminProfileUpdateOneWithoutUserNestedInput
   artJournals?: Prisma.ArtJournalUpdateManyWithoutUserNestedInput
   completions?: Prisma.ArticleCompletionUpdateManyWithoutStudentNestedInput
@@ -12705,6 +13153,7 @@ export type UserUncheckedUpdateWithoutLocationInput = {
   parentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedUpdateManyWithoutUserNestedInput
   counselorNotifications?: Prisma.CounselorNotificationUncheckedUpdateManyWithoutUserNestedInput
+  parentNotifications?: Prisma.ParentNotificationUncheckedUpdateManyWithoutUserNestedInput
   adminProfile?: Prisma.AdminProfileUncheckedUpdateOneWithoutUserNestedInput
   artJournals?: Prisma.ArtJournalUncheckedUpdateManyWithoutUserNestedInput
   completions?: Prisma.ArticleCompletionUncheckedUpdateManyWithoutStudentNestedInput
@@ -12795,6 +13244,7 @@ export type UserUpdateWithoutClassRefInput = {
   studentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUpdateManyWithoutUserNestedInput
   counselorNotifications?: Prisma.CounselorNotificationUpdateManyWithoutUserNestedInput
+  parentNotifications?: Prisma.ParentNotificationUpdateManyWithoutUserNestedInput
   adminProfile?: Prisma.AdminProfileUpdateOneWithoutUserNestedInput
   artJournals?: Prisma.ArtJournalUpdateManyWithoutUserNestedInput
   completions?: Prisma.ArticleCompletionUpdateManyWithoutStudentNestedInput
@@ -12857,6 +13307,7 @@ export type UserUncheckedUpdateWithoutClassRefInput = {
   parentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedUpdateManyWithoutUserNestedInput
   counselorNotifications?: Prisma.CounselorNotificationUncheckedUpdateManyWithoutUserNestedInput
+  parentNotifications?: Prisma.ParentNotificationUncheckedUpdateManyWithoutUserNestedInput
   adminProfile?: Prisma.AdminProfileUncheckedUpdateOneWithoutUserNestedInput
   artJournals?: Prisma.ArtJournalUncheckedUpdateManyWithoutUserNestedInput
   completions?: Prisma.ArticleCompletionUncheckedUpdateManyWithoutStudentNestedInput
@@ -12947,6 +13398,7 @@ export type UserUpdateWithoutRoleInput = {
   studentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUpdateManyWithoutUserNestedInput
   counselorNotifications?: Prisma.CounselorNotificationUpdateManyWithoutUserNestedInput
+  parentNotifications?: Prisma.ParentNotificationUpdateManyWithoutUserNestedInput
   adminProfile?: Prisma.AdminProfileUpdateOneWithoutUserNestedInput
   artJournals?: Prisma.ArtJournalUpdateManyWithoutUserNestedInput
   completions?: Prisma.ArticleCompletionUpdateManyWithoutStudentNestedInput
@@ -13009,6 +13461,7 @@ export type UserUncheckedUpdateWithoutRoleInput = {
   parentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedUpdateManyWithoutUserNestedInput
   counselorNotifications?: Prisma.CounselorNotificationUncheckedUpdateManyWithoutUserNestedInput
+  parentNotifications?: Prisma.ParentNotificationUncheckedUpdateManyWithoutUserNestedInput
   adminProfile?: Prisma.AdminProfileUncheckedUpdateOneWithoutUserNestedInput
   artJournals?: Prisma.ArtJournalUncheckedUpdateManyWithoutUserNestedInput
   completions?: Prisma.ArticleCompletionUncheckedUpdateManyWithoutStudentNestedInput
@@ -13075,6 +13528,7 @@ export type UserUncheckedUpdateManyWithoutRoleInput = {
 export type UserCountOutputType = {
   adminNotifications: number
   counselorNotifications: number
+  parentNotifications: number
   artJournals: number
   completions: number
   articles: number
@@ -13113,6 +13567,7 @@ export type UserCountOutputType = {
 export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   adminNotifications?: boolean | UserCountOutputTypeCountAdminNotificationsArgs
   counselorNotifications?: boolean | UserCountOutputTypeCountCounselorNotificationsArgs
+  parentNotifications?: boolean | UserCountOutputTypeCountParentNotificationsArgs
   artJournals?: boolean | UserCountOutputTypeCountArtJournalsArgs
   completions?: boolean | UserCountOutputTypeCountCompletionsArgs
   articles?: boolean | UserCountOutputTypeCountArticlesArgs
@@ -13170,6 +13625,13 @@ export type UserCountOutputTypeCountAdminNotificationsArgs<ExtArgs extends runti
  */
 export type UserCountOutputTypeCountCounselorNotificationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.CounselorNotificationWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountParentNotificationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ParentNotificationWhereInput
 }
 
 /**
@@ -13423,6 +13885,7 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   parentId?: boolean
   adminNotifications?: boolean | Prisma.User$adminNotificationsArgs<ExtArgs>
   counselorNotifications?: boolean | Prisma.User$counselorNotificationsArgs<ExtArgs>
+  parentNotifications?: boolean | Prisma.User$parentNotificationsArgs<ExtArgs>
   adminProfile?: boolean | Prisma.User$adminProfileArgs<ExtArgs>
   artJournals?: boolean | Prisma.User$artJournalsArgs<ExtArgs>
   completions?: boolean | Prisma.User$completionsArgs<ExtArgs>
@@ -13540,6 +14003,7 @@ export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = run
 export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   adminNotifications?: boolean | Prisma.User$adminNotificationsArgs<ExtArgs>
   counselorNotifications?: boolean | Prisma.User$counselorNotificationsArgs<ExtArgs>
+  parentNotifications?: boolean | Prisma.User$parentNotificationsArgs<ExtArgs>
   adminProfile?: boolean | Prisma.User$adminProfileArgs<ExtArgs>
   artJournals?: boolean | Prisma.User$artJournalsArgs<ExtArgs>
   completions?: boolean | Prisma.User$completionsArgs<ExtArgs>
@@ -13605,6 +14069,7 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   objects: {
     adminNotifications: Prisma.$AdminNotificationPayload<ExtArgs>[]
     counselorNotifications: Prisma.$CounselorNotificationPayload<ExtArgs>[]
+    parentNotifications: Prisma.$ParentNotificationPayload<ExtArgs>[]
     adminProfile: Prisma.$AdminProfilePayload<ExtArgs> | null
     artJournals: Prisma.$ArtJournalPayload<ExtArgs>[]
     completions: Prisma.$ArticleCompletionPayload<ExtArgs>[]
@@ -14062,6 +14527,7 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   readonly [Symbol.toStringTag]: "PrismaPromise"
   adminNotifications<T extends Prisma.User$adminNotificationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$adminNotificationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AdminNotificationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   counselorNotifications<T extends Prisma.User$counselorNotificationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$counselorNotificationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CounselorNotificationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  parentNotifications<T extends Prisma.User$parentNotificationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$parentNotificationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ParentNotificationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   adminProfile<T extends Prisma.User$adminProfileArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$adminProfileArgs<ExtArgs>>): Prisma.Prisma__AdminProfileClient<runtime.Types.Result.GetResult<Prisma.$AdminProfilePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   artJournals<T extends Prisma.User$artJournalsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$artJournalsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ArtJournalPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   completions<T extends Prisma.User$completionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$completionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ArticleCompletionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -14591,6 +15057,30 @@ export type User$counselorNotificationsArgs<ExtArgs extends runtime.Types.Extens
   take?: number
   skip?: number
   distinct?: Prisma.CounselorNotificationScalarFieldEnum | Prisma.CounselorNotificationScalarFieldEnum[]
+}
+
+/**
+ * User.parentNotifications
+ */
+export type User$parentNotificationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ParentNotification
+   */
+  select?: Prisma.ParentNotificationSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the ParentNotification
+   */
+  omit?: Prisma.ParentNotificationOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ParentNotificationInclude<ExtArgs> | null
+  where?: Prisma.ParentNotificationWhereInput
+  orderBy?: Prisma.ParentNotificationOrderByWithRelationInput | Prisma.ParentNotificationOrderByWithRelationInput[]
+  cursor?: Prisma.ParentNotificationWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ParentNotificationScalarFieldEnum | Prisma.ParentNotificationScalarFieldEnum[]
 }
 
 /**

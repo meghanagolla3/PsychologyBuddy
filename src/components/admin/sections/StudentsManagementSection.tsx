@@ -40,7 +40,7 @@ import {
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
 import { formatRelativeTime } from "@/src/utils/date.util";
-import { LoadingButton } from "@/src/components/admin/ui/AdminLoader";
+import { LoadingButton, TableRowLoader } from "@/src/components/admin/ui/AdminLoader";
 
 import { AddStudentModal } from "../modals/AddStudentModal";
 import { EditStudentModal } from "../modals/EditStudentModal";
@@ -325,7 +325,7 @@ export default function StudentsPage() {
   
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const { executeWithLoading } = useAdminLoading();
+  const { executeWithLoading, isLoading: isActionLoading } = useAdminLoading();
 
   const handleAddStudent = () => {
     setShowAdd(true);
@@ -535,11 +535,7 @@ export default function StudentsPage() {
             <TableBody>
               {/* LOADING */}
               {isLoading && (
-                <TableRow>
-                  <TableCell colSpan={7} className="py-12 text-center">
-                    Loading...
-                  </TableCell>
-                </TableRow>
+                <TableRowLoader colSpan={7} message="Loading students..." />
               )}
 
               {/* EMPTY */}
@@ -643,12 +639,15 @@ export default function StudentsPage() {
               <AlertDialogCancel>
                 Cancel
               </AlertDialogCancel>
-              <AlertDialogAction
+              <LoadingButton
+                variant="destructive"
                 onClick={confirmArchive}
+                loadingText="Deleting..."
+                isLoading={isActionLoading(AdminActions.DELETE_STUDENT)}
                 className="bg-[#EF4444] text-[#FFFFFF] hover:bg-[#EF4444]/90"
               >
                 Delete Student
-              </AlertDialogAction>
+              </LoadingButton>
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
@@ -669,12 +668,15 @@ export default function StudentsPage() {
               <AlertDialogCancel>
                 Cancel
               </AlertDialogCancel>
-              <AlertDialogAction
+              <LoadingButton
+                variant="default"
                 onClick={confirmRestore}
+                loadingText="Restoring..."
+                isLoading={isActionLoading(AdminActions.RESTORE_STUDENT)}
                 className="bg-green-600 text-white hover:bg-green-700"
               >
                 Restore Student
-              </AlertDialogAction>
+              </LoadingButton>
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>

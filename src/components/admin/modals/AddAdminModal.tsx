@@ -123,7 +123,7 @@ export function AddAdminModal({ onClose, onSuccess, schools }: AddAdminModalProp
   const [selectedLocation, setSelectedLocation] = useState<SchoolLocation | null>(null);
 
   const { user } = useAuth();
-  const { executeWithLoading } = useAdminLoading();
+  const { executeWithLoading, isLoading } = useAdminLoading();
 
   const generateDefaultPassword = () => {
     const lowercase = 'abcdefghijklmnopqrstuvwxyz';
@@ -682,6 +682,7 @@ export function AddAdminModal({ onClose, onSuccess, schools }: AddAdminModalProp
             </LoadingButton>
             <LoadingButton
               type="submit"
+              isLoading={isLoading(AdminActions.ADD_ADMIN)}
               loadingText="Creating..."
               className="gap-2 text-white"
             >

@@ -1,12 +1,13 @@
 "use client";
 
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import { useRouter } from 'next/navigation';
 import { usePermissions } from '@/src/hooks/usePermissions';
 import { useAuth } from '@/src/contexts/AuthContext';
 import { useSchoolFilter } from '@/src/contexts/SchoolFilterContext';
 
 import {
-  Plus, Search, MoreVertical, Edit, Trash2, Heart, Eye, Users, X
+  Plus, Search, ChevronRight, Edit, Trash2, Heart, Eye, Users, X
 } from 'lucide-react';
 
 import { AddCounselorModal } from '@/src/components/admin/modals/AddCounselorModal';
@@ -42,7 +43,7 @@ import {
 import { cn } from '@/lib/utils';
 import { useToast } from '@/components/ui/use-toast';
 import { useAdminLoading, AdminActions } from '@/src/contexts/AdminLoadingContext';
-import { LoadingButton } from '@/src/components/admin/ui/AdminLoader';
+import { LoadingButton, TableRowLoader } from '@/src/components/admin/ui/AdminLoader';
 
 ///////////////////////////////////////////////////////////////////////////
 // CONSTANTS
@@ -61,10 +62,11 @@ const ROLE_STYLES: Record<string, { bg: string; text: string; label: string }> =
 ///////////////////////////////////////////////////////////////////////////
 
 export function CounselorManagementSection() {
+  const router = useRouter();
   const { toast } = useToast();
   const { user, refreshUser } = useAuth();
   const { selectedSchoolId, setSelectedSchoolId, schools, isSuperAdmin } = useSchoolFilter();
-  const { executeWithLoading } = useAdminLoading();
+  const { executeWithLoading, isLoading: isActionLoading } = useAdminLoading();
 
   const [counselors, setCounselors] = useState<Counselor[]>([]);
   const [locations, setLocations] = useState<any[]>([]);
@@ -319,19 +321,21 @@ export function CounselorManagementSection() {
         <div className="rounded-xl border border-gray-300 bg-white overflow-hidden">
           <Table>
             <TableHeader>
-              <TableRow className="bg-gray-200/50">
-                <TableHead>Name</TableHead>
-                <TableHead>Email</TableHead>
-                <TableHead>School</TableHead>
-                <TableHead>Location</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Last Active</TableHead>
-                <TableHead className="w-12"></TableHead>
+              <TableRow className="bg-gray-100">
+                <TableHead className="font-semibold text-gray-700">Counselor</TableHead>
+                <TableHead className="font-semibold text-gray-700">Specialization</TableHead>
+                <TableHead className="font-semibold text-gray-700">Today Counsels</TableHead>
+                <TableHead className="font-semibold text-gray-700">Total Counsels</TableHead>
+                <TableHead className="font-semibold text-gray-700">Declined Counsels</TableHead>
+                <TableHead className="font-semibold text-gray-700">Status</TableHead>
+                <TableHead className="w-10"></TableHead>
               </TableRow>
             </TableHeader>
 
             <TableBody>
-              {filteredCounselors.length === 0 ? (
+              {isActionLoading(AdminActions.FETCH_ADMINS) ? (
+                <TableRowLoader colSpan={7} message="Loading counselors..." />
+              ) : filteredCounselors.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={7} className="text-center py-12 text-gray-500">
                     No counselors found
@@ -339,128 +343,76 @@ export function CounselorManagementSection() {
                 </TableRow>
               ) : (
                 filteredCounselors.map((counselor) => (
-                  <TableRow key={counselor.id} className="hover:bg-gray-200/30">
+                  <TableRow key={counselor.id} className="hover:bg-gray-50 border-b border-gray-100 cursor-pointer" onClick={() => {
+                    router.push(`/admin/counselors/${counselor.id}`);
+                  }}>
 
-                    {/* NAME */}
-                    <TableCell>
+                    {/* COUNSELOR */}
+                    <TableCell className="py-4">
                       <div className="flex items-center gap-3">
-                        <Avatar className="h-9 w-9">
+                        <Avatar className="h-10 w-10">
                           <AvatarImage
                             src={counselor.adminProfile?.profileImageUrl || ''}
                             alt={`${counselor.firstName} ${counselor.lastName}`}
                           />
-                          <AvatarFallback className="bg-purple-500/10 text-purple-500 text-sm">
+                          <AvatarFallback className="bg-purple-100 text-purple-600 font-medium">
                             {counselor.firstName[0]}{counselor.lastName[0]}
                           </AvatarFallback>
                         </Avatar>
                         <div>
-                          <p className="font-medium text-gray-900">
+                          <p className="font-medium text-gray-900 text-sm">
                             {counselor.firstName} {counselor.lastName}
                           </p>
-                          <Badge
-                            variant="secondary"
-                            className={cn(
-                              "text-xs mt-1",
-                              ROLE_STYLES[counselor.role.name]?.bg || ROLE_STYLES.DEFAULT.bg,
-                              ROLE_STYLES[counselor.role.name]?.text || ROLE_STYLES.DEFAULT.text
-                            )}
-                          >
-                            {ROLE_STYLES[counselor.role.name]?.label || ROLE_STYLES.DEFAULT.label}
-                          </Badge>
+                          <p className="text-xs text-gray-500">{counselor.email}</p>
                         </div>
                       </div>
                     </TableCell>
 
-                    {/* EMAIL */}
-                    <TableCell>
-                      <span className="text-sm text-gray-700">
-                        {counselor.email}
+                    {/* SPECIALIZATION */}
+                    <TableCell className="py-4">
+                      <span className="text-sm text-gray-600">
+                        {counselor.adminProfile?.specialization || counselor.adminProfile?.department || 'Not specified'}
                       </span>
                     </TableCell>
 
-                    {/* SCHOOL */}
-                    <TableCell>
-                      <span className="text-sm text-gray-700">
-                        {counselor.school?.name || 'No school assigned'}
+                    {/* TODAY COUNSELS */}
+                    <TableCell className="py-4">
+                      <span className="text-sm font-semibold text-blue-600">
+                        {counselor.sessionStats?.todayCounsels || 0}
                       </span>
                     </TableCell>
 
-                    {/* LOCATION */}
-                    <TableCell>
-                      <span className="text-sm text-gray-700">
-                        {counselor.location?.name || 'No location assigned'}
+                    {/* TOTAL COUNSELS */}
+                    <TableCell className="py-4">
+                      <span className="text-sm font-medium text-gray-900">
+                        {counselor.sessionStats?.totalCounsels || 0}
+                      </span>
+                    </TableCell>
+
+                    {/* DECLINED COUNSELS */}
+                    <TableCell className="py-4">
+                      <span className="text-sm font-semibold text-red-600">
+                        {counselor.sessionStats?.declinedCounsels || 0}
                       </span>
                     </TableCell>
 
                     {/* STATUS */}
-                    <TableCell>
-                      <div className="flex items-center gap-2">
-                        <div
-                          className={cn(
-                            "h-2 w-2 rounded-full",
-                            counselor.status === "ACTIVE" ? "bg-green-500" : "bg-gray-400"
-                          )}
-                        />
-                        <span className="text-sm capitalize">{counselor.status.toLowerCase()}</span>
-                      </div>
+                    <TableCell className="py-4">
+                      <Badge
+                        className={cn(
+                          "font-medium",
+                          counselor.status === "ACTIVE"
+                            ? "bg-green-100 text-green-700 hover:bg-green-200"
+                            : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                        )}
+                      >
+                        {counselor.status === "ACTIVE" ? "Active" : counselor.status.toLowerCase()}
+                      </Badge>
                     </TableCell>
 
-                    {/* LAST ACTIVE */}
-                    <TableCell>
-                      {counselor.lastActive
-                        ? formatRelativeTime(counselor.lastActive)
-                        : "Never"}
-                    </TableCell>
-
-                    {/* ACTION MENU */}
-                    <TableCell>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="icon" className="h-8 w-8">
-                            <MoreVertical className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="bg-white">
-
-                          <DropdownMenuItem className="gap-2" onClick={() => {
-                            setSelectedCounselor(counselor);
-                            setShowViewModal(true);
-                          }}>
-                            <Eye className="h-4 w-4" /> View
-                          </DropdownMenuItem>
-
-                          {canUpdateCounselors && (
-                            <DropdownMenuItem className="gap-2" onClick={() => {
-                              setSelectedCounselor(counselor);
-                              setShowAssignModal(true);
-                            }}>
-                              <Users className="h-4 w-4" /> Assign Students
-                            </DropdownMenuItem>
-                          )}
-
-                          {canUpdateCounselors && (
-                            <DropdownMenuItem className="gap-2" onClick={() => {
-                              setSelectedCounselor(counselor);
-                              setShowEditModal(true);
-                            }}>
-                              <Edit className="h-4 w-4" /> Edit
-                            </DropdownMenuItem>
-                          )}
-
-                          {canDeleteCounselors && (
-                            <DropdownMenuItem
-                              className="gap-2 text-red-500"
-                              onClick={() => {
-                                setSelectedCounselor(counselor);
-                                setIsDeleteOpen(true);
-                              }}
-                            >
-                              <Trash2 className="h-4 w-4" /> Delete
-                            </DropdownMenuItem>
-                          )}
-
-                        </DropdownMenuContent>
-                      </DropdownMenu>
+                    {/* CHEVRON RIGHT */}
+                    <TableCell className="py-4">
+                      <ChevronRight className="h-4 w-4 text-gray-400" />
                     </TableCell>
 
                   </TableRow>
