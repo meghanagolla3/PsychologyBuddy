@@ -1,5 +1,6 @@
 import { prisma } from './prisma';
 import { AuthError } from '@/src/utils/errors';
+import { uploadBase64ToS3, deleteFromS3 } from '@/src/utils/s3';
 
 export interface CreateImageBlockData {
   src: string;
@@ -46,6 +47,10 @@ export class ImageBlockService {
 
       const order = data.order ?? (lastBlock ? lastBlock.order + 1 : 0);
 
+      if (data.src && data.src.startsWith('data:')) {
+        data.src = await uploadBase64ToS3(data.src, `article_img_${articleId}_${Date.now()}`) || '';
+      }
+
       const block = await prisma.imageBlock.create({
         data: {
           articleId,
@@ -70,6 +75,22 @@ export class ImageBlockService {
   // Update an image block
   static async updateImageBlock(blockId: string, data: UpdateImageBlockData) {
     try {
+      const existingBlock = await prisma.imageBlock.findUnique({
+        where: { id: blockId }
+      });
+
+      if (!existingBlock) {
+        throw new AuthError('Image block not found', 404);
+      }
+
+      if (data.src && data.src.startsWith('data:')) {
+        const oldUrl = existingBlock.src;
+        data.src = await uploadBase64ToS3(data.src, `article_img_${existingBlock.articleId}_${Date.now()}`) || '';
+        if (oldUrl && (oldUrl.startsWith('http:') || oldUrl.startsWith('https:'))) {
+          await deleteFromS3(oldUrl);
+        }
+      }
+
       const block = await prisma.imageBlock.update({
         where: { id: blockId },
         data: {
@@ -87,6 +108,7 @@ export class ImageBlockService {
       };
     } catch (error) {
       console.error('Update image block error:', error);
+      if (error instanceof AuthError) throw error;
       throw new AuthError('Failed to update image block', 500);
     }
   }
@@ -94,6 +116,14 @@ export class ImageBlockService {
   // Delete an image block
   static async deleteImageBlock(blockId: string) {
     try {
+      const existingBlock = await prisma.imageBlock.findUnique({
+        where: { id: blockId }
+      });
+
+      if (existingBlock && existingBlock.src && (existingBlock.src.startsWith('http:') || existingBlock.src.startsWith('https:'))) {
+        await deleteFromS3(existingBlock.src);
+      }
+
       await prisma.imageBlock.delete({
         where: { id: blockId },
       });

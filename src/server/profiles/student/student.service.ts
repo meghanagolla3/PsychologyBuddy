@@ -5,6 +5,7 @@ import { AuthError } from '@/src/utils/errors';
 import { CreateStudentData, UpdateStudentData, StudentSelfUpdateData, ResetStudentPasswordData, UpdateStudentStatusData } from './student.validators';
 import { ExtendedUpdateStudentData } from './student.repository';
 import prisma from '@/src/prisma';
+import { uploadToS3, deleteFromS3 } from '@/src/utils/s3';
 
 export class StudentService {
   static studentSelfUpdate(id: any, validatedData: { profileImage?: string | undefined; }) {
@@ -572,27 +573,28 @@ export class StudentService {
       // Handle photo upload if provided
       if (photo) {
         try {
-          // Create uploads directory if it doesn't exist
-          const fs = require('fs');
-          const path = require('path');
-          const uploadsDir = path.join(process.cwd(), 'public', 'uploads', 'profiles');
-          
-          if (!fs.existsSync(uploadsDir)) {
-            fs.mkdirSync(uploadsDir, { recursive: true });
-          }
-
-          // Generate unique filename
-          const fileExtension = photo.name.split('.').pop();
-          const fileName = `${studentId}_${Date.now()}.${fileExtension}`;
-          const filePath = path.join(uploadsDir, fileName);
-
-          // Convert File to Buffer and save
           const bytes = await photo.arrayBuffer();
           const buffer = Buffer.from(bytes);
-          fs.writeFileSync(filePath, buffer);
+
+          // Get existing student profile to retrieve the old image url
+          const existingProfile = await prisma.studentProfile.findUnique({
+            where: { userId: studentId },
+            select: { profileImage: true }
+          });
+
+          // Upload using centralized S3 service
+          const imageUrl = await uploadToS3(buffer, photo.name, photo.type);
+
+          // Delete old image from S3 if it exists and is an S3 URL
+          if (existingProfile?.profileImage && (existingProfile.profileImage.startsWith('http://') || existingProfile.profileImage.startsWith('https://'))) {
+            try {
+              await deleteFromS3(existingProfile.profileImage);
+            } catch (delError) {
+              console.warn('Failed to delete old student profile photo from S3:', delError);
+            }
+          }
 
           // Update profile image in database
-          const imageUrl = `/uploads/profiles/${fileName}`;
           await prisma.studentProfile.upsert({
             where: { userId: studentId },
             update: { profileImage: imageUrl },
@@ -602,9 +604,9 @@ export class StudentService {
             }
           });
 
-          console.log('Photo uploaded successfully:', imageUrl);
+          console.log('Photo uploaded to S3 successfully:', imageUrl);
         } catch (photoError) {
-          console.error('Photo upload error:', photoError);
+          console.error('Photo upload to S3 error:', photoError);
           // Continue with profile update even if photo fails
         }
       }

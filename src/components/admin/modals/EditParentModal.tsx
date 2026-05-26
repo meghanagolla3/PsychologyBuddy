@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { LoadingButton } from "@/src/components/admin/ui/AdminLoader";
 import {
   Select,
   SelectContent,
@@ -293,10 +294,10 @@ export function EditParentModal({ parent, onClose, onSuccess, onDelete }: EditPa
               <Button type="button" variant="outline" onClick={onClose}>
                 Cancel
               </Button>
-              <Button type="submit" disabled={isSubmitting}>
-                <Save className="h-4 w-4 mr-1" />
-                {isSubmitting ? "Saving..." : "Save Changes"}
-              </Button>
+              <LoadingButton type="submit" isLoading={isSubmitting} loadingText="Saving..." className="gap-2">
+                <Save className="h-4 w-4" />
+                Save Changes
+              </LoadingButton>
             </div>
           </div>
         </form>

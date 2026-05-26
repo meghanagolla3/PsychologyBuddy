@@ -98,12 +98,12 @@ export default function TrustSection() {
   return (
     <section
       ref={ref}
-      className="relative py-5 px-4 xs:px-6 sm:py-16 bg-[#F3FAFE] overflow-hidden"
+      className="relative py-5 px-4 xs:px-6 sm:py-16 md:py-20 bg-[#F3FAFE] overflow-hidden"
     >
       <div className="max-w-7xl mx-auto">
 
         {/* Heading */}
-        <div className="text-center mb-2 sm:mb-16" style={fade()}>
+        <div className="text-center mb-2 sm:mb-16 md:mb-20" style={fade()}>
           <div className="inline-flex items-center bg-white px-3 py-1 rounded-full border mb-5 drop-shadow-xl text-[8px] text-[#3A3A3A]">
             <Shield className="w-[10px] h-[12px] text-[#1FA1E2]"></Shield>
             Safe. Private. Supported.
@@ -114,21 +114,21 @@ export default function TrustSection() {
           </h2>
         </div>
 
-        <div className="flex flex-row items-center justify-center gap-4 sm:gap-6 lg:gap-8 xl:gap-12 w-full relative min-h-[500px] sm:min-h-[800px] lg:min-h-0">
+        <div className="flex flex-row items-center justify-center gap-4 sm:gap-6 md:gap-8 lg:gap-8 xl:gap-12 w-full relative min-h-[500px] sm:min-h-[800px] md:min-h-[600px] lg:min-h-0">
 
           {/* Column 1: Illustration (Watermark on Mobile, Interactive Column on Desktop) */}
-          <div className="absolute lg:relative -left-20 xs:-left-16 sm:left-0 lg:left-auto top-40 sm:top-36 lg:top-auto w-[240px] xs:w-[280px] sm:w-[320px] lg:w-[500px] xl:w-[620px] opacity-25 sm:opacity-30 lg:opacity-100 flex justify-center pointer-events-none lg:pointer-events-auto z-0" style={fade(200)}>
+          <div className="absolute lg:relative -left-20 xs:-left-16 sm:left-0 md:left-4 lg:left-auto top-40 sm:top-36 md:top-32 lg:top-auto w-[240px] xs:w-[280px] sm:w-[320px] md:w-[400px] lg:w-[500px] xl:w-[620px] opacity-25 sm:opacity-30 md:opacity-40 lg:opacity-100 flex justify-center pointer-events-none lg:pointer-events-auto z-0" style={fade(200)}>
             <Image
               src="/LandingPage/1.svg"
               alt="Laptop security"
               width={674.4769287109375}
               height={440.00042724609375}
-              className="w-full h-auto max-w-[450px] sm:max-w-[500px] xl:max-w-[620px] object-contain"
+              className="w-full h-auto max-w-[450px] sm:max-w-[500px] md:max-w-[550px] xl:max-w-[620px] object-contain"
             />
           </div>
 
           {/* Cards Container */}
-          <div className="w-full lg:w-auto ml-auto lg:ml-0 relative z-10 max-w-[185px] xs:max-w-[220px] sm:max-w-[240px] lg:max-w-none grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-8 justify-items-center items-center">
+          <div className="w-full lg:w-auto ml-auto lg:ml-0 relative z-10 max-w-[185px] xs:max-w-[220px] sm:max-w-[240px] md:max-w-[280px] lg:max-w-none grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-8 justify-items-center items-center">
 
             {/* Card 1 Wrapper (Always Supported) */}
             <div style={fade(300)} className="w-full flex justify-center order-1 lg:col-start-1 lg:row-start-1">
@@ -172,11 +172,11 @@ function Card({
           ? "0 12px 40px rgba(0,0,0,0.08)"
           : "0 4px 18px rgba(0,0,0,0.05)",
       }}
-      className="bg-[#FFFFFF1A] rounded-2xl p-3 sm:p-5 text-center w-full max-w-[185px] xs:max-w-[220px] lg:max-w-[300px] min-h-[140px] xs:min-h-[160px] sm:min-h-[220px] flex flex-col items-center justify-center border border-[#E2E2E2] drop-shadow-2xl drop-shadow-[#0980D226] mx-auto backdrop-blur-sm z-10"
+      className="bg-[#FFFFFF1A] rounded-2xl p-3 sm:p-5 md:p-6 text-center w-full max-w-[185px] xs:max-w-[220px] md:max-w-[280px] lg:max-w-[300px] min-h-[140px] xs:min-h-[160px] sm:min-h-[220px] md:min-h-[250px] flex flex-col items-center justify-center border border-[#E2E2E2] drop-shadow-2xl drop-shadow-[#0980D226] mx-auto backdrop-blur-sm z-10"
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
     >
-      <div className="w-[34px] h-[30px] sm:w-[48px] sm:h-[43px] flex items-center justify-center rounded-lg sm:rounded-xl bg-[#FFFFFF1A] mx-auto mb-1.5 sm:mb-3">
+      <div className="w-[34px] h-[30px] sm:w-[48px] sm:h-[43px] md:w-[56px] md:h-[50px] flex items-center justify-center rounded-lg sm:rounded-xl bg-[#FFFFFF1A] mx-auto mb-1.5 sm:mb-3 md:mb-4">
         <Image
           src={feature.imageSrc}
           alt={feature.imageAlt}
@@ -186,11 +186,11 @@ function Card({
         />
       </div>
 
-      <h3 className="font-medium text-xs xs:text-sm sm:text-[18px] text-[#2F3D43] mb-0.5 sm:mb-2">
+      <h3 className="font-medium text-xs xs:text-sm sm:text-[18px] md:text-[20px] text-[#2F3D43] mb-0.5 sm:mb-2 md:mb-3">
         {feature.title}
       </h3>
 
-      <p className="text-[9.5px] xs:text-[11px] sm:text-[13px] text-[#686D70] leading-normal sm:leading-relaxed">
+      <p className="text-[9.5px] xs:text-[11px] sm:text-[13px] md:text-[15px] text-[#686D70] leading-normal sm:leading-relaxed md:leading-relaxed">
         {feature.description}
       </p>
     </div>

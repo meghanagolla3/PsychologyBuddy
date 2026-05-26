@@ -12,7 +12,7 @@ import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { Mail, Phone, Building, Shield, Camera, User, Calendar, Edit2, Save, X, Key } from "lucide-react";
 import { Admin } from '@/src/types/admin.types';
-import { RingSpinner } from "../../ui/Spinners";
+import { AdminLoader } from '@/src/components/admin/ui/AdminLoader';
 
 interface AdminProfile extends Admin {
   adminProfile?: {
@@ -328,7 +328,12 @@ export default function Profile() {
     
     console.log('Checking image URL:', url.length, 'characters');
     
-    // Check if URL is too large (over 1MB for better performance)
+    // Check if it's a standard web URL (like our Linode S3 URLs)
+    if (url.startsWith('http://') || url.startsWith('https://')) {
+      return true;
+    }
+    
+    // Check if URL is too large (over 1MB for better performance of legacy base64 images)
     if (url.length > 1024 * 1024) {
       console.warn('Image URL too large:', url.length, 'characters');
       return false;
@@ -386,9 +391,9 @@ export default function Profile() {
 
   if (isLoading) {
     return (
-      <div className="flex justify-center py-8">
-                      <RingSpinner className="h-8 w-8" />
-                    </div>
+      <div className="flex justify-center py-12">
+        <AdminLoader size="md" message="Loading profile..." />
+      </div>
     );
   }
 

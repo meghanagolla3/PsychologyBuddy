@@ -4,7 +4,7 @@ import { z } from 'zod';
 export const CreateArticleSchema = z.object({
   title: z.string().min(1, 'Article title is required'),
   author: z.string().min(1, 'Author is required'),
-  thumbnailUrl: z.string().url().optional().or(z.literal('')),
+  thumbnailUrl: z.string().optional().or(z.literal('')),
   readTime: z.number().int().min(1, 'Read time must be at least 1 minute').optional(),
   description: z.string().min(1, 'Short description is required'),
   categoryIds: z.array(z.string()).optional(),
@@ -17,7 +17,7 @@ export const CreateArticleSchema = z.object({
 export const UpdateArticleSchema = z.object({
   title: z.string().min(1, 'Article title is required').optional(),
   author: z.string().min(1, 'Author is required').optional(),
-  thumbnailUrl: z.string().url().optional().or(z.literal('')),
+  thumbnailUrl: z.string().optional().or(z.literal('')),
   readTime: z.number().int().min(1, 'Read time must be at least 1 minute').optional(),
   description: z.string().min(1, 'Short description is required').optional(),
   categoryIds: z.array(z.string()).optional(),

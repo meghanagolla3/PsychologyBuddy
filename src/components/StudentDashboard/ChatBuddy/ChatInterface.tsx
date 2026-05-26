@@ -1,7 +1,7 @@
 "use client";
 import { X, Sparkles, Lightbulb, Shield, ArrowUpRight } from "lucide-react";
 
-import React, { useState, useRef, useCallback } from "react";
+import React, { useState, useRef, useCallback, useMemo, memo } from "react";
 import { Send } from "lucide-react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
@@ -12,7 +12,10 @@ import { NavigationUtils } from "@/src/utils";
 import { FullPageLoading } from "@/components/ui/LoadingSpinner";
 import { AuthError } from "@/components/ui/ErrorMessage";
 import BackToDashboard from "../Layout/BackToDashboard";
-import ReactMarkdown from 'react-markdown';
+import dynamic from 'next/dynamic';
+
+// Lazy load ReactMarkdown for better performance
+const ReactMarkdown = dynamic(() => import('react-markdown'), { ssr: false });
 
 // Format timestamp to show only hours and minutes
 const formatTime = (timestamp: string) => {
@@ -80,8 +83,8 @@ const DEFAULT_QUICK_REPLIES = [
   "I'm feeling sad",
 ];
 
-// Chat Message Component
-function ChatMessage({ 
+// Chat Message Component - memoized to prevent unnecessary re-renders
+const ChatMessage = memo(function ChatMessage({ 
   message, 
   onImportLastConversation,
   lastSession,
@@ -210,10 +213,10 @@ function ChatMessage({
       )}
     </div>
   );
-}
+});
 
-// Typing Indicator Component
-function TypingIndicator() {
+// Typing Indicator Component - memoized
+const TypingIndicator = memo(function TypingIndicator() {
   return (
     <div className="flex gap-2 sm:gap-3 justify-start mb-4 sm:mb-6">
       <div className=" text-gray-600 rounded-2xl rounded-tl-sm flex items-center">
@@ -227,10 +230,10 @@ function TypingIndicator() {
       </div>
     </div>
   );
-}
+});
 
-// Chat Input Component
-function ChatInput({ 
+// Chat Input Component - memoized
+const ChatInput = memo(function ChatInput({ 
   input, 
   onInputChange, 
   onSend, 
@@ -243,12 +246,12 @@ function ChatInput({
   disabled?: boolean;
   placeholder?: string;
 }) {
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+  const handleKeyDown = useCallback((e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       onSend();
     }
-  };
+  }, [onSend]);
 
   return (
     <div className="px-3 sm:px-4 lg:px-15 py-3 sm:py-4 bg-white border-t border-[#f8f8f8]">
@@ -272,10 +275,10 @@ function ChatInput({
       </div>
     </div>
   );
-}
+});
 
-// Exercise Suggestions Component (as bot message)
-function ExerciseSuggestions({ 
+// Exercise Suggestions Component (as bot message) - memoized
+const ExerciseSuggestions = memo(function ExerciseSuggestions({ 
   suggestions, 
   onSuggestionClick, 
   onDismiss 
@@ -359,10 +362,10 @@ function ExerciseSuggestions({
       </div>
     </div>
   );
-}
+});
 
-// Quick Replies Component
-function QuickReplies({ 
+// Quick Replies Component - memoized
+const QuickReplies = memo(function QuickReplies({ 
   replies, 
   onReplyClick, 
   className = "" 
@@ -389,10 +392,10 @@ function QuickReplies({
       </div>
     </div>
   );
-}
+});
 
-// Last Summary Import Component
-function LastSummaryImport({ 
+// Last Summary Import Component - memoized
+const LastSummaryImport = memo(function LastSummaryImport({ 
   mainTopic, 
   onImport, 
   onDismiss 
@@ -426,10 +429,10 @@ function LastSummaryImport({
       </div>
     </div>
   );
-}
+});
 
-// Chat Header Component
-function ChatHeader({ onSummariesClick, onMoodCheckinClick }: {
+// Chat Header Component - memoized
+const ChatHeader = memo(function ChatHeader({ onSummariesClick, onMoodCheckinClick }: {
   onSummariesClick: () => void;
   onMoodCheckinClick: () => void;
 }) {
@@ -470,10 +473,10 @@ function ChatHeader({ onSummariesClick, onMoodCheckinClick }: {
       </div>
     </div>
   );
-}
+});
 
-// Disclaimer Component
-function Disclaimer() {
+// Disclaimer Component - memoized
+const Disclaimer = memo(function Disclaimer() {
   return (
     <div className="px-3 sm:px-4 lg:px-6 py-2 sm:py-3  ">
       <div className="flex items-center justify-center gap-2">
@@ -494,7 +497,7 @@ function Disclaimer() {
       </div>
     </div>
   );
-}
+});
 
 // Main Chat Interface Component
 export default function ChatInterface({
@@ -506,7 +509,6 @@ export default function ChatInterface({
   notes,
 }: ChatInterfaceProps) {
   const router = useRouter();
-  const chatRef = useRef<HTMLDivElement>(null);
   
   // Reusable authentication hook
   const { user, loading: authLoading, error: authError } = useServerAuth();
@@ -648,7 +650,7 @@ export default function ChatInterface({
     setIsLoading(hookIsLoading);
   }, [hookIsLoading]);
 
-  // Debug logging and ensure chat initialization
+  // Debug logging and ensure chat initialization - optimized dependencies
   React.useEffect(() => {
     console.log('ChatInterface Debug:', {
       user: user?.id,
@@ -665,30 +667,54 @@ export default function ChatInterface({
       console.log('Manually triggering chat initialization');
       initializeChat(mood || accessMood, triggers || accessTriggers, notes || accessNotes);
     }
-  }, [messages, mood, accessMood, triggers, accessTriggers, notes, accessNotes, hookIsLoading, hookSessionId, initializeChat]);
+  }, [user?.id, messages.length, hookSessionId, hookIsLoading, initializeChat]);
 
-  // State to track if last message was from user
-  const [lastMessageWasFromUser, setLastMessageWasFromUser] = useState(false);
-  
-  // State for exercise suggestions
-  const [showExerciseSuggestions, setShowExerciseSuggestions] = useState(false);
-  const [exerciseSuggestions, setExerciseSuggestions] = useState<any[]>([]);
-  const [studentMessageCount, setStudentMessageCount] = useState(0);
-
-  // Auto-scroll to bottom - only when user sends message, not when bot responds
-  React.useEffect(() => {
-    if (chatRef.current && lastMessageWasFromUser) {
-      chatRef.current.scrollTop = chatRef.current.scrollHeight;
-      setLastMessageWasFromUser(false);
+  // State for exercise suggestions - persisted across refreshes
+  const [showExerciseSuggestions, setShowExerciseSuggestions] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return sessionStorage.getItem('showExerciseSuggestions') === 'true';
     }
-  }, [messages, lastMessageWasFromUser]);
+    return false;
+  });
+  const [exerciseSuggestions, setExerciseSuggestions] = useState<any[]>(() => {
+    if (typeof window !== 'undefined') {
+      const saved = sessionStorage.getItem('exerciseSuggestions');
+      return saved ? JSON.parse(saved) : [];
+    }
+    return [];
+  });
+  const [studentMessageCount, setStudentMessageCount] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const saved = sessionStorage.getItem('studentMessageCount');
+      return saved ? parseInt(saved, 10) : 0;
+    }
+    return 0;
+  });
 
-  // Track when user sends messages and count them
+  // Persist exercise suggestions state to sessionStorage
+  React.useEffect(() => {
+    if (typeof window !== 'undefined') {
+      sessionStorage.setItem('showExerciseSuggestions', showExerciseSuggestions.toString());
+    }
+  }, [showExerciseSuggestions]);
+
+  React.useEffect(() => {
+    if (typeof window !== 'undefined') {
+      sessionStorage.setItem('exerciseSuggestions', JSON.stringify(exerciseSuggestions));
+    }
+  }, [exerciseSuggestions]);
+
+  React.useEffect(() => {
+    if (typeof window !== 'undefined') {
+      sessionStorage.setItem('studentMessageCount', studentMessageCount.toString());
+    }
+  }, [studentMessageCount]);
+
+  // Track when user sends messages and count them - optimized to only run when last message changes
   React.useEffect(() => {
     if (messages.length > 0) {
       const lastMessage = messages[messages.length - 1];
       if (lastMessage.sender === 'student') {
-        setLastMessageWasFromUser(true);
         setStudentMessageCount(prev => {
           const newCount = prev + 1;
           // Show exercise suggestions after 5 student messages
@@ -699,7 +725,7 @@ export default function ChatInterface({
         });
       }
     }
-  }, [messages]);
+  }, [messages.length]);
 
   // Fetch exercise suggestions
   const fetchExerciseSuggestions = async () => {
@@ -871,7 +897,7 @@ export default function ChatInterface({
           )}
 
           {/* Chat Area */}
-          <div ref={chatRef} className="flex-1 overflow-y-auto px-3 sm:px-4 lg:px-15 py-3 sm:py-4 lg:py-6 bg-white">
+          <div ref={hookChatRef} className="flex-1 overflow-y-auto px-3 sm:px-4 lg:px-15 py-3 sm:py-4 lg:py-6 bg-white">
            
               
 

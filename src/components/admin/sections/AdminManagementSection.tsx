@@ -41,7 +41,7 @@ import {
 import { cn } from '@/lib/utils';
 import { useToast } from '@/components/ui/use-toast';
 import { useAdminLoading, AdminActions } from '@/src/contexts/AdminLoadingContext';
-import { LoadingButton } from '@/src/components/admin/ui/AdminLoader';
+import { LoadingButton, TableRowLoader } from '@/src/components/admin/ui/AdminLoader';
 
 ///////////////////////////////////////////////////////////////////////////
 // CONSTANTS
@@ -122,7 +122,7 @@ export function AdminManagementSection() {
   const { toast } = useToast();
   const { user, refreshUser } = useAuth();
   const { selectedSchoolId, setSelectedSchoolId, schools, isSuperAdmin } = useSchoolFilter();
-  const { executeWithLoading } = useAdminLoading();
+  const { executeWithLoading, isLoading: isActionLoading } = useAdminLoading();
 
   const [admins, setAdmins] = useState<Admin[]>([]);
   const [locations, setLocations] = useState<any[]>([]);
@@ -500,7 +500,9 @@ export function AdminManagementSection() {
             </TableHeader>
 
             <TableBody>
-              {filteredAdmins.length === 0 ? (
+              {isActionLoading(AdminActions.FETCH_ADMINS) ? (
+                <TableRowLoader colSpan={8} message="Loading admins..." />
+              ) : filteredAdmins.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={8} className="text-center py-12 text-gray-500">
                     No admins found

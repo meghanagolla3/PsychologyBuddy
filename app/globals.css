@@ -44,6 +44,14 @@
     --chart-3: 38 92% 50%;
     --chart-4: 0 84% 60%;
     --chart-5: 262 83% 58%;
+    
+    /* Brand colors for new login design */
+    --brand: 211 79% 53%;
+    --brand-soft: 211 79% 95%;
+    --brand-foreground: 0 0% 100%;
+    --gradient-brand: linear-gradient(135deg, #4FC1F9 0%, #1B9EE0 100%);
+    --shadow-soft: 0 4px 20px rgba(79, 193, 249, 0.15);
+    --shadow-card: 0 4px 12px rgba(0, 0, 0, 0.08);
   }
 
   .dark {
@@ -142,6 +150,27 @@
 
   .custom-scrollbar::-webkit-scrollbar-thumb:hover {
     background: #CBD5E1;
+  }
+
+  /* Brand color utilities for new login design */
+  .bg-brand-soft {
+    background-color: hsl(var(--brand-soft));
+  }
+
+  .text-brand {
+    color: hsl(var(--brand));
+  }
+
+  .text-heart {
+    color: #E91E63;
+  }
+
+  .text-info {
+    color: #2196F3;
+  }
+
+  .text-shield {
+    color: #4CAF50;
   }
 }
 @keyframes float {

@@ -1,5 +1,6 @@
 import { MusicRepository } from "../repository/music.repository";
 import prisma from "@/src/prisma";
+import { uploadBase64ToS3, deleteFromS3 } from "@/src/utils/s3";
 import {
   CreateMusicResourceInput,
   UpdateMusicResourceInput,
@@ -33,6 +34,17 @@ export class MusicAdminService {
 
   async createMusicResource(data: CreateMusicResourceInput & { schoolId?: string }) {
     try {
+      const titleSlug = data.title.toLowerCase().replace(/[^a-z0-9]/g, "_");
+      if (data.url && data.url.startsWith("data:")) {
+        data.url = await uploadBase64ToS3(data.url, `music_audio_${titleSlug}`) || "";
+      }
+      if (data.coverImage && data.coverImage.startsWith("data:")) {
+        data.coverImage = await uploadBase64ToS3(data.coverImage, `music_cover_${titleSlug}`) || "";
+      }
+      if (data.thumbnailUrl && data.thumbnailUrl.startsWith("data:")) {
+        data.thumbnailUrl = await uploadBase64ToS3(data.thumbnailUrl, `music_thumb_${titleSlug}`) || "";
+      }
+
       const resource = await this.musicRepository.createMusicResource(data);
       
       return {
@@ -109,6 +121,30 @@ export class MusicAdminService {
           success: false,
           message: "Music resource not found",
         };
+      }
+
+      const titleSlug = (data.title || existingResource.title).toLowerCase().replace(/[^a-z0-9]/g, "_");
+
+      if (data.url && data.url.startsWith("data:")) {
+        const oldUrl = existingResource.url;
+        data.url = await uploadBase64ToS3(data.url, `music_audio_${titleSlug}`) || "";
+        if (oldUrl && (oldUrl.startsWith("http:") || oldUrl.startsWith("https:"))) {
+          await deleteFromS3(oldUrl);
+        }
+      }
+      if (data.coverImage && data.coverImage.startsWith("data:")) {
+        const oldUrl = existingResource.coverImage;
+        data.coverImage = await uploadBase64ToS3(data.coverImage, `music_cover_${titleSlug}`) || "";
+        if (oldUrl && (oldUrl.startsWith("http:") || oldUrl.startsWith("https:"))) {
+          await deleteFromS3(oldUrl);
+        }
+      }
+      if (data.thumbnailUrl && data.thumbnailUrl.startsWith("data:")) {
+        const oldUrl = existingResource.thumbnailUrl;
+        data.thumbnailUrl = await uploadBase64ToS3(data.thumbnailUrl, `music_thumb_${titleSlug}`) || "";
+        if (oldUrl && (oldUrl.startsWith("http:") || oldUrl.startsWith("https:"))) {
+          await deleteFromS3(oldUrl);
+        }
       }
 
       const { id, schoolId, ...updateData } = data;

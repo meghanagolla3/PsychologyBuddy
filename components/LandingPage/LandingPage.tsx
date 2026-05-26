@@ -17,7 +17,7 @@ const LandingPage: React.FC = () => {
       <Hero />
 
       {/* Section 2: Features */}
-      <div id="features" className="relative z-20 w-full mt-[-35vw] sm:mt-[-35vw] lg:mt-[-18vw] pb-20"> 
+      <div id="features" className="relative z-20 w-full mt-[-35vw] sm:mt-[-35vw] md:mt-[-55vw] lg:mt-[-18vw] pb-20"> 
         <Features />
       </div>
 

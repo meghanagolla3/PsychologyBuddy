@@ -6,7 +6,7 @@ const AboutSection = () => {
   return (
     <section className="w-full">
       {/* Hero Banner */}
-<div className="relative w-full h-64 md:h-[354px] overflow-hidden">
+<div className="relative w-full h-64 md:h-[260px] bg-gradient-to-b from-[#1f94ce] to-[#1e8cc6] overflow-hidden">
   {/* Mobile Background Image */}
   <Image
     src="/about/Group 1321317931.svg"
@@ -19,7 +19,7 @@ const AboutSection = () => {
     src="/about/About.svg"
     alt="Psychology Buddy Background"
     fill
-    className="object-cover hidden md:block"
+    className="object-cover md:object-contain md:object-bottom hidden md:block"
   />
 </div>        
       

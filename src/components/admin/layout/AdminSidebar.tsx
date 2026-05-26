@@ -180,7 +180,6 @@ export function AdminSidebar() {
       icon: AlertTriangle,
       href: "/admin/alerts",
       permission: 'escalations.view',
-      badge: 3,
     },
     {
       label: "ENGAGEMENT",

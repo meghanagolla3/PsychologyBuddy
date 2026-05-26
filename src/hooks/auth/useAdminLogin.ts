@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/src/contexts/AuthContext';
+import { useAdminLoading } from '@/src/contexts/AdminLoadingContext';
 
 interface AdminLoginData {
   email: string;
@@ -35,12 +36,12 @@ export function useAdminLogin() {
     password: '',
     rememberMe: false,
   });
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
   const { login } = useAuth();
+  const { executeWithLoading, setLoading } = useAdminLoading();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
@@ -64,23 +65,22 @@ export function useAdminLogin() {
       return;
     }
 
-    setLoading(true);
     setError(null);
 
     try {
-      const response = await fetch('/api/auth/admin-login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData),
-      });
-
-      const data: AdminLoginResponse = await response.json();
+      const data = await executeWithLoading(
+        'admin_login',
+        fetch('/api/auth/admin-login', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(formData),
+        }).then(res => res.json()),
+        'Logging in...'
+      );
 
       if (data.success && data.data?.user) {
-        setSuccess('Login successful!');
-        
         // Login user in context with required adminProfile
         const userWithProfile = {
           ...data.data.user,
@@ -90,6 +90,9 @@ export function useAdminLogin() {
         
         // Redirect based on role
         const userRole = data.data.user.role.name;
+        
+        // Keep loader active during redirect
+        setLoading('admin_login', true, 'Redirecting...');
         
         setTimeout(() => {
           if (userRole === 'SUPERADMIN' || userRole === 'SCHOOL_SUPERADMIN') {
@@ -110,8 +113,6 @@ export function useAdminLogin() {
     } catch (err) {
       console.error('Admin login error:', err);
       setError('Network error. Please check your connection and try again.');
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -126,7 +127,7 @@ export function useAdminLogin() {
 
   return {
     formData,
-    loading,
+    loading: false,
     error,
     success,
     showPassword,

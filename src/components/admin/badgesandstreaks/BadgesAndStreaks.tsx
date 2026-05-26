@@ -36,7 +36,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { useAuth } from "@/src/contexts/AuthContext";
 import { useSchoolFilter } from "@/src/contexts/SchoolFilterContext";
 import { useAdminLoading, AdminActions } from "@/src/contexts/AdminLoadingContext";
-import { RingSpinner } from "../../ui/Spinners";
+import { AdminLoader } from "../../ui/AdminLoader";
 
 // Emoji mappings for different badge types
 const BADGE_TYPE_EMOJIS = {
@@ -573,7 +573,7 @@ export default function BadgesAndStreaks() {
 
             {loading ? (
               <div className="flex justify-center py-8">
-                <RingSpinner className="h-8 w-8" />
+                <AdminLoader size="md" message="Loading badges..." />
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">

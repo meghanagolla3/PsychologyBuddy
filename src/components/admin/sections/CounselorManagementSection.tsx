@@ -42,7 +42,7 @@ import {
 import { cn } from '@/lib/utils';
 import { useToast } from '@/components/ui/use-toast';
 import { useAdminLoading, AdminActions } from '@/src/contexts/AdminLoadingContext';
-import { LoadingButton } from '@/src/components/admin/ui/AdminLoader';
+import { LoadingButton, TableRowLoader } from '@/src/components/admin/ui/AdminLoader';
 
 ///////////////////////////////////////////////////////////////////////////
 // CONSTANTS
@@ -64,7 +64,7 @@ export function CounselorManagementSection() {
   const { toast } = useToast();
   const { user, refreshUser } = useAuth();
   const { selectedSchoolId, setSelectedSchoolId, schools, isSuperAdmin } = useSchoolFilter();
-  const { executeWithLoading } = useAdminLoading();
+  const { executeWithLoading, isLoading: isActionLoading } = useAdminLoading();
 
   const [counselors, setCounselors] = useState<Counselor[]>([]);
   const [locations, setLocations] = useState<any[]>([]);
@@ -331,7 +331,9 @@ export function CounselorManagementSection() {
             </TableHeader>
 
             <TableBody>
-              {filteredCounselors.length === 0 ? (
+              {isActionLoading(AdminActions.FETCH_ADMINS) ? (
+                <TableRowLoader colSpan={7} message="Loading counselors..." />
+              ) : filteredCounselors.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={7} className="text-center py-12 text-gray-500">
                     No counselors found

@@ -693,15 +693,41 @@ export default function MusicTools({
     return isNaN(parsed) ? 0 : parsed;
   };
 
-  const handleThumbnailUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleThumbnailUpload = async (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
     const file = e.target.files?.[0];
     if (file) {
       const reader = new FileReader();
-      reader.onloadend = (event) => {
-        const result = event.target?.result as string;
-        if (result) {
-          setMusicForm(prev => ({ ...prev, thumbnail: result }));
-          toast({ title: "Thumbnail Uploaded", description: "Thumbnail image uploaded successfully" });
+      reader.onloadend = async () => {
+        const base64 = reader.result as string;
+        try {
+          const resp = await fetch('/api/admin/upload', {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ base64, name: `music_thumb_${file.name}` }),
+          });
+          const data = await resp.json();
+          if (data.success) {
+            setMusicForm((prev) => ({ ...prev, thumbnail: data.url }));
+            toast({
+              title: "Thumbnail uploaded",
+              description: `File "${file.name}" uploaded successfully`,
+            });
+          } else {
+            toast({
+              title: "Upload error",
+              description: data.message || "Failed to upload thumbnail",
+              variant: "destructive",
+            });
+          }
+        } catch (err) {
+          console.error("Thumbnail upload error:", err);
+          toast({
+            title: "Upload error",
+            description: "Failed to upload thumbnail",
+            variant: "destructive",
+          });
         }
       };
       reader.readAsDataURL(file);
@@ -710,62 +736,83 @@ export default function MusicTools({
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handleAudioUpload = (
+  const handleAudioUpload = async (
     e: React.ChangeEvent<HTMLInputElement>,
     type: string,
   ) => {
     const file = e.target.files?.[0];
     if (file) {
       const reader = new FileReader();
-      reader.onloadend = () => {
+      reader.onloadend = async () => {
         if (type === "meditation" || type === "edit") {
-          const url = reader.result as string;
-
-          // Get actual duration for audio files
-          if (file.type.startsWith("audio/")) {
-            const audio = new Audio(url);
-            audio.addEventListener("loadedmetadata", () => {
-              const durationInSeconds = Math.floor(audio.duration);
-              const durationInMinutes = Math.round((durationInSeconds / 60) * 100) / 100;
-
-              setMusicForm((prev) => ({
-                ...prev,
-                audioUrl: url,
-                videoUrl: url,
-                duration: durationInMinutes.toString(),
-              }));
-              toast({
-                title: "File Uploaded",
-                description: `${musicForm.format.toLowerCase()} file "${file.name}" uploaded successfully`,
-              });
+          const base64 = reader.result as string;
+          try {
+            const resp = await fetch('/api/admin/upload', {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ base64, name: `music_media_${file.name}` }),
             });
-
-            audio.addEventListener("error", () => {
-              // Fallback to file size estimate if audio metadata fails
-              const durationInMinutes = Math.round((file.size / 6000000) * 100) / 100; // Rough estimate: 1MB ≈ 1 minute
-              setMusicForm((prev) => ({
-                ...prev,
-                audioUrl: url,
-                videoUrl: url,
-                duration: durationInMinutes.toString(),
-              }));
+            const data = await resp.json();
+            if (data.success) {
+              const url = data.url;
+              // Determine duration for audio files
+              if (file.type.startsWith("audio/")) {
+                const audio = new Audio(url);
+                audio.addEventListener("loadedmetadata", () => {
+                  const duration = Math.floor(audio.duration);
+                  const minutes = Math.floor(duration / 60);
+                  const seconds = duration % 60;
+                  const durationString = `${minutes}:${seconds.toString().padStart(2, "0")}`;
+                  setMusicForm((prev) => ({
+                    ...prev,
+                    audioUrl: url,
+                    videoUrl: url,
+                    duration: durationString,
+                  }));
+                  toast({
+                    title: "File Uploaded",
+                    description: `${musicForm.format.toLowerCase()} file "${file.name}" uploaded successfully`,
+                  });
+                });
+                audio.addEventListener("error", () => {
+                  const durationString = `${Math.floor(file.size / 100000)}s`;
+                  setMusicForm((prev) => ({
+                    ...prev,
+                    audioUrl: url,
+                    videoUrl: url,
+                    duration: durationString,
+                  }));
+                  toast({
+                    title: "File Uploaded",
+                    description: `${musicForm.format.toLowerCase()} file "${file.name}" uploaded successfully`,
+                  });
+                });
+              } else {
+                const durationString = `${Math.floor(file.size / 100000)}s`;
+                setMusicForm((prev) => ({
+                  ...prev,
+                  audioUrl: url,
+                  videoUrl: url,
+                  duration: durationString,
+                }));
+                toast({
+                  title: "File Uploaded",
+                  description: `${musicForm.format.toLowerCase()} file "${file.name}" uploaded successfully`,
+                });
+              }
+            } else {
               toast({
-                title: "File Uploaded",
-                description: `${musicForm.format.toLowerCase()} file "${file.name}" uploaded successfully`,
+                title: "Upload error",
+                description: data.message || "Failed to upload file",
+                variant: "destructive",
               });
-            });
-          } else {
-            // For non-audio files, use file size estimate
-            const durationInMinutes = (file.size / 6000000).toFixed(2); // Rough estimate: 1MB ≈ 1 minute
-            setMusicForm((prev) => ({
-              ...prev,
-              audioUrl: url,
-              videoUrl: url,
-              duration: durationInMinutes.toString(),
-            }));
+            }
+          } catch (err) {
+            console.error("Media upload error:", err);
             toast({
-              title: "File Uploaded",
-              description: `${musicForm.format.toLowerCase()} file "${file.name}" uploaded successfully`,
+              title: "Upload error",
+              description: "Failed to upload file",
+              variant: "destructive",
             });
           }
         }

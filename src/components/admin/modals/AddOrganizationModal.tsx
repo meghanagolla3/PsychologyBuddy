@@ -16,7 +16,7 @@ interface AddOrganizationModalProps {
 
 export function AddOrganizationModal({ isOpen, onClose, onSuccess }: AddOrganizationModalProps) {
   const { toast } = useToast();
-  const { executeWithLoading } = useAdminLoading();
+  const { executeWithLoading, isLoading } = useAdminLoading();
   const [formData, setFormData] = useState({
     name: '',
     phone: '',
@@ -538,6 +538,7 @@ export function AddOrganizationModal({ isOpen, onClose, onSuccess }: AddOrganiza
             </LoadingButton>
             <LoadingButton
               type="submit"
+              isLoading={isLoading(AdminActions.CREATE_ORGANIZATION)}
               disabled={isSubmitDisabled()}
               loadingText="Creating..."
               className="flex-1 bg-[#3B82F6] text-white hover:bg-blue-700"

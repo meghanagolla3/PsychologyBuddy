@@ -36,7 +36,7 @@ import { useAuth } from '@/src/contexts/AuthContext';
 import { usePermissions } from '@/src/hooks/usePermissions';
 import { AdminHeader } from '@/src/components/admin/layout/AdminHeader';
 import { useAdminLoading, AdminActions } from '@/src/contexts/AdminLoadingContext';
-import { RingSpinner } from '@/src/components/ui/Spinners';
+import { AdminLoader } from '@/src/components/admin/ui/AdminLoader';
 
 interface SchoolLocation {
   id: string;
@@ -373,10 +373,7 @@ export default function SchoolLocationsSection() {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <div className="text-center">
-          <RingSpinner size="md" color="blue" />
-          <p className="mt-2 text-gray-600">Loading locations...</p>
-        </div>
+        <AdminLoader size="md" message="Loading locations..." />
       </div>
     );
   }

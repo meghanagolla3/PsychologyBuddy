@@ -223,28 +223,8 @@ export function useChat({
         sessionStorage.setItem("lastSummaryId", data.data.id);
         console.log(`[AutoTermination] Summary generated successfully, ID: ${data.data.id}`);
         
-        // Instead of redirecting to summary page, start a new chat session
-        console.log(`[AutoTermination] Starting new chat session after summary generation`);
-        
-        // Clear current session for this student
-        const studentSessionKey = `chatSessionId_${studentId}`
-        sessionStorage.removeItem(studentSessionKey);
-        sessionIdRef.current = null;
-        sessionStartTimeRef.current = null;
-        isInitialized.current = false;
-        isTerminatingRef.current = false;
-        
-        // Reset state for new chat
-        setState({
-          messages: [],
-          input: '',
-          isLoading: false,
-          sessionId: null,
-          sessionStartTime: null
-        });
-        
-        // Initialize new chat session
-        await initializeChat();
+        // Don't clear session here - let handleAutomaticTermination handle it after redirect
+        console.log(`[AutoTermination] Summary stored, session will be cleared after redirect`);
         
       } else {
         console.error(`[AutoTermination] Summary generation failed:`, data);
@@ -295,7 +275,34 @@ export function useChat({
       
       // Redirect to reflections page to show the new summary
       console.log(`[AutoTermination] Redirecting to reflections page...`);
-      router.push('/students/reflections');
+      // Only redirect if summary was successfully generated
+      const lastSummaryId = sessionStorage.getItem("lastSummaryId");
+      if (lastSummaryId) {
+        console.log(`[AutoTermination] Summary ID found (${lastSummaryId}), redirecting to reflections`);
+        
+        // Clear current session for this student before redirect
+        const studentSessionKey = `chatSessionId_${studentId}`;
+        sessionStorage.removeItem(studentSessionKey);
+        sessionIdRef.current = null;
+        sessionStartTimeRef.current = null;
+        isInitialized.current = false;
+        isTerminatingRef.current = false;
+        
+        // Reset state for new chat
+        setState({
+          messages: [],
+          input: '',
+          isLoading: false,
+          sessionId: null,
+          sessionStartTime: null
+        });
+        
+        router.push('/students/reflections');
+      } else {
+        console.log(`[AutoTermination] No summary ID found, skipping redirect and starting new chat`);
+        // Start new chat without redirect
+        await initializeChat();
+      }
       
     } catch (error) {
       console.error('Error during automatic termination:', error);

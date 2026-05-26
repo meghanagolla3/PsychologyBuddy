@@ -44,7 +44,7 @@ const Features: React.FC = () => {
   ];
 
   return (
-    <div className="-py-2 sm:py-10 md:pt-28 px-4 sm:px-6 bg-transparent">
+    <div className="-py-2 sm:py-10 md:-pt-2 lg:pt-28 px-4 sm:px-6 bg-transparent">
       {/* 1. Ensure the outer container is centered with mx-auto */}
       <div className="max-w-7xl mx-auto flex flex-col items-center">
         
@@ -58,7 +58,7 @@ const Features: React.FC = () => {
         </div>
         
         {/* 2. ADDED: justify-center and justify-items-center to ensure the cards stay in the middle */}
-        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 justify-center justify-items-center w-full">
+        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 md:gap-8 justify-center justify-items-center w-full">
           {features.map((feature, index) => (
             <FeatureCard
               key={index}
