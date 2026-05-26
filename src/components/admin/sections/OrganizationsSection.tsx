@@ -49,7 +49,7 @@ import {
 
 import { AddOrganizationModal } from "@/src/components/admin/modals/AddOrganizationModal";
 import { useAdminLoading, AdminActions } from '@/src/contexts/AdminLoadingContext';
-import { LoadingButton } from '@/src/components/admin/ui/AdminLoader';
+import { LoadingButton, TableRowLoader } from '@/src/components/admin/ui/AdminLoader';
 
 // ---------------------------
 // TYPES
@@ -420,11 +420,7 @@ export default function OrganizationsPage() {
 
               <TableBody>
                 {isLoading ? (
-                  <TableRow>
-                    <TableCell colSpan={6} className="text-center py-6">
-                      Loading...
-                    </TableCell>
-                  </TableRow>
+                  <TableRowLoader colSpan={6} message="Loading organizations..." />
                 ) : organizations.length === 0 ? (
                   <TableRow>
                     <TableCell colSpan={6} className="text-center py-6">

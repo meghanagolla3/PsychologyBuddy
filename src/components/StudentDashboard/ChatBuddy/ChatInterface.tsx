@@ -1,7 +1,7 @@
 "use client";
 import { X, Sparkles, Lightbulb, Shield, ArrowUpRight } from "lucide-react";
 
-import React, { useState, useRef, useCallback } from "react";
+import React, { useState, useRef, useCallback, useMemo, memo } from "react";
 import { Send } from "lucide-react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
@@ -12,7 +12,10 @@ import { NavigationUtils } from "@/src/utils";
 import { FullPageLoading } from "@/components/ui/LoadingSpinner";
 import { AuthError } from "@/components/ui/ErrorMessage";
 import BackToDashboard from "../Layout/BackToDashboard";
-import ReactMarkdown from 'react-markdown';
+import dynamic from 'next/dynamic';
+
+// Lazy load ReactMarkdown for better performance
+const ReactMarkdown = dynamic(() => import('react-markdown'), { ssr: false });
 
 // Format timestamp to show only hours and minutes
 const formatTime = (timestamp: string) => {
@@ -74,14 +77,9 @@ interface ChatInterfaceProps {
   notes?: string;
 }
 
-const DEFAULT_QUICK_REPLIES = [
-  "I'm feeling anxious",
-  "I need help with stress",
-  "I'm feeling sad",
-];
 
-// Chat Message Component
-function ChatMessage({ 
+// Chat Message Component - memoized to prevent unnecessary re-renders
+const ChatMessage = memo(function ChatMessage({ 
   message, 
   onImportLastConversation,
   lastSession,
@@ -210,10 +208,10 @@ function ChatMessage({
       )}
     </div>
   );
-}
+});
 
-// Typing Indicator Component
-function TypingIndicator() {
+// Typing Indicator Component - memoized
+const TypingIndicator = memo(function TypingIndicator() {
   return (
     <div className="flex gap-2 sm:gap-3 justify-start mb-4 sm:mb-6">
       <div className=" text-gray-600 rounded-2xl rounded-tl-sm flex items-center">
@@ -227,10 +225,10 @@ function TypingIndicator() {
       </div>
     </div>
   );
-}
+});
 
-// Chat Input Component
-function ChatInput({ 
+// Chat Input Component - memoized
+const ChatInput = memo(function ChatInput({ 
   input, 
   onInputChange, 
   onSend, 
@@ -243,12 +241,12 @@ function ChatInput({
   disabled?: boolean;
   placeholder?: string;
 }) {
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+  const handleKeyDown = useCallback((e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       onSend();
     }
-  };
+  }, [onSend]);
 
   return (
     <div className="px-3 sm:px-4 lg:px-15 py-3 sm:py-4 bg-white border-t border-[#f8f8f8]">
@@ -272,10 +270,10 @@ function ChatInput({
       </div>
     </div>
   );
-}
+});
 
-// Exercise Suggestions Component (as bot message)
-function ExerciseSuggestions({ 
+// Exercise Suggestions Component (as bot message) - memoized
+const ExerciseSuggestions = memo(function ExerciseSuggestions({ 
   suggestions, 
   onSuggestionClick, 
   onDismiss 
@@ -359,10 +357,10 @@ function ExerciseSuggestions({
       </div>
     </div>
   );
-}
+});
 
-// Quick Replies Component
-function QuickReplies({ 
+// Quick Replies Component - memoized
+const QuickReplies = memo(function QuickReplies({ 
   replies, 
   onReplyClick, 
   className = "" 
@@ -389,10 +387,10 @@ function QuickReplies({
       </div>
     </div>
   );
-}
+});
 
-// Last Summary Import Component
-function LastSummaryImport({ 
+// Last Summary Import Component - memoized
+const LastSummaryImport = memo(function LastSummaryImport({ 
   mainTopic, 
   onImport, 
   onDismiss 
@@ -426,10 +424,10 @@ function LastSummaryImport({
       </div>
     </div>
   );
-}
+});
 
-// Chat Header Component
-function ChatHeader({ onSummariesClick, onMoodCheckinClick }: {
+// Chat Header Component - memoized
+const ChatHeader = memo(function ChatHeader({ onSummariesClick, onMoodCheckinClick }: {
   onSummariesClick: () => void;
   onMoodCheckinClick: () => void;
 }) {
@@ -470,10 +468,10 @@ function ChatHeader({ onSummariesClick, onMoodCheckinClick }: {
       </div>
     </div>
   );
-}
+});
 
-// Disclaimer Component
-function Disclaimer() {
+// Disclaimer Component - memoized
+const Disclaimer = memo(function Disclaimer() {
   return (
     <div className="px-3 sm:px-4 lg:px-6 py-2 sm:py-3  ">
       <div className="flex items-center justify-center gap-2">
@@ -494,7 +492,7 @@ function Disclaimer() {
       </div>
     </div>
   );
-}
+});
 
 // Main Chat Interface Component
 export default function ChatInterface({
@@ -506,7 +504,6 @@ export default function ChatInterface({
   notes,
 }: ChatInterfaceProps) {
   const router = useRouter();
-  const chatRef = useRef<HTMLDivElement>(null);
   
   // Reusable authentication hook
   const { user, loading: authLoading, error: authError } = useServerAuth();
@@ -524,9 +521,80 @@ export default function ChatInterface({
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showSummaryImport, setShowSummaryImport] = useState(true);
+  const [quickReplies, setQuickReplies] = useState<string[]>([]);
   
   // Check if user is importing from reflections page
   const [isImportingFromReflections, setIsImportingFromReflections] = useState(false);
+
+  // Prevent duplicate quick reply API calls
+  const isFetchingQuickRepliesRef = React.useRef(false);
+
+  // Fetch dynamic quick replies based on AI response
+  const fetchQuickReplies = useCallback(async (botMessage: string, currentMessages: any[]) => {
+    const currentMood = mood || accessMood;
+    const currentTriggers = triggers || accessTriggers;
+    const currentNotes = notes || accessNotes;
+    
+    console.log('fetchQuickReplies called:', { currentMood, currentTriggers, botMessage });
+    
+    // Prevent multiple simultaneous calls
+    if (isFetchingQuickRepliesRef.current) {
+      console.log('Already fetching, skipping...');
+      return;
+    }
+
+    isFetchingQuickRepliesRef.current = true;
+    console.log('Fetching quick replies from API...');
+
+    try {
+      const response = await fetch('/api/students/chat/quick-replies', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          mood: currentMood,
+          triggers: currentTriggers,
+          notes: currentNotes,
+          botMessage, // Pass the bot's last message for context
+          lastMessages: currentMessages.slice(-3),
+          messageCount: currentMessages.length,
+        }),
+      });
+
+      console.log('API response status:', response.status);
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log('API response data:', data);
+        if (data.success && data.quickReplies) {
+          console.log('Setting quick replies:', data.quickReplies);
+          setQuickReplies(data.quickReplies);
+        } else {
+          console.log('API response missing quickReplies or success');
+        }
+      } else {
+        console.log('API response not OK:', response.status);
+      }
+    } catch (error) {
+      console.error('Error fetching quick replies:', error);
+      // Use fallback replies on error
+      setQuickReplies(["I'm feeling anxious", "I need help with stress", "I'm feeling sad"]);
+    } finally {
+      isFetchingQuickRepliesRef.current = false;
+    }
+  }, [mood, accessMood, triggers, accessTriggers, notes, accessNotes]);
+
+  // Set initial quick replies based on mood when chat loads
+  React.useEffect(() => {
+    const currentMood = mood || accessMood;
+    const currentTriggers = triggers || accessTriggers;
+    
+    console.log('Initial quick replies effect:', { currentMood, currentTriggers });
+    
+    // Always fetch dynamic replies, regardless of mood/triggers
+    fetchQuickReplies("", []);
+  }, [mood, accessMood, triggers, accessTriggers]);
   
   // Check URL parameters for import on mount
   React.useEffect(() => {
@@ -577,6 +645,27 @@ export default function ChatInterface({
     endChat,
     importConversation,
   } = chatHookResult;
+
+  // Track last bot message to prevent duplicate quick reply calls
+  const lastBotMessageIdRef = React.useRef<string | null>(null);
+
+  // Watch for new bot messages and fetch quick replies
+  React.useEffect(() => {
+    console.log('Bot message watcher effect:', { messagesLength: messages.length, lastBotMessageId: lastBotMessageIdRef.current });
+    
+    if (messages.length > 0) {
+      const lastMessage = messages[messages.length - 1];
+      console.log('Last message:', { sender: lastMessage?.sender, id: lastMessage?.id, content: lastMessage?.content?.substring(0, 50) });
+      
+      if (lastMessage && lastMessage.sender === 'bot' && lastMessage.id !== lastBotMessageIdRef.current) {
+        console.log('New bot message detected, fetching quick replies');
+        lastBotMessageIdRef.current = lastMessage.id;
+        fetchQuickReplies(lastMessage.content, messages);
+      } else {
+        console.log('Not a new bot message or already processed');
+      }
+    }
+  }, [messages]);
 
   // Only call summary hook when user is available
   const summaryHookResult = useChatSummary({ studentId: user?.studentId || user?.id || "" });
@@ -648,7 +737,7 @@ export default function ChatInterface({
     setIsLoading(hookIsLoading);
   }, [hookIsLoading]);
 
-  // Debug logging and ensure chat initialization
+  // Debug logging and ensure chat initialization - optimized dependencies
   React.useEffect(() => {
     console.log('ChatInterface Debug:', {
       user: user?.id,
@@ -665,30 +754,54 @@ export default function ChatInterface({
       console.log('Manually triggering chat initialization');
       initializeChat(mood || accessMood, triggers || accessTriggers, notes || accessNotes);
     }
-  }, [messages, mood, accessMood, triggers, accessTriggers, notes, accessNotes, hookIsLoading, hookSessionId, initializeChat]);
+  }, [user?.id, messages.length, hookSessionId, hookIsLoading, initializeChat]);
 
-  // State to track if last message was from user
-  const [lastMessageWasFromUser, setLastMessageWasFromUser] = useState(false);
-  
-  // State for exercise suggestions
-  const [showExerciseSuggestions, setShowExerciseSuggestions] = useState(false);
-  const [exerciseSuggestions, setExerciseSuggestions] = useState<any[]>([]);
-  const [studentMessageCount, setStudentMessageCount] = useState(0);
-
-  // Auto-scroll to bottom - only when user sends message, not when bot responds
-  React.useEffect(() => {
-    if (chatRef.current && lastMessageWasFromUser) {
-      chatRef.current.scrollTop = chatRef.current.scrollHeight;
-      setLastMessageWasFromUser(false);
+  // State for exercise suggestions - persisted across refreshes
+  const [showExerciseSuggestions, setShowExerciseSuggestions] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return sessionStorage.getItem('showExerciseSuggestions') === 'true';
     }
-  }, [messages, lastMessageWasFromUser]);
+    return false;
+  });
+  const [exerciseSuggestions, setExerciseSuggestions] = useState<any[]>(() => {
+    if (typeof window !== 'undefined') {
+      const saved = sessionStorage.getItem('exerciseSuggestions');
+      return saved ? JSON.parse(saved) : [];
+    }
+    return [];
+  });
+  const [studentMessageCount, setStudentMessageCount] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const saved = sessionStorage.getItem('studentMessageCount');
+      return saved ? parseInt(saved, 10) : 0;
+    }
+    return 0;
+  });
 
-  // Track when user sends messages and count them
+  // Persist exercise suggestions state to sessionStorage
+  React.useEffect(() => {
+    if (typeof window !== 'undefined') {
+      sessionStorage.setItem('showExerciseSuggestions', showExerciseSuggestions.toString());
+    }
+  }, [showExerciseSuggestions]);
+
+  React.useEffect(() => {
+    if (typeof window !== 'undefined') {
+      sessionStorage.setItem('exerciseSuggestions', JSON.stringify(exerciseSuggestions));
+    }
+  }, [exerciseSuggestions]);
+
+  React.useEffect(() => {
+    if (typeof window !== 'undefined') {
+      sessionStorage.setItem('studentMessageCount', studentMessageCount.toString());
+    }
+  }, [studentMessageCount]);
+
+  // Track when user sends messages and count them - optimized to only run when last message changes
   React.useEffect(() => {
     if (messages.length > 0) {
       const lastMessage = messages[messages.length - 1];
       if (lastMessage.sender === 'student') {
-        setLastMessageWasFromUser(true);
         setStudentMessageCount(prev => {
           const newCount = prev + 1;
           // Show exercise suggestions after 5 student messages
@@ -699,7 +812,7 @@ export default function ChatInterface({
         });
       }
     }
-  }, [messages]);
+  }, [messages.length]);
 
   // Fetch exercise suggestions
   const fetchExerciseSuggestions = async () => {
@@ -871,7 +984,7 @@ export default function ChatInterface({
           )}
 
           {/* Chat Area */}
-          <div ref={chatRef} className="flex-1 overflow-y-auto px-3 sm:px-4 lg:px-15 py-3 sm:py-4 lg:py-6 bg-white">
+          <div ref={hookChatRef} className="flex-1 overflow-y-auto px-3 sm:px-4 lg:px-15 py-3 sm:py-4 lg:py-6 bg-white">
            
               
 
@@ -925,7 +1038,7 @@ export default function ChatInterface({
 
           {/* Quick Replies */}
           <QuickReplies
-            replies={DEFAULT_QUICK_REPLIES}
+            replies={quickReplies}
             onReplyClick={handleQuickReply}
           />
 

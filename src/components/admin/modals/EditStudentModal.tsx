@@ -89,7 +89,7 @@ export function EditStudentModal({ student, onClose, onSuccess, schools, classes
   const [loadingLocations, setLoadingLocations] = useState(false);
 
   const { user } = useAuth();
-  const { executeWithLoading } = useAdminLoading();
+  const { executeWithLoading, isLoading } = useAdminLoading();
 
   useEffect(() => {
     // Pre-fill form with student data
@@ -938,6 +938,7 @@ export function EditStudentModal({ student, onClose, onSuccess, schools, classes
             </Button>
             <LoadingButton
               type="submit"
+              isLoading={isLoading(AdminActions.EDIT_STUDENT)}
               loadingText="Updating..."
               className="gap-2 text-white"
             >

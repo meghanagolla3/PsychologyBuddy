@@ -1,6 +1,7 @@
 import prisma from "@/src/prisma";
 import { z } from "zod";
 import { MeditationRepository } from "../repository/meditation.repository";
+import { uploadBase64ToS3, deleteFromS3 } from "@/src/utils/s3";
 import {
   CreateMeditationResourceSchema,
   UpdateMeditationResourceSchema,
@@ -51,6 +52,17 @@ export class MeditationAdminService {
 
   async createMeditationResource(data: CreateMeditationResourceInput & { schoolId?: string; createdBy: string }) {
     try {
+      const titleSlug = data.title.toLowerCase().replace(/[^a-z0-9]/g, "_");
+      if (data.thumbnailUrl && data.thumbnailUrl.startsWith("data:")) {
+        data.thumbnailUrl = await uploadBase64ToS3(data.thumbnailUrl, `meditation_thumb_${titleSlug}`);
+      }
+      if (data.audioUrl && data.audioUrl.startsWith("data:")) {
+        data.audioUrl = await uploadBase64ToS3(data.audioUrl, `meditation_audio_${titleSlug}`);
+      }
+      if (data.videoUrl && data.videoUrl.startsWith("data:")) {
+        data.videoUrl = await uploadBase64ToS3(data.videoUrl, `meditation_video_${titleSlug}`);
+      }
+
       const meditation = await this.repository.createMeditationResource(data);
 
       return {
@@ -119,6 +131,40 @@ export class MeditationAdminService {
 
   async updateMeditationResource(data: UpdateMeditationResourceInput & { id: string; schoolId?: string }) {
     try {
+      const existing = await this.repository.getMeditationResourceById(data.id);
+      if (!existing) {
+        return {
+          success: false,
+          message: "Meditation resource not found"
+        };
+      }
+
+      const titleSlug = (data.title || existing.title || "meditation").toLowerCase().replace(/[^a-z0-9]/g, "_");
+
+      if (data.thumbnailUrl && data.thumbnailUrl.startsWith("data:")) {
+        const oldUrl = existing.thumbnailUrl;
+        data.thumbnailUrl = await uploadBase64ToS3(data.thumbnailUrl, `meditation_thumb_${titleSlug}`);
+        if (oldUrl && (oldUrl.startsWith("http:") || oldUrl.startsWith("https:"))) {
+          await deleteFromS3(oldUrl);
+        }
+      }
+
+      if (data.audioUrl && data.audioUrl.startsWith("data:")) {
+        const oldUrl = existing.audioUrl;
+        data.audioUrl = await uploadBase64ToS3(data.audioUrl, `meditation_audio_${titleSlug}`);
+        if (oldUrl && (oldUrl.startsWith("http:") || oldUrl.startsWith("https:"))) {
+          await deleteFromS3(oldUrl);
+        }
+      }
+
+      if (data.videoUrl && data.videoUrl.startsWith("data:")) {
+        const oldUrl = existing.videoUrl;
+        data.videoUrl = await uploadBase64ToS3(data.videoUrl, `meditation_video_${titleSlug}`);
+        if (oldUrl && (oldUrl.startsWith("http:") || oldUrl.startsWith("https:"))) {
+          await deleteFromS3(oldUrl);
+        }
+      }
+
       const meditation = await this.repository.updateMeditationResource(data.id, data);
 
       return {

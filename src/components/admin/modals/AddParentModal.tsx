@@ -12,6 +12,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";
+import { LoadingButton } from "@/src/components/admin/ui/AdminLoader";
 
 interface AddParentModalProps {
   onClose: () => void;
@@ -303,9 +304,9 @@ export function AddParentModal({ onClose, onSuccess }: AddParentModalProps) {
             <Button type="button" variant="outline" onClick={onClose}>
               Cancel
             </Button>
-            <Button type="submit" disabled={isSubmitting}>
-              {isSubmitting ? "Creating..." : "Create Parent"}
-            </Button>
+            <LoadingButton type="submit" isLoading={isSubmitting} loadingText="Creating...">
+              Create Parent
+            </LoadingButton>
           </div>
         </form>
       </DialogContent>

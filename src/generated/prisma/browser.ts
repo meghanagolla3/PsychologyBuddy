@@ -258,6 +258,11 @@ export type AdminNotification = Prisma.AdminNotificationModel
  */
 export type CounselorNotification = Prisma.CounselorNotificationModel
 /**
+ * Model ParentNotification
+ * 
+ */
+export type ParentNotification = Prisma.ParentNotificationModel
+/**
  * Model MoodLabel
  * 
  */
@@ -392,3 +397,8 @@ export type SessionReport = Prisma.SessionReportModel
  * 
  */
 export type CounselorAssignment = Prisma.CounselorAssignmentModel
+/**
+ * Model ContactMessage
+ * 
+ */
+export type ContactMessage = Prisma.ContactMessageModel

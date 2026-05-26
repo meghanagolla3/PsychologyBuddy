@@ -94,7 +94,7 @@ export function AddStudentModal({
   const [studentIdError, setStudentIdError] = useState("");
   const { user } = useAuth();
   const { toast } = useToast();
-  const { executeWithLoading } = useAdminLoading();
+  const { executeWithLoading, isLoading } = useAdminLoading();
   const [formData, setFormData] = useState<FormData>({
     studentId: "",
     firstName: "",
@@ -1315,6 +1315,7 @@ export function AddStudentModal({
             </Button>
             <LoadingButton
               type="submit"
+              isLoading={isLoading(AdminActions.ADD_STUDENT)}
               loadingText="Creating..."
               className="gap-2 bg-[#3B82F6] text-white hover:bg-[#3B82F6]/80"
             >

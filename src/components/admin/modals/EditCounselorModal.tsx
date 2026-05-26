@@ -81,7 +81,7 @@ interface SchoolLocation {
 export function EditCounselorModal({ counselor, onClose, onSuccess, schools }: EditCounselorModalProps) {
   const { toast } = useToast();
   const { user } = useAuth();
-  const { executeWithLoading } = useAdminLoading();
+  const { executeWithLoading, isLoading } = useAdminLoading();
 
   const [formData, setFormData] = useState<FormData>({
     firstName: counselor.firstName,
@@ -534,6 +534,7 @@ export function EditCounselorModal({ counselor, onClose, onSuccess, schools }: E
             </Button>
             <LoadingButton
               type="submit"
+              isLoading={isLoading(AdminActions.EDIT_ADMIN)}
               loadingText="Updating..."
             >
               Update Counselor
