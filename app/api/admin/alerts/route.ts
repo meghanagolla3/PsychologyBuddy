@@ -52,6 +52,7 @@ export const GET = withPermission({
       }
     };
 
+    
     console.log('API: Sending response', response);
     return NextResponse.json(response);
 
