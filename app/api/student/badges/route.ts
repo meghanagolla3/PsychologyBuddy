@@ -6,3 +6,4 @@ const badgeStudentController = new BadgeStudentController();
 export async function GET(req: NextRequest) {
   return badgeStudentController.getUserBadges(req);
 }
+

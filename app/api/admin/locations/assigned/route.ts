@@ -87,3 +87,4 @@ export const GET = withPermission({
     return NextResponse.json(errorResponse, { status: errorResponse.error?.code || 500 });
   }
 });
+

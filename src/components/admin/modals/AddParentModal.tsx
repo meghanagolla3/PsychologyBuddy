@@ -313,3 +313,4 @@ export function AddParentModal({ onClose, onSuccess }: AddParentModalProps) {
     </Dialog>
   );
 }
+

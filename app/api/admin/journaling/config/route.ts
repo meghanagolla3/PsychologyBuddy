@@ -12,3 +12,4 @@ export async function PATCH(req: NextRequest) {
 export async function PUT(req: NextRequest) {
   return journalingAdminController.updateJournalingConfig(req);
 }
+

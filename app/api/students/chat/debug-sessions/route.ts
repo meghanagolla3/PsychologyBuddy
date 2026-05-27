@@ -1,5 +1,5 @@
-import { createAPIHandler } from '@/src/lib/api'
-import { DatabaseService } from '@/src/lib/database/database-service'
+import { createAPIHandler } from '@/src/lib/create-api-handler';
+import { DatabaseService } from '@/src/lib/database/database-service';
 
 export const dynamic = 'force-dynamic'
 
@@ -53,3 +53,4 @@ export const GET = createAPIHandler.get(
   },
   { requireAuth: false }
 )
+

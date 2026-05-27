@@ -71,3 +71,4 @@ export default function ContactMessageModal({ message, open, onClose }: ContactM
     </Dialog>
   );
 }
+

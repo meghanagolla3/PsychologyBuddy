@@ -3,3 +3,4 @@ import { AlertsIndex } from '@/src/components/counselor/sections/Alerts/AlertsIn
 export default function CounselorAlertsPage() {
   return <AlertsIndex />;
 }
+

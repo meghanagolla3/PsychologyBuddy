@@ -21,3 +21,4 @@ export class JournalingUtils {
     return config;
   }
 }
+

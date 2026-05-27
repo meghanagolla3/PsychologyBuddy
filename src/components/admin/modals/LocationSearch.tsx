@@ -102,3 +102,4 @@ export function LocationSearch({ schoolId, onLocationSelect, placeholder = "Sear
     </div>
   );
 }
+

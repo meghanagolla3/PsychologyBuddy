@@ -199,3 +199,4 @@ export const PlayerModal = ({ card, onClose }: PlayerModalProps) => {
     </>
   );
 };
+

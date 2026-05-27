@@ -18,3 +18,4 @@ export async function PATCH(req: NextRequest) {
 export async function DELETE(req: NextRequest) {
   return badgeAdminController.deleteBadge(req);
 }
+

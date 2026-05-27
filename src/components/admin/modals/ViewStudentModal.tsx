@@ -399,3 +399,4 @@ export function ViewStudentModal({ student, onClose }: ViewStudentModalProps) {
     </div>
   );
 }
+

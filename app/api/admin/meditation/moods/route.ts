@@ -6,3 +6,4 @@ export const GET = MeditationMoodsController.getMeditationMoods;
 
 // POST /api/admin/meditation/moods - Create meditation mood
 export const POST = MeditationMoodsController.createMeditationMood;
+

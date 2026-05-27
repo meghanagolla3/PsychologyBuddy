@@ -7,3 +7,4 @@ export default function Layout({
 }) {
   return <CounselorLayout>{children}</CounselorLayout>;
 }
+

@@ -5,3 +5,4 @@ import { authController } from '@/src/server/controllers/auth.controller';
 export async function POST(req: NextRequest) {
   return authController.studentLogin(req);
 }
+

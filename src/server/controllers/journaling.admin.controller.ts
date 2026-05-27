@@ -145,3 +145,4 @@ export class JournalingAdminController {
 }
 
 export const journalingAdminController = new JournalingAdminController();
+

@@ -52,3 +52,4 @@ export const GET = withPermission({
     return NextResponse.json({ success: false, message: 'Internal server error' }, { status: 500 });
   }
 });
+

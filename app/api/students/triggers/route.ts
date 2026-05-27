@@ -1,6 +1,6 @@
-import { createAPIHandler } from '@/src/lib/api'
-import { TriggerSelectionSchema } from '@/src/lib/validation/api-schemas'
-import { TriggerService } from '@/src/services/chats'
+import { createAPIHandler } from '@/src/lib/create-api-handler';
+import { TriggerSelectionSchema } from '@/src/lib/validation/api-schemas';
+import { TriggerService } from '@/src/services/chats';
 
 export const dynamic = 'force-dynamic'
 
@@ -14,3 +14,4 @@ export const POST = createAPIHandler.post(
   },
   { requireAuth: true }
 )
+

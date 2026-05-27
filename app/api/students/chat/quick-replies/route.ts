@@ -172,3 +172,4 @@ function getFallbackQuickReplies(mood?: string, triggers?: string[]): string[] {
   // Default fallback
   return ["I'm feeling anxious", "I need help with stress", "I'm feeling sad"];
 }
+

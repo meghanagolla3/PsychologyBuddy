@@ -230,3 +230,4 @@ export default function CourseGrid({ selectedCategory = 'all', showSaves = false
     </>
   );
 }
+

@@ -42,3 +42,4 @@ export default function MoodSelector({ selectedMood, onMoodSelect }: MoodSelecto
     </div>
   );
 }
+

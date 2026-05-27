@@ -6,3 +6,4 @@ export const GET = CategoryController.getCategories;
 
 // POST /api/labels/categories - Create category (Admin & SuperAdmin)
 export const POST = CategoryController.createCategory;
+

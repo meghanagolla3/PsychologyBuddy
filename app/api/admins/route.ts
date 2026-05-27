@@ -6,3 +6,4 @@ export const POST = AdminController.createAdmin;
 
 // GET /api/admins - Get all admins (SuperAdmin only)
 export const GET = AdminController.getAdmins;
+

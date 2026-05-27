@@ -1,5 +1,5 @@
 import { DatabaseService } from '@/src/lib/database/database-service'
-import { ValidationError } from '@/src/lib/errors/custom-errors'
+import { ValidationError } from '@/src/lib/errors/custom-errors';
 import { StreakService } from '@/src/server/services/streak.service'
 
 export interface MoodCheckinData {
@@ -215,3 +215,4 @@ export class MoodService {
     ]
   }
 }
+

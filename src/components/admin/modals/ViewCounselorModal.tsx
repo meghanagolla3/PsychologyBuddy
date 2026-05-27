@@ -294,3 +294,4 @@ export function ViewCounselorModal({ counselor, onClose }: ViewCounselorModalPro
     </Dialog>
   );
 }
+

@@ -218,3 +218,4 @@ export class BehavioralEscalationDetector {
     return recommendations[level] || 'Monitor mood patterns.';
   }
 }
+

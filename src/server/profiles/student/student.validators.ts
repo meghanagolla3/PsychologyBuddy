@@ -58,3 +58,4 @@ export type UpdateStudentData = z.infer<typeof UpdateStudentSchema>;
 export type StudentSelfUpdateData = z.infer<typeof StudentSelfUpdateSchema>;
 export type ResetStudentPasswordData = z.infer<typeof ResetStudentPasswordSchema>;
 export type UpdateStudentStatusData = z.infer<typeof UpdateStudentStatusSchema>;
+

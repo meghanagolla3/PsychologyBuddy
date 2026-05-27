@@ -34,3 +34,4 @@ export const UpdateArticleStatusSchema = z.object({
 export type CreateArticleData = z.infer<typeof CreateArticleSchema>;
 export type UpdateArticleData = z.infer<typeof UpdateArticleSchema>;
 export type UpdateArticleStatusData = z.infer<typeof UpdateArticleStatusSchema>;
+

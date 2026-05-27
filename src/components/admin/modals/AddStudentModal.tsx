@@ -1366,3 +1366,4 @@ export function AddStudentModal({
     </Dialog>
   );
 }
+

@@ -26,3 +26,4 @@ export const UpdateParentStatusSchema = z.object({
 export type CreateParentData = z.infer<typeof CreateParentSchema>;
 export type UpdateParentData = z.infer<typeof UpdateParentSchema>;
 export type UpdateParentStatusData = z.infer<typeof UpdateParentStatusSchema>;
+

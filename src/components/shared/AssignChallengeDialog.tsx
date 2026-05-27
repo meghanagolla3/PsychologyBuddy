@@ -369,3 +369,4 @@ export function AssignChallengeDialog({
     </Dialog>
   );
 }
+

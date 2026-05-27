@@ -22,3 +22,4 @@ export const POST = withPermission({
     return NextResponse.json(errorResponse, { status: errorResponse.error?.code || 500 });
   }
 });
+

@@ -1566,3 +1566,4 @@ export default function ArticleEditor({ articleId }: ArticleEditorProps) {
     return <div>Error loading editor: {error instanceof Error ? error.message : 'Unknown error'}</div>;
   }
 }
+

@@ -213,3 +213,4 @@ export default function RecentActivity() {
   const { activities } = profileData;
   return <ActivitySection activities={activities || []} />;
 }
+

@@ -18,3 +18,4 @@ export const UpdateMusicMoodSchema = z.object({
 
 export type CreateMusicMoodInput = z.infer<typeof CreateMusicMoodSchema>;
 export type UpdateMusicMoodInput = z.infer<typeof UpdateMusicMoodSchema>;
+

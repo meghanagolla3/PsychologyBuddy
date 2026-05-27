@@ -3,3 +3,4 @@ import { SessionsIndex } from '@/src/components/counselor/sections/Sessions/Sess
 export default function CounselorSessionsPage() {
   return <SessionsIndex />;
 }
+

@@ -433,3 +433,4 @@ const fetchArtJournals = async () => {
     </div>
   );
 }
+

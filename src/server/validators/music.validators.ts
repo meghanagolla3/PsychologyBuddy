@@ -168,3 +168,4 @@ export type GetInstructionsByResourceInput = z.infer<typeof GetInstructionsByRes
 export type StudentGetMusicResourcesInput = z.infer<typeof StudentGetMusicResourcesSchema>;
 export type StudentGetFeaturedMusicInput = z.infer<typeof StudentGetFeaturedMusicSchema>;
 export type StudentGetMusicInstructionsInput = z.infer<typeof StudentGetMusicInstructionsSchema>;
+

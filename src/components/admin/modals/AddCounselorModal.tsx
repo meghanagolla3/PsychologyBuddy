@@ -715,3 +715,4 @@ export function AddCounselorModal({ onClose, onSuccess, schools }: AddCounselorM
     </Dialog>
   );
 }
+

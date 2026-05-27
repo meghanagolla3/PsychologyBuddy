@@ -14,3 +14,4 @@ export function useClassData(selectedSchoolId: string, isSuperAdmin: boolean, us
     },
   });
 }
+

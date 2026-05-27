@@ -80,3 +80,4 @@ export type CreateJournalingPromptInput = z.infer<typeof CreateJournalingPromptS
 export type UpdateJournalingPromptInput = z.infer<typeof UpdateJournalingPromptSchema>;
 export type DeleteJournalingPromptInput = z.infer<typeof DeleteJournalingPromptSchema>;
 export type GetJournalingConfigInput = z.infer<typeof GetJournalingConfigSchema>;
+

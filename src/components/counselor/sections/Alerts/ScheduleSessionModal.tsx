@@ -506,3 +506,4 @@ export function ScheduleSessionModal({ open, onOpenChange, defaultStudent, onSes
     </Dialog>
   );
 }
+

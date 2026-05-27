@@ -14,3 +14,4 @@ export function useTriggerData(selectedSchoolId: string, isSuperAdmin: boolean, 
     },
   });
 }
+

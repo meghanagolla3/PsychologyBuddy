@@ -1,5 +1,5 @@
 import React from 'react';
-import { RingSpinner } from '@/src/components/ui/Spinners';
+import { RingSpinner } from '@/components/ui/Spinners';
 
 interface AdminLoaderProps {
   size?: 'sm' | 'md' | 'lg';
@@ -128,3 +128,4 @@ export function InlineLoader({ message = 'Loading...' }: { message?: string }) {
     </div>
   );
 }
+

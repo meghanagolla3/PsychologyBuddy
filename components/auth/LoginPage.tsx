@@ -1,4 +1,4 @@
-﻿import React, { useState } from 'react';
+import React, { useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Mail, Lock, Eye, EyeOff, Phone, GraduationCap, Heart, User, ShieldCheck, ShieldQuestion, FileText, HelpCircle, PhoneCall } from 'lucide-react';
 import Link from 'next/link';
@@ -93,7 +93,7 @@ function LoginPageContent() {
               </Link>
             </div>
             <h1 className="mt-6 text-2xl font-extrabold tracking-tight">
-              Welcome back! <span aria-hidden>👋</span>
+              Welcome back! <span aria-hidden>??</span>
             </h1>
             <p className="mt-1 text-sm text-muted-foreground">
               Your wellbeing matters. We're here for you.
@@ -230,3 +230,4 @@ function FooterItem({ icon: Icon, label }: { icon: React.ComponentType<{ classNa
     </a>
   );
 }
+

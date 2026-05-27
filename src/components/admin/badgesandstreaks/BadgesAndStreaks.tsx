@@ -939,3 +939,4 @@ export default function BadgesAndStreaks() {
     </div>
   );
 }
+

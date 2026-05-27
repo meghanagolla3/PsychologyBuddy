@@ -6,3 +6,4 @@ export const POST = StudentController.createStudent;
 
 // GET /api/students - Get students by school (Admin only)
 export const GET = StudentController.getStudents;
+

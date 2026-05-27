@@ -104,3 +104,4 @@ export default function JournalHistory({ journals, onDelete, loading }: JournalH
     </div>
   );
 }
+

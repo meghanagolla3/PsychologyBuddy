@@ -2,7 +2,7 @@ import { X, User, GraduationCap, Mail, Phone, Calendar, Clock, MessageSquare, Us
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
-import { RingSpinner } from "@/src/components/ui/Spinners";
+import { RingSpinner } from "@/components/ui/Spinners";
 
 interface MeetingAcceptModalProps {
   open: boolean;
@@ -153,3 +153,4 @@ function Row({
     </div>
   );
 }
+

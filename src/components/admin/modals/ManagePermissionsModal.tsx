@@ -190,3 +190,4 @@ export function ManagePermissionsModal({ admin, onClose, onSuccess }: ManagePerm
     </div>
   );
 }
+

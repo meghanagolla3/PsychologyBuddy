@@ -132,3 +132,4 @@ shadow-[inset_0_1px_1px_rgba(255,255,255,0.25)]
 };
 
 export default Hero;
+

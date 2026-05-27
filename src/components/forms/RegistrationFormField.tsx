@@ -79,3 +79,4 @@ export const RegistrationFormField: React.FC<RegistrationFormFieldProps> = ({
     </div>
   );
 };
+

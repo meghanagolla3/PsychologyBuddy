@@ -378,3 +378,4 @@ export default function ArticlePreview({ articleId }: ArticlePreviewProps) {
     </div>
   );
 }
+

@@ -370,3 +370,4 @@ function MusicCard({ music, isSaved, onSave, onPlay }: any) {
     </div>
   );
 }
+

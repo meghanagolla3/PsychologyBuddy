@@ -839,3 +839,4 @@ export function EditAdminModal({ admin, onClose, onSuccess, schools }: EditAdmin
     </Dialog>
   );
 }
+

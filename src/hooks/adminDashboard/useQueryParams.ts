@@ -26,3 +26,4 @@ export function useQueryParams(selectedSchoolId: string, isSuperAdmin: boolean, 
 
   return { buildParams };
 }
+

@@ -1,6 +1,6 @@
-import { createAPIHandler } from '@/src/lib/create-api-handler'
-import { MoodCheckinSchema } from '@/src/lib/validation/api-schemas'
-import { MoodService } from '@/src/services/chats'
+import { createAPIHandler } from '@/src/lib/create-api-handler';
+import { MoodCheckinSchema } from '@/src/lib/validation/api-schemas';
+import { MoodService } from '@/src/services/chats';
 
 // Trigger HMR compilation after schema update
 export const dynamic = 'force-dynamic'
@@ -17,3 +17,4 @@ export const POST = createAPIHandler.post(
   },
   { requireAuth: true } // Re-enable authentication - require real user login
 )
+

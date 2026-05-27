@@ -40,3 +40,4 @@ export function isClientAuthenticated() {
   const studentId = getStudentId();
   return studentId && studentId !== 'student-123';
 }
+

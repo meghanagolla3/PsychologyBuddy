@@ -226,3 +226,4 @@ export const withRateLimit = (windowMs: number, max: number, config: APIHandlerC
   rateLimit: { windowMs, max },
   ...config
 })
+

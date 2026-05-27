@@ -1,5 +1,5 @@
-import { createAPIHandler } from '@/src/lib/api'
-import { SummaryService } from '@/src/services/chats'
+import { createAPIHandler } from '@/src/lib/create-api-handler';
+import { SummaryService } from '@/src/services/chats';
 
 export const dynamic = 'force-dynamic'
 
@@ -34,3 +34,4 @@ export const GET = createAPIHandler.get(
   },
   { requireAuth: false } // Disable auth for now
 )
+

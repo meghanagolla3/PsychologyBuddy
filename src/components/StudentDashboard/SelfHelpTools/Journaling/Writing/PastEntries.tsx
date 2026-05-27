@@ -140,3 +140,4 @@ export default function PastEntries({ journals, onDelete, loading }: PastEntries
     </div>
   );
 }
+

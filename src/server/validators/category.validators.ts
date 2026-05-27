@@ -20,3 +20,4 @@ export const UpdateCategoryStatusSchema = z.object({
 export type CreateCategoryData = z.infer<typeof CreateCategorySchema>;
 export type UpdateCategoryData = z.infer<typeof UpdateCategorySchema>;
 export type UpdateCategoryStatusData = z.infer<typeof UpdateCategoryStatusSchema>;
+
