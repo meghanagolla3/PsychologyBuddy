@@ -6,7 +6,6 @@ import {
   Tooltip,
   Legend,
 } from 'chart.js';
-import { Margarine } from 'next/font/google';
 import { Doughnut } from 'react-chartjs-2';
 
 ChartJS.register(ArcElement, Tooltip, Legend);
