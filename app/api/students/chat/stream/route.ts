@@ -75,14 +75,15 @@ export async function POST(req: Request) {
       );
     }
 
-    // Get conversation history for context (all messages, will be managed by context window)
+    // Get recent conversation history for context (limit to last 10 messages for performance)
     const conversationHistory = await prisma.chatMessage.findMany({
       where: {
         sessionId: sessionId
       },
       orderBy: {
-        createdAt: 'asc'
+        createdAt: 'desc'
       },
+      take: 10,
     });
 
     console.log('Conversation history loaded:', conversationHistory.length, 'messages');
@@ -98,8 +99,9 @@ export async function POST(req: Request) {
     });
     console.log('Student message saved:', studentMessage.id);
 
-    // Format conversation context for escalation detection (reuse existing data)
-    const conversationContext = conversationHistory
+    // Reverse to get chronological order and format for escalation detection
+    const chronologicalHistory = conversationHistory.reverse();
+    const conversationContext = chronologicalHistory
       .filter(msg => msg.senderType === 'STUDENT')
       .map(msg => msg.content);
 
@@ -164,8 +166,8 @@ export async function POST(req: Request) {
     
     while (retryCount < maxRetries) {
       try {
-        // Format conversation history for AI
-        const formattedHistory = formatMessagesForAI(conversationHistory);
+        // Format conversation history for AI (use chronological order)
+        const formattedHistory = formatMessagesForAI(chronologicalHistory);
         
         // Build conversation context with smart memory management
         const messagesForAI = await buildConversationContext(
