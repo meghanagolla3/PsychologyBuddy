@@ -52,15 +52,20 @@ export async function POST(req: Request) {
 ${context}
 
 TASK:
-Generate 3-4 quick reply suggestions that the student might want to say next in response to Buddy's message.
-These should be:
-- Short and natural (3-8 words each)
-- Directly relevant to what Buddy just said
-- Helpful for moving the conversation forward
-- Empathetic and supportive
-- Different from each other (not variations of the same thing)
+Generate 3-4 quick reply suggestions that are DIRECT responses to Buddy's last message above.
 
-IMPORTANT: The quick replies should be natural responses to Buddy's specific message above. If Buddy asked a question, the replies should answer it. If Buddy offered support, the replies should accept or decline gracefully. If there's no specific message context, provide general conversation starters like "How are you?", "I need to talk", or "Can you help me?".
+CRITICAL RULES:
+- Each reply MUST be a direct response to what Buddy just said
+- If Buddy asked a question, provide answers to that question
+- If Buddy made a statement, provide reactions or follow-up thoughts
+- If Buddy offered help, provide acceptance, decline, or specific requests
+- Keep replies short and natural (3-8 words each)
+- Make them empathetic and authentic
+
+EXAMPLES:
+- If Buddy asks "How are you feeling today?": ["I'm feeling anxious", "Pretty good thanks", "A bit overwhelmed"]
+- If Buddy says "I'm here to listen": ["I need to talk about stress", "Thanks for being here", "Can you help me?"]
+- If Buddy suggests "Try taking deep breaths": ["I'll try that now", "Does that really help?", "What else can I do?"]
 
 Return ONLY a JSON array of strings, like:
 ["I'm feeling overwhelmed", "Can we talk about exams?", "I need some advice"]

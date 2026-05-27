@@ -18,8 +18,10 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { Calendar } from "@/components/ui/calendar";
 import { SchoolSearch } from "./SchoolSearch";
 import { useToast } from "@/components/ui/use-toast";
+import { format } from "date-fns";
 import {
   useAdminLoading,
   AdminActions,
@@ -143,6 +145,9 @@ export function AddStudentModal({
 
   // Location popover state
   const [isLocationPopoverOpen, setIsLocationPopoverOpen] = useState(false);
+
+  // Calendar popover state
+  const [isCalendarOpen, setIsCalendarOpen] = useState(false);
 
   // Fetch school sections when school is selected
   useEffect(() => {
@@ -531,21 +536,26 @@ export function AddStudentModal({
     } else {
       const dob = new Date(formData.dateOfBirth);
       const today = new Date();
-      const age = today.getFullYear() - dob.getFullYear();
-      const monthDiff = today.getMonth() - dob.getMonth();
       
-      if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < dob.getDate())) {
-        dob.setFullYear(today.getFullYear() - 1);
-      }
-      
-      const finalAge = today.getFullYear() - dob.getFullYear();
-      
+      // Check if date is in the future
       if (dob > today) {
         newErrors.dateOfBirth = "Date of birth cannot be in the future";
-      } else if (finalAge < 13) {
-        newErrors.dateOfBirth = "Student must be 13 years or older";
-      } else if (finalAge > 100) {
-        newErrors.dateOfBirth = "Please enter a valid date of birth";
+      } else {
+        // Calculate correct age
+        let age = today.getFullYear() - dob.getFullYear();
+        const monthDiff = today.getMonth() - dob.getMonth();
+        const dayDiff = today.getDate() - dob.getDate();
+        
+        // Adjust age if birthday hasn't occurred yet this year
+        if (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0)) {
+          age--;
+        }
+        
+        if (age < 13) {
+          newErrors.dateOfBirth = "Student must be 13 years or older";
+        } else if (age > 100) {
+          newErrors.dateOfBirth = "Please enter a valid date of birth";
+        }
       }
     }
 
@@ -848,17 +858,45 @@ export function AddStudentModal({
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Date of Birth *
                 </label>
-                <Input
-                  type="date"
-                  name="dateOfBirth"
-                  value={formData.dateOfBirth}
-                  onChange={(e) => handleInputChange("dateOfBirth", e.target.value)}
-                  max={new Date().toISOString().split('T')[0]}
-                  className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                    errors.dateOfBirth ? "border-red-500" : "border-gray-300"
-                  }`}
-                  required
-                />
+                <Popover open={isCalendarOpen} onOpenChange={setIsCalendarOpen}>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className={`w-full justify-start text-left font-normal ${
+                        errors.dateOfBirth ? "border-red-500" : "border-gray-300"
+                      }`}
+                    >
+                      {formData.dateOfBirth ? (
+                        format(new Date(formData.dateOfBirth), "PPP")
+                      ) : (
+                        <span className="text-gray-500">Pick a date</span>
+                      )}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar
+                      mode="single"
+                      selected={formData.dateOfBirth ? new Date(formData.dateOfBirth) : undefined}
+                      onSelect={(date) => {
+                        if (date) {
+                          const dateString = date.toISOString().split('T')[0];
+                          handleInputChange("dateOfBirth", dateString);
+                        }
+                        setIsCalendarOpen(false);
+                      }}
+                      disabled={(date) => {
+                        const today = new Date();
+                        const thirteenYearsAgo = new Date(
+                          today.getFullYear() - 13,
+                          today.getMonth(),
+                          today.getDate()
+                        );
+                        return date > today || date > thirteenYearsAgo;
+                      }}
+                      
+                    />
+                  </PopoverContent>
+                </Popover>
                 {errors.dateOfBirth && (
                   <p className="mt-1 text-sm text-red-600">{errors.dateOfBirth}</p>
                 )}

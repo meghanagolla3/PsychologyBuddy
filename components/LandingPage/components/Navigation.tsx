@@ -4,13 +4,66 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import Image from "next/image";
 import { Menu, X } from "lucide-react";
+import { useAuth } from "@/src/contexts/AuthContext";
 
 const Navigation: React.FC = () => {
   const router = useRouter();
+  const { user, loading, refreshUser } = useAuth();
   const [open, setOpen] = useState(false);
 
-  const handleGetStarted = () => {
-    router.push("/login");
+  const handleGetStarted = async () => {
+    // If user is already logged in, redirect to their dashboard
+    if (!loading && user) {
+      switch (user.role.name) {
+        case 'STUDENT':
+          router.push('/students');
+          break;
+        case 'COUNSELOR':
+          router.push('/counselor');
+          break;
+        case 'PARENT':
+          router.push('/parent');
+          break;
+        case 'ADMIN':
+        case 'SUPERADMIN':
+        case 'SCHOOL_SUPERADMIN':
+          router.push('/admin');
+          break;
+        default:
+          router.push('/login');
+          break;
+      }
+    } else if (!loading) {
+      // If not loading and no user (might be on landing page where auth is skipped),
+      // try to refresh user data first
+      await refreshUser();
+      // Check again after refresh
+      const updatedUser = await fetch('/api/auth/me').then(res => res.json()).then(data => data.data?.user).catch(() => null);
+      if (updatedUser) {
+        switch (updatedUser.role.name) {
+          case 'STUDENT':
+            router.push('/students');
+            break;
+          case 'COUNSELOR':
+            router.push('/counselor');
+            break;
+          case 'PARENT':
+            router.push('/parent');
+            break;
+          case 'ADMIN':
+          case 'SUPERADMIN':
+          case 'SCHOOL_SUPERADMIN':
+            router.push('/admin');
+            break;
+          default:
+            router.push('/login');
+            break;
+        }
+      } else {
+        // If still no user after refresh, redirect to login page
+        router.push('/login');
+      }
+    }
   };
 
   return (
