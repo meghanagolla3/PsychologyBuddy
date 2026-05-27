@@ -34,6 +34,21 @@ export class SummaryService {
         throw new ValidationError('Session not found')
       }
       
+      // Check if summary already exists for this session
+      const existingSummary = await DatabaseService.getStructuredSummaryBySession(summaryData.sessionId)
+      if (existingSummary) {
+        console.log('[SummaryService] Summary already exists for session:', summaryData.sessionId);
+        return {
+          id: existingSummary.id,
+          mainTopic: existingSummary.mainTopic || 'No Topic',
+          conversationStart: existingSummary.conversationStart || '',
+          conversationAbout: existingSummary.conversationAbout || '',
+          reflection: existingSummary.reflection || '',
+          createdAt: existingSummary.createdAt,
+          sessionId: existingSummary.sessionId
+        }
+      }
+      
       console.log('[SummaryService] Session verified, generating AI summary...');
       
       // Generate AI structured summary
@@ -49,7 +64,7 @@ export class SummaryService {
         mainTopic: aiSummary.mainTopic,
         conversationStart: aiSummary.conversationStart,
         conversationAbout: aiSummary.conversationAbout,
-        reflection: aiSummary.reflection
+        reflection: aiSummary.reflection,
       })
       
       console.log('[SummaryService] Database record created:', summary);

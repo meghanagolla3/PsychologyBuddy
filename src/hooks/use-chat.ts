@@ -155,23 +155,30 @@ export function useChat({
       
       console.log('Chat session created successfully:', data.sessionId)
 
-      // Display the opening message from the API
-      const openingMessage: Message = {
-        id: crypto.randomUUID(),
-        sender: 'bot',
-        content: data.openingMessage || "Hello! I'm here to listen and support you. How are you feeling today?",
-        timestamp: new Date().toISOString(),
-        type: 'opening'
-      }
+      // Check if there's already an opening message to prevent duplicates
+      const hasOpeningMessage = state.messages.some(msg => msg.type === 'opening' || (msg.sender === 'bot' && state.messages.length === 0));
       
-      console.log('Opening message from API:', openingMessage)
+      if (!hasOpeningMessage) {
+        // Display the opening message from the API
+        const openingMessage: Message = {
+          id: crypto.randomUUID(),
+          sender: 'bot',
+          content: data.openingMessage || "Hello! I'm here to listen and support you. How are you feeling today?",
+          timestamp: new Date().toISOString(),
+          type: 'opening'
+        }
+        
+        console.log('Opening message from API:', openingMessage)
 
-      setState(prev => ({
-        ...prev,
-        messages: [...prev.messages, openingMessage]
-      }))
+        setState(prev => ({
+          ...prev,
+          messages: [...prev.messages, openingMessage]
+        }))
 
-      onMessage?.(openingMessage)
+        onMessage?.(openingMessage)
+      } else {
+        console.log('Opening message already exists, skipping duplicate');
+      }
 
     } catch (error) {
       const err = error instanceof Error ? error : new Error('Failed to initialize chat')
@@ -280,6 +287,13 @@ export function useChat({
       if (lastSummaryId) {
         console.log(`[AutoTermination] Summary ID found (${lastSummaryId}), redirecting to reflections`);
         
+        // Clear termination timer
+        if (terminationTimerRef.current) {
+          clearTimeout(terminationTimerRef.current);
+          terminationTimerRef.current = null;
+        }
+        timerSetRef.current = false;
+        
         // Clear current session for this student before redirect
         const studentSessionKey = `chatSessionId_${studentId}`;
         sessionStorage.removeItem(studentSessionKey);
@@ -312,56 +326,143 @@ export function useChat({
 
   // Set up automatic termination monitoring
   useEffect(() => {
-    console.log(`[AutoTermination] useEffect triggered! sessionId=${state.sessionId}, sessionStartTime=${state.sessionStartTime}`);
-    
-    const currentSessionId = state.sessionId;
-    const messageCount = state.messages.length;
-    const sessionStartTime = state.sessionStartTime;
-    
-    console.log(`[AutoTermination] Setting up monitoring: sessionId=${currentSessionId}, messageCount=${messageCount}, sessionStartTime=${sessionStartTime ? new Date(sessionStartTime).toISOString() : 'null'}`);
-    
-    if (!currentSessionId) {
-      console.log(`[AutoTermination] No session ID, skipping monitoring setup`);
-      return; // Only need a valid session ID for time-based monitoring
-    }
+    // Automatic termination disabled for performance - causing slow chat responses
+    // console.log(`[AutoTermination] useEffect triggered! sessionId=${state.sessionId}, sessionStartTime=${state.sessionStartTime}`);
+    // 
+    // const currentSessionId = state.sessionId;
+    // const messageCount = state.messages.length;
+    // const sessionStartTime = state.sessionStartTime;
+    // 
+    // console.log(`[AutoTermination] Setting up monitoring: sessionId=${currentSessionId}, messageCount=${messageCount}, sessionStartTime=${sessionStartTime ? new Date(sessionStartTime).toISOString() : 'null'}`);
+    // 
+    // if (!currentSessionId) {
+    //   console.log(`[AutoTermination] No session ID, skipping monitoring setup`);
+    //   return; // Only need a valid session ID for time-based monitoring
+    // }
+    // 
+    // // Clean up any existing termination check
+    // if (terminationCleanupRef.current) {
+    //   console.log(`[AutoTermination] Cleaning up previous interval before setting up new one`);
+    //   try {
+    //     const cleanup = terminationCleanupRef.current;
+    //     terminationCleanupRef.current = null;
+    //     cleanup();
+    //   } catch (error) {
+    //     console.error('[AutoTermination] Error during initial cleanup:', error);
+    //   }
+    // }
+    // 
+    // console.log(`[AutoTermination] Starting termination monitoring for ${messageCount} messages (time-based checks enabled)`);
+    // 
+    // // Set up new termination check with a function that returns current messages
+    // terminationCleanupRef.current = AutomaticChatTermination.setupTerminationCheck(
+    //   () => state.messages, // Pass a function to get current messages
+    //   currentSessionId,
+    //   handleAutomaticTermination, // Use the stable callback directly
+    //   sessionStartTime || undefined
+    // );
+    // 
+    // console.log(`[AutoTermination] Monitoring setup complete`);
+    // 
+    // return () => {
+    //   if (terminationCleanupRef.current) {
+    //     console.log(`[AutoTermination] Effect cleanup - cleaning up termination monitoring`);
+    //     try {
+    //       const cleanup = terminationCleanupRef.current;
+    //       terminationCleanupRef.current = null;
+    //       cleanup();
+    //     } catch (error) {
+    //       console.error('[AutoTermination] Error during cleanup:', error);
+    //     }
+    //   }
+    // };
+  }, [state.sessionId, state.sessionStartTime, handleAutomaticTermination]); // Include handleAutomaticTermination in dependencies
 
-    // Clean up any existing termination check
-    if (terminationCleanupRef.current) {
-      console.log(`[AutoTermination] Cleaning up previous interval before setting up new one`);
-      try {
-        const cleanup = terminationCleanupRef.current;
-        terminationCleanupRef.current = null;
-        cleanup();
-      } catch (error) {
-        console.error('[AutoTermination] Error during initial cleanup:', error);
+  // Timer reference for automatic termination
+  const terminationTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const timerSetRef = useRef(false);
+
+  // Set up automatic termination timer when session starts
+  useEffect(() => {
+    if (state.sessionStartTime && sessionIdRef.current && !isTerminatingRef.current && !timerSetRef.current) {
+      timerSetRef.current = true;
+      
+      const maxDuration = 30 * 60 * 1000; // 30 minutes
+      const currentTime = Date.now();
+      const elapsed = currentTime - state.sessionStartTime;
+      const remainingTime = Math.max(0, maxDuration - elapsed);
+      
+      if (remainingTime > 0) {
+        console.log(`[AutoTermination] Setting up timer for ${Math.round(remainingTime / 1000)} seconds`);
+        
+        // Set timer to trigger termination when duration is reached
+        console.log(`[AutoTermination] Timer will trigger in ${Math.round(remainingTime / 1000)} seconds at ${new Date(Date.now() + remainingTime).toISOString()}`);
+        terminationTimerRef.current = setTimeout(async () => {
+          console.log(`[AutoTermination] Timer expired - auto terminating session at ${new Date().toISOString()}`);
+          if (!isTerminatingRef.current && sessionIdRef.current) {
+            console.log(`[AutoTermination] Proceeding with automatic termination`);
+            const result: ChatTerminationResult = {
+              shouldTerminate: true,
+              reason: 'Time limit reached',
+              analysis: {
+                shouldEnd: true,
+                reason: 'Session time limit exceeded',
+                completionScore: 100,
+                nextSteps: [],
+                emotionalProgress: { improvement: false },
+                conversationQuality: { depth: 'moderate', engagement: 'medium', resolution: 'partial' }
+              },
+              closingMessage: "I've enjoyed our conversation and will generate a summary for you to review later. Take care!"
+            };
+            
+            await handleAutomaticTermination(result);
+          } else {
+            console.log(`[AutoTermination] Timer expired but session already terminating or no session ID`);
+          }
+        }, remainingTime);
       }
     }
-
-    console.log(`[AutoTermination] Starting termination monitoring for ${messageCount} messages (time-based checks enabled)`);
-
-    // Set up new termination check with a function that returns current messages
-    terminationCleanupRef.current = AutomaticChatTermination.setupTerminationCheck(
-      () => state.messages, // Pass a function to get current messages
-      currentSessionId,
-      handleAutomaticTermination, // Use the stable callback directly
-      sessionStartTime || undefined
-    );
-
-    console.log(`[AutoTermination] Monitoring setup complete`);
-
+    
+    // Cleanup timer when session ends or component unmounts
     return () => {
-      if (terminationCleanupRef.current) {
-        console.log(`[AutoTermination] Effect cleanup - cleaning up termination monitoring`);
-        try {
-          const cleanup = terminationCleanupRef.current;
-          terminationCleanupRef.current = null;
-          cleanup();
-        } catch (error) {
-          console.error('[AutoTermination] Error during cleanup:', error);
-        }
+      if (terminationTimerRef.current) {
+        clearTimeout(terminationTimerRef.current);
+        terminationTimerRef.current = null;
+        timerSetRef.current = false;
       }
     };
-  }, [state.sessionId, state.sessionStartTime, handleAutomaticTermination]); // Include handleAutomaticTermination in dependencies
+  }, [state.sessionStartTime, state.sessionId, handleAutomaticTermination]);
+
+  // Simple time-based termination check (runs only when needed - for immediate termination if already expired)
+  const checkSessionTimeLimit = useCallback(async () => {
+    if (!state.sessionStartTime || !sessionIdRef.current || isTerminatingRef.current) {
+      return;
+    }
+    
+    const currentTime = Date.now();
+    const sessionDuration = currentTime - state.sessionStartTime;
+    const maxDuration = 30 * 60 * 1000; // 30 minutes
+    
+    if (sessionDuration >= maxDuration) {
+      console.log(`[AutoTermination] Session time limit reached, ending chat`);
+      // Generate a simple termination result
+      const result: ChatTerminationResult = {
+        shouldTerminate: true,
+        reason: 'Time limit reached',
+        analysis: {
+          shouldEnd: true,
+          reason: 'Session time limit exceeded',
+          completionScore: 100,
+          nextSteps: [],
+          emotionalProgress: { improvement: false },
+          conversationQuality: { depth: 'moderate', engagement: 'medium', resolution: 'partial' }
+        },
+        closingMessage: "I've enjoyed our conversation and will generate a summary for you to review later. Take care!"
+      };
+      
+      await handleAutomaticTermination(result);
+    }
+  }, [state.sessionStartTime, handleAutomaticTermination]);
 
   // Send message with streaming
   const sendMessage = useCallback(async (messageText: string) => {
@@ -651,6 +752,8 @@ export function useChat({
 
       onMessage?.(userMessage)
 
+      // Note: Timer handles automatic termination, no need to check after each message
+
     } catch (error) {
       console.error('Failed to send message:', error)
       onError?.(error as Error)
@@ -773,10 +876,26 @@ export function useChat({
             // Fetch existing messages for this session (will also set session start time)
             const messageData = await fetchExistingMessages(savedSessionId)
             
-            // If no messages exist, initialize with mood-aware opening message
+            // If no messages exist, check if we should add an opening message
             if (!messageData || messageData.messages.length === 0) {
-              console.log('No messages in existing session, initializing with mood data:', { mood, triggers, notes })
-              await initializeChat(mood, triggers, notes)
+              console.log('No messages in existing session, checking if opening message needed')
+              // Don't initialize a new session - just add opening message if needed
+              const hasOpeningMessage = state.messages.some(msg => msg.type === 'opening');
+              if (!hasOpeningMessage) {
+                console.log('Adding opening message to existing empty session')
+                const openingMessage: Message = {
+                  id: crypto.randomUUID(),
+                  sender: 'bot',
+                  content: "Hello! I'm here to listen and support you. How are you feeling today?",
+                  timestamp: new Date().toISOString(),
+                  type: 'opening'
+                }
+                setState(prev => ({
+                  ...prev,
+                  messages: [...prev.messages, openingMessage]
+                }))
+                onMessage?.(openingMessage)
+              }
             }
           } else {
             // Create new session with mood-aware opening message

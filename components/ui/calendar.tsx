@@ -31,7 +31,7 @@ function Calendar({
     <DayPicker
       showOutsideDays={showOutsideDays}
       captionLayout={captionLayout}
-      startMonth={new Date(2020, 0)}
+      startMonth={new Date(2000, 0)}
       endMonth={new Date(2035, 11)}
       className={cn(
         "w-fit rounded-2xl border border-[#E5E7EB] bg-white p-4",
