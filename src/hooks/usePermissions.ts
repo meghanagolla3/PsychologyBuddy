@@ -111,3 +111,4 @@ export function usePermissions() {
     userPermissions, // This should now be the correct value
   };
 }
+

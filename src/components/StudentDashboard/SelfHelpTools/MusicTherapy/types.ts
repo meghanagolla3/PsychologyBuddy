@@ -9,3 +9,4 @@ export interface MusicCardProps {
   coverImage?: string;
   onClick?: () => void;
 }
+

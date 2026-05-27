@@ -57,3 +57,4 @@ export default function EndChatButton({ sessionId, studentId, messages, endChat,
     </button>
   );
 }
+

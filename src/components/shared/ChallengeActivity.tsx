@@ -217,3 +217,4 @@ function ActivityCard({ activity }: { activity: ActivityItem }) {
     </div>
   );
 }
+

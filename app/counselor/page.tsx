@@ -315,3 +315,4 @@ function LevelBadge({ level }: { level: number }) {
     </span>
   );
 }
+

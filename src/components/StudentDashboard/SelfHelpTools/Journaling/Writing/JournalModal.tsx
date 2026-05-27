@@ -111,3 +111,4 @@ export default function JournalModal({ journal, isOpen, onClose, onDelete }: Jou
     </div>
   );
 }
+

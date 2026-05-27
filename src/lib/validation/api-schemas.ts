@@ -113,3 +113,4 @@ export type SummaryGenerateRequest = z.infer<typeof SummaryGenerateSchema>
 export type MoodCheckinResponse = z.infer<typeof MoodCheckinResponseSchema>
 export type TriggerSelectionResponse = z.infer<typeof TriggerSelectionResponseSchema>
 export type ChatSessionResponse = z.infer<typeof ChatSessionResponseSchema>
+

@@ -55,3 +55,4 @@ function InfoCard({ icon: Icon, label, value, color }: InfoCardProps) {
     </div>
   );
 }
+

@@ -72,3 +72,4 @@ function StatsCards({ stats, loading, permissions }: StatsCardsProps) {
 }
 
 export default memo(StatsCards);
+

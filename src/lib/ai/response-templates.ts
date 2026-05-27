@@ -48,3 +48,4 @@ export class ResponseFormatter {
     return this.formatStructuredResponse(newResponse)
   }
 }
+

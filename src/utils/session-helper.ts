@@ -112,3 +112,4 @@ export async function requirePermission(req: Request, permission: string): Promi
 
   return session;
 }
+

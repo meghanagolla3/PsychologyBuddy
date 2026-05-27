@@ -296,3 +296,4 @@ export function SessionDetailsModal({ open, onOpenChange, session }: SessionDeta
     </div>
   );
 }
+

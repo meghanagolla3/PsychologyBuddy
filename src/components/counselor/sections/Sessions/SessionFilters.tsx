@@ -113,3 +113,4 @@ export function SessionFilters({ onFilter }: SessionFiltersProps) {
     </div>
   );
 }
+

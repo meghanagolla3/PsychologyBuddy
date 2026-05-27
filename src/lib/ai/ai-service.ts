@@ -217,3 +217,4 @@ Respond only with valid JSON, no other text.`
 export const generateOpeningMessage = AIService.generateOpeningMessage.bind(AIService)
 export const generateChatResponse = AIService.generateChatResponse.bind(AIService)
 export const generateSummary = AIService.generateSummary.bind(AIService)
+

@@ -28,3 +28,4 @@ export function formatRelativeTime(date: Date | string): string {
     return `${years} years ago`;
   }
 }
+

@@ -83,3 +83,4 @@ export default function CourseCard({ id, title, category, time, description, col
     </div>
   );
 }
+

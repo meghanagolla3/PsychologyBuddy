@@ -22,3 +22,4 @@ export const AlertMessage: React.FC<AlertMessageProps> = ({ type, message, class
     </div>
   );
 };
+

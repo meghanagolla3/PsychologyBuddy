@@ -28,3 +28,4 @@ export const PageIllustration: React.FC = () => {
     </>
   );
 };
+

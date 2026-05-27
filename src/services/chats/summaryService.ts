@@ -1,6 +1,6 @@
 import { DatabaseService } from '@/src/lib/database/database-service'
 import { AIService } from '@/src/lib/ai/ai-service'
-import { ValidationError } from '@/src/lib/errors/custom-errors'
+import { ValidationError } from '@/src/lib/errors/custom-errors';
 
 export interface SummaryGenerationData {
   sessionId: string
@@ -185,3 +185,4 @@ export class SummaryService {
     }
   }
 }
+

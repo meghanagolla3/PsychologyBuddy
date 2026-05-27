@@ -14,3 +14,4 @@ export function useMoodData(selectedSchoolId: string, isSuperAdmin: boolean, use
     },
   });
 }
+

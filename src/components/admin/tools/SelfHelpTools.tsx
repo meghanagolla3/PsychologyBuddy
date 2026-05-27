@@ -4,7 +4,7 @@ import { AdminHeader } from "@/src/components/admin/layout/AdminHeader";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/src/contexts/AuthContext";
-import { useToast } from "@/hooks/use-toast";
+import { useToast } from "@/src/hooks/use-toast";
 import JournalingTools from "./SelfHelpTools/JournalingTools";
 import MusicTools from "./SelfHelpTools/MusicTools";
 import MeditationTools from "./SelfHelpTools/MeditationTools";
@@ -257,3 +257,4 @@ export default function SelfHelpTools() {
     </div>
   );
 }
+

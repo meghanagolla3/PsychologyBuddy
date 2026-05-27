@@ -6,3 +6,4 @@ export const GET = MusicMoodsController.getMusicMoods;
 
 // POST /api/admin/music/moods - Create music mood
 export const POST = MusicMoodsController.createMusicMood;
+

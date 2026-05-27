@@ -25,7 +25,7 @@ import {
 import Link from "next/link";
 import { useAuth } from "@/src/contexts/AuthContext";
 import StudentLayout from "@/src/components/StudentDashboard/Layout/StudentLayout";
-import { useToast } from "@/hooks/use-toast";
+import { useToast } from "@/src/hooks/use-toast";
 import { useState, useEffect } from "react";
 import BackToDashboard from "../Layout/BackToDashboard";
 import { toast } from "@/components/ui/use-toast";
@@ -1072,3 +1072,4 @@ function SessionCard({ session, setSelectedSession, setIsModalOpen }: any) {
       </div>
     );
   }
+

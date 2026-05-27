@@ -301,3 +301,4 @@ export const DELETE = withPermission({
     );
   }
 });
+

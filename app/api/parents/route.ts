@@ -6,3 +6,4 @@ export const POST = ParentController.createParent;
 
 // GET /api/parents - Get parents (Admin only)
 export const GET = ParentController.getParents;
+

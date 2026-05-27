@@ -12,3 +12,4 @@ export const UpdateMoodSchema = z.object({
 
 export type CreateMoodData = z.infer<typeof CreateMoodSchema>;
 export type UpdateMoodData = z.infer<typeof UpdateMoodSchema>;
+

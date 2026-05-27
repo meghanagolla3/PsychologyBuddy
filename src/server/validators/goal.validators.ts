@@ -12,3 +12,4 @@ export const UpdateGoalSchema = z.object({
 
 export type CreateGoalData = z.infer<typeof CreateGoalSchema>;
 export type UpdateGoalData = z.infer<typeof UpdateGoalSchema>;
+

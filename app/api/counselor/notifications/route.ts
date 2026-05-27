@@ -69,3 +69,4 @@ export const GET = withPermission({
 // POST /api/counselor/notifications/read - Mark notification as read
 // This is normally in a separate file like app/api/counselor/notifications/[id]/read/route.ts
 // but for simplicity I can put it here if I use a different path or just create the sub-routes.
+

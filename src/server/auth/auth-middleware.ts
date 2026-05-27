@@ -91,3 +91,4 @@ export class AuthMiddleware {
     return this.createErrorResponse('Internal server error', 500);
   }
 }
+

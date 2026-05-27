@@ -6,3 +6,4 @@ export const GET = GoalController.getGoals;
 
 // POST /api/goals - Create goal (Admin & SuperAdmin)
 export const POST = GoalController.createGoal;
+

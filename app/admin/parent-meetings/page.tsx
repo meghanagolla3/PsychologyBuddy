@@ -5,3 +5,4 @@ import ParentMeetings from '@/src/components/admin/sections/support/ParentMeetin
 export default function AdminParentMeetingsPage() {
   return <ParentMeetings />;
 }
+

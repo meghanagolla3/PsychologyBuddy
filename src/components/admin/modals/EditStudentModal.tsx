@@ -950,3 +950,4 @@ export function EditStudentModal({ student, onClose, onSuccess, schools, classes
     </Dialog>
   );
 }
+

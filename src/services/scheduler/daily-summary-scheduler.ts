@@ -134,3 +134,4 @@ export class DailySummaryScheduler {
 if (process.env.NODE_ENV !== 'test' && process.env.DAILY_SUMMARY_ENABLED === 'true') {
   DailySummaryScheduler.configureFromEnv()
 }
+

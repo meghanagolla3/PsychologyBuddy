@@ -77,3 +77,4 @@ export default function JournalTabs({ activeTab, setActiveTab, config }: TabProp
     </div>
   );
 }
+

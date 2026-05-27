@@ -184,3 +184,4 @@ export function Sidebar({ className, onClose }: CounselorSidebarProps) {
 }
 
 export default Sidebar;
+

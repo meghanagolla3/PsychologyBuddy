@@ -241,3 +241,4 @@ export const CreateMeditationMoodSchema = z.object({
   name: z.string().min(1, "Mood name is required"),
   status: z.enum(["ACTIVE", "INACTIVE"]).default("ACTIVE"),
 });
+

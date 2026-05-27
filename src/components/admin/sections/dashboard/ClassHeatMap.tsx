@@ -51,3 +51,4 @@ function ClassHeatmap({ classData }: ClassHeatmapProps) {
 }
 
 export default memo(ClassHeatmap);
+

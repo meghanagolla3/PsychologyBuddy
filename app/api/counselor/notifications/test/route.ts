@@ -29,3 +29,4 @@ export const POST = withPermission({
     return NextResponse.json({ success: false }, { status: 500 });
   }
 });
+

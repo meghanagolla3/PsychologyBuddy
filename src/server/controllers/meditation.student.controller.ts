@@ -140,3 +140,4 @@ export const getStudentMeditationInstructions = asyncHandler(async (request: Nex
     return NextResponse.json(result, { status: 400 });
   }
 });
+

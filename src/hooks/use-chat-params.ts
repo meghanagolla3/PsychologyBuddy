@@ -40,3 +40,4 @@ export function useChatParams(redirectToMoodCheckin = true): UseChatParamsReturn
     loading
   }
 }
+

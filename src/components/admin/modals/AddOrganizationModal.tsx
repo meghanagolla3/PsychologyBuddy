@@ -551,3 +551,4 @@ export function AddOrganizationModal({ isOpen, onClose, onSuccess }: AddOrganiza
     </div>
   );
 }
+

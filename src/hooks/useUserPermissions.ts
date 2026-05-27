@@ -51,3 +51,4 @@ export function useUserPermissions() {
     canManage: (module: string) => perms.includes(`${module}.manage`),
   };
 }
+

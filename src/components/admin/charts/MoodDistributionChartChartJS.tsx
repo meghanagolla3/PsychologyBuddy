@@ -192,3 +192,4 @@ export function MoodDistributionChart({
     </div>
   );
 }
+

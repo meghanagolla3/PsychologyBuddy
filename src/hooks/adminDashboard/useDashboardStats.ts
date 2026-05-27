@@ -14,3 +14,4 @@ export function useDashboardStats(selectedSchoolId: string, isSuperAdmin: boolea
     staleTime: 30_000,
   });
 }
+

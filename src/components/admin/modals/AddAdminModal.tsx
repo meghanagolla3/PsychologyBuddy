@@ -695,3 +695,4 @@ export function AddAdminModal({ onClose, onSuccess, schools }: AddAdminModalProp
     </Dialog>
   );
 }
+

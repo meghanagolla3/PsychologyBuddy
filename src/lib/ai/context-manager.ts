@@ -223,3 +223,4 @@ export function formatMessagesForAI(messages: any[]): ChatMessage[] {
     content: msg.content
   }));
 }
+

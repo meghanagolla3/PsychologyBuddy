@@ -23,3 +23,4 @@ export default function SearchHeader({ searchQuery, onSearchChange, onFilterClic
     </div>
   );
 }
+

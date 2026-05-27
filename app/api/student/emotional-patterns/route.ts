@@ -261,3 +261,4 @@ function getTriggerName(trigger: string): string {
   };
   return triggerNames[trigger] || trigger;
 }
+

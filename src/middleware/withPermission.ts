@@ -18,3 +18,4 @@ export function withPermission(requiredPermission: string, handler: Function) {
     return handler(req, context, user);
   };
 }
+

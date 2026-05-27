@@ -173,3 +173,4 @@ export function ParentSidebar({ className, setSidebarOpen }: ParentSidebarProps)
 }
 
 export default ParentSidebar;
+

@@ -8,3 +8,4 @@ export const PasswordUtil = {
   verify: async (plain: string, hashed: string) =>
     bcrypt.compare(plain, hashed), // Alias for compare
 };
+

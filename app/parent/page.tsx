@@ -3,3 +3,4 @@ import { ParentDashboard } from '@/src/components/parent/sections/ParentDashboar
 export default function ParentPage() {
   return <ParentDashboard />;
 }
+

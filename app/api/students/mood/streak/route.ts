@@ -1,5 +1,5 @@
-import { createAPIHandler } from '@/src/lib/create-api-handler'
-import { StreakService } from '@/src/server/services/streak.service'
+import { createAPIHandler } from '@/src/lib/create-api-handler';
+import { StreakService } from '@/src/server/services/streak.service';
 
 export const dynamic = 'force-dynamic'
 
@@ -13,3 +13,4 @@ export const GET = createAPIHandler.get(
   },
   { requireAuth: true }
 )
+

@@ -41,3 +41,4 @@ export default function FilterTabs({ activeTab, onTabChange, categories = [], go
     </div>
   );
 }
+

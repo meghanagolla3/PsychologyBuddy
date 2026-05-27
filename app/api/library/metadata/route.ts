@@ -3,3 +3,4 @@ import { LibraryController } from '@/src/server/content/library/library.controll
 
 // GET /api/library/metadata - Get categories, moods, and goals (Admin & SuperAdmin)
 export const GET = LibraryController.getLibraryMetadata;
+

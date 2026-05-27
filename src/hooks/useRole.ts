@@ -32,3 +32,4 @@ export function useRole() {
     canViewOnly: ['STUDENT', 'PARENT'].includes(role || ''),
   };
 }
+

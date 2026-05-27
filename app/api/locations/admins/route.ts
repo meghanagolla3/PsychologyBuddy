@@ -78,3 +78,4 @@ export const DELETE = withPermission({
     return Response.json(errorResponse, { status: errorResponse.error?.code || 500 });
   }
 });
+

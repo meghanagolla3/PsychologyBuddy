@@ -33,3 +33,4 @@ export class NavigationUtils {
     router.push('/dashboard/student')
   }
 }
+

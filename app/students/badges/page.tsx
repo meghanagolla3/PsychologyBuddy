@@ -3,3 +3,4 @@ import BadgesAndStreaks from '@/src/components/StudentDashboard/BadgesAndStreaks
 export default function BadgesAndStreaksPage() {
   return <BadgesAndStreaks />;
 }
+

@@ -94,3 +94,4 @@ const WhySchools = () => {
 };
 
 export default WhySchools;
+

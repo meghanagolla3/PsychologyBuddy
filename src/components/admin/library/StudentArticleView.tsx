@@ -621,3 +621,4 @@ export const StudentArticleView = ({ articleId }: { articleId: string }) => {
     </div>
   );
 }
+

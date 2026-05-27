@@ -112,3 +112,4 @@ export const GET = withPermission({
     return Response.json(errorResponse, { status: errorResponse.error?.code || 500 });
   }
 });
+

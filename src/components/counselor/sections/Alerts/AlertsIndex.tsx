@@ -415,3 +415,4 @@ export function AlertsIndex() {
 }
 
 export default AlertsIndex;
+

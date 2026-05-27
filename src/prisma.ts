@@ -36,3 +36,4 @@ const getPrisma = () => {
 const prisma = getPrisma()
 
 export default prisma
+

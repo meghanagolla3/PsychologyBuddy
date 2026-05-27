@@ -24,3 +24,4 @@ export const Icons = {
   Music: (props: React.SVGProps<SVGSVGElement>) => <Music {...props} />,
   Repeat: (props: React.SVGProps<SVGSVGElement>) => <Repeat {...props} />,
 };
+

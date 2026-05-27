@@ -168,3 +168,4 @@ export default function AudioJournalList({ journals, onDelete, loading }: AudioJ
     </div>
   );
 }
+

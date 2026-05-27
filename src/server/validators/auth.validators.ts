@@ -36,3 +36,4 @@ export const validateAdminLogin = (body: any) => {
   }
   return result.data;
 };
+

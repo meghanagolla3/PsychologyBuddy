@@ -494,3 +494,4 @@ This is an automated alert from the Psychology Buddy system.
     }
   }
 }
+

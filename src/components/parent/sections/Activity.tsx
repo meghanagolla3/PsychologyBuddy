@@ -178,3 +178,4 @@ function ActivityRow({ name, time }: { name: string; time: string }) {
     </li>
   );
 }
+

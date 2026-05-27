@@ -26,3 +26,4 @@ export function extractUserPermissions(user: UserWithPermissions | null) {
   const all = new Set([...rolePerms, ...adminPerms]);
   return Array.from(all);
 }
+

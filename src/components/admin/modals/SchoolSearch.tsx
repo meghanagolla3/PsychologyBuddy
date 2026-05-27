@@ -162,3 +162,4 @@ export function SchoolSearch({ onSchoolSelect, placeholder = "Search schools..."
     </div>
   );
 }
+

@@ -6,3 +6,4 @@ export const GET = MoodController.getMoods;
 
 // POST /api/labels/moods - Create mood (Admin & SuperAdmin)
 export const POST = MoodController.createMood;
+

@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { CalendarIcon, CalendarPlus, Clock, Eye, Play, Plus, User, Mail, FileText, CalendarDays, UserRound, Briefcase, CircleCheck, CalendarClock } from 'lucide-react';
 import { AdminLoader } from '@/src/components/admin/ui/AdminLoader';
-import { RingSpinner } from '@/src/components/ui/Spinners';
+import { RingSpinner } from '@/components/ui/Spinners';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { ParentMeetingModal } from '@/src/components/counselor/sections/ParentMeetings/ParentMeetingModal';
@@ -1005,3 +1005,4 @@ export default function ParentMeetingsPage() {
     </div>
   );
 }
+

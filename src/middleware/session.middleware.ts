@@ -13,3 +13,4 @@ export async function requireAuth(req: Request) {
 
   return session;
 }
+

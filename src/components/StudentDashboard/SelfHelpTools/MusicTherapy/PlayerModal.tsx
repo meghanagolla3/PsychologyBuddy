@@ -308,3 +308,4 @@ export const PlayerModal = ({ card, onClose, categories }: PlayerModalProps) => 
     </>
   );
 };
+

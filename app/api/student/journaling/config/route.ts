@@ -5,3 +5,4 @@ import { journalingStudentController } from '@/src/server/controllers/journaling
 export async function GET(req: NextRequest) {
   return journalingStudentController.getJournalingConfig(req);
 }
+

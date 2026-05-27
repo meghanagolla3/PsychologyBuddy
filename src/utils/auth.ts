@@ -48,3 +48,4 @@ export const setUserId = (userId: string): void => {
     localStorage.setItem('userId', userId);
   }
 };
+

@@ -256,3 +256,4 @@ export class JournalingStudentController {
 }
 
 export const journalingStudentController = new JournalingStudentController();
+

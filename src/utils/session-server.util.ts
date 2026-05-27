@@ -88,3 +88,4 @@ export async function deleteSession(sessionId: string) {
     console.error('Error deleting session:', error);
   }
 }
+

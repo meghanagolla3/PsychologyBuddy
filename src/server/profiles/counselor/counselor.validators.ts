@@ -55,3 +55,4 @@ export const UpdateCounselorStatusSchema = z.object({
 export type CreateCounselorRequest = z.infer<typeof CreateCounselorSchema>;
 export type UpdateCounselorRequest = z.infer<typeof UpdateCounselorSchema>;
 export type UpdateCounselorStatusRequest = z.infer<typeof UpdateCounselorStatusSchema>;
+

@@ -305,3 +305,4 @@ export function EditParentModal({ parent, onClose, onSuccess, onDelete }: EditPa
     </Dialog>
   );
 }
+

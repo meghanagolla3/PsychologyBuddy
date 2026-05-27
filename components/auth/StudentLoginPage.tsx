@@ -199,3 +199,4 @@ function FooterItem({ icon: Icon, label }: { icon: React.ComponentType<{ classNa
     </a>
   );
 }
+

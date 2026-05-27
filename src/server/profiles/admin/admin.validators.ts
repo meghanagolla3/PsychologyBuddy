@@ -69,3 +69,4 @@ export type UpdateAdminData = z.infer<typeof UpdateAdminSchema>;
 export type ResetAdminPasswordData = z.infer<typeof ResetAdminPasswordSchema>;
 export type UpdateAdminStatusData = z.infer<typeof UpdateAdminStatusSchema>;
 export type UpdateAdminProfileData = z.infer<typeof UpdateAdminProfileSchema>;
+

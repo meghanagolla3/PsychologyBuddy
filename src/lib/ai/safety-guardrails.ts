@@ -460,3 +460,4 @@ Remember: You are a friend who listens and supports, not a professional who trea
     return "I care about you a lot, and because I'm just an AI, I can't provide the help you need right now. Please reach out to a trusted adult, counselor, or call emergency services. Your safety matters too much to handle alone. 🛡️ Would you like me to help you find someone to talk to? 🌊";
   }
 }
+

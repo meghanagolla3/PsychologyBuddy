@@ -133,3 +133,4 @@ function getToneFromCategory(category: string): 'warning' | 'info' | 'success' {
   if (lower.includes('psychoeducation') || lower.includes('music')) return 'success';
   return 'info';
 }
+

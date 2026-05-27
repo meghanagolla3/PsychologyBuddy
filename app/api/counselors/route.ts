@@ -6,3 +6,4 @@ export const POST = CounselorController.createCounselor;
 
 // GET /api/counselors - Get all counselors (Admin, SuperAdmin, School SuperAdmin)
 export const GET = CounselorController.getCounselors;
+

@@ -59,3 +59,4 @@ export async function PUT(req: NextRequest) {
     return NextResponse.json(errorResponse, { status: 500 });
   }
 }
+

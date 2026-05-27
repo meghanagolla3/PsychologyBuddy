@@ -34,3 +34,4 @@ export function FullPageLoading({ message = "Loading..." }: { message?: string }
     </div>
   )
 }
+
