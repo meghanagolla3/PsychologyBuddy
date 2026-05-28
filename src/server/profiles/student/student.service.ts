@@ -220,6 +220,7 @@ export class StudentService {
 
           return {
             ...student,
+            dateOfBirth: student.dateOfBirth || null,
             status: student.studentProfile?.status || 'ACTIVE',
             studentProfile: {
               ...student.studentProfile,
@@ -321,6 +322,28 @@ export class StudentService {
         take: 5
       });
 
+      // Fetch parent details if parentId exists
+      let parentDetails = null;
+      if (student.parentId) {
+        const parent = await prisma.user.findUnique({
+          where: { id: student.parentId },
+          select: {
+            firstName: true,
+            lastName: true,
+            email: true,
+            phone: true,
+          }
+        });
+        if (parent) {
+          parentDetails = {
+            name: `${parent.firstName} ${parent.lastName}`,
+            email: parent.email,
+            phone: parent.phone,
+            relationship: 'Parent'
+          };
+        }
+      }
+
       // Create support sessions from resolved alerts
       const completedSessions = await Promise.all(
         escalationAlerts.filter(alert => alert.status === 'resolved').map(async (alert) => {
@@ -403,6 +426,7 @@ export class StudentService {
         lastName: student.lastName,
         email: student.email,
         phone: student.phone,
+        dateOfBirth: student.dateOfBirth || null,
         status: student.studentProfile?.status || 'ACTIVE',
         classRef: student.classRef ? {
           id: student.classRef.id,
@@ -421,7 +445,7 @@ export class StudentService {
           streakDays: 0, // Default since not in schema
           joinDate: student.createdAt?.toISOString().split('T')[0],
         },
-        emergencyContact: (student.studentProfile as any)?.emergencyContact || {
+        emergencyContact: parentDetails || (student.studentProfile as any)?.emergencyContact || {
           name: "Not provided",
           phone: "Not provided",
           relationship: "Not specified"

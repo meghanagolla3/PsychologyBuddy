@@ -199,11 +199,11 @@ const StudentRow = React.memo(function StudentRow({
             <DropdownMenuItem className="gap-2" onClick={() => onView(student)}>
               <Eye className="h-4 w-4" /> View Profile
             </DropdownMenuItem>
-            {permissions.canUpdateUsers && (
+            
               <DropdownMenuItem className="gap-2" onClick={() => onEdit(student)}>
                 <Edit className="h-4 w-4" /> Edit
               </DropdownMenuItem>
-            )}
+            
             <DropdownMenuSeparator />
             {student.status === 'INACTIVE' ? (
               <DropdownMenuItem className="gap-2 text-green-600 focus:text-green-600" onClick={() => onRestore(student)}>

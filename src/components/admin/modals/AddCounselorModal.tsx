@@ -40,7 +40,6 @@ interface FormData {
   schoolId: string;
   locationId: string;
   specialization?: string;
-  availability?: string;
 }
 
 interface FormErrors {
@@ -54,7 +53,6 @@ interface FormErrors {
   schoolId?: string;
   locationId?: string;
   specialization?: string;
-  availability?: string;
 }
 
 interface SchoolLocation {
@@ -91,8 +89,7 @@ export function AddCounselorModal({ onClose, onSuccess, schools }: AddCounselorM
     status: 'ACTIVE',
     schoolId: (user?.school?.id && /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$/.test(user.school.id)) ? user.school.id : '',
     locationId: '',
-    specialization: '',
-    availability: ''
+    specialization: ''
   });
   const [errors, setErrors] = useState<FormErrors>({});
   const [submitError, setSubmitError] = useState<string>('');
@@ -134,8 +131,7 @@ export function AddCounselorModal({ onClose, onSuccess, schools }: AddCounselorM
       status: 'ACTIVE',
       schoolId: initialSchoolId,
       locationId: '',
-      specialization: '',
-      availability: ''
+      specialization: ''
     });
     setErrors({});
     setSubmitError('');
@@ -194,9 +190,10 @@ export function AddCounselorModal({ onClose, onSuccess, schools }: AddCounselorM
       return;
     }
 
-    const phoneRegex = /^[+]?[\d\s\-\(\)]+$/;
+    // Only accept exactly 10 digits
+    const phoneRegex = /^\d{10}$/;
     if (!phoneRegex.test(phone)) {
-      setPhoneError("Invalid phone number format");
+      setPhoneError("Phone number must be exactly 10 digits");
       return;
     }
 
@@ -250,6 +247,23 @@ export function AddCounselorModal({ onClose, onSuccess, schools }: AddCounselorM
   // Handle input changes
   const handleInputChange = (field: keyof FormData, value: string | null) => {
     console.log('handleInputChange called:', field, '=', value);
+    
+    // For phone field, only allow numbers and limit to 10 digits
+    if (field === 'phone' && value) {
+      const numericValue = value.replace(/\D/g, '').slice(0, 10);
+      setFormData(prev => ({ ...prev, [field]: numericValue }));
+      
+      // Clear errors when user starts typing
+      if (errors[field]) {
+        setErrors(prev => ({ ...prev, [field]: undefined }));
+      }
+      setSubmitError('');
+
+      // Validate phone in real-time
+      validatePhone(numericValue);
+      return;
+    }
+    
     setFormData(prev => ({ ...prev, [field]: value || '' }));
     
     // Clear errors when user starts typing
@@ -258,10 +272,8 @@ export function AddCounselorModal({ onClose, onSuccess, schools }: AddCounselorM
     }
     setSubmitError('');
 
-    // Validate phone and email in real-time
-    if (field === 'phone') {
-      validatePhone(value || '');
-    } else if (field === 'email') {
+    // Validate email in real-time
+    if (field === 'email') {
       validateEmail(value || '');
     }
   };
@@ -427,7 +439,8 @@ export function AddCounselorModal({ onClose, onSuccess, schools }: AddCounselorM
               <Input
                 value={formData.phone}
                 onChange={(e) => handleInputChange('phone', e.target.value)}
-                placeholder="+1 (555) 123-4567"
+                placeholder="Enter 10 digit phone number"
+                maxLength={10}
                 className={errors.phone ? 'border-red-500' : ''}
               />
               {errors.phone && (
@@ -494,16 +507,6 @@ export function AddCounselorModal({ onClose, onSuccess, schools }: AddCounselorM
               />
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Availability
-              </label>
-              <Input
-                value={formData.availability}
-                onChange={(e) => handleInputChange('availability', e.target.value)}
-                placeholder="e.g., Monday-Friday 9AM-5PM"
-              />
-            </div>
           </div>
 
           {/* Assignment */}

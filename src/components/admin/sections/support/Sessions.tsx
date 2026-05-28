@@ -15,6 +15,8 @@ import {
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { CalendarDay } from "react-day-picker";
+import { useSchoolFilter } from "@/src/contexts/SchoolFilterContext";
+import { useAuth } from "@/src/contexts/AuthContext";
 
 type SessionStatus = "SCHEDULED" | "IN_PROGRESS" | "COMPLETED" | "CANCELLED" | "MISSED";
 type SessionType = "INTAKE" | "FOLLOW_UP";
@@ -68,6 +70,9 @@ const statuses = ["All Status", "SCHEDULED", "IN_PROGRESS", "COMPLETED", "CANCEL
 
 export default function Sessions() {
   const router = useRouter();
+  const { user } = useAuth();
+  const { selectedSchoolId, schools, isSuperAdmin, setSelectedSchoolId } = useSchoolFilter();
+  
   const [search, setSearch] = useState("");
   const [sessionType, setSessionType] = useState("All Types");
   const [status, setStatus] = useState("All Status");
@@ -82,6 +87,14 @@ export default function Sessions() {
     page: 1,
     limit: 10
   });
+
+  // Location filter state
+  const [locationFilter, setLocationFilter] = useState("all");
+  const [locations, setLocations] = useState<any[]>([]);
+
+  // Check if user should see location filter
+  const effectiveSchoolId = (user?.role?.name === 'SCHOOL_SUPERADMIN' || user?.role?.name === 'ADMIN') ? user?.school?.id : selectedSchoolId;
+  const shouldShowLocationFilter = (user?.role?.name === 'SCHOOL_SUPERADMIN' || user?.role?.name === 'ADMIN') && effectiveSchoolId && effectiveSchoolId !== 'all';
 
   const [selectedSessionId, setSelectedSessionId] = useState<string | null>(null);
   const [modalLoading, setModalLoading] = useState(false);
@@ -256,6 +269,28 @@ export default function Sessions() {
     }
   };
 
+  // Fetch locations for school superadmin and admin
+  useEffect(() => {
+    const fetchLocations = async () => {
+      if (effectiveSchoolId && effectiveSchoolId !== 'all') {
+        try {
+          const response = await fetch(`/api/admin/schools/locations?schoolId=${effectiveSchoolId}`, { 
+            credentials: 'include' 
+          });
+          const data = await response.json();
+          setLocations(data || []);
+        } catch (error) {
+          console.error('Failed to fetch locations:', error);
+          setLocations([]);
+        }
+      } else {
+        setLocations([]);
+      }
+    };
+
+    fetchLocations();
+  }, [effectiveSchoolId]);
+
   useEffect(() => {
     fetchSessions();
   }, [page]);
@@ -269,6 +304,10 @@ export default function Sessions() {
       if (sessionType !== "All Types") params.append('sessionType', sessionType);
       if (status !== "All Status") params.append('status', status);
       if (search) params.append('search', search);
+      if (locationFilter !== "all") params.append('locationId', locationFilter);
+      if (isSuperAdmin && selectedSchoolId && selectedSchoolId !== 'all') {
+        params.append('schoolId', selectedSchoolId);
+      }
       params.append('page', page.toString());
       params.append('limit', limit.toString());
 
@@ -321,7 +360,7 @@ export default function Sessions() {
   useEffect(() => {
     setPage(1);
     fetchSessions();
-  }, [sessionType, status]);
+  }, [sessionType, status, locationFilter, selectedSchoolId]);
 
   // Debounced search and reset to page 1
   useEffect(() => {
@@ -358,7 +397,19 @@ export default function Sessions() {
 
   return (
     <div className="flex flex-col min-h-screen">
-      <AdminHeader title="Sessions" subtitle="All counselling sessions across counselors." showTimeFilter={false} />
+      <AdminHeader 
+        title="Sessions" 
+        subtitle="All counselling sessions across counselors." 
+        showTimeFilter={false}
+        showSchoolFilter={isSuperAdmin}
+        schoolFilterValue={selectedSchoolId}
+        onSchoolFilterChange={setSelectedSchoolId}
+        schools={schools}
+        showLocationFilter={shouldShowLocationFilter || false}
+        locationFilterValue={locationFilter}
+        onLocationFilterChange={setLocationFilter}
+        locations={locations}
+      />
 
       <div className="flex-1 overflow-auto p-6 space-y-6 animate-fade-in">
         {/* Filters */}
@@ -505,7 +556,11 @@ export default function Sessions() {
                           <button 
                             onClick={() => {
                               setSelectedSessionId(s.id);
-                              fetchSessionReportData(s.id);
+                              if (s.status === 'SCHEDULED' || s.status === 'CANCELLED' || s.status === 'IN_PROGRESS') {
+                                setModalData({ sessionNotCompleted: true, status: s.status });
+                              } else {
+                                fetchSessionReportData(s.id);
+                              }
                             }}
                             className="text-[14px] font-medium bg-[#F0F7FF] px-4 py-2 rounded-[12px] text-[#2D85F2] hover:cursor-pointer hover:bg-[#e5f1ff]"
                           >
@@ -557,9 +612,9 @@ export default function Sessions() {
             <div className="flex items-center justify-between px-6 py-4 border-b border-[#E2E8F0] dark:border-slate-800">
               <div>
                 <h2 className="text-xl font-bold text-[#1E293B] dark:text-white">Session Report Preview</h2>
-                {modalData && (
+                {modalData && !modalData.sessionNotCompleted && (
                   <p className="text-sm text-[#767676] dark:text-slate-400 mt-0.5">
-                    Student: <span className="font-semibold text-[#3A3A3A] dark:text-slate-200">{modalData.session.student ? `${modalData.session.student.firstName} ${modalData.session.student.lastName}` : "N/A"}</span> | 
+                    Student: <span className="font-semibold text-[#3A3A3A] dark:text-slate-200">{modalData.session.student ? `${modalData.session.student.firstName} ${modalData.session.student.lastName}` : "N/A"}</span> |
                     Counselor: <span className="font-semibold text-[#3A3A3A] dark:text-slate-200">{modalData.session.counselor ? `${modalData.session.counselor.firstName} ${modalData.session.counselor.lastName}` : "N/A"}</span>
                   </p>
                 )}
@@ -596,6 +651,20 @@ export default function Sessions() {
               ) : !modalData ? (
                 <div className="text-center py-16 text-[#767676]">
                   No report details found for this session.
+                </div>
+              ) : modalData.sessionNotCompleted ? (
+                <div className="text-center py-16">
+                  <div className="h-16 w-16 mx-auto mb-4 rounded-full bg-orange-100 dark:bg-orange-900/20 flex items-center justify-center">
+                    <CalendarDays className="h-8 w-8 text-orange-500" />
+                  </div>
+                  <p className="text-lg font-semibold text-[#1E293B] dark:text-white mb-2">
+                    Session Not Completed
+                  </p>
+                  <p className="text-sm text-[#767676] dark:text-slate-400">
+                    {modalData.status === 'CANCELLED' ? 'This session has been declined.' :
+                     modalData.status === 'IN_PROGRESS' ? 'This session is currently in progress.' :
+                     'This session is scheduled.'} The report will be available once the session is completed.
+                  </p>
                 </div>
               ) : (() => {
                 const { intakeData, session, isFollowUpSession } = modalData;

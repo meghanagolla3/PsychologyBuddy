@@ -26,53 +26,31 @@ export const GET = withPermission({
       );
     }
 
-    let assignedLocations: Array<{ locationId: string; name: string; address: string | null; city: string | null }> = [];
-
-    const prismaClient = prisma as any;
-    if (prismaClient.locationAdminAssignment) {
-      const assignments = await prismaClient.locationAdminAssignment.findMany({
-        where: { adminId: user.id },
-        include: {
-          location: {
-            select: {
-              id: true,
-              name: true,
-              address: true,
-              city: true,
-            }
-          }
-        }
+    // Get the user's assigned location from the User model
+    if (!user.locationId) {
+      console.log('User has no location assigned');
+      return NextResponse.json({
+        success: true,
+        data: []
       });
-      assignedLocations = assignments.map((a: any) => ({
-        locationId: a.locationId,
-        name: a.location.name,
-        address: a.location.address,
-        city: a.location.city
-      }));
-    } else {
-      console.log('locationAdminAssignment model not found on prisma client, attempting raw postgres query fallback...');
-      try {
-        const rawAssignments = await prisma.$queryRaw<any[]>`
-          SELECT 
-            la."locationId",
-            sl.name as "locationName",
-            sl.address as "locationAddress",
-            sl.city as "locationCity"
-          FROM "LocationAdminAssignments" la
-          JOIN "SchoolLocations" sl ON la."locationId" = sl.id
-          WHERE la."adminId" = ${user.id}
-        `;
-        assignedLocations = rawAssignments.map((a: any) => ({
-          locationId: a.locationId,
-          name: a.locationName,
-          address: a.locationAddress,
-          city: a.locationCity
-        }));
-      } catch (rawError) {
-        console.error('Raw fallback query failed for location assignments:', rawError);
-        assignedLocations = [];
-      }
     }
+
+    const location = await prisma.schoolLocation.findUnique({
+      where: { id: user.locationId },
+      select: {
+        id: true,
+        name: true,
+        address: true,
+        city: true,
+      }
+    });
+
+    const assignedLocations = location ? [{
+      locationId: location.id,
+      name: location.name,
+      address: location.address,
+      city: location.city
+    }] : [];
 
     console.log('Found assigned locations:', assignedLocations);
 

@@ -26,15 +26,21 @@ export function usePermissions() {
 
   const userRole = user.role.name;
   const rolePermissions = ROLE_PERMISSIONS[userRole as keyof typeof ROLE_PERMISSIONS] || [];
-  
-  // For ADMIN and SCHOOL_SUPERADMIN users, combine individual permissions with role permissions
-  // Individual permissions are used for default features, role permissions for management functions
+
+  // For ADMIN and SCHOOL_SUPERADMIN users, use individual permissions if set
+  // If individual permissions exist, use only those (overrides role permissions)
+  // Otherwise, fall back to role permissions
   let userPermissions = [...rolePermissions];
   if ((userRole === 'ADMIN' || userRole === 'SCHOOL_SUPERADMIN') && user.adminProfile?.adminPermissions) {
     const adminPermissions = user.adminProfile.adminPermissions.map((ap: any) => ap.permission?.name).filter(Boolean);
-    // Combine individual permissions with role permissions
-    // Individual permissions control default features, role permissions provide management capabilities
-    userPermissions = [...new Set([...adminPermissions, ...rolePermissions])];
+    // If individual permissions are set, use only those (not combined with role permissions)
+    // This allows superadmin to control exactly what features the admin can access
+    if (adminPermissions.length > 0) {
+      userPermissions = adminPermissions;
+      console.log(`${userRole} user - using individual permissions:`, adminPermissions);
+    } else {
+      console.log(`${userRole} user - no individual permissions found, using role permissions`);
+    }
   } else if (userRole === 'ADMIN' || userRole === 'SCHOOL_SUPERADMIN') {
     console.log(`${userRole} user - no individual permissions found, using role permissions`);
   }
@@ -69,15 +75,6 @@ export function usePermissions() {
       const hasCreatePerm = hasPermission('users.create');
       const roleCheck = userRole === 'ADMIN' || userRole === 'SUPERADMIN' || userRole === 'SCHOOL_SUPERADMIN';
       const result = hasCreatePerm && roleCheck;
-      
-      console.log('usePermissions - Student Management Debug:');
-      console.log('- userRole:', userRole);
-      console.log('- hasPermission(users.create):', hasCreatePerm);
-      console.log('- roleCheck (ADMIN || SUPERADMIN || SCHOOL_SUPERADMIN):', roleCheck);
-      console.log('- final canManageStudents:', result);
-      console.log('- userPermissions:', userPermissions);
-      console.log('- rolePermissions:', rolePermissions);
-      
       return result;
     })(),
     canViewStudents: hasPermission('users.view') && (userRole === 'ADMIN' || userRole === 'SUPERADMIN' || userRole === 'SCHOOL_SUPERADMIN'),

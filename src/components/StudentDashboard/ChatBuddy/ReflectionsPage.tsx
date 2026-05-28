@@ -33,6 +33,7 @@ export default function ReflectionsPage() {
   // State hooks - must be called before any early returns
   const [activeTab, setActiveTab] = useState<"related" | "all">("all");
   const [search, setSearch] = useState("");
+  const [sortBy, setSortBy] = useState<"all" | "recent" | "oldest">("all");
   const [reflections, setReflections] = useState<Reflection[]>([]);
   const [filtered, setFiltered] = useState<Reflection[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -107,8 +108,17 @@ export default function ReflectionsPage() {
     if (search.trim()) {
       list = list.filter((r) =>
         r.title.toLowerCase().includes(search.toLowerCase()) ||
-        r.content.toLowerCase().includes(search.toLowerCase())
+        r.content.toLowerCase().includes(search.toLowerCase()) ||
+        r.conversationAbout.toLowerCase().includes(search.toLowerCase()) ||
+        r.reflection.toLowerCase().includes(search.toLowerCase())
       );
+    }
+
+    // Apply sorting
+    if (sortBy === "recent") {
+      list = [...list].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    } else if (sortBy === "oldest") {
+      list = [...list].sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
     }
 
     setFiltered(list);
@@ -116,7 +126,7 @@ export default function ReflectionsPage() {
 
   useEffect(() => {
     filterReflections();
-  }, [search, activeTab, reflections]);
+  }, [search, activeTab, sortBy, reflections]);
 
   // Show loading state
   if (loading) {
@@ -323,10 +333,14 @@ export default function ReflectionsPage() {
                 <Search className="absolute right-5 top-1/2 -translate-y-1/2 text-[#9f9f9f] w-[18px] h-[18px]" size={20} />
               </div>
               <div className="relative">
-                <select className="w-[80px] sm:w-[100px] h-[40px] sm:h-[47px] pl-6 sm:pl-8 pr-8 sm:pr-10 py-2 border border-[#eaeaea] rounded-[25px] bg-white text-xs sm:text-sm text-gray-400 focus:ring-2 focus:ring-blue-400 focus:border-transparent outline-none appearance-none cursor-pointer">
-                  <option>All</option>
-                  <option>Recent</option>
-                  <option>Oldest</option>
+                <select 
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value as "all" | "recent" | "oldest")}
+                  className="w-[80px] sm:w-[100px] h-[40px] sm:h-[47px] pl-6 sm:pl-8 pr-8 sm:pr-10 py-2 border border-[#eaeaea] rounded-[25px] bg-white text-xs sm:text-sm text-gray-400 focus:ring-2 focus:ring-blue-400 focus:border-transparent outline-none appearance-none cursor-pointer"
+                >
+                  <option value="all">All</option>
+                  <option value="recent">Recent</option>
+                  <option value="oldest">Oldest</option>
                 </select>
                 <svg className="absolute right-4 sm:right-7 top-1/2 -translate-y-1/2 w-3 h-3 sm:w-4 sm:h-4 text-gray-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />

@@ -27,6 +27,7 @@ export const StudentRepository = {
         schoolId: data.schoolId,
         classId: data.classId,
         locationId: data.locationId,
+        dateOfBirth: data.dateOfBirth || null,
         emailVerified: true,
         studentProfile: {
           create: {
@@ -400,6 +401,7 @@ export const StudentRepository = {
         ...(data.lastName && { lastName: data.lastName }),
         ...(data.email && { email: data.email }),
         ...(data.phone && { phone: data.phone }),
+        ...(data.dateOfBirth !== undefined && { dateOfBirth: data.dateOfBirth }),
         ...(classIdToUpdate && { classId: classIdToUpdate }),
         ...(schoolIdToUpdate && { schoolId: schoolIdToUpdate }),
         ...(locationIdToUpdate && { locationId: locationIdToUpdate }),

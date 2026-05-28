@@ -13,6 +13,7 @@ export const CreateStudentSchema = z.object({
   schoolId: z.string().min(1, 'School selection is required'),
   locationId: z.string().min(1, 'Location is required'),
   phone: z.string().regex(/^\d{10}$/, 'Phone must be exactly 10 digits'),
+  dateOfBirth: z.string().optional(),
   status: z.enum(['ACTIVE', 'INACTIVE', 'SUSPENDED']).default('ACTIVE'),
   parent: z.object({
     firstName: z.string().min(2, 'Parent first name must be at least 2 characters'),
@@ -30,6 +31,7 @@ export const UpdateStudentSchema = z.object({
   lastName: z.string().min(2, 'Last name must be at least 2 characters').optional(),
   email: z.string().email('Valid email required').optional(),
   phone: z.string().optional(),
+  dateOfBirth: z.string().optional(),
   classId: z.string().optional(),
   schoolId: z.string().optional(),
   locationId: z.string().optional(),

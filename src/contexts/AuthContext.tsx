@@ -20,6 +20,11 @@ interface User {
   lastName: string;
   role: {
     name: string;
+    rolePermissions?: {
+      permission: {
+        name: string;
+      };
+    }[];
   };
   school?: {
     id: string;
@@ -37,6 +42,7 @@ interface User {
     dateOfBirth?: Date;
     emergencyContact?: any;
   };
+  updatedAt?: Date | string;
 }
 
 interface AuthContextType {
@@ -84,6 +90,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const data = await response.json();
       
       if (data.success && data.data?.user) {
+        const oldUpdatedAt = user?.updatedAt;
+        const newUpdatedAt = data.data.user.updatedAt;
+        
+        // Check if user data changed (permissions were updated by superadmin)
+        const permissionsChanged = oldUpdatedAt && newUpdatedAt && new Date(newUpdatedAt) > new Date(oldUpdatedAt);
+        
+        if (permissionsChanged) {
+          console.log('Permissions changed by superadmin, refreshing user data');
+          console.log('Old updatedAt:', oldUpdatedAt);
+          console.log('New updatedAt:', newUpdatedAt);
+          console.log('New permissions count:', data.data.user.adminProfile?.adminPermissions?.length || 0);
+        }
+        
         setUser(data.data.user);
         // Store studentId in localStorage for easy access
         if (data.data.user.studentId) {
@@ -113,6 +132,33 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
     refreshUser();
   }, []);
+
+  // Refresh user data when window regains focus to get updated permissions
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (!document.hidden && user) {
+        refreshUser();
+      }
+    };
+
+    if (typeof window !== 'undefined') {
+      document.addEventListener('visibilitychange', handleVisibilityChange);
+      return () => {
+        document.removeEventListener('visibilitychange', handleVisibilityChange);
+      };
+    }
+  }, [user]);
+
+  // Periodically refresh user data every 10 seconds to ensure permissions stay up to date
+  useEffect(() => {
+    if (!user) return;
+
+    const interval = setInterval(() => {
+      refreshUser();
+    }, 10 * 1000); // 10 seconds
+
+    return () => clearInterval(interval);
+  }, [user]);
 
   const value = {
     user,

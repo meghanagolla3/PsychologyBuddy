@@ -44,7 +44,7 @@ export function DashboardOverview() {
       />
     <div className="flex-1 overflow-auto p-6 space-y-6 animate-fade-in">
 
-      <StatsCards stats={stats || {}} loading={isLoading} permissions={permissions} />
+      <StatsCards stats={stats || {}} loading={isLoading} />
 
       {!selectedSchoolId && permissions.isAdmin && user?.school && (
                   <SchoolInfo 

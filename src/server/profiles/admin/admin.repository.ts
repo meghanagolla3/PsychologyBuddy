@@ -35,156 +35,41 @@ export const AdminRepository = {
     
 
     const result = await prisma.user.create({
-
       data: {
-
         email: data.email,
-
         password: data.password,
-
         firstName: data.firstName,
-
         lastName: data.lastName,
-
         phone: data.phone || null,
-
         roleId: data.roleId,
-
         ...(data.schoolId && { schoolId: data.schoolId }),
-
+        ...(data.locationId && { locationId: data.locationId }),
         emailVerified: true,
-
         adminProfile: {
-
           create: {
-
             department: data.department || 'General Administration',
-
           },
-
         },
-
       },
-
       include: {
-
         role: true,
-
         adminProfile: true,
-
         school: {
-
           select: {
-
             id: true,
-
             name: true,
-
           },
-
         },
-
+        location: {
+          select: {
+            id: true,
+            name: true,
+            address: true,
+            city: true,
+          },
+        },
       },
-
     });
-
-
-
-    // If this is an ADMIN role with locationId, create location assignment
-
-    if (data.role === 'ADMIN' && data.locationId) {
-
-      console.log('ADMIN role with locationId detected, proceeding with assignment creation');
-
-      try {
-
-        console.log('Creating location assignment for admin:', {
-
-          adminId: result.id,
-
-          locationId: data.locationId,
-
-          assignedBy: data.createdBy || 'system'
-
-        });
-
-        
-
-        // Check if locationAdminAssignment model exists
-
-        if (!(prisma as any).locationAdminAssignment) {
-
-          console.log('locationAdminAssignment model not found, trying raw query for assignment creation');
-
-          
-
-          // Try raw query as fallback
-
-          try {
-
-            // Use the newly created admin's ID as the assignedBy value (self-assignment)
-
-            await prisma.$queryRaw`
-
-              INSERT INTO "LocationAdminAssignments" (id, "locationId", "adminId", "assignedBy", "assignedAt")
-
-              VALUES (gen_random_uuid(), ${data.locationId}, ${result.id}, ${result.id}, NOW())
-
-            `;
-
-            console.log('Raw query assignment created successfully');
-
-          } catch (rawError) {
-
-            console.error('Raw query assignment creation failed:', rawError);
-
-          }
-
-        } else {
-
-          const assignment = await (prisma as any).locationAdminAssignment.create({
-
-            data: {
-
-              locationId: data.locationId,
-
-              adminId: result.id,
-
-              assignedBy: result.id, // Self-assignment
-
-            },
-
-          });
-
-          
-
-          console.log('Location assignment created successfully:', assignment);
-
-        }
-
-      } catch (error) {
-
-        console.error('Error creating location assignment:', error);
-
-        console.error('Assignment data:', {
-
-          locationId: data.locationId,
-
-          adminId: result.id,
-
-          assignedBy: data.createdBy || 'system'
-
-        });
-
-        // Don't fail the admin creation if location assignment fails
-
-      }
-
-    } else {
-
-      console.log('No location assignment created. Role:', data.role, 'LocationId:', data.locationId, '(Location assignment only applies to ADMIN role)');
-
-    }
 
 
 
@@ -279,27 +164,6 @@ export const AdminRepository = {
   // Get all admins (SuperAdmin only)
 
   getAllAdmins: async (schoolId?: string, locationId?: string, page: number = 1, limit: number = 10) => {
-
-    // Debug: Check LocationAdminAssignments table count at the start
-
-    try {
-
-      const tableCheck = await prisma.$queryRaw<any[]>`
-
-        SELECT COUNT(*) as count FROM "LocationAdminAssignments"
-
-      `;
-
-      console.log('LocationAdminAssignments table total count at start:', tableCheck[0]?.count || 0);
-
-    } catch (error) {
-
-      console.log('LocationAdminAssignments table does not exist or error:', error instanceof Error ? error.message : String(error));
-
-    }
-
-    
-
     const whereClause: any = {
 
       role: {
@@ -326,16 +190,10 @@ export const AdminRepository = {
 
 
 
-    // Add location filter if provided - locationAdminAssignment model doesn't exist, skipping location filter
-
-    // if (locationId && locationId !== 'all') {
-    //   // For admins, we need to filter by LocationAdminAssignments
-    //   whereClause.locationAdminAssignments = {
-    //     some: {
-    //       locationId: locationId
-    //     }
-    //   };
-    // }
+    // Add location filter if provided
+    if (locationId && locationId !== 'all') {
+      whereClause.locationId = locationId;
+    }
 
 
 
@@ -378,7 +236,7 @@ export const AdminRepository = {
         roleId: true,
 
         schoolId: true,
-
+        locationId: true,
         role: {
 
           include: {
@@ -426,6 +284,14 @@ export const AdminRepository = {
           },
 
         },
+        location: {
+          select: {
+            id: true,
+            name: true,
+            address: true,
+            city: true,
+          },
+        },
 
       },
 
@@ -450,184 +316,21 @@ export const AdminRepository = {
 
 
     // Get location assignments for ADMIN role users
-
-    const adminsWithLocations = await Promise.all(
-
-      admins.map(async (admin) => {
-
-        if (admin.role.name === 'ADMIN') {
-
-          try {
-
-            console.log('Fetching location assignments for admin:', admin.id);
-
-            
-
-            // Check if locationAdminAssignment model exists
-
-            if (!(prisma as any).locationAdminAssignment) {
-
-              console.log('locationAdminAssignment model not found, trying raw query');
-
-              
-
-              // Try raw query as fallback
-
-              try {
-
-                // First check if table exists and has any data
-
-                const tableCheck = await prisma.$queryRaw<any[]>`
-
-                  SELECT COUNT(*) as count FROM "LocationAdminAssignments"
-
-                `;
-
-                
-
-                console.log('LocationAdminAssignments table count:', tableCheck[0]?.count || 0);
-
-                
-
-                const rawAssignments = await prisma.$queryRaw<any[]>`
-
-                  SELECT 
-
-                    la.id,
-
-                    la."locationId",
-
-                    la."adminId",
-
-                    la."assignedAt",
-
-                    la."assignedBy",
-
-                    sl.id as "locationId",
-
-                    sl.name as "locationName",
-
-                    sl.address as "locationAddress",
-
-                    sl.city as "locationCity"
-
-                  FROM "LocationAdminAssignments" la
-
-                  JOIN "SchoolLocations" sl ON la."locationId" = sl.id
-
-                  WHERE la."adminId" = ${admin.id}
-
-                `;
-
-                
-
-                console.log('Raw query found assignments:', rawAssignments.length);
-
-                
-
-                const assignedLocations = rawAssignments.map((assignment: any) => ({
-
-                  id: assignment.locationId,
-
-                  name: assignment.locationName,
-
-                  address: assignment.locationAddress,
-
-                  city: assignment.locationCity,
-
-                }));
-
-                
-
-                return {
-
-                  ...admin,
-
-                  assignedLocations
-
-                };
-
-              } catch (rawError) {
-
-                console.error('Raw query also failed:', rawError);
-
-                return {
-
-                  ...admin,
-
-                  assignedLocations: []
-
-                };
-
-              }
-
-            }
-
-            
-
-            // Query location assignments for this admin
-
-            const locationAssignments = await (prisma as any).locationAdminAssignment.findMany({
-
-              where: { adminId: admin.id },
-
-              include: {
-
-                location: {
-
-                  select: {
-
-                    id: true,
-
-                    name: true,
-
-                    address: true,
-
-                    city: true,
-
-                  }
-
-                }
-
-              }
-
-            });
-
-
-
-            console.log('Found location assignments for admin', admin.id, ':', locationAssignments.length);
-
-
-
-            return {
-
-              ...admin,
-
-              assignedLocations: locationAssignments.map((assignment: any) => assignment.location)
-
-            };
-
-          } catch (error) {
-
-            console.error('Error fetching location assignments for admin', admin.id, ':', error);
-
-            return {
-
-              ...admin,
-
-              assignedLocations: []
-
-            };
-
-          }
-
-        }
-
-        return admin;
-
-      })
-
-    );
+    // Location assignments are stored directly on User model via locationId field
+    // Location data is now included in the main query
+    const adminsWithLocations = admins.map((admin: any) => {
+      if (admin.role.name === 'ADMIN' && admin.location) {
+        return {
+          ...admin,
+          assignedLocations: [admin.location]
+        };
+      }
+      
+      return {
+        ...admin,
+        assignedLocations: []
+      };
+    });
 
 
 
@@ -752,168 +455,47 @@ export const AdminRepository = {
 
 
     // Update admin basic info
-
     const updatedAdmin = await prisma.user.update({
-
       where: { id },
-
       data: {
-
         ...(data.firstName && { firstName: data.firstName }),
-
         ...(data.lastName && { lastName: data.lastName }),
-
         ...(data.phone && { phone: data.phone }),
-
         ...(data.status && { status: data.status }),
-
         ...(data.schoolId && { schoolId: data.schoolId }),
-
+        ...(data.locationId !== undefined && { locationId: data.locationId }),
         adminProfile: {
-
           upsert: {
-
             create: {
-
               ...(data.department && { department: data.department }),
-
               ...(data.profileImage && { profileImage: data.profileImage }),
-
             },
-
             update: {
-
               ...(data.department && { department: data.department }),
-
               ...(data.profileImage && { profileImage: data.profileImage }),
-
             },
-
           },
-
         },
-
       },
-
       include: {
-
         role: true,
-
         adminProfile: true,
-
         school: {
-
           select: {
-
             id: true,
-
             name: true,
-
           },
-
         },
-
+        location: {
+          select: {
+            id: true,
+            name: true,
+            address: true,
+            city: true,
+          },
+        },
       },
-
     });
-
-
-
-    // Handle location assignment for ADMIN role
-
-    if (currentAdmin.role.name === 'ADMIN' && data.locationId) {
-
-      try {
-
-        console.log('Updating location assignment for admin:', {
-
-          adminId: id,
-
-          newLocationId: data.locationId
-
-        });
-
-
-
-        // Use the current admin's ID as the assignedBy value (self-assignment)
-
-        const assignedById = id; // The admin being updated is the assigner
-
-
-
-        // Check if locationAdminAssignment model exists
-
-        if (!(prisma as any).locationAdminAssignment) {
-
-          console.log('locationAdminAssignment model not found, using raw query for update');
-
-          
-
-          // First, delete existing assignments
-
-          await prisma.$queryRaw`
-
-            DELETE FROM "LocationAdminAssignments" WHERE "adminId" = ${id}
-
-          `;
-
-          
-
-          // Then insert new assignment
-
-          await prisma.$queryRaw`
-
-            INSERT INTO "LocationAdminAssignments" (id, "locationId", "adminId", "assignedBy", "assignedAt")
-
-            VALUES (gen_random_uuid(), ${data.locationId}, ${id}, ${assignedById}, NOW())
-
-          `;
-
-          
-
-          console.log('Raw query location assignment updated successfully');
-
-        } else {
-
-          // Delete existing assignments
-
-          await (prisma as any).locationAdminAssignment.deleteMany({
-
-            where: { adminId: id }
-
-          });
-
-          
-
-          // Create new assignment
-
-          await (prisma as any).locationAdminAssignment.create({
-
-            data: {
-
-              locationId: data.locationId,
-
-              adminId: id,
-
-              assignedBy: assignedById,
-
-            },
-
-          });
-
-          
-
-          console.log('Location assignment updated successfully');
-
-        }
-
-      } catch (error) {
-        console.error('Error updating location assignment:', error);
-        // Don't fail the admin update if location assignment fails
-      }
-    }
-
-
 
     return updatedAdmin;
 

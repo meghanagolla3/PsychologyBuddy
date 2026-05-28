@@ -83,7 +83,6 @@ export function EditAdminModal({ admin, onClose, onSuccess, schools }: EditAdmin
   const [showPassword, setShowPassword] = useState(false);
   const [isRolePopoverOpen, setIsRolePopoverOpen] = useState(false);
   const [isStatusPopoverOpen, setIsStatusPopoverOpen] = useState(false);
-  const [isLocationPopoverOpen, setIsLocationPopoverOpen] = useState(false);
   const [locations, setLocations] = useState<Location[]>([]);
   const [selectedLocation, setSelectedLocation] = useState<Location | null>(null);
 
@@ -228,14 +227,14 @@ export function EditAdminModal({ admin, onClose, onSuccess, schools }: EditAdmin
         status: admin.status || 'ACTIVE',
         role: admin.role?.name || 'ADMIN',
         schoolId: admin.school?.id || '',
-        locationId: admin.assignedLocations?.[0]?.id || '' // Pre-select first assigned location
+        locationId: admin.location?.id || '' // Use location field instead of assignedLocations
       });
       
-      // Set selected location if admin has assigned locations
-      if (admin.assignedLocations?.[0]) {
+      // Set selected location if admin has a location
+      if (admin.location) {
         setSelectedLocation({
-          id: admin.assignedLocations[0].id,
-          name: admin.assignedLocations[0].name || admin.assignedLocations[0].location?.name || 'Unknown Location'
+          id: admin.location.id,
+          name: admin.location.name || 'Unknown Location'
         });
       }
     }
@@ -265,16 +264,10 @@ export function EditAdminModal({ admin, onClose, onSuccess, schools }: EditAdmin
         if (response.ok) {
           const data = await response.json();
           setLocations(data || []);
-          
-          // Find and set the selected location from fetched locations
-          if (formData.locationId && data?.length > 0) {
-            const matchedLocation = data.find((loc: Location) => loc.id === formData.locationId);
-            if (matchedLocation) {
-              setSelectedLocation(matchedLocation);
-            }
-          }
         } else {
-          console.error('Failed to fetch locations');
+          console.error('Failed to fetch locations, status:', response.status);
+          const errorData = await response.json();
+          console.error('Error data:', errorData);
           setLocations([]);
         }
       } catch (error) {
@@ -285,6 +278,16 @@ export function EditAdminModal({ admin, onClose, onSuccess, schools }: EditAdmin
 
     fetchLocations();
   }, [formData.schoolId, user?.id]);
+
+  // Set selected location when locations are loaded and formData.locationId is set
+  useEffect(() => {
+    if (formData.locationId && locations.length > 0) {
+      const matchedLocation = locations.find((loc: Location) => loc.id === formData.locationId);
+      if (matchedLocation) {
+        setSelectedLocation(matchedLocation);
+      }
+    }
+  }, [formData.locationId, locations]);
 
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -326,7 +329,7 @@ export function EditAdminModal({ admin, onClose, onSuccess, schools }: EditAdmin
     if (!formData.schoolId) newErrors.schoolId = 'School is required';
     
     // Location is required for ADMIN role
-    if (admin?.role?.name === 'ADMIN' && !formData.locationId) {
+    if (formData.role === 'ADMIN' && !formData.locationId) {
       newErrors.locationId = 'Location is required for ADMIN role';
     }
 
@@ -751,59 +754,31 @@ export function EditAdminModal({ admin, onClose, onSuccess, schools }: EditAdmin
           </div>
 
           {/* Location Assignment - Only show for ADMIN role */}
-          {admin?.role?.name === 'ADMIN' && (
+          {formData.role === 'ADMIN' && (
             <div>
               <h3 className="text-lg font-medium text-gray-900 mb-4">Location Assignment</h3>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Location *
                 </label>
-                <Popover open={isLocationPopoverOpen} onOpenChange={setIsLocationPopoverOpen}>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant="outline"
-                      type="button"
-                      className={`w-full justify-between text-left font-normal ${
-                        errors.locationId ? 'border-red-500' : 'border-gray-300'
-                      }`}
-                    >
-                      {selectedLocation ? selectedLocation.name : 'Select location'}
-                      <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-full p-2 border z-10 bg-white shadow-xl rounded-[6px]" align="start">
-                    <div className="p-1 max-h-60 overflow-y-auto">
-                      {locations.length === 0 ? (
-                        <div className="px-3 py-2 text-sm text-gray-500">
-                          No locations available
-                        </div>
-                      ) : (
-                        locations.map((location) => (
-                          <div
-                            key={location.id}
-                            className="flex items-center px-3 py-2 cursor-pointer hover:bg-gray-100 rounded-md"
-                            onClick={() => {
-                              setSelectedLocation(location);
-                              handleInputChange('locationId', location.id);
-                              setIsLocationPopoverOpen(false);
-                            }}
-                          >
-                            <div
-                              className={`h-4 w-4 border rounded-full flex items-center justify-center ${
-                                formData.locationId === location.id ? "bg-blue-500 border-blue-500" : "border-gray-300"
-                              }`}
-                            >
-                              {formData.locationId === location.id && (
-                                <Check className="h-3 w-3 text-white" />
-                              )}
-                            </div>
-                            <span className="ml-2">{location.name}</span>
-                          </div>
-                        ))
-                      )}
-                    </div>
-                  </PopoverContent>
-                </Popover>
+                <select
+                  value={formData.locationId}
+                  onChange={(e) => {
+                    handleInputChange('locationId', e.target.value);
+                    const selected = locations.find(l => l.id === e.target.value);
+                    setSelectedLocation(selected || null);
+                  }}
+                  className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                    errors.locationId ? 'border-red-500' : 'border-gray-300'
+                  }`}
+                >
+                  <option value="">Select location</option>
+                  {locations.map((location) => (
+                    <option key={location.id} value={location.id}>
+                      {location.name}
+                    </option>
+                  ))}
+                </select>
                 {errors.locationId && (
                   <p className="mt-1 text-sm text-red-600">{errors.locationId}</p>
                 )}

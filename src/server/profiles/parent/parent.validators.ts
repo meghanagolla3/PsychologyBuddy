@@ -7,7 +7,7 @@ export const CreateParentSchema = z.object({
   phone: z.string().optional(),
   password: z.string().min(8, 'Password must be at least 8 characters').optional(),
   schoolId: z.string().min(1, 'School ID is required'),
-  studentId: z.string().optional(), // Add studentId to link parent to student
+  studentId: z.string().min(1, 'Student ID is required'),
   status: z.enum(['ACTIVE', 'INACTIVE', 'SUSPENDED']).default('ACTIVE'),
 });
 

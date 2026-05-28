@@ -67,13 +67,7 @@ export class AdminService {
             },
           },
           ...(schoolId && schoolId !== 'all' && { schoolId }),
-          ...(locationId && locationId !== 'all' && {
-            locationAdminAssignments: {
-              some: {
-                locationId: locationId
-              }
-            }
-          }),
+          ...(locationId && locationId !== 'all' && { locationId }),
         },
       });
 

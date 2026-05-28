@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { AdminService } from '@/src/server/profiles/admin/admin.service';
+import prisma from '@/src/prisma';
 
 export async function PUT(
   request: NextRequest,
@@ -29,6 +30,13 @@ export async function PUT(
 
     console.log('Permissions API - result:', result);
     console.log('Permissions API - saved permissions:', permissions);
+
+    // Invalidate the admin's session by updating their updatedAt timestamp
+    // This will force them to re-login with new permissions
+    await prisma.user.update({
+      where: { id },
+      data: { updatedAt: new Date() }
+    });
 
     return NextResponse.json(result);
   } catch (error) {

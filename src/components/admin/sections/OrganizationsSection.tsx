@@ -287,7 +287,7 @@ export default function OrganizationsPage() {
       <AdminHeader
         title="Organizations"
         subtitle="Manage all schools in the system"
-        showSchoolFilter={false}
+        showSchoolFilter={isSuperAdmin}
         schoolFilterValue={selectedSchoolId}
         onSchoolFilterChange={setSelectedSchoolId}
         showTimeFilter={false}
