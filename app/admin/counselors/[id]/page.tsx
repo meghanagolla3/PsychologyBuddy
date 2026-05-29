@@ -17,6 +17,7 @@ import {
   User,
   XCircle,
   AlertTriangle,
+  Trash2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -24,6 +25,15 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { useToast } from "@/components/ui/use-toast";
 import { EditCounselorModal } from "@/src/components/admin/modals/EditCounselorModal";
 import { useAuth } from "@/src/contexts/AuthContext";
 import { useSchoolFilter } from "@/src/contexts/SchoolFilterContext";
@@ -158,10 +168,13 @@ export default function CounselorProfilePage() {
   const counselorId = params.id as string;
   const { user } = useAuth();
   const { schools } = useSchoolFilter();
+  const { toast } = useToast();
 
   const [counselor, setCounselor] = useState<CounselorProfileData | null>(null);
   const [loading, setLoading] = useState(true);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const [viewMonth, setViewMonth] = useState(new Date());
   const [selected, setSelected] = useState(new Date());
@@ -311,6 +324,55 @@ export default function CounselorProfilePage() {
 
   const slots = sessionsToSlots(selectedDateSessions);
 
+  // Delete counselor function
+  const handleDeleteCounselor = async () => {
+    if (!counselor) return;
+
+    // Only SUPERADMIN can delete counselors
+    if (user?.role?.name !== 'SUPERADMIN') {
+      toast({
+        title: "Access Denied",
+        description: "Only SuperAdmin can delete counselors.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsDeleting(true);
+    try {
+      const response = await fetch(`/api/counselors/${counselorId}`, {
+        method: 'DELETE',
+        credentials: 'include',
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        toast({
+          title: "Counselor deleted successfully",
+          description: `${counselor.firstName} ${counselor.lastName} has been permanently deleted from the system.`,
+        });
+        router.push("/admin/users/counselors");
+      } else {
+        toast({
+          title: "Failed to delete counselor",
+          description: data.message || "An error occurred while deleting the counselor.",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      console.error('Error deleting counselor:', error);
+      toast({
+        title: "Failed to delete counselor",
+        description: "Network error occurred. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsDeleting(false);
+      setIsDeleteDialogOpen(false);
+    }
+  };
+
   // Helper to get sessions for a specific date from monthly sessions
   const getSessionsForDate = (date: Date): Session[] => {
     const dateStart = new Date(date);
@@ -392,10 +454,18 @@ export default function CounselorProfilePage() {
                 </p>
               </div>
             </div>
-            <Button className="bg-blue-500 hover:bg-blue-600" onClick={() => setIsEditModalOpen(true)}>
-              <Pencil className="h-4 w-4 mr-1" />
-              Edit Profile
-            </Button>
+            <div className="flex items-center gap-2">
+              <Button className="bg-blue-500 hover:bg-blue-600" onClick={() => setIsEditModalOpen(true)}>
+                <Pencil className="h-4 w-4 mr-1" />
+                Edit Profile
+              </Button>
+              {user?.role?.name === 'SUPERADMIN' && (
+                <Button variant="destructive" onClick={() => setIsDeleteDialogOpen(true)}>
+                  <Trash2 className="h-4 w-4 mr-1" />
+                  Delete
+                </Button>
+              )}
+            </div>
           </div>
         </Card>
 
@@ -562,7 +632,7 @@ export default function CounselorProfilePage() {
               </Card>
 
               {/* Schedule list */}
-              <Card className="p-5">
+              <Card className="p-5 max-h-[616px] overflow-y-auto scrollbar-thin">
                 <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-400">
                   Schedule for
                 </p>
@@ -706,6 +776,35 @@ export default function CounselorProfilePage() {
           schools={schools}
         />
       )}
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete Counselor</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to permanently delete {counselor?.firstName} {counselor?.lastName}?
+              This action cannot be undone and all counselor data will be permanently removed from the system.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setIsDeleteDialogOpen(false)}
+              disabled={isDeleting}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={handleDeleteCounselor}
+              disabled={isDeleting}
+            >
+              {isDeleting ? "Deleting..." : "Delete Counselor"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

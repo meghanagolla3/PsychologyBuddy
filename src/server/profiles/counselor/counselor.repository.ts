@@ -651,6 +651,12 @@ export const CounselorRepository = {
   // Delete counselor
   deleteCounselor: async (id: string) => {
     // First, delete related records
+    await prisma.counselorNotification.deleteMany({
+      where: {
+        userId: id,
+      },
+    });
+
     await prisma.adminProfile.deleteMany({
       where: {
         userId: id,

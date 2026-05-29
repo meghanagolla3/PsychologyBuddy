@@ -94,6 +94,31 @@ export function useChat({
     console.log(`[AutoTermination] State changed: sessionId=${state.sessionId}, sessionStartTime=${state.sessionStartTime}, messages=${state.messages.length}`);
   }, [state.sessionId, state.sessionStartTime, state.messages]);
 
+  // Debug: Monitor session time in real-time
+  useEffect(() => {
+    if (!state.sessionStartTime || !state.sessionId) return;
+
+    const logSessionTime = () => {
+      const currentTime = Date.now();
+      const elapsed = currentTime - state.sessionStartTime!;
+      const elapsedSeconds = Math.round(elapsed / 1000);
+      const remainingTime = AutomaticChatTermination.getRemainingSessionTime(state.sessionStartTime!);
+      const remainingSeconds = Math.round(remainingTime / 1000);
+      const shouldWarn = AutomaticChatTermination.shouldShowTimeWarning(state.sessionStartTime!);
+      const config = AutomaticChatTermination.getConfiguration();
+
+      console.log(`[AutoTermination] Session Monitor | Session: ${state.sessionId!.slice(0, 8)}... | Elapsed: ${elapsedSeconds}s | Remaining: ${remainingSeconds}s | Warning: ${shouldWarn ? '⚠️ YES' : 'No'} | Max: ${config.maxSessionDurationMinutes}min`);
+    };
+
+    // Log immediately
+    logSessionTime();
+
+    // Log every second
+    const interval = setInterval(logSessionTime, 1000);
+
+    return () => clearInterval(interval);
+  }, [state.sessionStartTime, state.sessionId]);
+
   // Initialize chat session
   const initializeChat = useCallback(async (
     mood?: string, 
@@ -102,20 +127,23 @@ export function useChat({
     skipImportSuggestion: boolean = false,
     importData?: { mainTopic?: string; sessionId?: string }
   ) => {
+    console.log('[AutoTermination] initializeChat called with:', { studentId, mood, triggers, notes, skipImportSuggestion, importData });
+    
     if (!studentId) {
-      console.warn('Cannot initialize chat: No student ID provided')
+      console.warn('[AutoTermination] Cannot initialize chat: No student ID provided')
       return
     }
     
     if (isInitialized.current) {
-      console.log('Chat already initialized')
+      console.log('[AutoTermination] Chat already initialized')
       return
     }
     
     isInitialized.current = true
+    console.log('[AutoTermination] isInitialized set to true')
     
     try {
-      console.log('Initializing chat with:', { studentId, mood, triggers, notes, skipImportSuggestion, importData });
+      console.log('[AutoTermination] Initializing chat with:', { studentId, mood, triggers, notes, skipImportSuggestion, importData });
       
       // Call the chat start API to create a real session
       const response = await fetch('/api/students/chat/start', {
@@ -146,14 +174,15 @@ export function useChat({
       }
 
       // Set the real session ID from the API response
+      // Note: sessionStartTime is NOT set here - it will be set when student sends first message
       sessionIdRef.current = data.sessionId
       setState(prev => ({ 
         ...prev, 
-        sessionId: data.sessionId,
-        sessionStartTime: Date.now()
+        sessionId: data.sessionId
       }))
       
-      console.log('Chat session created successfully:', data.sessionId)
+      console.log('Chat session created successfully:', data.sessionId);
+      console.log('[AutoTermination] Session ID set, timer will start when student sends first message');
 
       // Check if there's already an opening message to prevent duplicates
       const hasOpeningMessage = state.messages.some(msg => msg.type === 'opening' || (msg.sender === 'bot' && state.messages.length === 0));
@@ -441,7 +470,7 @@ export function useChat({
     
     const currentTime = Date.now();
     const sessionDuration = currentTime - state.sessionStartTime;
-    const maxDuration = 30 * 60 * 1000; // 30 minutes
+    const maxDuration = 330 * 60 * 1000; // 30 minutes
     
     if (sessionDuration >= maxDuration) {
       console.log(`[AutoTermination] Session time limit reached, ending chat`);
@@ -474,6 +503,14 @@ export function useChat({
       return
     }
 
+    // Start the session timer on the first student message
+    if (!sessionStartTimeRef.current && !state.sessionStartTime) {
+      const startTime = Date.now()
+      sessionStartTimeRef.current = startTime
+      setState(prev => ({ ...prev, sessionStartTime: startTime }))
+      console.log(`[AutoTermination] Session timer started on first student message: ${new Date(startTime).toISOString()}`);
+    }
+
     // Check if this is the first message (temp session)
     const isFirstMessage = sessionIdRef.current?.startsWith('temp_')
     console.log(`[AutoTermination] Is first message? ${isFirstMessage}, current sessionIdRef: ${sessionIdRef.current}`);
@@ -501,17 +538,6 @@ export function useChat({
           console.log(`[AutoTermination] State update - prev sessionId: ${prev.sessionId}, new sessionId: ${data.sessionId}`);
           return { ...prev, sessionId: data.sessionId }
         })
-        
-        // Set session start time for time-based termination
-        if (!sessionStartTimeRef.current) {
-          sessionStartTimeRef.current = Date.now()
-          console.log(`[AutoTermination] About to update state sessionStartTime to: ${sessionStartTimeRef.current}`);
-          setState(prev => {
-            console.log(`[AutoTermination] State update - prev sessionStartTime: ${prev.sessionStartTime}, new sessionStartTime: ${sessionStartTimeRef.current}`);
-            return { ...prev, sessionStartTime: sessionStartTimeRef.current }
-          })
-          console.log('Session start time set:', new Date(sessionStartTimeRef.current).toISOString())
-        }
         
         // Save the real session ID for this specific student
         const studentSessionKey = `chatSessionId_${studentId}`
@@ -813,19 +839,9 @@ export function useChat({
         
         setState(prev => ({ ...prev, messages: formattedMessages }))
         
-        // Set session start time from actual session data
-        if (data.session?.startedAt && (!sessionStartTimeRef.current || !state.sessionStartTime)) {
-          const actualStartTime = new Date(data.session.startedAt).getTime()
-          sessionStartTimeRef.current = actualStartTime
-          setState(prev => ({ ...prev, sessionStartTime: actualStartTime }))
-          console.log(`[AutoTermination] Session start time set from database: ${new Date(actualStartTime).toISOString()}`)
-        } else if (!sessionStartTimeRef.current && !state.sessionStartTime) {
-          // Fallback: Use current time minus 1 minute if no session data
-          const startTime = Date.now() - (1 * 60 * 1000)
-          sessionStartTimeRef.current = startTime
-          setState(prev => ({ ...prev, sessionStartTime: startTime }))
-          console.log(`[AutoTermination] Session start time set to fallback: ${new Date(startTime).toISOString()}`)
-        }
+        // Do NOT set session start time when loading existing session
+        // Timer will start when student sends their first message
+        console.log(`[AutoTermination] Session loaded from database, timer will start when student sends first message`);
         
         return data // Return the data so caller can check message count
       }

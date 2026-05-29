@@ -41,6 +41,7 @@ export type UserMinAggregateOutputType = {
   status: string | null
   studentId: string | null
   parentId: string | null
+  dateOfBirth: string | null
 }
 
 export type UserMaxAggregateOutputType = {
@@ -60,6 +61,7 @@ export type UserMaxAggregateOutputType = {
   status: string | null
   studentId: string | null
   parentId: string | null
+  dateOfBirth: string | null
 }
 
 export type UserCountAggregateOutputType = {
@@ -79,6 +81,7 @@ export type UserCountAggregateOutputType = {
   status: number
   studentId: number
   parentId: number
+  dateOfBirth: number
   _all: number
 }
 
@@ -100,6 +103,7 @@ export type UserMinAggregateInputType = {
   status?: true
   studentId?: true
   parentId?: true
+  dateOfBirth?: true
 }
 
 export type UserMaxAggregateInputType = {
@@ -119,6 +123,7 @@ export type UserMaxAggregateInputType = {
   status?: true
   studentId?: true
   parentId?: true
+  dateOfBirth?: true
 }
 
 export type UserCountAggregateInputType = {
@@ -138,6 +143,7 @@ export type UserCountAggregateInputType = {
   status?: true
   studentId?: true
   parentId?: true
+  dateOfBirth?: true
   _all?: true
 }
 
@@ -230,6 +236,7 @@ export type UserGroupByOutputType = {
   status: string
   studentId: string | null
   parentId: string | null
+  dateOfBirth: string | null
   _count: UserCountAggregateOutputType | null
   _min: UserMinAggregateOutputType | null
   _max: UserMaxAggregateOutputType | null
@@ -270,6 +277,7 @@ export type UserWhereInput = {
   status?: Prisma.StringFilter<"User"> | string
   studentId?: Prisma.StringNullableFilter<"User"> | string | null
   parentId?: Prisma.StringNullableFilter<"User"> | string | null
+  dateOfBirth?: Prisma.StringNullableFilter<"User"> | string | null
   adminNotifications?: Prisma.AdminNotificationListRelationFilter
   counselorNotifications?: Prisma.CounselorNotificationListRelationFilter
   parentNotifications?: Prisma.ParentNotificationListRelationFilter
@@ -335,6 +343,7 @@ export type UserOrderByWithRelationInput = {
   status?: Prisma.SortOrder
   studentId?: Prisma.SortOrderInput | Prisma.SortOrder
   parentId?: Prisma.SortOrderInput | Prisma.SortOrder
+  dateOfBirth?: Prisma.SortOrderInput | Prisma.SortOrder
   adminNotifications?: Prisma.AdminNotificationOrderByRelationAggregateInput
   counselorNotifications?: Prisma.CounselorNotificationOrderByRelationAggregateInput
   parentNotifications?: Prisma.ParentNotificationOrderByRelationAggregateInput
@@ -403,6 +412,7 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   roleId?: Prisma.StringFilter<"User"> | string
   status?: Prisma.StringFilter<"User"> | string
   parentId?: Prisma.StringNullableFilter<"User"> | string | null
+  dateOfBirth?: Prisma.StringNullableFilter<"User"> | string | null
   adminNotifications?: Prisma.AdminNotificationListRelationFilter
   counselorNotifications?: Prisma.CounselorNotificationListRelationFilter
   parentNotifications?: Prisma.ParentNotificationListRelationFilter
@@ -468,6 +478,7 @@ export type UserOrderByWithAggregationInput = {
   status?: Prisma.SortOrder
   studentId?: Prisma.SortOrderInput | Prisma.SortOrder
   parentId?: Prisma.SortOrderInput | Prisma.SortOrder
+  dateOfBirth?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.UserCountOrderByAggregateInput
   _max?: Prisma.UserMaxOrderByAggregateInput
   _min?: Prisma.UserMinOrderByAggregateInput
@@ -493,6 +504,7 @@ export type UserScalarWhereWithAggregatesInput = {
   status?: Prisma.StringWithAggregatesFilter<"User"> | string
   studentId?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
   parentId?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
+  dateOfBirth?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
 }
 
 export type UserCreateInput = {
@@ -507,6 +519,7 @@ export type UserCreateInput = {
   emailVerified?: boolean
   status?: string
   studentId?: string | null
+  dateOfBirth?: string | null
   adminNotifications?: Prisma.AdminNotificationCreateNestedManyWithoutUserInput
   counselorNotifications?: Prisma.CounselorNotificationCreateNestedManyWithoutUserInput
   parentNotifications?: Prisma.ParentNotificationCreateNestedManyWithoutUserInput
@@ -572,6 +585,7 @@ export type UserUncheckedCreateInput = {
   status?: string
   studentId?: string | null
   parentId?: string | null
+  dateOfBirth?: string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedCreateNestedManyWithoutUserInput
   counselorNotifications?: Prisma.CounselorNotificationUncheckedCreateNestedManyWithoutUserInput
   parentNotifications?: Prisma.ParentNotificationUncheckedCreateNestedManyWithoutUserInput
@@ -627,6 +641,7 @@ export type UserUpdateInput = {
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   status?: Prisma.StringFieldUpdateOperationsInput | string
   studentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dateOfBirth?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUpdateManyWithoutUserNestedInput
   counselorNotifications?: Prisma.CounselorNotificationUpdateManyWithoutUserNestedInput
   parentNotifications?: Prisma.ParentNotificationUpdateManyWithoutUserNestedInput
@@ -692,6 +707,7 @@ export type UserUncheckedUpdateInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
   studentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   parentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dateOfBirth?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedUpdateManyWithoutUserNestedInput
   counselorNotifications?: Prisma.CounselorNotificationUncheckedUpdateManyWithoutUserNestedInput
   parentNotifications?: Prisma.ParentNotificationUncheckedUpdateManyWithoutUserNestedInput
@@ -752,6 +768,7 @@ export type UserCreateManyInput = {
   status?: string
   studentId?: string | null
   parentId?: string | null
+  dateOfBirth?: string | null
 }
 
 export type UserUpdateManyMutationInput = {
@@ -766,6 +783,7 @@ export type UserUpdateManyMutationInput = {
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   status?: Prisma.StringFieldUpdateOperationsInput | string
   studentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dateOfBirth?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type UserUncheckedUpdateManyInput = {
@@ -785,6 +803,7 @@ export type UserUncheckedUpdateManyInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
   studentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   parentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dateOfBirth?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type UserNullableScalarRelationFilter = {
@@ -819,6 +838,7 @@ export type UserCountOrderByAggregateInput = {
   status?: Prisma.SortOrder
   studentId?: Prisma.SortOrder
   parentId?: Prisma.SortOrder
+  dateOfBirth?: Prisma.SortOrder
 }
 
 export type UserMaxOrderByAggregateInput = {
@@ -838,6 +858,7 @@ export type UserMaxOrderByAggregateInput = {
   status?: Prisma.SortOrder
   studentId?: Prisma.SortOrder
   parentId?: Prisma.SortOrder
+  dateOfBirth?: Prisma.SortOrder
 }
 
 export type UserMinOrderByAggregateInput = {
@@ -857,6 +878,7 @@ export type UserMinOrderByAggregateInput = {
   status?: Prisma.SortOrder
   studentId?: Prisma.SortOrder
   parentId?: Prisma.SortOrder
+  dateOfBirth?: Prisma.SortOrder
 }
 
 export type UserScalarRelationFilter = {
@@ -1688,6 +1710,7 @@ export type UserCreateWithoutChildrenInput = {
   emailVerified?: boolean
   status?: string
   studentId?: string | null
+  dateOfBirth?: string | null
   adminNotifications?: Prisma.AdminNotificationCreateNestedManyWithoutUserInput
   counselorNotifications?: Prisma.CounselorNotificationCreateNestedManyWithoutUserInput
   parentNotifications?: Prisma.ParentNotificationCreateNestedManyWithoutUserInput
@@ -1752,6 +1775,7 @@ export type UserUncheckedCreateWithoutChildrenInput = {
   status?: string
   studentId?: string | null
   parentId?: string | null
+  dateOfBirth?: string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedCreateNestedManyWithoutUserInput
   counselorNotifications?: Prisma.CounselorNotificationUncheckedCreateNestedManyWithoutUserInput
   parentNotifications?: Prisma.ParentNotificationUncheckedCreateNestedManyWithoutUserInput
@@ -1811,6 +1835,7 @@ export type UserCreateWithoutParentInput = {
   emailVerified?: boolean
   status?: string
   studentId?: string | null
+  dateOfBirth?: string | null
   adminNotifications?: Prisma.AdminNotificationCreateNestedManyWithoutUserInput
   counselorNotifications?: Prisma.CounselorNotificationCreateNestedManyWithoutUserInput
   parentNotifications?: Prisma.ParentNotificationCreateNestedManyWithoutUserInput
@@ -1874,6 +1899,7 @@ export type UserUncheckedCreateWithoutParentInput = {
   roleId: string
   status?: string
   studentId?: string | null
+  dateOfBirth?: string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedCreateNestedManyWithoutUserInput
   counselorNotifications?: Prisma.CounselorNotificationUncheckedCreateNestedManyWithoutUserInput
   parentNotifications?: Prisma.ParentNotificationUncheckedCreateNestedManyWithoutUserInput
@@ -1950,6 +1976,7 @@ export type UserUpdateWithoutChildrenInput = {
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   status?: Prisma.StringFieldUpdateOperationsInput | string
   studentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dateOfBirth?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUpdateManyWithoutUserNestedInput
   counselorNotifications?: Prisma.CounselorNotificationUpdateManyWithoutUserNestedInput
   parentNotifications?: Prisma.ParentNotificationUpdateManyWithoutUserNestedInput
@@ -2014,6 +2041,7 @@ export type UserUncheckedUpdateWithoutChildrenInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
   studentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   parentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dateOfBirth?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedUpdateManyWithoutUserNestedInput
   counselorNotifications?: Prisma.CounselorNotificationUncheckedUpdateManyWithoutUserNestedInput
   parentNotifications?: Prisma.ParentNotificationUncheckedUpdateManyWithoutUserNestedInput
@@ -2092,6 +2120,7 @@ export type UserScalarWhereInput = {
   status?: Prisma.StringFilter<"User"> | string
   studentId?: Prisma.StringNullableFilter<"User"> | string | null
   parentId?: Prisma.StringNullableFilter<"User"> | string | null
+  dateOfBirth?: Prisma.StringNullableFilter<"User"> | string | null
 }
 
 export type UserCreateWithoutStudentProfileInput = {
@@ -2106,6 +2135,7 @@ export type UserCreateWithoutStudentProfileInput = {
   emailVerified?: boolean
   status?: string
   studentId?: string | null
+  dateOfBirth?: string | null
   adminNotifications?: Prisma.AdminNotificationCreateNestedManyWithoutUserInput
   counselorNotifications?: Prisma.CounselorNotificationCreateNestedManyWithoutUserInput
   parentNotifications?: Prisma.ParentNotificationCreateNestedManyWithoutUserInput
@@ -2170,6 +2200,7 @@ export type UserUncheckedCreateWithoutStudentProfileInput = {
   status?: string
   studentId?: string | null
   parentId?: string | null
+  dateOfBirth?: string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedCreateNestedManyWithoutUserInput
   counselorNotifications?: Prisma.CounselorNotificationUncheckedCreateNestedManyWithoutUserInput
   parentNotifications?: Prisma.ParentNotificationUncheckedCreateNestedManyWithoutUserInput
@@ -2240,6 +2271,7 @@ export type UserUpdateWithoutStudentProfileInput = {
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   status?: Prisma.StringFieldUpdateOperationsInput | string
   studentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dateOfBirth?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUpdateManyWithoutUserNestedInput
   counselorNotifications?: Prisma.CounselorNotificationUpdateManyWithoutUserNestedInput
   parentNotifications?: Prisma.ParentNotificationUpdateManyWithoutUserNestedInput
@@ -2304,6 +2336,7 @@ export type UserUncheckedUpdateWithoutStudentProfileInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
   studentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   parentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dateOfBirth?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedUpdateManyWithoutUserNestedInput
   counselorNotifications?: Prisma.CounselorNotificationUncheckedUpdateManyWithoutUserNestedInput
   parentNotifications?: Prisma.ParentNotificationUncheckedUpdateManyWithoutUserNestedInput
@@ -2358,6 +2391,7 @@ export type UserCreateWithoutAdminProfileInput = {
   emailVerified?: boolean
   status?: string
   studentId?: string | null
+  dateOfBirth?: string | null
   adminNotifications?: Prisma.AdminNotificationCreateNestedManyWithoutUserInput
   counselorNotifications?: Prisma.CounselorNotificationCreateNestedManyWithoutUserInput
   parentNotifications?: Prisma.ParentNotificationCreateNestedManyWithoutUserInput
@@ -2422,6 +2456,7 @@ export type UserUncheckedCreateWithoutAdminProfileInput = {
   status?: string
   studentId?: string | null
   parentId?: string | null
+  dateOfBirth?: string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedCreateNestedManyWithoutUserInput
   counselorNotifications?: Prisma.CounselorNotificationUncheckedCreateNestedManyWithoutUserInput
   parentNotifications?: Prisma.ParentNotificationUncheckedCreateNestedManyWithoutUserInput
@@ -2492,6 +2527,7 @@ export type UserUpdateWithoutAdminProfileInput = {
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   status?: Prisma.StringFieldUpdateOperationsInput | string
   studentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dateOfBirth?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUpdateManyWithoutUserNestedInput
   counselorNotifications?: Prisma.CounselorNotificationUpdateManyWithoutUserNestedInput
   parentNotifications?: Prisma.ParentNotificationUpdateManyWithoutUserNestedInput
@@ -2556,6 +2592,7 @@ export type UserUncheckedUpdateWithoutAdminProfileInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
   studentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   parentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dateOfBirth?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedUpdateManyWithoutUserNestedInput
   counselorNotifications?: Prisma.CounselorNotificationUncheckedUpdateManyWithoutUserNestedInput
   parentNotifications?: Prisma.ParentNotificationUncheckedUpdateManyWithoutUserNestedInput
@@ -2610,6 +2647,7 @@ export type UserCreateWithoutCounselorProfileInput = {
   emailVerified?: boolean
   status?: string
   studentId?: string | null
+  dateOfBirth?: string | null
   adminNotifications?: Prisma.AdminNotificationCreateNestedManyWithoutUserInput
   counselorNotifications?: Prisma.CounselorNotificationCreateNestedManyWithoutUserInput
   parentNotifications?: Prisma.ParentNotificationCreateNestedManyWithoutUserInput
@@ -2674,6 +2712,7 @@ export type UserUncheckedCreateWithoutCounselorProfileInput = {
   status?: string
   studentId?: string | null
   parentId?: string | null
+  dateOfBirth?: string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedCreateNestedManyWithoutUserInput
   counselorNotifications?: Prisma.CounselorNotificationUncheckedCreateNestedManyWithoutUserInput
   parentNotifications?: Prisma.ParentNotificationUncheckedCreateNestedManyWithoutUserInput
@@ -2744,6 +2783,7 @@ export type UserUpdateWithoutCounselorProfileInput = {
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   status?: Prisma.StringFieldUpdateOperationsInput | string
   studentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dateOfBirth?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUpdateManyWithoutUserNestedInput
   counselorNotifications?: Prisma.CounselorNotificationUpdateManyWithoutUserNestedInput
   parentNotifications?: Prisma.ParentNotificationUpdateManyWithoutUserNestedInput
@@ -2808,6 +2848,7 @@ export type UserUncheckedUpdateWithoutCounselorProfileInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
   studentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   parentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dateOfBirth?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedUpdateManyWithoutUserNestedInput
   counselorNotifications?: Prisma.CounselorNotificationUncheckedUpdateManyWithoutUserNestedInput
   parentNotifications?: Prisma.ParentNotificationUncheckedUpdateManyWithoutUserNestedInput
@@ -2862,6 +2903,7 @@ export type UserCreateWithoutParentProfileInput = {
   emailVerified?: boolean
   status?: string
   studentId?: string | null
+  dateOfBirth?: string | null
   adminNotifications?: Prisma.AdminNotificationCreateNestedManyWithoutUserInput
   counselorNotifications?: Prisma.CounselorNotificationCreateNestedManyWithoutUserInput
   parentNotifications?: Prisma.ParentNotificationCreateNestedManyWithoutUserInput
@@ -2926,6 +2968,7 @@ export type UserUncheckedCreateWithoutParentProfileInput = {
   status?: string
   studentId?: string | null
   parentId?: string | null
+  dateOfBirth?: string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedCreateNestedManyWithoutUserInput
   counselorNotifications?: Prisma.CounselorNotificationUncheckedCreateNestedManyWithoutUserInput
   parentNotifications?: Prisma.ParentNotificationUncheckedCreateNestedManyWithoutUserInput
@@ -2996,6 +3039,7 @@ export type UserUpdateWithoutParentProfileInput = {
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   status?: Prisma.StringFieldUpdateOperationsInput | string
   studentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dateOfBirth?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUpdateManyWithoutUserNestedInput
   counselorNotifications?: Prisma.CounselorNotificationUpdateManyWithoutUserNestedInput
   parentNotifications?: Prisma.ParentNotificationUpdateManyWithoutUserNestedInput
@@ -3060,6 +3104,7 @@ export type UserUncheckedUpdateWithoutParentProfileInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
   studentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   parentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dateOfBirth?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedUpdateManyWithoutUserNestedInput
   counselorNotifications?: Prisma.CounselorNotificationUncheckedUpdateManyWithoutUserNestedInput
   parentNotifications?: Prisma.ParentNotificationUncheckedUpdateManyWithoutUserNestedInput
@@ -3114,6 +3159,7 @@ export type UserCreateWithoutCounselorParentMeetingsInput = {
   emailVerified?: boolean
   status?: string
   studentId?: string | null
+  dateOfBirth?: string | null
   adminNotifications?: Prisma.AdminNotificationCreateNestedManyWithoutUserInput
   counselorNotifications?: Prisma.CounselorNotificationCreateNestedManyWithoutUserInput
   parentNotifications?: Prisma.ParentNotificationCreateNestedManyWithoutUserInput
@@ -3178,6 +3224,7 @@ export type UserUncheckedCreateWithoutCounselorParentMeetingsInput = {
   status?: string
   studentId?: string | null
   parentId?: string | null
+  dateOfBirth?: string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedCreateNestedManyWithoutUserInput
   counselorNotifications?: Prisma.CounselorNotificationUncheckedCreateNestedManyWithoutUserInput
   parentNotifications?: Prisma.ParentNotificationUncheckedCreateNestedManyWithoutUserInput
@@ -3237,6 +3284,7 @@ export type UserCreateWithoutStudentParentMeetingsInput = {
   emailVerified?: boolean
   status?: string
   studentId?: string | null
+  dateOfBirth?: string | null
   adminNotifications?: Prisma.AdminNotificationCreateNestedManyWithoutUserInput
   counselorNotifications?: Prisma.CounselorNotificationCreateNestedManyWithoutUserInput
   parentNotifications?: Prisma.ParentNotificationCreateNestedManyWithoutUserInput
@@ -3301,6 +3349,7 @@ export type UserUncheckedCreateWithoutStudentParentMeetingsInput = {
   status?: string
   studentId?: string | null
   parentId?: string | null
+  dateOfBirth?: string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedCreateNestedManyWithoutUserInput
   counselorNotifications?: Prisma.CounselorNotificationUncheckedCreateNestedManyWithoutUserInput
   parentNotifications?: Prisma.ParentNotificationUncheckedCreateNestedManyWithoutUserInput
@@ -3371,6 +3420,7 @@ export type UserUpdateWithoutCounselorParentMeetingsInput = {
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   status?: Prisma.StringFieldUpdateOperationsInput | string
   studentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dateOfBirth?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUpdateManyWithoutUserNestedInput
   counselorNotifications?: Prisma.CounselorNotificationUpdateManyWithoutUserNestedInput
   parentNotifications?: Prisma.ParentNotificationUpdateManyWithoutUserNestedInput
@@ -3435,6 +3485,7 @@ export type UserUncheckedUpdateWithoutCounselorParentMeetingsInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
   studentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   parentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dateOfBirth?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedUpdateManyWithoutUserNestedInput
   counselorNotifications?: Prisma.CounselorNotificationUncheckedUpdateManyWithoutUserNestedInput
   parentNotifications?: Prisma.ParentNotificationUncheckedUpdateManyWithoutUserNestedInput
@@ -3500,6 +3551,7 @@ export type UserUpdateWithoutStudentParentMeetingsInput = {
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   status?: Prisma.StringFieldUpdateOperationsInput | string
   studentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dateOfBirth?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUpdateManyWithoutUserNestedInput
   counselorNotifications?: Prisma.CounselorNotificationUpdateManyWithoutUserNestedInput
   parentNotifications?: Prisma.ParentNotificationUpdateManyWithoutUserNestedInput
@@ -3564,6 +3616,7 @@ export type UserUncheckedUpdateWithoutStudentParentMeetingsInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
   studentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   parentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dateOfBirth?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedUpdateManyWithoutUserNestedInput
   counselorNotifications?: Prisma.CounselorNotificationUncheckedUpdateManyWithoutUserNestedInput
   parentNotifications?: Prisma.ParentNotificationUncheckedUpdateManyWithoutUserNestedInput
@@ -3618,6 +3671,7 @@ export type UserCreateWithoutSchoolInput = {
   emailVerified?: boolean
   status?: string
   studentId?: string | null
+  dateOfBirth?: string | null
   adminNotifications?: Prisma.AdminNotificationCreateNestedManyWithoutUserInput
   counselorNotifications?: Prisma.CounselorNotificationCreateNestedManyWithoutUserInput
   parentNotifications?: Prisma.ParentNotificationCreateNestedManyWithoutUserInput
@@ -3681,6 +3735,7 @@ export type UserUncheckedCreateWithoutSchoolInput = {
   status?: string
   studentId?: string | null
   parentId?: string | null
+  dateOfBirth?: string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedCreateNestedManyWithoutUserInput
   counselorNotifications?: Prisma.CounselorNotificationUncheckedCreateNestedManyWithoutUserInput
   parentNotifications?: Prisma.ParentNotificationUncheckedCreateNestedManyWithoutUserInput
@@ -3762,6 +3817,7 @@ export type UserCreateWithoutLocationInput = {
   emailVerified?: boolean
   status?: string
   studentId?: string | null
+  dateOfBirth?: string | null
   adminNotifications?: Prisma.AdminNotificationCreateNestedManyWithoutUserInput
   counselorNotifications?: Prisma.CounselorNotificationCreateNestedManyWithoutUserInput
   parentNotifications?: Prisma.ParentNotificationCreateNestedManyWithoutUserInput
@@ -3825,6 +3881,7 @@ export type UserUncheckedCreateWithoutLocationInput = {
   status?: string
   studentId?: string | null
   parentId?: string | null
+  dateOfBirth?: string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedCreateNestedManyWithoutUserInput
   counselorNotifications?: Prisma.CounselorNotificationUncheckedCreateNestedManyWithoutUserInput
   parentNotifications?: Prisma.ParentNotificationUncheckedCreateNestedManyWithoutUserInput
@@ -3906,6 +3963,7 @@ export type UserCreateWithoutClassRefInput = {
   emailVerified?: boolean
   status?: string
   studentId?: string | null
+  dateOfBirth?: string | null
   adminNotifications?: Prisma.AdminNotificationCreateNestedManyWithoutUserInput
   counselorNotifications?: Prisma.CounselorNotificationCreateNestedManyWithoutUserInput
   parentNotifications?: Prisma.ParentNotificationCreateNestedManyWithoutUserInput
@@ -3969,6 +4027,7 @@ export type UserUncheckedCreateWithoutClassRefInput = {
   status?: string
   studentId?: string | null
   parentId?: string | null
+  dateOfBirth?: string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedCreateNestedManyWithoutUserInput
   counselorNotifications?: Prisma.CounselorNotificationUncheckedCreateNestedManyWithoutUserInput
   parentNotifications?: Prisma.ParentNotificationUncheckedCreateNestedManyWithoutUserInput
@@ -4050,6 +4109,7 @@ export type UserCreateWithoutRoleInput = {
   emailVerified?: boolean
   status?: string
   studentId?: string | null
+  dateOfBirth?: string | null
   adminNotifications?: Prisma.AdminNotificationCreateNestedManyWithoutUserInput
   counselorNotifications?: Prisma.CounselorNotificationCreateNestedManyWithoutUserInput
   parentNotifications?: Prisma.ParentNotificationCreateNestedManyWithoutUserInput
@@ -4113,6 +4173,7 @@ export type UserUncheckedCreateWithoutRoleInput = {
   status?: string
   studentId?: string | null
   parentId?: string | null
+  dateOfBirth?: string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedCreateNestedManyWithoutUserInput
   counselorNotifications?: Prisma.CounselorNotificationUncheckedCreateNestedManyWithoutUserInput
   parentNotifications?: Prisma.ParentNotificationUncheckedCreateNestedManyWithoutUserInput
@@ -4194,6 +4255,7 @@ export type UserCreateWithoutChatSessionsInput = {
   emailVerified?: boolean
   status?: string
   studentId?: string | null
+  dateOfBirth?: string | null
   adminNotifications?: Prisma.AdminNotificationCreateNestedManyWithoutUserInput
   counselorNotifications?: Prisma.CounselorNotificationCreateNestedManyWithoutUserInput
   parentNotifications?: Prisma.ParentNotificationCreateNestedManyWithoutUserInput
@@ -4258,6 +4320,7 @@ export type UserUncheckedCreateWithoutChatSessionsInput = {
   status?: string
   studentId?: string | null
   parentId?: string | null
+  dateOfBirth?: string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedCreateNestedManyWithoutUserInput
   counselorNotifications?: Prisma.CounselorNotificationUncheckedCreateNestedManyWithoutUserInput
   parentNotifications?: Prisma.ParentNotificationUncheckedCreateNestedManyWithoutUserInput
@@ -4328,6 +4391,7 @@ export type UserUpdateWithoutChatSessionsInput = {
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   status?: Prisma.StringFieldUpdateOperationsInput | string
   studentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dateOfBirth?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUpdateManyWithoutUserNestedInput
   counselorNotifications?: Prisma.CounselorNotificationUpdateManyWithoutUserNestedInput
   parentNotifications?: Prisma.ParentNotificationUpdateManyWithoutUserNestedInput
@@ -4392,6 +4456,7 @@ export type UserUncheckedUpdateWithoutChatSessionsInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
   studentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   parentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dateOfBirth?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedUpdateManyWithoutUserNestedInput
   counselorNotifications?: Prisma.CounselorNotificationUncheckedUpdateManyWithoutUserNestedInput
   parentNotifications?: Prisma.ParentNotificationUncheckedUpdateManyWithoutUserNestedInput
@@ -4446,6 +4511,7 @@ export type UserCreateWithoutMoodCheckinsInput = {
   emailVerified?: boolean
   status?: string
   studentId?: string | null
+  dateOfBirth?: string | null
   adminNotifications?: Prisma.AdminNotificationCreateNestedManyWithoutUserInput
   counselorNotifications?: Prisma.CounselorNotificationCreateNestedManyWithoutUserInput
   parentNotifications?: Prisma.ParentNotificationCreateNestedManyWithoutUserInput
@@ -4510,6 +4576,7 @@ export type UserUncheckedCreateWithoutMoodCheckinsInput = {
   status?: string
   studentId?: string | null
   parentId?: string | null
+  dateOfBirth?: string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedCreateNestedManyWithoutUserInput
   counselorNotifications?: Prisma.CounselorNotificationUncheckedCreateNestedManyWithoutUserInput
   parentNotifications?: Prisma.ParentNotificationUncheckedCreateNestedManyWithoutUserInput
@@ -4580,6 +4647,7 @@ export type UserUpdateWithoutMoodCheckinsInput = {
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   status?: Prisma.StringFieldUpdateOperationsInput | string
   studentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dateOfBirth?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUpdateManyWithoutUserNestedInput
   counselorNotifications?: Prisma.CounselorNotificationUpdateManyWithoutUserNestedInput
   parentNotifications?: Prisma.ParentNotificationUpdateManyWithoutUserNestedInput
@@ -4644,6 +4712,7 @@ export type UserUncheckedUpdateWithoutMoodCheckinsInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
   studentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   parentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dateOfBirth?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedUpdateManyWithoutUserNestedInput
   counselorNotifications?: Prisma.CounselorNotificationUncheckedUpdateManyWithoutUserNestedInput
   parentNotifications?: Prisma.ParentNotificationUncheckedUpdateManyWithoutUserNestedInput
@@ -4698,6 +4767,7 @@ export type UserCreateWithoutTriggerSelectionsInput = {
   emailVerified?: boolean
   status?: string
   studentId?: string | null
+  dateOfBirth?: string | null
   adminNotifications?: Prisma.AdminNotificationCreateNestedManyWithoutUserInput
   counselorNotifications?: Prisma.CounselorNotificationCreateNestedManyWithoutUserInput
   parentNotifications?: Prisma.ParentNotificationCreateNestedManyWithoutUserInput
@@ -4762,6 +4832,7 @@ export type UserUncheckedCreateWithoutTriggerSelectionsInput = {
   status?: string
   studentId?: string | null
   parentId?: string | null
+  dateOfBirth?: string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedCreateNestedManyWithoutUserInput
   counselorNotifications?: Prisma.CounselorNotificationUncheckedCreateNestedManyWithoutUserInput
   parentNotifications?: Prisma.ParentNotificationUncheckedCreateNestedManyWithoutUserInput
@@ -4832,6 +4903,7 @@ export type UserUpdateWithoutTriggerSelectionsInput = {
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   status?: Prisma.StringFieldUpdateOperationsInput | string
   studentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dateOfBirth?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUpdateManyWithoutUserNestedInput
   counselorNotifications?: Prisma.CounselorNotificationUpdateManyWithoutUserNestedInput
   parentNotifications?: Prisma.ParentNotificationUpdateManyWithoutUserNestedInput
@@ -4896,6 +4968,7 @@ export type UserUncheckedUpdateWithoutTriggerSelectionsInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
   studentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   parentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dateOfBirth?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedUpdateManyWithoutUserNestedInput
   counselorNotifications?: Prisma.CounselorNotificationUncheckedUpdateManyWithoutUserNestedInput
   parentNotifications?: Prisma.ParentNotificationUncheckedUpdateManyWithoutUserNestedInput
@@ -4950,6 +5023,7 @@ export type UserCreateWithoutSummariesInput = {
   emailVerified?: boolean
   status?: string
   studentId?: string | null
+  dateOfBirth?: string | null
   adminNotifications?: Prisma.AdminNotificationCreateNestedManyWithoutUserInput
   counselorNotifications?: Prisma.CounselorNotificationCreateNestedManyWithoutUserInput
   parentNotifications?: Prisma.ParentNotificationCreateNestedManyWithoutUserInput
@@ -5014,6 +5088,7 @@ export type UserUncheckedCreateWithoutSummariesInput = {
   status?: string
   studentId?: string | null
   parentId?: string | null
+  dateOfBirth?: string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedCreateNestedManyWithoutUserInput
   counselorNotifications?: Prisma.CounselorNotificationUncheckedCreateNestedManyWithoutUserInput
   parentNotifications?: Prisma.ParentNotificationUncheckedCreateNestedManyWithoutUserInput
@@ -5084,6 +5159,7 @@ export type UserUpdateWithoutSummariesInput = {
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   status?: Prisma.StringFieldUpdateOperationsInput | string
   studentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dateOfBirth?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUpdateManyWithoutUserNestedInput
   counselorNotifications?: Prisma.CounselorNotificationUpdateManyWithoutUserNestedInput
   parentNotifications?: Prisma.ParentNotificationUpdateManyWithoutUserNestedInput
@@ -5148,6 +5224,7 @@ export type UserUncheckedUpdateWithoutSummariesInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
   studentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   parentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dateOfBirth?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedUpdateManyWithoutUserNestedInput
   counselorNotifications?: Prisma.CounselorNotificationUncheckedUpdateManyWithoutUserNestedInput
   parentNotifications?: Prisma.ParentNotificationUncheckedUpdateManyWithoutUserNestedInput
@@ -5202,6 +5279,7 @@ export type UserCreateWithoutWritingJournalsInput = {
   emailVerified?: boolean
   status?: string
   studentId?: string | null
+  dateOfBirth?: string | null
   adminNotifications?: Prisma.AdminNotificationCreateNestedManyWithoutUserInput
   counselorNotifications?: Prisma.CounselorNotificationCreateNestedManyWithoutUserInput
   parentNotifications?: Prisma.ParentNotificationCreateNestedManyWithoutUserInput
@@ -5266,6 +5344,7 @@ export type UserUncheckedCreateWithoutWritingJournalsInput = {
   status?: string
   studentId?: string | null
   parentId?: string | null
+  dateOfBirth?: string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedCreateNestedManyWithoutUserInput
   counselorNotifications?: Prisma.CounselorNotificationUncheckedCreateNestedManyWithoutUserInput
   parentNotifications?: Prisma.ParentNotificationUncheckedCreateNestedManyWithoutUserInput
@@ -5336,6 +5415,7 @@ export type UserUpdateWithoutWritingJournalsInput = {
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   status?: Prisma.StringFieldUpdateOperationsInput | string
   studentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dateOfBirth?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUpdateManyWithoutUserNestedInput
   counselorNotifications?: Prisma.CounselorNotificationUpdateManyWithoutUserNestedInput
   parentNotifications?: Prisma.ParentNotificationUpdateManyWithoutUserNestedInput
@@ -5400,6 +5480,7 @@ export type UserUncheckedUpdateWithoutWritingJournalsInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
   studentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   parentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dateOfBirth?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedUpdateManyWithoutUserNestedInput
   counselorNotifications?: Prisma.CounselorNotificationUncheckedUpdateManyWithoutUserNestedInput
   parentNotifications?: Prisma.ParentNotificationUncheckedUpdateManyWithoutUserNestedInput
@@ -5454,6 +5535,7 @@ export type UserCreateWithoutAudioJournalsInput = {
   emailVerified?: boolean
   status?: string
   studentId?: string | null
+  dateOfBirth?: string | null
   adminNotifications?: Prisma.AdminNotificationCreateNestedManyWithoutUserInput
   counselorNotifications?: Prisma.CounselorNotificationCreateNestedManyWithoutUserInput
   parentNotifications?: Prisma.ParentNotificationCreateNestedManyWithoutUserInput
@@ -5518,6 +5600,7 @@ export type UserUncheckedCreateWithoutAudioJournalsInput = {
   status?: string
   studentId?: string | null
   parentId?: string | null
+  dateOfBirth?: string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedCreateNestedManyWithoutUserInput
   counselorNotifications?: Prisma.CounselorNotificationUncheckedCreateNestedManyWithoutUserInput
   parentNotifications?: Prisma.ParentNotificationUncheckedCreateNestedManyWithoutUserInput
@@ -5588,6 +5671,7 @@ export type UserUpdateWithoutAudioJournalsInput = {
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   status?: Prisma.StringFieldUpdateOperationsInput | string
   studentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dateOfBirth?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUpdateManyWithoutUserNestedInput
   counselorNotifications?: Prisma.CounselorNotificationUpdateManyWithoutUserNestedInput
   parentNotifications?: Prisma.ParentNotificationUpdateManyWithoutUserNestedInput
@@ -5652,6 +5736,7 @@ export type UserUncheckedUpdateWithoutAudioJournalsInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
   studentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   parentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dateOfBirth?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedUpdateManyWithoutUserNestedInput
   counselorNotifications?: Prisma.CounselorNotificationUncheckedUpdateManyWithoutUserNestedInput
   parentNotifications?: Prisma.ParentNotificationUncheckedUpdateManyWithoutUserNestedInput
@@ -5706,6 +5791,7 @@ export type UserCreateWithoutArtJournalsInput = {
   emailVerified?: boolean
   status?: string
   studentId?: string | null
+  dateOfBirth?: string | null
   adminNotifications?: Prisma.AdminNotificationCreateNestedManyWithoutUserInput
   counselorNotifications?: Prisma.CounselorNotificationCreateNestedManyWithoutUserInput
   parentNotifications?: Prisma.ParentNotificationCreateNestedManyWithoutUserInput
@@ -5770,6 +5856,7 @@ export type UserUncheckedCreateWithoutArtJournalsInput = {
   status?: string
   studentId?: string | null
   parentId?: string | null
+  dateOfBirth?: string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedCreateNestedManyWithoutUserInput
   counselorNotifications?: Prisma.CounselorNotificationUncheckedCreateNestedManyWithoutUserInput
   parentNotifications?: Prisma.ParentNotificationUncheckedCreateNestedManyWithoutUserInput
@@ -5840,6 +5927,7 @@ export type UserUpdateWithoutArtJournalsInput = {
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   status?: Prisma.StringFieldUpdateOperationsInput | string
   studentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dateOfBirth?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUpdateManyWithoutUserNestedInput
   counselorNotifications?: Prisma.CounselorNotificationUpdateManyWithoutUserNestedInput
   parentNotifications?: Prisma.ParentNotificationUpdateManyWithoutUserNestedInput
@@ -5904,6 +5992,7 @@ export type UserUncheckedUpdateWithoutArtJournalsInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
   studentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   parentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dateOfBirth?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedUpdateManyWithoutUserNestedInput
   counselorNotifications?: Prisma.CounselorNotificationUncheckedUpdateManyWithoutUserNestedInput
   parentNotifications?: Prisma.ParentNotificationUncheckedUpdateManyWithoutUserNestedInput
@@ -5958,6 +6047,7 @@ export type UserCreateWithoutMusicTherapyInput = {
   emailVerified?: boolean
   status?: string
   studentId?: string | null
+  dateOfBirth?: string | null
   adminNotifications?: Prisma.AdminNotificationCreateNestedManyWithoutUserInput
   counselorNotifications?: Prisma.CounselorNotificationCreateNestedManyWithoutUserInput
   parentNotifications?: Prisma.ParentNotificationCreateNestedManyWithoutUserInput
@@ -6022,6 +6112,7 @@ export type UserUncheckedCreateWithoutMusicTherapyInput = {
   status?: string
   studentId?: string | null
   parentId?: string | null
+  dateOfBirth?: string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedCreateNestedManyWithoutUserInput
   counselorNotifications?: Prisma.CounselorNotificationUncheckedCreateNestedManyWithoutUserInput
   parentNotifications?: Prisma.ParentNotificationUncheckedCreateNestedManyWithoutUserInput
@@ -6092,6 +6183,7 @@ export type UserUpdateWithoutMusicTherapyInput = {
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   status?: Prisma.StringFieldUpdateOperationsInput | string
   studentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dateOfBirth?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUpdateManyWithoutUserNestedInput
   counselorNotifications?: Prisma.CounselorNotificationUpdateManyWithoutUserNestedInput
   parentNotifications?: Prisma.ParentNotificationUpdateManyWithoutUserNestedInput
@@ -6156,6 +6248,7 @@ export type UserUncheckedUpdateWithoutMusicTherapyInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
   studentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   parentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dateOfBirth?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedUpdateManyWithoutUserNestedInput
   counselorNotifications?: Prisma.CounselorNotificationUncheckedUpdateManyWithoutUserNestedInput
   parentNotifications?: Prisma.ParentNotificationUncheckedUpdateManyWithoutUserNestedInput
@@ -6210,6 +6303,7 @@ export type UserCreateWithoutMeditationsInput = {
   emailVerified?: boolean
   status?: string
   studentId?: string | null
+  dateOfBirth?: string | null
   adminNotifications?: Prisma.AdminNotificationCreateNestedManyWithoutUserInput
   counselorNotifications?: Prisma.CounselorNotificationCreateNestedManyWithoutUserInput
   parentNotifications?: Prisma.ParentNotificationCreateNestedManyWithoutUserInput
@@ -6274,6 +6368,7 @@ export type UserUncheckedCreateWithoutMeditationsInput = {
   status?: string
   studentId?: string | null
   parentId?: string | null
+  dateOfBirth?: string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedCreateNestedManyWithoutUserInput
   counselorNotifications?: Prisma.CounselorNotificationUncheckedCreateNestedManyWithoutUserInput
   parentNotifications?: Prisma.ParentNotificationUncheckedCreateNestedManyWithoutUserInput
@@ -6344,6 +6439,7 @@ export type UserUpdateWithoutMeditationsInput = {
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   status?: Prisma.StringFieldUpdateOperationsInput | string
   studentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dateOfBirth?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUpdateManyWithoutUserNestedInput
   counselorNotifications?: Prisma.CounselorNotificationUpdateManyWithoutUserNestedInput
   parentNotifications?: Prisma.ParentNotificationUpdateManyWithoutUserNestedInput
@@ -6408,6 +6504,7 @@ export type UserUncheckedUpdateWithoutMeditationsInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
   studentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   parentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dateOfBirth?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedUpdateManyWithoutUserNestedInput
   counselorNotifications?: Prisma.CounselorNotificationUncheckedUpdateManyWithoutUserNestedInput
   parentNotifications?: Prisma.ParentNotificationUncheckedUpdateManyWithoutUserNestedInput
@@ -6462,6 +6559,7 @@ export type UserCreateWithoutMusicInstructionsInput = {
   emailVerified?: boolean
   status?: string
   studentId?: string | null
+  dateOfBirth?: string | null
   adminNotifications?: Prisma.AdminNotificationCreateNestedManyWithoutUserInput
   counselorNotifications?: Prisma.CounselorNotificationCreateNestedManyWithoutUserInput
   parentNotifications?: Prisma.ParentNotificationCreateNestedManyWithoutUserInput
@@ -6526,6 +6624,7 @@ export type UserUncheckedCreateWithoutMusicInstructionsInput = {
   status?: string
   studentId?: string | null
   parentId?: string | null
+  dateOfBirth?: string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedCreateNestedManyWithoutUserInput
   counselorNotifications?: Prisma.CounselorNotificationUncheckedCreateNestedManyWithoutUserInput
   parentNotifications?: Prisma.ParentNotificationUncheckedCreateNestedManyWithoutUserInput
@@ -6596,6 +6695,7 @@ export type UserUpdateWithoutMusicInstructionsInput = {
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   status?: Prisma.StringFieldUpdateOperationsInput | string
   studentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dateOfBirth?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUpdateManyWithoutUserNestedInput
   counselorNotifications?: Prisma.CounselorNotificationUpdateManyWithoutUserNestedInput
   parentNotifications?: Prisma.ParentNotificationUpdateManyWithoutUserNestedInput
@@ -6660,6 +6760,7 @@ export type UserUncheckedUpdateWithoutMusicInstructionsInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
   studentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   parentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dateOfBirth?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedUpdateManyWithoutUserNestedInput
   counselorNotifications?: Prisma.CounselorNotificationUncheckedUpdateManyWithoutUserNestedInput
   parentNotifications?: Prisma.ParentNotificationUncheckedUpdateManyWithoutUserNestedInput
@@ -6714,6 +6815,7 @@ export type UserCreateWithoutMeditationInstructionsInput = {
   emailVerified?: boolean
   status?: string
   studentId?: string | null
+  dateOfBirth?: string | null
   adminNotifications?: Prisma.AdminNotificationCreateNestedManyWithoutUserInput
   counselorNotifications?: Prisma.CounselorNotificationCreateNestedManyWithoutUserInput
   parentNotifications?: Prisma.ParentNotificationCreateNestedManyWithoutUserInput
@@ -6778,6 +6880,7 @@ export type UserUncheckedCreateWithoutMeditationInstructionsInput = {
   status?: string
   studentId?: string | null
   parentId?: string | null
+  dateOfBirth?: string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedCreateNestedManyWithoutUserInput
   counselorNotifications?: Prisma.CounselorNotificationUncheckedCreateNestedManyWithoutUserInput
   parentNotifications?: Prisma.ParentNotificationUncheckedCreateNestedManyWithoutUserInput
@@ -6848,6 +6951,7 @@ export type UserUpdateWithoutMeditationInstructionsInput = {
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   status?: Prisma.StringFieldUpdateOperationsInput | string
   studentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dateOfBirth?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUpdateManyWithoutUserNestedInput
   counselorNotifications?: Prisma.CounselorNotificationUpdateManyWithoutUserNestedInput
   parentNotifications?: Prisma.ParentNotificationUpdateManyWithoutUserNestedInput
@@ -6912,6 +7016,7 @@ export type UserUncheckedUpdateWithoutMeditationInstructionsInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
   studentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   parentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dateOfBirth?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedUpdateManyWithoutUserNestedInput
   counselorNotifications?: Prisma.CounselorNotificationUncheckedUpdateManyWithoutUserNestedInput
   parentNotifications?: Prisma.ParentNotificationUncheckedUpdateManyWithoutUserNestedInput
@@ -6966,6 +7071,7 @@ export type UserCreateWithoutArticlesInput = {
   emailVerified?: boolean
   status?: string
   studentId?: string | null
+  dateOfBirth?: string | null
   adminNotifications?: Prisma.AdminNotificationCreateNestedManyWithoutUserInput
   counselorNotifications?: Prisma.CounselorNotificationCreateNestedManyWithoutUserInput
   parentNotifications?: Prisma.ParentNotificationCreateNestedManyWithoutUserInput
@@ -7030,6 +7136,7 @@ export type UserUncheckedCreateWithoutArticlesInput = {
   status?: string
   studentId?: string | null
   parentId?: string | null
+  dateOfBirth?: string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedCreateNestedManyWithoutUserInput
   counselorNotifications?: Prisma.CounselorNotificationUncheckedCreateNestedManyWithoutUserInput
   parentNotifications?: Prisma.ParentNotificationUncheckedCreateNestedManyWithoutUserInput
@@ -7100,6 +7207,7 @@ export type UserUpdateWithoutArticlesInput = {
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   status?: Prisma.StringFieldUpdateOperationsInput | string
   studentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dateOfBirth?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUpdateManyWithoutUserNestedInput
   counselorNotifications?: Prisma.CounselorNotificationUpdateManyWithoutUserNestedInput
   parentNotifications?: Prisma.ParentNotificationUpdateManyWithoutUserNestedInput
@@ -7164,6 +7272,7 @@ export type UserUncheckedUpdateWithoutArticlesInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
   studentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   parentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dateOfBirth?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedUpdateManyWithoutUserNestedInput
   counselorNotifications?: Prisma.CounselorNotificationUncheckedUpdateManyWithoutUserNestedInput
   parentNotifications?: Prisma.ParentNotificationUncheckedUpdateManyWithoutUserNestedInput
@@ -7218,6 +7327,7 @@ export type UserCreateWithoutRatingsInput = {
   emailVerified?: boolean
   status?: string
   studentId?: string | null
+  dateOfBirth?: string | null
   adminNotifications?: Prisma.AdminNotificationCreateNestedManyWithoutUserInput
   counselorNotifications?: Prisma.CounselorNotificationCreateNestedManyWithoutUserInput
   parentNotifications?: Prisma.ParentNotificationCreateNestedManyWithoutUserInput
@@ -7282,6 +7392,7 @@ export type UserUncheckedCreateWithoutRatingsInput = {
   status?: string
   studentId?: string | null
   parentId?: string | null
+  dateOfBirth?: string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedCreateNestedManyWithoutUserInput
   counselorNotifications?: Prisma.CounselorNotificationUncheckedCreateNestedManyWithoutUserInput
   parentNotifications?: Prisma.ParentNotificationUncheckedCreateNestedManyWithoutUserInput
@@ -7352,6 +7463,7 @@ export type UserUpdateWithoutRatingsInput = {
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   status?: Prisma.StringFieldUpdateOperationsInput | string
   studentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dateOfBirth?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUpdateManyWithoutUserNestedInput
   counselorNotifications?: Prisma.CounselorNotificationUpdateManyWithoutUserNestedInput
   parentNotifications?: Prisma.ParentNotificationUpdateManyWithoutUserNestedInput
@@ -7416,6 +7528,7 @@ export type UserUncheckedUpdateWithoutRatingsInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
   studentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   parentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dateOfBirth?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedUpdateManyWithoutUserNestedInput
   counselorNotifications?: Prisma.CounselorNotificationUncheckedUpdateManyWithoutUserNestedInput
   parentNotifications?: Prisma.ParentNotificationUncheckedUpdateManyWithoutUserNestedInput
@@ -7470,6 +7583,7 @@ export type UserCreateWithoutSavedArticlesInput = {
   emailVerified?: boolean
   status?: string
   studentId?: string | null
+  dateOfBirth?: string | null
   adminNotifications?: Prisma.AdminNotificationCreateNestedManyWithoutUserInput
   counselorNotifications?: Prisma.CounselorNotificationCreateNestedManyWithoutUserInput
   parentNotifications?: Prisma.ParentNotificationCreateNestedManyWithoutUserInput
@@ -7534,6 +7648,7 @@ export type UserUncheckedCreateWithoutSavedArticlesInput = {
   status?: string
   studentId?: string | null
   parentId?: string | null
+  dateOfBirth?: string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedCreateNestedManyWithoutUserInput
   counselorNotifications?: Prisma.CounselorNotificationUncheckedCreateNestedManyWithoutUserInput
   parentNotifications?: Prisma.ParentNotificationUncheckedCreateNestedManyWithoutUserInput
@@ -7604,6 +7719,7 @@ export type UserUpdateWithoutSavedArticlesInput = {
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   status?: Prisma.StringFieldUpdateOperationsInput | string
   studentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dateOfBirth?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUpdateManyWithoutUserNestedInput
   counselorNotifications?: Prisma.CounselorNotificationUpdateManyWithoutUserNestedInput
   parentNotifications?: Prisma.ParentNotificationUpdateManyWithoutUserNestedInput
@@ -7668,6 +7784,7 @@ export type UserUncheckedUpdateWithoutSavedArticlesInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
   studentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   parentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dateOfBirth?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedUpdateManyWithoutUserNestedInput
   counselorNotifications?: Prisma.CounselorNotificationUncheckedUpdateManyWithoutUserNestedInput
   parentNotifications?: Prisma.ParentNotificationUncheckedUpdateManyWithoutUserNestedInput
@@ -7722,6 +7839,7 @@ export type UserCreateWithoutCompletionsInput = {
   emailVerified?: boolean
   status?: string
   studentId?: string | null
+  dateOfBirth?: string | null
   adminNotifications?: Prisma.AdminNotificationCreateNestedManyWithoutUserInput
   counselorNotifications?: Prisma.CounselorNotificationCreateNestedManyWithoutUserInput
   parentNotifications?: Prisma.ParentNotificationCreateNestedManyWithoutUserInput
@@ -7786,6 +7904,7 @@ export type UserUncheckedCreateWithoutCompletionsInput = {
   status?: string
   studentId?: string | null
   parentId?: string | null
+  dateOfBirth?: string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedCreateNestedManyWithoutUserInput
   counselorNotifications?: Prisma.CounselorNotificationUncheckedCreateNestedManyWithoutUserInput
   parentNotifications?: Prisma.ParentNotificationUncheckedCreateNestedManyWithoutUserInput
@@ -7856,6 +7975,7 @@ export type UserUpdateWithoutCompletionsInput = {
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   status?: Prisma.StringFieldUpdateOperationsInput | string
   studentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dateOfBirth?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUpdateManyWithoutUserNestedInput
   counselorNotifications?: Prisma.CounselorNotificationUpdateManyWithoutUserNestedInput
   parentNotifications?: Prisma.ParentNotificationUpdateManyWithoutUserNestedInput
@@ -7920,6 +8040,7 @@ export type UserUncheckedUpdateWithoutCompletionsInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
   studentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   parentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dateOfBirth?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedUpdateManyWithoutUserNestedInput
   counselorNotifications?: Prisma.CounselorNotificationUncheckedUpdateManyWithoutUserNestedInput
   parentNotifications?: Prisma.ParentNotificationUncheckedUpdateManyWithoutUserNestedInput
@@ -7974,6 +8095,7 @@ export type UserCreateWithoutDailyLoginsInput = {
   emailVerified?: boolean
   status?: string
   studentId?: string | null
+  dateOfBirth?: string | null
   adminNotifications?: Prisma.AdminNotificationCreateNestedManyWithoutUserInput
   counselorNotifications?: Prisma.CounselorNotificationCreateNestedManyWithoutUserInput
   parentNotifications?: Prisma.ParentNotificationCreateNestedManyWithoutUserInput
@@ -8038,6 +8160,7 @@ export type UserUncheckedCreateWithoutDailyLoginsInput = {
   status?: string
   studentId?: string | null
   parentId?: string | null
+  dateOfBirth?: string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedCreateNestedManyWithoutUserInput
   counselorNotifications?: Prisma.CounselorNotificationUncheckedCreateNestedManyWithoutUserInput
   parentNotifications?: Prisma.ParentNotificationUncheckedCreateNestedManyWithoutUserInput
@@ -8108,6 +8231,7 @@ export type UserUpdateWithoutDailyLoginsInput = {
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   status?: Prisma.StringFieldUpdateOperationsInput | string
   studentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dateOfBirth?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUpdateManyWithoutUserNestedInput
   counselorNotifications?: Prisma.CounselorNotificationUpdateManyWithoutUserNestedInput
   parentNotifications?: Prisma.ParentNotificationUpdateManyWithoutUserNestedInput
@@ -8172,6 +8296,7 @@ export type UserUncheckedUpdateWithoutDailyLoginsInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
   studentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   parentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dateOfBirth?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedUpdateManyWithoutUserNestedInput
   counselorNotifications?: Prisma.CounselorNotificationUncheckedUpdateManyWithoutUserNestedInput
   parentNotifications?: Prisma.ParentNotificationUncheckedUpdateManyWithoutUserNestedInput
@@ -8226,6 +8351,7 @@ export type UserCreateWithoutResourceAccessInput = {
   emailVerified?: boolean
   status?: string
   studentId?: string | null
+  dateOfBirth?: string | null
   adminNotifications?: Prisma.AdminNotificationCreateNestedManyWithoutUserInput
   counselorNotifications?: Prisma.CounselorNotificationCreateNestedManyWithoutUserInput
   parentNotifications?: Prisma.ParentNotificationCreateNestedManyWithoutUserInput
@@ -8290,6 +8416,7 @@ export type UserUncheckedCreateWithoutResourceAccessInput = {
   status?: string
   studentId?: string | null
   parentId?: string | null
+  dateOfBirth?: string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedCreateNestedManyWithoutUserInput
   counselorNotifications?: Prisma.CounselorNotificationUncheckedCreateNestedManyWithoutUserInput
   parentNotifications?: Prisma.ParentNotificationUncheckedCreateNestedManyWithoutUserInput
@@ -8360,6 +8487,7 @@ export type UserUpdateWithoutResourceAccessInput = {
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   status?: Prisma.StringFieldUpdateOperationsInput | string
   studentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dateOfBirth?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUpdateManyWithoutUserNestedInput
   counselorNotifications?: Prisma.CounselorNotificationUpdateManyWithoutUserNestedInput
   parentNotifications?: Prisma.ParentNotificationUpdateManyWithoutUserNestedInput
@@ -8424,6 +8552,7 @@ export type UserUncheckedUpdateWithoutResourceAccessInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
   studentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   parentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dateOfBirth?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedUpdateManyWithoutUserNestedInput
   counselorNotifications?: Prisma.CounselorNotificationUncheckedUpdateManyWithoutUserNestedInput
   parentNotifications?: Prisma.ParentNotificationUncheckedUpdateManyWithoutUserNestedInput
@@ -8478,6 +8607,7 @@ export type UserCreateWithoutStreaksInput = {
   emailVerified?: boolean
   status?: string
   studentId?: string | null
+  dateOfBirth?: string | null
   adminNotifications?: Prisma.AdminNotificationCreateNestedManyWithoutUserInput
   counselorNotifications?: Prisma.CounselorNotificationCreateNestedManyWithoutUserInput
   parentNotifications?: Prisma.ParentNotificationCreateNestedManyWithoutUserInput
@@ -8542,6 +8672,7 @@ export type UserUncheckedCreateWithoutStreaksInput = {
   status?: string
   studentId?: string | null
   parentId?: string | null
+  dateOfBirth?: string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedCreateNestedManyWithoutUserInput
   counselorNotifications?: Prisma.CounselorNotificationUncheckedCreateNestedManyWithoutUserInput
   parentNotifications?: Prisma.ParentNotificationUncheckedCreateNestedManyWithoutUserInput
@@ -8612,6 +8743,7 @@ export type UserUpdateWithoutStreaksInput = {
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   status?: Prisma.StringFieldUpdateOperationsInput | string
   studentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dateOfBirth?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUpdateManyWithoutUserNestedInput
   counselorNotifications?: Prisma.CounselorNotificationUpdateManyWithoutUserNestedInput
   parentNotifications?: Prisma.ParentNotificationUpdateManyWithoutUserNestedInput
@@ -8676,6 +8808,7 @@ export type UserUncheckedUpdateWithoutStreaksInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
   studentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   parentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dateOfBirth?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedUpdateManyWithoutUserNestedInput
   counselorNotifications?: Prisma.CounselorNotificationUncheckedUpdateManyWithoutUserNestedInput
   parentNotifications?: Prisma.ParentNotificationUncheckedUpdateManyWithoutUserNestedInput
@@ -8730,6 +8863,7 @@ export type UserCreateWithoutHighRiskAlertsInput = {
   emailVerified?: boolean
   status?: string
   studentId?: string | null
+  dateOfBirth?: string | null
   adminNotifications?: Prisma.AdminNotificationCreateNestedManyWithoutUserInput
   counselorNotifications?: Prisma.CounselorNotificationCreateNestedManyWithoutUserInput
   parentNotifications?: Prisma.ParentNotificationCreateNestedManyWithoutUserInput
@@ -8794,6 +8928,7 @@ export type UserUncheckedCreateWithoutHighRiskAlertsInput = {
   status?: string
   studentId?: string | null
   parentId?: string | null
+  dateOfBirth?: string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedCreateNestedManyWithoutUserInput
   counselorNotifications?: Prisma.CounselorNotificationUncheckedCreateNestedManyWithoutUserInput
   parentNotifications?: Prisma.ParentNotificationUncheckedCreateNestedManyWithoutUserInput
@@ -8864,6 +8999,7 @@ export type UserUpdateWithoutHighRiskAlertsInput = {
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   status?: Prisma.StringFieldUpdateOperationsInput | string
   studentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dateOfBirth?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUpdateManyWithoutUserNestedInput
   counselorNotifications?: Prisma.CounselorNotificationUpdateManyWithoutUserNestedInput
   parentNotifications?: Prisma.ParentNotificationUpdateManyWithoutUserNestedInput
@@ -8928,6 +9064,7 @@ export type UserUncheckedUpdateWithoutHighRiskAlertsInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
   studentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   parentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dateOfBirth?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedUpdateManyWithoutUserNestedInput
   counselorNotifications?: Prisma.CounselorNotificationUncheckedUpdateManyWithoutUserNestedInput
   parentNotifications?: Prisma.ParentNotificationUncheckedUpdateManyWithoutUserNestedInput
@@ -8982,6 +9119,7 @@ export type UserCreateWithoutEscalationAlertsInput = {
   emailVerified?: boolean
   status?: string
   studentId?: string | null
+  dateOfBirth?: string | null
   adminNotifications?: Prisma.AdminNotificationCreateNestedManyWithoutUserInput
   counselorNotifications?: Prisma.CounselorNotificationCreateNestedManyWithoutUserInput
   parentNotifications?: Prisma.ParentNotificationCreateNestedManyWithoutUserInput
@@ -9046,6 +9184,7 @@ export type UserUncheckedCreateWithoutEscalationAlertsInput = {
   status?: string
   studentId?: string | null
   parentId?: string | null
+  dateOfBirth?: string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedCreateNestedManyWithoutUserInput
   counselorNotifications?: Prisma.CounselorNotificationUncheckedCreateNestedManyWithoutUserInput
   parentNotifications?: Prisma.ParentNotificationUncheckedCreateNestedManyWithoutUserInput
@@ -9116,6 +9255,7 @@ export type UserUpdateWithoutEscalationAlertsInput = {
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   status?: Prisma.StringFieldUpdateOperationsInput | string
   studentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dateOfBirth?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUpdateManyWithoutUserNestedInput
   counselorNotifications?: Prisma.CounselorNotificationUpdateManyWithoutUserNestedInput
   parentNotifications?: Prisma.ParentNotificationUpdateManyWithoutUserNestedInput
@@ -9180,6 +9320,7 @@ export type UserUncheckedUpdateWithoutEscalationAlertsInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
   studentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   parentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dateOfBirth?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedUpdateManyWithoutUserNestedInput
   counselorNotifications?: Prisma.CounselorNotificationUncheckedUpdateManyWithoutUserNestedInput
   parentNotifications?: Prisma.ParentNotificationUncheckedUpdateManyWithoutUserNestedInput
@@ -9234,6 +9375,7 @@ export type UserCreateWithoutAdminNotificationsInput = {
   emailVerified?: boolean
   status?: string
   studentId?: string | null
+  dateOfBirth?: string | null
   counselorNotifications?: Prisma.CounselorNotificationCreateNestedManyWithoutUserInput
   parentNotifications?: Prisma.ParentNotificationCreateNestedManyWithoutUserInput
   adminProfile?: Prisma.AdminProfileCreateNestedOneWithoutUserInput
@@ -9298,6 +9440,7 @@ export type UserUncheckedCreateWithoutAdminNotificationsInput = {
   status?: string
   studentId?: string | null
   parentId?: string | null
+  dateOfBirth?: string | null
   counselorNotifications?: Prisma.CounselorNotificationUncheckedCreateNestedManyWithoutUserInput
   parentNotifications?: Prisma.ParentNotificationUncheckedCreateNestedManyWithoutUserInput
   adminProfile?: Prisma.AdminProfileUncheckedCreateNestedOneWithoutUserInput
@@ -9368,6 +9511,7 @@ export type UserUpdateWithoutAdminNotificationsInput = {
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   status?: Prisma.StringFieldUpdateOperationsInput | string
   studentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dateOfBirth?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   counselorNotifications?: Prisma.CounselorNotificationUpdateManyWithoutUserNestedInput
   parentNotifications?: Prisma.ParentNotificationUpdateManyWithoutUserNestedInput
   adminProfile?: Prisma.AdminProfileUpdateOneWithoutUserNestedInput
@@ -9432,6 +9576,7 @@ export type UserUncheckedUpdateWithoutAdminNotificationsInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
   studentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   parentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dateOfBirth?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   counselorNotifications?: Prisma.CounselorNotificationUncheckedUpdateManyWithoutUserNestedInput
   parentNotifications?: Prisma.ParentNotificationUncheckedUpdateManyWithoutUserNestedInput
   adminProfile?: Prisma.AdminProfileUncheckedUpdateOneWithoutUserNestedInput
@@ -9486,6 +9631,7 @@ export type UserCreateWithoutCounselorNotificationsInput = {
   emailVerified?: boolean
   status?: string
   studentId?: string | null
+  dateOfBirth?: string | null
   adminNotifications?: Prisma.AdminNotificationCreateNestedManyWithoutUserInput
   parentNotifications?: Prisma.ParentNotificationCreateNestedManyWithoutUserInput
   adminProfile?: Prisma.AdminProfileCreateNestedOneWithoutUserInput
@@ -9550,6 +9696,7 @@ export type UserUncheckedCreateWithoutCounselorNotificationsInput = {
   status?: string
   studentId?: string | null
   parentId?: string | null
+  dateOfBirth?: string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedCreateNestedManyWithoutUserInput
   parentNotifications?: Prisma.ParentNotificationUncheckedCreateNestedManyWithoutUserInput
   adminProfile?: Prisma.AdminProfileUncheckedCreateNestedOneWithoutUserInput
@@ -9620,6 +9767,7 @@ export type UserUpdateWithoutCounselorNotificationsInput = {
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   status?: Prisma.StringFieldUpdateOperationsInput | string
   studentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dateOfBirth?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUpdateManyWithoutUserNestedInput
   parentNotifications?: Prisma.ParentNotificationUpdateManyWithoutUserNestedInput
   adminProfile?: Prisma.AdminProfileUpdateOneWithoutUserNestedInput
@@ -9684,6 +9832,7 @@ export type UserUncheckedUpdateWithoutCounselorNotificationsInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
   studentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   parentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dateOfBirth?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedUpdateManyWithoutUserNestedInput
   parentNotifications?: Prisma.ParentNotificationUncheckedUpdateManyWithoutUserNestedInput
   adminProfile?: Prisma.AdminProfileUncheckedUpdateOneWithoutUserNestedInput
@@ -9738,6 +9887,7 @@ export type UserCreateWithoutParentNotificationsInput = {
   emailVerified?: boolean
   status?: string
   studentId?: string | null
+  dateOfBirth?: string | null
   adminNotifications?: Prisma.AdminNotificationCreateNestedManyWithoutUserInput
   counselorNotifications?: Prisma.CounselorNotificationCreateNestedManyWithoutUserInput
   adminProfile?: Prisma.AdminProfileCreateNestedOneWithoutUserInput
@@ -9802,6 +9952,7 @@ export type UserUncheckedCreateWithoutParentNotificationsInput = {
   status?: string
   studentId?: string | null
   parentId?: string | null
+  dateOfBirth?: string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedCreateNestedManyWithoutUserInput
   counselorNotifications?: Prisma.CounselorNotificationUncheckedCreateNestedManyWithoutUserInput
   adminProfile?: Prisma.AdminProfileUncheckedCreateNestedOneWithoutUserInput
@@ -9872,6 +10023,7 @@ export type UserUpdateWithoutParentNotificationsInput = {
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   status?: Prisma.StringFieldUpdateOperationsInput | string
   studentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dateOfBirth?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUpdateManyWithoutUserNestedInput
   counselorNotifications?: Prisma.CounselorNotificationUpdateManyWithoutUserNestedInput
   adminProfile?: Prisma.AdminProfileUpdateOneWithoutUserNestedInput
@@ -9936,6 +10088,7 @@ export type UserUncheckedUpdateWithoutParentNotificationsInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
   studentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   parentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dateOfBirth?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedUpdateManyWithoutUserNestedInput
   counselorNotifications?: Prisma.CounselorNotificationUncheckedUpdateManyWithoutUserNestedInput
   adminProfile?: Prisma.AdminProfileUncheckedUpdateOneWithoutUserNestedInput
@@ -9990,6 +10143,7 @@ export type UserCreateWithoutSessionsInput = {
   emailVerified?: boolean
   status?: string
   studentId?: string | null
+  dateOfBirth?: string | null
   adminNotifications?: Prisma.AdminNotificationCreateNestedManyWithoutUserInput
   counselorNotifications?: Prisma.CounselorNotificationCreateNestedManyWithoutUserInput
   parentNotifications?: Prisma.ParentNotificationCreateNestedManyWithoutUserInput
@@ -10054,6 +10208,7 @@ export type UserUncheckedCreateWithoutSessionsInput = {
   status?: string
   studentId?: string | null
   parentId?: string | null
+  dateOfBirth?: string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedCreateNestedManyWithoutUserInput
   counselorNotifications?: Prisma.CounselorNotificationUncheckedCreateNestedManyWithoutUserInput
   parentNotifications?: Prisma.ParentNotificationUncheckedCreateNestedManyWithoutUserInput
@@ -10124,6 +10279,7 @@ export type UserUpdateWithoutSessionsInput = {
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   status?: Prisma.StringFieldUpdateOperationsInput | string
   studentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dateOfBirth?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUpdateManyWithoutUserNestedInput
   counselorNotifications?: Prisma.CounselorNotificationUpdateManyWithoutUserNestedInput
   parentNotifications?: Prisma.ParentNotificationUpdateManyWithoutUserNestedInput
@@ -10188,6 +10344,7 @@ export type UserUncheckedUpdateWithoutSessionsInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
   studentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   parentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dateOfBirth?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedUpdateManyWithoutUserNestedInput
   counselorNotifications?: Prisma.CounselorNotificationUncheckedUpdateManyWithoutUserNestedInput
   parentNotifications?: Prisma.ParentNotificationUncheckedUpdateManyWithoutUserNestedInput
@@ -10242,6 +10399,7 @@ export type UserCreateWithoutCreatedBadgesInput = {
   emailVerified?: boolean
   status?: string
   studentId?: string | null
+  dateOfBirth?: string | null
   adminNotifications?: Prisma.AdminNotificationCreateNestedManyWithoutUserInput
   counselorNotifications?: Prisma.CounselorNotificationCreateNestedManyWithoutUserInput
   parentNotifications?: Prisma.ParentNotificationCreateNestedManyWithoutUserInput
@@ -10306,6 +10464,7 @@ export type UserUncheckedCreateWithoutCreatedBadgesInput = {
   status?: string
   studentId?: string | null
   parentId?: string | null
+  dateOfBirth?: string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedCreateNestedManyWithoutUserInput
   counselorNotifications?: Prisma.CounselorNotificationUncheckedCreateNestedManyWithoutUserInput
   parentNotifications?: Prisma.ParentNotificationUncheckedCreateNestedManyWithoutUserInput
@@ -10376,6 +10535,7 @@ export type UserUpdateWithoutCreatedBadgesInput = {
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   status?: Prisma.StringFieldUpdateOperationsInput | string
   studentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dateOfBirth?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUpdateManyWithoutUserNestedInput
   counselorNotifications?: Prisma.CounselorNotificationUpdateManyWithoutUserNestedInput
   parentNotifications?: Prisma.ParentNotificationUpdateManyWithoutUserNestedInput
@@ -10440,6 +10600,7 @@ export type UserUncheckedUpdateWithoutCreatedBadgesInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
   studentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   parentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dateOfBirth?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedUpdateManyWithoutUserNestedInput
   counselorNotifications?: Prisma.CounselorNotificationUncheckedUpdateManyWithoutUserNestedInput
   parentNotifications?: Prisma.ParentNotificationUncheckedUpdateManyWithoutUserNestedInput
@@ -10494,6 +10655,7 @@ export type UserCreateWithoutUserBadgesInput = {
   emailVerified?: boolean
   status?: string
   studentId?: string | null
+  dateOfBirth?: string | null
   adminNotifications?: Prisma.AdminNotificationCreateNestedManyWithoutUserInput
   counselorNotifications?: Prisma.CounselorNotificationCreateNestedManyWithoutUserInput
   parentNotifications?: Prisma.ParentNotificationCreateNestedManyWithoutUserInput
@@ -10558,6 +10720,7 @@ export type UserUncheckedCreateWithoutUserBadgesInput = {
   status?: string
   studentId?: string | null
   parentId?: string | null
+  dateOfBirth?: string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedCreateNestedManyWithoutUserInput
   counselorNotifications?: Prisma.CounselorNotificationUncheckedCreateNestedManyWithoutUserInput
   parentNotifications?: Prisma.ParentNotificationUncheckedCreateNestedManyWithoutUserInput
@@ -10628,6 +10791,7 @@ export type UserUpdateWithoutUserBadgesInput = {
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   status?: Prisma.StringFieldUpdateOperationsInput | string
   studentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dateOfBirth?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUpdateManyWithoutUserNestedInput
   counselorNotifications?: Prisma.CounselorNotificationUpdateManyWithoutUserNestedInput
   parentNotifications?: Prisma.ParentNotificationUpdateManyWithoutUserNestedInput
@@ -10692,6 +10856,7 @@ export type UserUncheckedUpdateWithoutUserBadgesInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
   studentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   parentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dateOfBirth?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedUpdateManyWithoutUserNestedInput
   counselorNotifications?: Prisma.CounselorNotificationUncheckedUpdateManyWithoutUserNestedInput
   parentNotifications?: Prisma.ParentNotificationUncheckedUpdateManyWithoutUserNestedInput
@@ -10746,6 +10911,7 @@ export type UserCreateWithoutCreatedChallengesInput = {
   emailVerified?: boolean
   status?: string
   studentId?: string | null
+  dateOfBirth?: string | null
   adminNotifications?: Prisma.AdminNotificationCreateNestedManyWithoutUserInput
   counselorNotifications?: Prisma.CounselorNotificationCreateNestedManyWithoutUserInput
   parentNotifications?: Prisma.ParentNotificationCreateNestedManyWithoutUserInput
@@ -10810,6 +10976,7 @@ export type UserUncheckedCreateWithoutCreatedChallengesInput = {
   status?: string
   studentId?: string | null
   parentId?: string | null
+  dateOfBirth?: string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedCreateNestedManyWithoutUserInput
   counselorNotifications?: Prisma.CounselorNotificationUncheckedCreateNestedManyWithoutUserInput
   parentNotifications?: Prisma.ParentNotificationUncheckedCreateNestedManyWithoutUserInput
@@ -10880,6 +11047,7 @@ export type UserUpdateWithoutCreatedChallengesInput = {
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   status?: Prisma.StringFieldUpdateOperationsInput | string
   studentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dateOfBirth?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUpdateManyWithoutUserNestedInput
   counselorNotifications?: Prisma.CounselorNotificationUpdateManyWithoutUserNestedInput
   parentNotifications?: Prisma.ParentNotificationUpdateManyWithoutUserNestedInput
@@ -10944,6 +11112,7 @@ export type UserUncheckedUpdateWithoutCreatedChallengesInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
   studentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   parentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dateOfBirth?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedUpdateManyWithoutUserNestedInput
   counselorNotifications?: Prisma.CounselorNotificationUncheckedUpdateManyWithoutUserNestedInput
   parentNotifications?: Prisma.ParentNotificationUncheckedUpdateManyWithoutUserNestedInput
@@ -10998,6 +11167,7 @@ export type UserCreateWithoutUserChallengesInput = {
   emailVerified?: boolean
   status?: string
   studentId?: string | null
+  dateOfBirth?: string | null
   adminNotifications?: Prisma.AdminNotificationCreateNestedManyWithoutUserInput
   counselorNotifications?: Prisma.CounselorNotificationCreateNestedManyWithoutUserInput
   parentNotifications?: Prisma.ParentNotificationCreateNestedManyWithoutUserInput
@@ -11062,6 +11232,7 @@ export type UserUncheckedCreateWithoutUserChallengesInput = {
   status?: string
   studentId?: string | null
   parentId?: string | null
+  dateOfBirth?: string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedCreateNestedManyWithoutUserInput
   counselorNotifications?: Prisma.CounselorNotificationUncheckedCreateNestedManyWithoutUserInput
   parentNotifications?: Prisma.ParentNotificationUncheckedCreateNestedManyWithoutUserInput
@@ -11132,6 +11303,7 @@ export type UserUpdateWithoutUserChallengesInput = {
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   status?: Prisma.StringFieldUpdateOperationsInput | string
   studentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dateOfBirth?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUpdateManyWithoutUserNestedInput
   counselorNotifications?: Prisma.CounselorNotificationUpdateManyWithoutUserNestedInput
   parentNotifications?: Prisma.ParentNotificationUpdateManyWithoutUserNestedInput
@@ -11196,6 +11368,7 @@ export type UserUncheckedUpdateWithoutUserChallengesInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
   studentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   parentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dateOfBirth?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedUpdateManyWithoutUserNestedInput
   counselorNotifications?: Prisma.CounselorNotificationUncheckedUpdateManyWithoutUserNestedInput
   parentNotifications?: Prisma.ParentNotificationUncheckedUpdateManyWithoutUserNestedInput
@@ -11250,6 +11423,7 @@ export type UserCreateWithoutChallengeAssignmentsInput = {
   emailVerified?: boolean
   status?: string
   studentId?: string | null
+  dateOfBirth?: string | null
   adminNotifications?: Prisma.AdminNotificationCreateNestedManyWithoutUserInput
   counselorNotifications?: Prisma.CounselorNotificationCreateNestedManyWithoutUserInput
   parentNotifications?: Prisma.ParentNotificationCreateNestedManyWithoutUserInput
@@ -11314,6 +11488,7 @@ export type UserUncheckedCreateWithoutChallengeAssignmentsInput = {
   status?: string
   studentId?: string | null
   parentId?: string | null
+  dateOfBirth?: string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedCreateNestedManyWithoutUserInput
   counselorNotifications?: Prisma.CounselorNotificationUncheckedCreateNestedManyWithoutUserInput
   parentNotifications?: Prisma.ParentNotificationUncheckedCreateNestedManyWithoutUserInput
@@ -11373,6 +11548,7 @@ export type UserCreateWithoutChallengeTargetAssignmentsInput = {
   emailVerified?: boolean
   status?: string
   studentId?: string | null
+  dateOfBirth?: string | null
   adminNotifications?: Prisma.AdminNotificationCreateNestedManyWithoutUserInput
   counselorNotifications?: Prisma.CounselorNotificationCreateNestedManyWithoutUserInput
   parentNotifications?: Prisma.ParentNotificationCreateNestedManyWithoutUserInput
@@ -11437,6 +11613,7 @@ export type UserUncheckedCreateWithoutChallengeTargetAssignmentsInput = {
   status?: string
   studentId?: string | null
   parentId?: string | null
+  dateOfBirth?: string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedCreateNestedManyWithoutUserInput
   counselorNotifications?: Prisma.CounselorNotificationUncheckedCreateNestedManyWithoutUserInput
   parentNotifications?: Prisma.ParentNotificationUncheckedCreateNestedManyWithoutUserInput
@@ -11507,6 +11684,7 @@ export type UserUpdateWithoutChallengeAssignmentsInput = {
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   status?: Prisma.StringFieldUpdateOperationsInput | string
   studentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dateOfBirth?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUpdateManyWithoutUserNestedInput
   counselorNotifications?: Prisma.CounselorNotificationUpdateManyWithoutUserNestedInput
   parentNotifications?: Prisma.ParentNotificationUpdateManyWithoutUserNestedInput
@@ -11571,6 +11749,7 @@ export type UserUncheckedUpdateWithoutChallengeAssignmentsInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
   studentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   parentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dateOfBirth?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedUpdateManyWithoutUserNestedInput
   counselorNotifications?: Prisma.CounselorNotificationUncheckedUpdateManyWithoutUserNestedInput
   parentNotifications?: Prisma.ParentNotificationUncheckedUpdateManyWithoutUserNestedInput
@@ -11636,6 +11815,7 @@ export type UserUpdateWithoutChallengeTargetAssignmentsInput = {
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   status?: Prisma.StringFieldUpdateOperationsInput | string
   studentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dateOfBirth?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUpdateManyWithoutUserNestedInput
   counselorNotifications?: Prisma.CounselorNotificationUpdateManyWithoutUserNestedInput
   parentNotifications?: Prisma.ParentNotificationUpdateManyWithoutUserNestedInput
@@ -11700,6 +11880,7 @@ export type UserUncheckedUpdateWithoutChallengeTargetAssignmentsInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
   studentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   parentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dateOfBirth?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedUpdateManyWithoutUserNestedInput
   counselorNotifications?: Prisma.CounselorNotificationUncheckedUpdateManyWithoutUserNestedInput
   parentNotifications?: Prisma.ParentNotificationUncheckedUpdateManyWithoutUserNestedInput
@@ -11754,6 +11935,7 @@ export type UserCreateWithoutCounselorCounselingSessionsInput = {
   emailVerified?: boolean
   status?: string
   studentId?: string | null
+  dateOfBirth?: string | null
   adminNotifications?: Prisma.AdminNotificationCreateNestedManyWithoutUserInput
   counselorNotifications?: Prisma.CounselorNotificationCreateNestedManyWithoutUserInput
   parentNotifications?: Prisma.ParentNotificationCreateNestedManyWithoutUserInput
@@ -11818,6 +12000,7 @@ export type UserUncheckedCreateWithoutCounselorCounselingSessionsInput = {
   status?: string
   studentId?: string | null
   parentId?: string | null
+  dateOfBirth?: string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedCreateNestedManyWithoutUserInput
   counselorNotifications?: Prisma.CounselorNotificationUncheckedCreateNestedManyWithoutUserInput
   parentNotifications?: Prisma.ParentNotificationUncheckedCreateNestedManyWithoutUserInput
@@ -11877,6 +12060,7 @@ export type UserCreateWithoutStudentCounselingSessionsInput = {
   emailVerified?: boolean
   status?: string
   studentId?: string | null
+  dateOfBirth?: string | null
   adminNotifications?: Prisma.AdminNotificationCreateNestedManyWithoutUserInput
   counselorNotifications?: Prisma.CounselorNotificationCreateNestedManyWithoutUserInput
   parentNotifications?: Prisma.ParentNotificationCreateNestedManyWithoutUserInput
@@ -11941,6 +12125,7 @@ export type UserUncheckedCreateWithoutStudentCounselingSessionsInput = {
   status?: string
   studentId?: string | null
   parentId?: string | null
+  dateOfBirth?: string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedCreateNestedManyWithoutUserInput
   counselorNotifications?: Prisma.CounselorNotificationUncheckedCreateNestedManyWithoutUserInput
   parentNotifications?: Prisma.ParentNotificationUncheckedCreateNestedManyWithoutUserInput
@@ -12011,6 +12196,7 @@ export type UserUpdateWithoutCounselorCounselingSessionsInput = {
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   status?: Prisma.StringFieldUpdateOperationsInput | string
   studentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dateOfBirth?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUpdateManyWithoutUserNestedInput
   counselorNotifications?: Prisma.CounselorNotificationUpdateManyWithoutUserNestedInput
   parentNotifications?: Prisma.ParentNotificationUpdateManyWithoutUserNestedInput
@@ -12075,6 +12261,7 @@ export type UserUncheckedUpdateWithoutCounselorCounselingSessionsInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
   studentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   parentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dateOfBirth?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedUpdateManyWithoutUserNestedInput
   counselorNotifications?: Prisma.CounselorNotificationUncheckedUpdateManyWithoutUserNestedInput
   parentNotifications?: Prisma.ParentNotificationUncheckedUpdateManyWithoutUserNestedInput
@@ -12140,6 +12327,7 @@ export type UserUpdateWithoutStudentCounselingSessionsInput = {
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   status?: Prisma.StringFieldUpdateOperationsInput | string
   studentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dateOfBirth?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUpdateManyWithoutUserNestedInput
   counselorNotifications?: Prisma.CounselorNotificationUpdateManyWithoutUserNestedInput
   parentNotifications?: Prisma.ParentNotificationUpdateManyWithoutUserNestedInput
@@ -12204,6 +12392,7 @@ export type UserUncheckedUpdateWithoutStudentCounselingSessionsInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
   studentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   parentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dateOfBirth?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedUpdateManyWithoutUserNestedInput
   counselorNotifications?: Prisma.CounselorNotificationUncheckedUpdateManyWithoutUserNestedInput
   parentNotifications?: Prisma.ParentNotificationUncheckedUpdateManyWithoutUserNestedInput
@@ -12258,6 +12447,7 @@ export type UserCreateWithoutCounselorAssignmentsInput = {
   emailVerified?: boolean
   status?: string
   studentId?: string | null
+  dateOfBirth?: string | null
   adminNotifications?: Prisma.AdminNotificationCreateNestedManyWithoutUserInput
   counselorNotifications?: Prisma.CounselorNotificationCreateNestedManyWithoutUserInput
   parentNotifications?: Prisma.ParentNotificationCreateNestedManyWithoutUserInput
@@ -12322,6 +12512,7 @@ export type UserUncheckedCreateWithoutCounselorAssignmentsInput = {
   status?: string
   studentId?: string | null
   parentId?: string | null
+  dateOfBirth?: string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedCreateNestedManyWithoutUserInput
   counselorNotifications?: Prisma.CounselorNotificationUncheckedCreateNestedManyWithoutUserInput
   parentNotifications?: Prisma.ParentNotificationUncheckedCreateNestedManyWithoutUserInput
@@ -12381,6 +12572,7 @@ export type UserCreateWithoutStudentAssignmentsInput = {
   emailVerified?: boolean
   status?: string
   studentId?: string | null
+  dateOfBirth?: string | null
   adminNotifications?: Prisma.AdminNotificationCreateNestedManyWithoutUserInput
   counselorNotifications?: Prisma.CounselorNotificationCreateNestedManyWithoutUserInput
   parentNotifications?: Prisma.ParentNotificationCreateNestedManyWithoutUserInput
@@ -12445,6 +12637,7 @@ export type UserUncheckedCreateWithoutStudentAssignmentsInput = {
   status?: string
   studentId?: string | null
   parentId?: string | null
+  dateOfBirth?: string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedCreateNestedManyWithoutUserInput
   counselorNotifications?: Prisma.CounselorNotificationUncheckedCreateNestedManyWithoutUserInput
   parentNotifications?: Prisma.ParentNotificationUncheckedCreateNestedManyWithoutUserInput
@@ -12515,6 +12708,7 @@ export type UserUpdateWithoutCounselorAssignmentsInput = {
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   status?: Prisma.StringFieldUpdateOperationsInput | string
   studentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dateOfBirth?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUpdateManyWithoutUserNestedInput
   counselorNotifications?: Prisma.CounselorNotificationUpdateManyWithoutUserNestedInput
   parentNotifications?: Prisma.ParentNotificationUpdateManyWithoutUserNestedInput
@@ -12579,6 +12773,7 @@ export type UserUncheckedUpdateWithoutCounselorAssignmentsInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
   studentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   parentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dateOfBirth?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedUpdateManyWithoutUserNestedInput
   counselorNotifications?: Prisma.CounselorNotificationUncheckedUpdateManyWithoutUserNestedInput
   parentNotifications?: Prisma.ParentNotificationUncheckedUpdateManyWithoutUserNestedInput
@@ -12644,6 +12839,7 @@ export type UserUpdateWithoutStudentAssignmentsInput = {
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   status?: Prisma.StringFieldUpdateOperationsInput | string
   studentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dateOfBirth?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUpdateManyWithoutUserNestedInput
   counselorNotifications?: Prisma.CounselorNotificationUpdateManyWithoutUserNestedInput
   parentNotifications?: Prisma.ParentNotificationUpdateManyWithoutUserNestedInput
@@ -12708,6 +12904,7 @@ export type UserUncheckedUpdateWithoutStudentAssignmentsInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
   studentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   parentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dateOfBirth?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedUpdateManyWithoutUserNestedInput
   counselorNotifications?: Prisma.CounselorNotificationUncheckedUpdateManyWithoutUserNestedInput
   parentNotifications?: Prisma.ParentNotificationUncheckedUpdateManyWithoutUserNestedInput
@@ -12766,6 +12963,7 @@ export type UserCreateManyParentInput = {
   roleId: string
   status?: string
   studentId?: string | null
+  dateOfBirth?: string | null
 }
 
 export type UserUpdateWithoutParentInput = {
@@ -12780,6 +12978,7 @@ export type UserUpdateWithoutParentInput = {
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   status?: Prisma.StringFieldUpdateOperationsInput | string
   studentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dateOfBirth?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUpdateManyWithoutUserNestedInput
   counselorNotifications?: Prisma.CounselorNotificationUpdateManyWithoutUserNestedInput
   parentNotifications?: Prisma.ParentNotificationUpdateManyWithoutUserNestedInput
@@ -12843,6 +13042,7 @@ export type UserUncheckedUpdateWithoutParentInput = {
   roleId?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
   studentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dateOfBirth?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedUpdateManyWithoutUserNestedInput
   counselorNotifications?: Prisma.CounselorNotificationUncheckedUpdateManyWithoutUserNestedInput
   parentNotifications?: Prisma.ParentNotificationUncheckedUpdateManyWithoutUserNestedInput
@@ -12902,6 +13102,7 @@ export type UserUncheckedUpdateManyWithoutParentInput = {
   roleId?: Prisma.StringFieldUpdateOperationsInput | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
   studentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dateOfBirth?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type UserCreateManySchoolInput = {
@@ -12920,6 +13121,7 @@ export type UserCreateManySchoolInput = {
   status?: string
   studentId?: string | null
   parentId?: string | null
+  dateOfBirth?: string | null
 }
 
 export type UserUpdateWithoutSchoolInput = {
@@ -12934,6 +13136,7 @@ export type UserUpdateWithoutSchoolInput = {
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   status?: Prisma.StringFieldUpdateOperationsInput | string
   studentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dateOfBirth?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUpdateManyWithoutUserNestedInput
   counselorNotifications?: Prisma.CounselorNotificationUpdateManyWithoutUserNestedInput
   parentNotifications?: Prisma.ParentNotificationUpdateManyWithoutUserNestedInput
@@ -12997,6 +13200,7 @@ export type UserUncheckedUpdateWithoutSchoolInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
   studentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   parentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dateOfBirth?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedUpdateManyWithoutUserNestedInput
   counselorNotifications?: Prisma.CounselorNotificationUncheckedUpdateManyWithoutUserNestedInput
   parentNotifications?: Prisma.ParentNotificationUncheckedUpdateManyWithoutUserNestedInput
@@ -13056,6 +13260,7 @@ export type UserUncheckedUpdateManyWithoutSchoolInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
   studentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   parentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dateOfBirth?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type UserCreateManyLocationInput = {
@@ -13074,6 +13279,7 @@ export type UserCreateManyLocationInput = {
   status?: string
   studentId?: string | null
   parentId?: string | null
+  dateOfBirth?: string | null
 }
 
 export type UserUpdateWithoutLocationInput = {
@@ -13088,6 +13294,7 @@ export type UserUpdateWithoutLocationInput = {
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   status?: Prisma.StringFieldUpdateOperationsInput | string
   studentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dateOfBirth?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUpdateManyWithoutUserNestedInput
   counselorNotifications?: Prisma.CounselorNotificationUpdateManyWithoutUserNestedInput
   parentNotifications?: Prisma.ParentNotificationUpdateManyWithoutUserNestedInput
@@ -13151,6 +13358,7 @@ export type UserUncheckedUpdateWithoutLocationInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
   studentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   parentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dateOfBirth?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedUpdateManyWithoutUserNestedInput
   counselorNotifications?: Prisma.CounselorNotificationUncheckedUpdateManyWithoutUserNestedInput
   parentNotifications?: Prisma.ParentNotificationUncheckedUpdateManyWithoutUserNestedInput
@@ -13210,6 +13418,7 @@ export type UserUncheckedUpdateManyWithoutLocationInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
   studentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   parentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dateOfBirth?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type UserCreateManyClassRefInput = {
@@ -13228,6 +13437,7 @@ export type UserCreateManyClassRefInput = {
   status?: string
   studentId?: string | null
   parentId?: string | null
+  dateOfBirth?: string | null
 }
 
 export type UserUpdateWithoutClassRefInput = {
@@ -13242,6 +13452,7 @@ export type UserUpdateWithoutClassRefInput = {
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   status?: Prisma.StringFieldUpdateOperationsInput | string
   studentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dateOfBirth?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUpdateManyWithoutUserNestedInput
   counselorNotifications?: Prisma.CounselorNotificationUpdateManyWithoutUserNestedInput
   parentNotifications?: Prisma.ParentNotificationUpdateManyWithoutUserNestedInput
@@ -13305,6 +13516,7 @@ export type UserUncheckedUpdateWithoutClassRefInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
   studentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   parentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dateOfBirth?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedUpdateManyWithoutUserNestedInput
   counselorNotifications?: Prisma.CounselorNotificationUncheckedUpdateManyWithoutUserNestedInput
   parentNotifications?: Prisma.ParentNotificationUncheckedUpdateManyWithoutUserNestedInput
@@ -13364,6 +13576,7 @@ export type UserUncheckedUpdateManyWithoutClassRefInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
   studentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   parentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dateOfBirth?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type UserCreateManyRoleInput = {
@@ -13382,6 +13595,7 @@ export type UserCreateManyRoleInput = {
   status?: string
   studentId?: string | null
   parentId?: string | null
+  dateOfBirth?: string | null
 }
 
 export type UserUpdateWithoutRoleInput = {
@@ -13396,6 +13610,7 @@ export type UserUpdateWithoutRoleInput = {
   emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
   status?: Prisma.StringFieldUpdateOperationsInput | string
   studentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dateOfBirth?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUpdateManyWithoutUserNestedInput
   counselorNotifications?: Prisma.CounselorNotificationUpdateManyWithoutUserNestedInput
   parentNotifications?: Prisma.ParentNotificationUpdateManyWithoutUserNestedInput
@@ -13459,6 +13674,7 @@ export type UserUncheckedUpdateWithoutRoleInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
   studentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   parentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dateOfBirth?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   adminNotifications?: Prisma.AdminNotificationUncheckedUpdateManyWithoutUserNestedInput
   counselorNotifications?: Prisma.CounselorNotificationUncheckedUpdateManyWithoutUserNestedInput
   parentNotifications?: Prisma.ParentNotificationUncheckedUpdateManyWithoutUserNestedInput
@@ -13518,6 +13734,7 @@ export type UserUncheckedUpdateManyWithoutRoleInput = {
   status?: Prisma.StringFieldUpdateOperationsInput | string
   studentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   parentId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  dateOfBirth?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 
@@ -13883,6 +14100,7 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   status?: boolean
   studentId?: boolean
   parentId?: boolean
+  dateOfBirth?: boolean
   adminNotifications?: boolean | Prisma.User$adminNotificationsArgs<ExtArgs>
   counselorNotifications?: boolean | Prisma.User$counselorNotificationsArgs<ExtArgs>
   parentNotifications?: boolean | Prisma.User$parentNotificationsArgs<ExtArgs>
@@ -13949,6 +14167,7 @@ export type UserSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   status?: boolean
   studentId?: boolean
   parentId?: boolean
+  dateOfBirth?: boolean
   classRef?: boolean | Prisma.User$classRefArgs<ExtArgs>
   location?: boolean | Prisma.User$locationArgs<ExtArgs>
   parent?: boolean | Prisma.User$parentArgs<ExtArgs>
@@ -13973,6 +14192,7 @@ export type UserSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   status?: boolean
   studentId?: boolean
   parentId?: boolean
+  dateOfBirth?: boolean
   classRef?: boolean | Prisma.User$classRefArgs<ExtArgs>
   location?: boolean | Prisma.User$locationArgs<ExtArgs>
   parent?: boolean | Prisma.User$parentArgs<ExtArgs>
@@ -13997,9 +14217,10 @@ export type UserSelectScalar = {
   status?: boolean
   studentId?: boolean
   parentId?: boolean
+  dateOfBirth?: boolean
 }
 
-export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "firstName" | "lastName" | "email" | "phone" | "password" | "schoolId" | "locationId" | "createdAt" | "updatedAt" | "emailVerified" | "classId" | "roleId" | "status" | "studentId" | "parentId", ExtArgs["result"]["user"]>
+export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "firstName" | "lastName" | "email" | "phone" | "password" | "schoolId" | "locationId" | "createdAt" | "updatedAt" | "emailVerified" | "classId" | "roleId" | "status" | "studentId" | "parentId" | "dateOfBirth", ExtArgs["result"]["user"]>
 export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   adminNotifications?: boolean | Prisma.User$adminNotificationsArgs<ExtArgs>
   counselorNotifications?: boolean | Prisma.User$counselorNotificationsArgs<ExtArgs>
@@ -14131,6 +14352,7 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     status: string
     studentId: string | null
     parentId: string | null
+    dateOfBirth: string | null
   }, ExtArgs["result"]["user"]>
   composites: {}
 }
@@ -14616,6 +14838,7 @@ export interface UserFieldRefs {
   readonly status: Prisma.FieldRef<"User", 'String'>
   readonly studentId: Prisma.FieldRef<"User", 'String'>
   readonly parentId: Prisma.FieldRef<"User", 'String'>
+  readonly dateOfBirth: Prisma.FieldRef<"User", 'String'>
 }
     
 

@@ -24,6 +24,7 @@ model User {
   status                      String                           @default("ACTIVE")
   studentId                   String?                          @unique
   parentId                    String?
+  dateOfBirth                 String?
   adminNotifications          AdminNotification[]
   counselorNotifications      CounselorNotification[]
   parentNotifications         ParentNotification[]

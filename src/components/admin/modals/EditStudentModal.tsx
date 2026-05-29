@@ -3,6 +3,8 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/src/contexts/AuthContext';
 import { X, Edit, ChevronDown, Check, Plus } from 'lucide-react';
+import { Calendar } from '@/components/ui/calendar';
+import { format } from 'date-fns';
 import { toast } from '@/components/ui/use-toast';
 import { useAdminLoading, AdminActions } from '@/src/contexts/AdminLoadingContext';
 import { LoadingButton } from '@/src/components/admin/ui/AdminLoader';
@@ -87,6 +89,15 @@ export function EditStudentModal({ student, onClose, onSuccess, schools, classes
   const [isLocationPopoverOpen, setIsLocationPopoverOpen] = useState(false);
   const [locations, setLocations] = useState<any[]>([]);
   const [loadingLocations, setLoadingLocations] = useState(false);
+
+  // Calendar popover state
+  const [isCalendarOpen, setIsCalendarOpen] = useState(false);
+
+  // Helper function to parse date string without timezone issues
+  const parseDateWithoutTimezone = (dateString: string) => {
+    const [year, month, day] = dateString.split('-').map(Number);
+    return new Date(year, month - 1, day);
+  };
 
   const { user } = useAuth();
   const { executeWithLoading, isLoading } = useAdminLoading();
@@ -322,6 +333,7 @@ export function EditStudentModal({ student, onClose, onSuccess, schools, classes
     if (!formData.firstName.trim()) newErrors.firstName = 'First name is required';
     if (!formData.lastName.trim()) newErrors.lastName = 'Last name is required';
     if (!formData.phone.trim()) newErrors.phone = 'Phone number is required';
+    else if (!/^\d{10}$/.test(formData.phone)) newErrors.phone = 'Phone number must be exactly 10 digits';
     if (formData.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
       newErrors.email = 'Invalid email format';
     }
@@ -331,22 +343,20 @@ export function EditStudentModal({ student, onClose, onSuccess, schools, classes
     if (!formData.dateOfBirth) {
       newErrors.dateOfBirth = 'Date of birth is required';
     } else {
-      const dob = new Date(formData.dateOfBirth);
+      const dob = parseDateWithoutTimezone(formData.dateOfBirth);
       const today = new Date();
-      const age = today.getFullYear() - dob.getFullYear();
+      let age = today.getFullYear() - dob.getFullYear();
       const monthDiff = today.getMonth() - dob.getMonth();
-      
+
       if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < dob.getDate())) {
-        dob.setFullYear(today.getFullYear() - 1);
+        age--;
       }
-      
-      const finalAge = today.getFullYear() - dob.getFullYear();
-      
+
       if (dob > today) {
         newErrors.dateOfBirth = "Date of birth cannot be in the future";
-      } else if (finalAge < 13) {
+      } else if (age < 13) {
         newErrors.dateOfBirth = "Student must be 13 years or older";
-      } else if (finalAge > 100) {
+      } else if (age > 100) {
         newErrors.dateOfBirth = "Please enter a valid date of birth";
       }
     }
@@ -561,7 +571,7 @@ export function EditStudentModal({ student, onClose, onSuccess, schools, classes
                   className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
                     errors.phone ? 'border-red-500' : 'border-gray-300'
                   }`}
-                  placeholder="Enter phone number"
+                  placeholder="Enter 10 digit phone number"
                   inputMode="numeric"
                   pattern="[0-9]*"
                   maxLength={10}
@@ -581,14 +591,47 @@ export function EditStudentModal({ student, onClose, onSuccess, schools, classes
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Date of Birth
                 </label>
-                <Input
-                  type="date"
-                  value={formData.dateOfBirth}
-                  onChange={(e) => handleInputChange('dateOfBirth', e.target.value)}
-                  className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
-                    errors.dateOfBirth ? 'border-red-500' : 'border-gray-300'
-                  }`}
-                />
+                <Popover open={isCalendarOpen} onOpenChange={setIsCalendarOpen}>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className={`w-full justify-start text-left font-normal ${
+                        errors.dateOfBirth ? 'border-red-500' : 'border-gray-300'
+                      }`}
+                    >
+                      {formData.dateOfBirth ? (
+                        format(parseDateWithoutTimezone(formData.dateOfBirth), 'PPP')
+                      ) : (
+                        <span className="text-muted-foreground">Select date of birth</span>
+                      )}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0 z-50" align="start">
+                    <Calendar
+                      mode="single"
+                      selected={formData.dateOfBirth ? parseDateWithoutTimezone(formData.dateOfBirth) : undefined}
+                      onSelect={(date) => {
+                        if (date) {
+                          const year = date.getFullYear();
+                          const month = String(date.getMonth() + 1).padStart(2, '0');
+                          const day = String(date.getDate()).padStart(2, '0');
+                          const dateString = `${year}-${month}-${day}`;
+                          handleInputChange('dateOfBirth', dateString);
+                        }
+                        setIsCalendarOpen(false);
+                      }}
+                      disabled={(date) => {
+                        const today = new Date();
+                        const thirteenYearsAgo = new Date(
+                          today.getFullYear() - 13,
+                          today.getMonth(),
+                          today.getDate()
+                        );
+                        return date > today || date > thirteenYearsAgo;
+                      }}
+                      />
+                  </PopoverContent>
+                </Popover>
                 {errors.dateOfBirth && (
                   <p className="mt-1 text-sm text-red-600">{errors.dateOfBirth}</p>
                 )}
@@ -617,7 +660,7 @@ export function EditStudentModal({ student, onClose, onSuccess, schools, classes
                     </Button>
                   </PopoverTrigger>
                   <PopoverContent
-                    className="w-full p-2 border z-10 bg-white shadow-xl rounded-[6px]"
+                    className="w-full p-2 border z-50 bg-white shadow-xl rounded-[6px]"
                     align="start"
                   >
                     <div className="space-y-2">
@@ -887,7 +930,7 @@ export function EditStudentModal({ student, onClose, onSuccess, schools, classes
                         </Button>
                       </PopoverTrigger>
                       <PopoverContent
-                        className="w-full p-2 border z-10 bg-white shadow-xl rounded-[6px]"
+                        className="w-full p-2 border z-50 bg-white shadow-xl rounded-[6px]"
                         align="start"
                       >
                         <div className="space-y-2">
