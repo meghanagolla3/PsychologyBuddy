@@ -72,6 +72,9 @@ const typeLabels: Record<string, string> = {
   streak: "Streak Updated",
   session: "Support Session",
   alert: "Alert Triggered",
+  meeting: "Parent Meeting",
+  assignment: "Counselor Assignment",
+  challenge: "Challenge Assigned",
 };
 
 const iconMap: Record<string, any> = {
@@ -83,6 +86,9 @@ const iconMap: Record<string, any> = {
   streak: Flame,
   session: MessageSquare,
   alert: AlertTriangle,
+  meeting: Clock,
+  assignment: UserCheck,
+  challenge: Award,
 };
 
 const styleMap: Record<string, string> = {
@@ -94,6 +100,9 @@ mood: "bg-[#10B981]/10 text-[#10B981]",
   streak: "bg-orange-100 text-orange-600",
   session: "bg-[#3B82F6]/10 text-[#3B82F6]",
   alert: "bg-[#EF4444]/10 text-[#EF4444]",
+  meeting: "bg-[#8B5CF6]/10 text-[#8B5CF6]",
+  assignment: "bg-[#06B6D4]/10 text-[#06B6D4]",
+  challenge: "bg-[#EC4899]/10 text-[#EC4899]",
 };
 
 // --------------------------

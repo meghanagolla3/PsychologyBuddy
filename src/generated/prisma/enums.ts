@@ -56,3 +56,53 @@ export const SessionStatus = {
 } as const
 
 export type SessionStatus = (typeof SessionStatus)[keyof typeof SessionStatus]
+
+
+export const ModuleType = {
+  JOURNALING: 'JOURNALING',
+  MEDITATION: 'MEDITATION',
+  MUSIC: 'MUSIC',
+  ARTICLE: 'ARTICLE'
+} as const
+
+export type ModuleType = (typeof ModuleType)[keyof typeof ModuleType]
+
+
+export const ChallengeType = {
+  DAILY: 'DAILY',
+  WEEKLY: 'WEEKLY',
+  STREAK: 'STREAK',
+  MILESTONE: 'MILESTONE'
+} as const
+
+export type ChallengeType = (typeof ChallengeType)[keyof typeof ChallengeType]
+
+
+export const TargetUnit = {
+  ENTRIES: 'ENTRIES',
+  SESSIONS: 'SESSIONS',
+  MINUTES: 'MINUTES',
+  DAYS: 'DAYS',
+  ARTICLES: 'ARTICLES'
+} as const
+
+export type TargetUnit = (typeof TargetUnit)[keyof typeof TargetUnit]
+
+
+export const Difficulty = {
+  BEGINNER: 'BEGINNER',
+  INTERMEDIATE: 'INTERMEDIATE',
+  ADVANCED: 'ADVANCED'
+} as const
+
+export type Difficulty = (typeof Difficulty)[keyof typeof Difficulty]
+
+
+export const UserChallengeStatus = {
+  NOT_STARTED: 'NOT_STARTED',
+  IN_PROGRESS: 'IN_PROGRESS',
+  COMPLETED: 'COMPLETED',
+  EXPIRED: 'EXPIRED'
+} as const
+
+export type UserChallengeStatus = (typeof UserChallengeStatus)[keyof typeof UserChallengeStatus]

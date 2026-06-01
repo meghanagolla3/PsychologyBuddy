@@ -474,60 +474,7 @@ export default function StudentProfile() {
     return `${firstName?.charAt(0) || ""}${lastName?.charAt(0) || ""}`.toUpperCase();
   };
 
-  // Create dynamic recent activity with admin name
-  const getRecentActivity = () => {
-    const baseActivity = [
-      {
-        id: "1",
-        type: "checkin" as const,
-        message: "Completed morning mood check-in",
-        time: "2 hours ago",
-      },
-      {
-        id: "2",
-        type: "badge" as const,
-        message: "Earned 'Consistency Champion' badge",
-        time: "1 day ago",
-      },
-      {
-        id: "4",
-        type: "content" as const,
-        message: "Completed 'Managing Exam Stress' article",
-        time: "3 days ago",
-      },
-      {
-        id: "5",
-        type: "checkin" as const,
-        message: "Completed evening reflection",
-        time: "4 days ago",
-      },
-      {
-        id: "6",
-        type: "alert" as const,
-        message: "Triggered wellness check due to low mood",
-        time: "5 days ago",
-      },
-    ];
-
-    // Insert the session activity with admin name
-    const sessionActivity = {
-      id: "3",
-      type: "session" as const,
-      message: user?.firstName && user?.lastName 
-        ? `Attended session with ${user.firstName} ${user.lastName}`
-        : user?.email 
-        ? `Attended session with ${user.email}`
-        : "Attended session with Admin",
-      time: "2 days ago",
-    };
-
-    return [
-      ...baseActivity.slice(0, 2),
-      sessionActivity,
-      ...baseActivity.slice(2)
-    ];
-  };
-
+  
   // Get moods for current page
   const totalMoodPages = Math.ceil(
     (profileData?.recentMoods?.length || 0) / moodsPerPage,
@@ -885,46 +832,52 @@ export default function StudentProfile() {
                 <h3 className="text-base font-semibold text-foreground mb-4">
                   Support Sessions
                 </h3>
-                <div className="space-y-3">
-                  {profileData.sessions?.map((session: any) => (
-                    <div
-                      key={session.id}
-                      className="flex items-center gap-4 p-4 rounded-xl bg-[#f8f9fb]"
-                    >
-                      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#e8f0ff] shrink-0">
-                        <Clock className="h-4 w-4 text-primary" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 mb-0.5">
-                          <p className="font-semibold text-foreground text-sm">
-                            {user?.firstName && user?.lastName 
-                              ? `${user.firstName} ${user.lastName}`
-                              : user?.email || 'Admin'
-                            }
-                          </p>
-                          <Badge className="bg-green-100 text-green-700 border-0 text-xs px-2 py-0.5 font-medium">
-                            {session.status}
-                          </Badge>
-                        </div>
-                        <p className="text-sm text-muted-foreground">
-                          {session.title}
-                        </p>
-                        <p className="text-xs text-muted-foreground mt-0.5">
-                          {session.date} • {session.time} • {session.duration}
-                        </p>
-                      </div>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="shrink-0 gap-2 text-sm"
-                        onClick={() => setSelectedSession(session)}
+                {profileData.sessions && profileData.sessions.length > 0 ? (
+                  <div className="space-y-3">
+                    {profileData.sessions.map((session: any) => (
+                      <div
+                        key={session.id}
+                        className="flex items-center gap-4 p-4 rounded-xl bg-[#f8f9fb]"
                       >
-                        <Eye className="h-4 w-4" />
-                        View Details
-                      </Button>
-                    </div>
-                  ))}
-                </div>
+                        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#e8f0ff] shrink-0">
+                          <Clock className="h-4 w-4 text-primary" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 mb-0.5">
+                            <p className="font-semibold text-foreground text-sm">
+                              {user?.firstName && user?.lastName 
+                                ? `${user.firstName} ${user.lastName}`
+                                : user?.email || 'Admin'
+                              }
+                            </p>
+                            <Badge className="bg-green-100 text-green-700 border-0 text-xs px-2 py-0.5 font-medium">
+                              {session.status}
+                            </Badge>
+                          </div>
+                          <p className="text-sm text-muted-foreground">
+                            {session.title}
+                          </p>
+                          <p className="text-xs text-muted-foreground mt-0.5">
+                            {session.date} • {session.time} • {session.duration}
+                          </p>
+                        </div>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="shrink-0 gap-2 text-sm"
+                          onClick={() => setSelectedSession(session)}
+                        >
+                          <Eye className="h-4 w-4" />
+                          View Details
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-sm text-muted-foreground text-center py-4">
+                    No support sessions yet
+                  </p>
+                )}
               </Card>
             </div>
 
@@ -936,30 +889,36 @@ export default function StudentProfile() {
                   Activity
                 </h3>
                 <div className="space-y-3">
-                  {getRecentActivity().map((activity: Activity) => {
-                    const Icon = activityIconMap[activity.type];
-                    return (
-                      <div key={activity.id} className="flex items-start gap-3">
-                        <div
-                          className={cn(
-                            "flex h-8 w-8 shrink-0 items-center justify-center rounded-lg",
-                            activityStyleMap[activity.type],
-                          )}
-                        >
-                          <Icon className="h-4 w-4" />
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm text-foreground leading-snug">
-                            {activity.message}
-                          </p>
-                          <div className="flex items-center gap-1 mt-1 text-xs text-muted-foreground">
-                            <Clock className="h-3 w-3" />
-                            {activity.time}
+                  {profileData.recentActivity && profileData.recentActivity.length > 0 ? (
+                    profileData.recentActivity.map((activity: Activity) => {
+                      const Icon = activityIconMap[activity.type];
+                      return (
+                        <div key={activity.id} className="flex items-start gap-3">
+                          <div
+                            className={cn(
+                              "flex h-8 w-8 shrink-0 items-center justify-center rounded-lg",
+                              activityStyleMap[activity.type],
+                            )}
+                          >
+                            <Icon className="h-4 w-4" />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm text-foreground leading-snug">
+                              {activity.message}
+                            </p>
+                            <div className="flex items-center gap-1 mt-1 text-xs text-muted-foreground">
+                              <Clock className="h-3 w-3" />
+                              {activity.time}
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    );
-                  })}
+                      );
+                    })
+                  ) : (
+                    <p className="text-sm text-muted-foreground text-center py-4">
+                      No recent activity
+                    </p>
+                  )}
                 </div>
               </Card>
 
@@ -968,24 +927,30 @@ export default function StudentProfile() {
                 <h3 className="text-base font-semibold text-foreground mb-4">
                   Earned Badges
                 </h3>
-                <div className="flex flex-wrap gap-2">
-                  {profileData.badges?.map((badge: any) => (
-                    <Badge
-                      key={badge}
-                      variant="outline"
-                      className="bg-[#e8f4ff] text-primary border-[#c5e0ff] py-1.5 px-3 gap-1.5 font-medium text-xs"
-                    >
-                      <Award className="h-3 w-3" />
-                      {badge}
-                    </Badge>
-                  ))}
-                </div>
+                {profileData.badges && profileData.badges.length > 0 ? (
+                  <div className="flex flex-wrap gap-2">
+                    {profileData.badges.map((badge: any) => (
+                      <Badge
+                        key={badge}
+                        variant="outline"
+                        className="bg-[#e8f4ff] text-primary border-[#c5e0ff] py-1.5 px-3 gap-1.5 font-medium text-xs"
+                      >
+                        <Award className="h-3 w-3" />
+                        {badge}
+                      </Badge>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-sm text-muted-foreground text-center py-4">
+                    No badges earned yet
+                  </p>
+                )}
               </Card>
 
               {/* Guardian Info */}
               <Card className="p-5 bg-white border border-border/40 shadow-sm">
                 <h3 className="text-base font-semibold text-foreground mb-4">
-                  Guardian Information
+                  Parent Information
                 </h3>
                 <div className="space-y-3">
                   <div className="flex items-center gap-3">

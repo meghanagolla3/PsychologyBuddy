@@ -56,8 +56,11 @@ const PERMISSION_LABELS: Record<string, string> = {
   selfHelp: "Self-help Tools",
   analytics: "Analytics & Reports",
   userManagement: "User Management",
+  counselingSessions: "Counseling Sessions",
+  parentMeetings: "Parent Meetings",
   alerts: "Escalation & Alerts",
-  gamification: "Badges & Streaks",
+  challenges: "Challenges",
+  badges: "Badges & Streaks",
   settings: "Settings",
 };
 
@@ -68,9 +71,13 @@ const PERMISSION_MAP: Record<string, string> = {
   selfHelp: 'selfhelp.view',
   analytics: 'analytics.view',
   userManagement: 'users.view',
+  counselingSessions: 'counselor.management.view',
+  parentMeetings: 'users.view',
   alerts: 'escalations.view',
-  gamification: 'badges.view',
+  challenges: 'challenges.view',
+  badges: 'badges.view',
   settings: 'settings.view',
+ 
 };
 
 const REVERSE_PERMISSION_MAP: Record<string, string> = Object.fromEntries(
@@ -78,7 +85,7 @@ const REVERSE_PERMISSION_MAP: Record<string, string> = Object.fromEntries(
 );
 
 // Default permissions that are automatically assigned to all admins (except SUPERADMIN)
-const DEFAULT_PERMISSIONS = ['dashboard', 'activity', 'alerts', 'settings'];
+const DEFAULT_PERMISSIONS = ['dashboard', 'activity', 'alerts', 'settings', 'counselingSessions', 'parentMeetings','userManagement'];
 
 const ROLE_STYLES: Record<string, { bg: string; text: string; label: string }> = {
   "SUPERADMIN": { bg: "bg-[#3B82F6]/10", text: "text-[#3B82F6]", label: "Super Admin" },
@@ -385,13 +392,14 @@ export function AdminManagementSection() {
 
           toast({
             title: "Permissions Updated",
-            description: `Updated permissions for ${selectedAdmin.firstName}`,
+            description: `Updated permissions for ${selectedAdmin.firstName}. The admin will need to log in again for changes to take effect.`,
           });
 
           setShowPermissionsModal(false);
           fetchAdmins();
           refreshUser();
 
+          // If the current user is the one being edited, reload the page
           if (user?.id === selectedAdmin.id) {
             window.location.reload();
           }
@@ -586,17 +594,26 @@ export function AdminManagementSection() {
                     {/* PERMISSIONS */}
                     <TableCell>
                       <Badge variant="outline" className="text-xs">
-                        {admin.role.name === "SUPERADMIN" 
-                          ? "All features" 
-                          : `${Array.isArray(admin.adminProfile?.adminPermissions) ? admin.adminProfile.adminPermissions.length : 0}/9 features`
+                        {admin.role.name === "SUPERADMIN"
+                          ? "All features"
+                          : (() => {
+                              // Count how many PERMISSION_LABELS are enabled for this admin
+                              const adminPermissions = Array.isArray(admin.adminProfile?.adminPermissions)
+                                ? admin.adminProfile.adminPermissions.map((ap: any) => ap.permission?.name)
+                                : [];
+                              const enabledCount = Object.entries(PERMISSION_MAP).filter(([uiKey, permName]) =>
+                                adminPermissions.includes(permName)
+                              ).length;
+                              return `${enabledCount}/${Object.keys(PERMISSION_LABELS).length} features`;
+                            })()
                         }
                       </Badge>
                     </TableCell>
 
                     {/* LAST ACTIVE */}
                     <TableCell>
-                      {admin.lastActive
-                        ? formatRelativeTime(admin.lastActive)
+                      {admin.updatedAt
+                        ? formatRelativeTime(admin.updatedAt)
                         : "Never"}
                     </TableCell>
 
@@ -624,7 +641,14 @@ export function AdminManagementSection() {
                             <Edit className="h-4 w-4" /> Edit
                           </DropdownMenuItem>
 
-                          {user?.role.name === 'SUPERADMIN' && (
+                          {/* 
+                            SUPERADMIN can manage permissions for all admins
+                            SCHOOL_SUPERADMIN can manage permissions for ADMIN users in their school only
+                            ADMIN cannot manage permissions
+                          */}
+                          {(user?.role.name === 'SUPERADMIN' || 
+                            (user?.role.name === 'SCHOOL_SUPERADMIN' && admin.role.name === 'ADMIN' && admin.school?.id === user?.school?.id)
+                          ) && (
                             <DropdownMenuItem className="gap-2" onClick={() => openPermissions(admin)}>
                               <Shield className="h-4 w-4" /> Manage Permissions
                             </DropdownMenuItem>
@@ -745,7 +769,7 @@ export function AdminManagementSection() {
 
       {/* PERMISSIONS MODAL */}
       <Dialog open={showPermissionsModal} onOpenChange={setShowPermissionsModal}>
-        <DialogContent className="sm:max-w-lg">
+        <DialogContent className="sm:max-w-lg max-h-[80vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Manage Permissions</DialogTitle>
 
@@ -793,20 +817,20 @@ export function AdminManagementSection() {
             ) : selectedAdmin?.role.name === 'SCHOOL_SUPERADMIN' ? (
               <div className="space-y-3">
                 <div className="rounded-lg bg-green-100 p-3 text-sm text-green-900">
-                  As a Super Admin, you can manage this School Superadmin's access.
+                  {user?.role.name === 'SUPERADMIN' 
+                    ? "As a Super Admin, you can manage this School Superadmin's access."
+                    : "You don't have permission to manage School Superadmin permissions."
+                  }
                 </div>
-                {/* <div className="rounded-lg bg-green-50 border border-green-200 p-3 text-sm text-green-800">
-                  <strong>Default Permissions:</strong> Dashboard, Activity, Escalation & Alerts, and Settings are automatically available to all admins and cannot be removed.
-                </div> */}
               </div>
             ) : (
               <div className="space-y-3">
                 <div className="rounded-lg bg-blue-100 p-3 text-sm text-blue-900">
-                  As a Super Admin, you can manage this admin's access.
+                  {user?.role.name === 'SUPERADMIN' 
+                    ? "As a Super Admin, you can manage this admin's access."
+                    : "As a School Super Admin, you can manage this admin's access for your school."
+                  }
                 </div>
-                {/* <div className="rounded-lg bg-green-50 border border-green-200 p-3 text-sm text-green-800">
-                  <strong>Default Permissions:</strong> Dashboard, Activity, Escalation & Alerts, and Settings are automatically available to all admins and cannot be removed.
-                </div> */}
               </div>
             )}
 
@@ -814,9 +838,28 @@ export function AdminManagementSection() {
               {Object.entries(PERMISSION_LABELS).map(([key, label]) => {
                 const isDefaultPermission = DEFAULT_PERMISSIONS.includes(key) && 
                   !['SUPERADMIN', 'SCHOOL_SUPERADMIN'].includes(selectedAdmin?.role.name || '');
+                
+                // Get current user's permissions (for SCHOOL_SUPERADMIN filtering)
+                const currentUserPermissions = user?.role?.rolePermissions?.map(
+                  (rp: any) => rp.permission.name
+                ) || [];
+                
+                // SCHOOL_SUPERADMIN can only manage permissions they have been granted, SUPERADMIN can manage all
+                const isPermissionAvailable = user?.role.name === 'SUPERADMIN' 
+                  ? true
+                  : user?.role.name === 'SCHOOL_SUPERADMIN' 
+                    ? currentUserPermissions.includes(PERMISSION_MAP[key])
+                    : true;
+                
                 const isDisabled = selectedAdmin?.role.name === 'SUPERADMIN' || 
                   (selectedAdmin?.role.name === 'SCHOOL_SUPERADMIN' && DEFAULT_PERMISSIONS.includes(key)) ||
-                  isDefaultPermission;
+                  isDefaultPermission ||
+                  !isPermissionAvailable;
+                
+                // Don't show permissions that the SCHOOL_SUPERADMIN doesn't have
+                if (user?.role.name === 'SCHOOL_SUPERADMIN' && !isPermissionAvailable) {
+                  return null;
+                }
                 
                 return (
                   <div key={key} className={`flex items-center justify-between py-2 border-b border-gray-200 last:border-0 ${

@@ -94,6 +94,7 @@
     border-color: #E2E8F0;
   }
   body {
+    font-family: 'Inter', system-ui, sans-serif;
     background-color: #F8FAFC;
     color: #1E293B;
   }

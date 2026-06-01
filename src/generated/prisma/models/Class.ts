@@ -40,9 +40,9 @@ export type ClassMinAggregateOutputType = {
   grade: number | null
   section: string | null
   schoolId: string | null
-  locationId: string | null
   createdAt: Date | null
   updatedAt: Date | null
+  locationId: string | null
 }
 
 export type ClassMaxAggregateOutputType = {
@@ -51,9 +51,9 @@ export type ClassMaxAggregateOutputType = {
   grade: number | null
   section: string | null
   schoolId: string | null
-  locationId: string | null
   createdAt: Date | null
   updatedAt: Date | null
+  locationId: string | null
 }
 
 export type ClassCountAggregateOutputType = {
@@ -62,9 +62,9 @@ export type ClassCountAggregateOutputType = {
   grade: number
   section: number
   schoolId: number
-  locationId: number
   createdAt: number
   updatedAt: number
+  locationId: number
   _all: number
 }
 
@@ -83,9 +83,9 @@ export type ClassMinAggregateInputType = {
   grade?: true
   section?: true
   schoolId?: true
-  locationId?: true
   createdAt?: true
   updatedAt?: true
+  locationId?: true
 }
 
 export type ClassMaxAggregateInputType = {
@@ -94,9 +94,9 @@ export type ClassMaxAggregateInputType = {
   grade?: true
   section?: true
   schoolId?: true
-  locationId?: true
   createdAt?: true
   updatedAt?: true
+  locationId?: true
 }
 
 export type ClassCountAggregateInputType = {
@@ -105,9 +105,9 @@ export type ClassCountAggregateInputType = {
   grade?: true
   section?: true
   schoolId?: true
-  locationId?: true
   createdAt?: true
   updatedAt?: true
+  locationId?: true
   _all?: true
 }
 
@@ -203,9 +203,9 @@ export type ClassGroupByOutputType = {
   grade: number
   section: string | null
   schoolId: string
-  locationId: string | null
   createdAt: Date
   updatedAt: Date
+  locationId: string | null
   _count: ClassCountAggregateOutputType | null
   _avg: ClassAvgAggregateOutputType | null
   _sum: ClassSumAggregateOutputType | null
@@ -237,9 +237,9 @@ export type ClassWhereInput = {
   grade?: Prisma.IntFilter<"Class"> | number
   section?: Prisma.StringNullableFilter<"Class"> | string | null
   schoolId?: Prisma.StringFilter<"Class"> | string
-  locationId?: Prisma.StringNullableFilter<"Class"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Class"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Class"> | Date | string
+  locationId?: Prisma.StringNullableFilter<"Class"> | string | null
   challengeAssignments?: Prisma.ChallengeAssignmentListRelationFilter
   location?: Prisma.XOR<Prisma.SchoolLocationNullableScalarRelationFilter, Prisma.SchoolLocationWhereInput> | null
   school?: Prisma.XOR<Prisma.SchoolScalarRelationFilter, Prisma.SchoolWhereInput>
@@ -253,9 +253,9 @@ export type ClassOrderByWithRelationInput = {
   grade?: Prisma.SortOrder
   section?: Prisma.SortOrderInput | Prisma.SortOrder
   schoolId?: Prisma.SortOrder
-  locationId?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  locationId?: Prisma.SortOrderInput | Prisma.SortOrder
   challengeAssignments?: Prisma.ChallengeAssignmentOrderByRelationAggregateInput
   location?: Prisma.SchoolLocationOrderByWithRelationInput
   school?: Prisma.SchoolOrderByWithRelationInput
@@ -272,9 +272,9 @@ export type ClassWhereUniqueInput = Prisma.AtLeast<{
   grade?: Prisma.IntFilter<"Class"> | number
   section?: Prisma.StringNullableFilter<"Class"> | string | null
   schoolId?: Prisma.StringFilter<"Class"> | string
-  locationId?: Prisma.StringNullableFilter<"Class"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Class"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Class"> | Date | string
+  locationId?: Prisma.StringNullableFilter<"Class"> | string | null
   challengeAssignments?: Prisma.ChallengeAssignmentListRelationFilter
   location?: Prisma.XOR<Prisma.SchoolLocationNullableScalarRelationFilter, Prisma.SchoolLocationWhereInput> | null
   school?: Prisma.XOR<Prisma.SchoolScalarRelationFilter, Prisma.SchoolWhereInput>
@@ -288,9 +288,9 @@ export type ClassOrderByWithAggregationInput = {
   grade?: Prisma.SortOrder
   section?: Prisma.SortOrderInput | Prisma.SortOrder
   schoolId?: Prisma.SortOrder
-  locationId?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  locationId?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.ClassCountOrderByAggregateInput
   _avg?: Prisma.ClassAvgOrderByAggregateInput
   _max?: Prisma.ClassMaxOrderByAggregateInput
@@ -307,9 +307,9 @@ export type ClassScalarWhereWithAggregatesInput = {
   grade?: Prisma.IntWithAggregatesFilter<"Class"> | number
   section?: Prisma.StringNullableWithAggregatesFilter<"Class"> | string | null
   schoolId?: Prisma.StringWithAggregatesFilter<"Class"> | string
-  locationId?: Prisma.StringNullableWithAggregatesFilter<"Class"> | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Class"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Class"> | Date | string
+  locationId?: Prisma.StringNullableWithAggregatesFilter<"Class"> | string | null
 }
 
 export type ClassCreateInput = {
@@ -332,9 +332,9 @@ export type ClassUncheckedCreateInput = {
   grade: number
   section?: string | null
   schoolId: string
-  locationId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  locationId?: string | null
   challengeAssignments?: Prisma.ChallengeAssignmentUncheckedCreateNestedManyWithoutTargetClassInput
   counselingSessions?: Prisma.CounselingSessionUncheckedCreateNestedManyWithoutClassInput
   users?: Prisma.UserUncheckedCreateNestedManyWithoutClassRefInput
@@ -360,9 +360,9 @@ export type ClassUncheckedUpdateInput = {
   grade?: Prisma.IntFieldUpdateOperationsInput | number
   section?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   schoolId?: Prisma.StringFieldUpdateOperationsInput | string
-  locationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  locationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   challengeAssignments?: Prisma.ChallengeAssignmentUncheckedUpdateManyWithoutTargetClassNestedInput
   counselingSessions?: Prisma.CounselingSessionUncheckedUpdateManyWithoutClassNestedInput
   users?: Prisma.UserUncheckedUpdateManyWithoutClassRefNestedInput
@@ -374,9 +374,9 @@ export type ClassCreateManyInput = {
   grade: number
   section?: string | null
   schoolId: string
-  locationId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  locationId?: string | null
 }
 
 export type ClassUpdateManyMutationInput = {
@@ -394,9 +394,9 @@ export type ClassUncheckedUpdateManyInput = {
   grade?: Prisma.IntFieldUpdateOperationsInput | number
   section?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   schoolId?: Prisma.StringFieldUpdateOperationsInput | string
-  locationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  locationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type ClassNullableScalarRelationFilter = {
@@ -420,9 +420,9 @@ export type ClassCountOrderByAggregateInput = {
   grade?: Prisma.SortOrder
   section?: Prisma.SortOrder
   schoolId?: Prisma.SortOrder
-  locationId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  locationId?: Prisma.SortOrder
 }
 
 export type ClassAvgOrderByAggregateInput = {
@@ -435,9 +435,9 @@ export type ClassMaxOrderByAggregateInput = {
   grade?: Prisma.SortOrder
   section?: Prisma.SortOrder
   schoolId?: Prisma.SortOrder
-  locationId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  locationId?: Prisma.SortOrder
 }
 
 export type ClassMinOrderByAggregateInput = {
@@ -446,9 +446,9 @@ export type ClassMinOrderByAggregateInput = {
   grade?: Prisma.SortOrder
   section?: Prisma.SortOrder
   schoolId?: Prisma.SortOrder
-  locationId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  locationId?: Prisma.SortOrder
 }
 
 export type ClassSumOrderByAggregateInput = {
@@ -614,9 +614,9 @@ export type ClassUncheckedCreateWithoutUsersInput = {
   grade: number
   section?: string | null
   schoolId: string
-  locationId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  locationId?: string | null
   challengeAssignments?: Prisma.ChallengeAssignmentUncheckedCreateNestedManyWithoutTargetClassInput
   counselingSessions?: Prisma.CounselingSessionUncheckedCreateNestedManyWithoutClassInput
 }
@@ -656,9 +656,9 @@ export type ClassUncheckedUpdateWithoutUsersInput = {
   grade?: Prisma.IntFieldUpdateOperationsInput | number
   section?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   schoolId?: Prisma.StringFieldUpdateOperationsInput | string
-  locationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  locationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   challengeAssignments?: Prisma.ChallengeAssignmentUncheckedUpdateManyWithoutTargetClassNestedInput
   counselingSessions?: Prisma.CounselingSessionUncheckedUpdateManyWithoutClassNestedInput
 }
@@ -681,9 +681,9 @@ export type ClassUncheckedCreateWithoutSchoolInput = {
   name: string
   grade: number
   section?: string | null
-  locationId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  locationId?: string | null
   challengeAssignments?: Prisma.ChallengeAssignmentUncheckedCreateNestedManyWithoutTargetClassInput
   counselingSessions?: Prisma.CounselingSessionUncheckedCreateNestedManyWithoutClassInput
   users?: Prisma.UserUncheckedCreateNestedManyWithoutClassRefInput
@@ -724,9 +724,9 @@ export type ClassScalarWhereInput = {
   grade?: Prisma.IntFilter<"Class"> | number
   section?: Prisma.StringNullableFilter<"Class"> | string | null
   schoolId?: Prisma.StringFilter<"Class"> | string
-  locationId?: Prisma.StringNullableFilter<"Class"> | string | null
   createdAt?: Prisma.DateTimeFilter<"Class"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Class"> | Date | string
+  locationId?: Prisma.StringNullableFilter<"Class"> | string | null
 }
 
 export type ClassCreateWithoutLocationInput = {
@@ -800,9 +800,9 @@ export type ClassUncheckedCreateWithoutChallengeAssignmentsInput = {
   grade: number
   section?: string | null
   schoolId: string
-  locationId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  locationId?: string | null
   counselingSessions?: Prisma.CounselingSessionUncheckedCreateNestedManyWithoutClassInput
   users?: Prisma.UserUncheckedCreateNestedManyWithoutClassRefInput
 }
@@ -842,9 +842,9 @@ export type ClassUncheckedUpdateWithoutChallengeAssignmentsInput = {
   grade?: Prisma.IntFieldUpdateOperationsInput | number
   section?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   schoolId?: Prisma.StringFieldUpdateOperationsInput | string
-  locationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  locationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   counselingSessions?: Prisma.CounselingSessionUncheckedUpdateManyWithoutClassNestedInput
   users?: Prisma.UserUncheckedUpdateManyWithoutClassRefNestedInput
 }
@@ -868,9 +868,9 @@ export type ClassUncheckedCreateWithoutCounselingSessionsInput = {
   grade: number
   section?: string | null
   schoolId: string
-  locationId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  locationId?: string | null
   challengeAssignments?: Prisma.ChallengeAssignmentUncheckedCreateNestedManyWithoutTargetClassInput
   users?: Prisma.UserUncheckedCreateNestedManyWithoutClassRefInput
 }
@@ -910,9 +910,9 @@ export type ClassUncheckedUpdateWithoutCounselingSessionsInput = {
   grade?: Prisma.IntFieldUpdateOperationsInput | number
   section?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   schoolId?: Prisma.StringFieldUpdateOperationsInput | string
-  locationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  locationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   challengeAssignments?: Prisma.ChallengeAssignmentUncheckedUpdateManyWithoutTargetClassNestedInput
   users?: Prisma.UserUncheckedUpdateManyWithoutClassRefNestedInput
 }
@@ -922,9 +922,9 @@ export type ClassCreateManySchoolInput = {
   name: string
   grade: number
   section?: string | null
-  locationId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
+  locationId?: string | null
 }
 
 export type ClassUpdateWithoutSchoolInput = {
@@ -945,9 +945,9 @@ export type ClassUncheckedUpdateWithoutSchoolInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   grade?: Prisma.IntFieldUpdateOperationsInput | number
   section?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  locationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  locationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   challengeAssignments?: Prisma.ChallengeAssignmentUncheckedUpdateManyWithoutTargetClassNestedInput
   counselingSessions?: Prisma.CounselingSessionUncheckedUpdateManyWithoutClassNestedInput
   users?: Prisma.UserUncheckedUpdateManyWithoutClassRefNestedInput
@@ -958,9 +958,9 @@ export type ClassUncheckedUpdateManyWithoutSchoolInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   grade?: Prisma.IntFieldUpdateOperationsInput | number
   section?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  locationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  locationId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type ClassCreateManyLocationInput = {
@@ -1064,9 +1064,9 @@ export type ClassSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   grade?: boolean
   section?: boolean
   schoolId?: boolean
-  locationId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  locationId?: boolean
   challengeAssignments?: boolean | Prisma.Class$challengeAssignmentsArgs<ExtArgs>
   location?: boolean | Prisma.Class$locationArgs<ExtArgs>
   school?: boolean | Prisma.SchoolDefaultArgs<ExtArgs>
@@ -1081,9 +1081,9 @@ export type ClassSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   grade?: boolean
   section?: boolean
   schoolId?: boolean
-  locationId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  locationId?: boolean
   location?: boolean | Prisma.Class$locationArgs<ExtArgs>
   school?: boolean | Prisma.SchoolDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["class"]>
@@ -1094,9 +1094,9 @@ export type ClassSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   grade?: boolean
   section?: boolean
   schoolId?: boolean
-  locationId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  locationId?: boolean
   location?: boolean | Prisma.Class$locationArgs<ExtArgs>
   school?: boolean | Prisma.SchoolDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["class"]>
@@ -1107,12 +1107,12 @@ export type ClassSelectScalar = {
   grade?: boolean
   section?: boolean
   schoolId?: boolean
-  locationId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  locationId?: boolean
 }
 
-export type ClassOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "grade" | "section" | "schoolId" | "locationId" | "createdAt" | "updatedAt", ExtArgs["result"]["class"]>
+export type ClassOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "grade" | "section" | "schoolId" | "createdAt" | "updatedAt" | "locationId", ExtArgs["result"]["class"]>
 export type ClassInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   challengeAssignments?: boolean | Prisma.Class$challengeAssignmentsArgs<ExtArgs>
   location?: boolean | Prisma.Class$locationArgs<ExtArgs>
@@ -1145,9 +1145,9 @@ export type $ClassPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
     grade: number
     section: string | null
     schoolId: string
-    locationId: string | null
     createdAt: Date
     updatedAt: Date
+    locationId: string | null
   }, ExtArgs["result"]["class"]>
   composites: {}
 }
@@ -1581,9 +1581,9 @@ export interface ClassFieldRefs {
   readonly grade: Prisma.FieldRef<"Class", 'Int'>
   readonly section: Prisma.FieldRef<"Class", 'String'>
   readonly schoolId: Prisma.FieldRef<"Class", 'String'>
-  readonly locationId: Prisma.FieldRef<"Class", 'String'>
   readonly createdAt: Prisma.FieldRef<"Class", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Class", 'DateTime'>
+  readonly locationId: Prisma.FieldRef<"Class", 'String'>
 }
     
 

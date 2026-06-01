@@ -28,92 +28,120 @@ export type AggregateUserChallenge = {
 
 export type UserChallengeAvgAggregateOutputType = {
   progressPercentage: number | null
+  currentProgress: number | null
 }
 
 export type UserChallengeSumAggregateOutputType = {
   progressPercentage: number | null
+  currentProgress: number | null
 }
 
 export type UserChallengeMinAggregateOutputType = {
   id: string | null
   userId: string | null
   challengeId: string | null
+  assignedAt: Date | null
   startedAt: Date | null
   completedAt: Date | null
   status: string | null
-  assignedAt: Date | null
-  lastActivityAt: Date | null
   progressPercentage: number | null
+  lastActivityAt: Date | null
+  challengeStatus: $Enums.UserChallengeStatus | null
+  createdAt: Date | null
+  currentProgress: number | null
+  updatedAt: Date | null
 }
 
 export type UserChallengeMaxAggregateOutputType = {
   id: string | null
   userId: string | null
   challengeId: string | null
+  assignedAt: Date | null
   startedAt: Date | null
   completedAt: Date | null
   status: string | null
-  assignedAt: Date | null
-  lastActivityAt: Date | null
   progressPercentage: number | null
+  lastActivityAt: Date | null
+  challengeStatus: $Enums.UserChallengeStatus | null
+  createdAt: Date | null
+  currentProgress: number | null
+  updatedAt: Date | null
 }
 
 export type UserChallengeCountAggregateOutputType = {
   id: number
   userId: number
   challengeId: number
+  assignedAt: number
   startedAt: number
   completedAt: number
   status: number
-  assignedAt: number
-  lastActivityAt: number
   progressPercentage: number
+  lastActivityAt: number
+  challengeStatus: number
+  createdAt: number
+  currentProgress: number
+  updatedAt: number
   _all: number
 }
 
 
 export type UserChallengeAvgAggregateInputType = {
   progressPercentage?: true
+  currentProgress?: true
 }
 
 export type UserChallengeSumAggregateInputType = {
   progressPercentage?: true
+  currentProgress?: true
 }
 
 export type UserChallengeMinAggregateInputType = {
   id?: true
   userId?: true
   challengeId?: true
+  assignedAt?: true
   startedAt?: true
   completedAt?: true
   status?: true
-  assignedAt?: true
-  lastActivityAt?: true
   progressPercentage?: true
+  lastActivityAt?: true
+  challengeStatus?: true
+  createdAt?: true
+  currentProgress?: true
+  updatedAt?: true
 }
 
 export type UserChallengeMaxAggregateInputType = {
   id?: true
   userId?: true
   challengeId?: true
+  assignedAt?: true
   startedAt?: true
   completedAt?: true
   status?: true
-  assignedAt?: true
-  lastActivityAt?: true
   progressPercentage?: true
+  lastActivityAt?: true
+  challengeStatus?: true
+  createdAt?: true
+  currentProgress?: true
+  updatedAt?: true
 }
 
 export type UserChallengeCountAggregateInputType = {
   id?: true
   userId?: true
   challengeId?: true
+  assignedAt?: true
   startedAt?: true
   completedAt?: true
   status?: true
-  assignedAt?: true
-  lastActivityAt?: true
   progressPercentage?: true
+  lastActivityAt?: true
+  challengeStatus?: true
+  createdAt?: true
+  currentProgress?: true
+  updatedAt?: true
   _all?: true
 }
 
@@ -207,12 +235,16 @@ export type UserChallengeGroupByOutputType = {
   id: string
   userId: string
   challengeId: string
+  assignedAt: Date
   startedAt: Date | null
   completedAt: Date | null
   status: string
-  assignedAt: Date
-  lastActivityAt: Date | null
   progressPercentage: number
+  lastActivityAt: Date | null
+  challengeStatus: $Enums.UserChallengeStatus
+  createdAt: Date
+  currentProgress: number
+  updatedAt: Date
   _count: UserChallengeCountAggregateOutputType | null
   _avg: UserChallengeAvgAggregateOutputType | null
   _sum: UserChallengeSumAggregateOutputType | null
@@ -242,12 +274,16 @@ export type UserChallengeWhereInput = {
   id?: Prisma.StringFilter<"UserChallenge"> | string
   userId?: Prisma.StringFilter<"UserChallenge"> | string
   challengeId?: Prisma.StringFilter<"UserChallenge"> | string
+  assignedAt?: Prisma.DateTimeFilter<"UserChallenge"> | Date | string
   startedAt?: Prisma.DateTimeNullableFilter<"UserChallenge"> | Date | string | null
   completedAt?: Prisma.DateTimeNullableFilter<"UserChallenge"> | Date | string | null
   status?: Prisma.StringFilter<"UserChallenge"> | string
-  assignedAt?: Prisma.DateTimeFilter<"UserChallenge"> | Date | string
-  lastActivityAt?: Prisma.DateTimeNullableFilter<"UserChallenge"> | Date | string | null
   progressPercentage?: Prisma.IntFilter<"UserChallenge"> | number
+  lastActivityAt?: Prisma.DateTimeNullableFilter<"UserChallenge"> | Date | string | null
+  challengeStatus?: Prisma.EnumUserChallengeStatusFilter<"UserChallenge"> | $Enums.UserChallengeStatus
+  createdAt?: Prisma.DateTimeFilter<"UserChallenge"> | Date | string
+  currentProgress?: Prisma.IntFilter<"UserChallenge"> | number
+  updatedAt?: Prisma.DateTimeFilter<"UserChallenge"> | Date | string
   challenge?: Prisma.XOR<Prisma.ChallengeScalarRelationFilter, Prisma.ChallengeWhereInput>
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
 }
@@ -256,12 +292,16 @@ export type UserChallengeOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   userId?: Prisma.SortOrder
   challengeId?: Prisma.SortOrder
+  assignedAt?: Prisma.SortOrder
   startedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   completedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   status?: Prisma.SortOrder
-  assignedAt?: Prisma.SortOrder
-  lastActivityAt?: Prisma.SortOrderInput | Prisma.SortOrder
   progressPercentage?: Prisma.SortOrder
+  lastActivityAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  challengeStatus?: Prisma.SortOrder
+  createdAt?: Prisma.SortOrder
+  currentProgress?: Prisma.SortOrder
+  updatedAt?: Prisma.SortOrder
   challenge?: Prisma.ChallengeOrderByWithRelationInput
   user?: Prisma.UserOrderByWithRelationInput
 }
@@ -274,12 +314,16 @@ export type UserChallengeWhereUniqueInput = Prisma.AtLeast<{
   NOT?: Prisma.UserChallengeWhereInput | Prisma.UserChallengeWhereInput[]
   userId?: Prisma.StringFilter<"UserChallenge"> | string
   challengeId?: Prisma.StringFilter<"UserChallenge"> | string
+  assignedAt?: Prisma.DateTimeFilter<"UserChallenge"> | Date | string
   startedAt?: Prisma.DateTimeNullableFilter<"UserChallenge"> | Date | string | null
   completedAt?: Prisma.DateTimeNullableFilter<"UserChallenge"> | Date | string | null
   status?: Prisma.StringFilter<"UserChallenge"> | string
-  assignedAt?: Prisma.DateTimeFilter<"UserChallenge"> | Date | string
-  lastActivityAt?: Prisma.DateTimeNullableFilter<"UserChallenge"> | Date | string | null
   progressPercentage?: Prisma.IntFilter<"UserChallenge"> | number
+  lastActivityAt?: Prisma.DateTimeNullableFilter<"UserChallenge"> | Date | string | null
+  challengeStatus?: Prisma.EnumUserChallengeStatusFilter<"UserChallenge"> | $Enums.UserChallengeStatus
+  createdAt?: Prisma.DateTimeFilter<"UserChallenge"> | Date | string
+  currentProgress?: Prisma.IntFilter<"UserChallenge"> | number
+  updatedAt?: Prisma.DateTimeFilter<"UserChallenge"> | Date | string
   challenge?: Prisma.XOR<Prisma.ChallengeScalarRelationFilter, Prisma.ChallengeWhereInput>
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
 }, "id" | "userId_challengeId">
@@ -288,12 +332,16 @@ export type UserChallengeOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   userId?: Prisma.SortOrder
   challengeId?: Prisma.SortOrder
+  assignedAt?: Prisma.SortOrder
   startedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   completedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   status?: Prisma.SortOrder
-  assignedAt?: Prisma.SortOrder
-  lastActivityAt?: Prisma.SortOrderInput | Prisma.SortOrder
   progressPercentage?: Prisma.SortOrder
+  lastActivityAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  challengeStatus?: Prisma.SortOrder
+  createdAt?: Prisma.SortOrder
+  currentProgress?: Prisma.SortOrder
+  updatedAt?: Prisma.SortOrder
   _count?: Prisma.UserChallengeCountOrderByAggregateInput
   _avg?: Prisma.UserChallengeAvgOrderByAggregateInput
   _max?: Prisma.UserChallengeMaxOrderByAggregateInput
@@ -308,22 +356,30 @@ export type UserChallengeScalarWhereWithAggregatesInput = {
   id?: Prisma.StringWithAggregatesFilter<"UserChallenge"> | string
   userId?: Prisma.StringWithAggregatesFilter<"UserChallenge"> | string
   challengeId?: Prisma.StringWithAggregatesFilter<"UserChallenge"> | string
+  assignedAt?: Prisma.DateTimeWithAggregatesFilter<"UserChallenge"> | Date | string
   startedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"UserChallenge"> | Date | string | null
   completedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"UserChallenge"> | Date | string | null
   status?: Prisma.StringWithAggregatesFilter<"UserChallenge"> | string
-  assignedAt?: Prisma.DateTimeWithAggregatesFilter<"UserChallenge"> | Date | string
-  lastActivityAt?: Prisma.DateTimeNullableWithAggregatesFilter<"UserChallenge"> | Date | string | null
   progressPercentage?: Prisma.IntWithAggregatesFilter<"UserChallenge"> | number
+  lastActivityAt?: Prisma.DateTimeNullableWithAggregatesFilter<"UserChallenge"> | Date | string | null
+  challengeStatus?: Prisma.EnumUserChallengeStatusWithAggregatesFilter<"UserChallenge"> | $Enums.UserChallengeStatus
+  createdAt?: Prisma.DateTimeWithAggregatesFilter<"UserChallenge"> | Date | string
+  currentProgress?: Prisma.IntWithAggregatesFilter<"UserChallenge"> | number
+  updatedAt?: Prisma.DateTimeWithAggregatesFilter<"UserChallenge"> | Date | string
 }
 
 export type UserChallengeCreateInput = {
   id?: string
+  assignedAt?: Date | string
   startedAt?: Date | string | null
   completedAt?: Date | string | null
   status?: string
-  assignedAt?: Date | string
-  lastActivityAt?: Date | string | null
   progressPercentage?: number
+  lastActivityAt?: Date | string | null
+  challengeStatus?: $Enums.UserChallengeStatus
+  createdAt?: Date | string
+  currentProgress?: number
+  updatedAt?: Date | string
   challenge: Prisma.ChallengeCreateNestedOneWithoutUserChallengesInput
   user: Prisma.UserCreateNestedOneWithoutUserChallengesInput
 }
@@ -332,22 +388,30 @@ export type UserChallengeUncheckedCreateInput = {
   id?: string
   userId: string
   challengeId: string
+  assignedAt?: Date | string
   startedAt?: Date | string | null
   completedAt?: Date | string | null
   status?: string
-  assignedAt?: Date | string
-  lastActivityAt?: Date | string | null
   progressPercentage?: number
+  lastActivityAt?: Date | string | null
+  challengeStatus?: $Enums.UserChallengeStatus
+  createdAt?: Date | string
+  currentProgress?: number
+  updatedAt?: Date | string
 }
 
 export type UserChallengeUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  assignedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
-  assignedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  lastActivityAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   progressPercentage?: Prisma.IntFieldUpdateOperationsInput | number
+  lastActivityAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  challengeStatus?: Prisma.EnumUserChallengeStatusFieldUpdateOperationsInput | $Enums.UserChallengeStatus
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  currentProgress?: Prisma.IntFieldUpdateOperationsInput | number
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   challenge?: Prisma.ChallengeUpdateOneRequiredWithoutUserChallengesNestedInput
   user?: Prisma.UserUpdateOneRequiredWithoutUserChallengesNestedInput
 }
@@ -356,46 +420,62 @@ export type UserChallengeUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   challengeId?: Prisma.StringFieldUpdateOperationsInput | string
+  assignedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
-  assignedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  lastActivityAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   progressPercentage?: Prisma.IntFieldUpdateOperationsInput | number
+  lastActivityAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  challengeStatus?: Prisma.EnumUserChallengeStatusFieldUpdateOperationsInput | $Enums.UserChallengeStatus
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  currentProgress?: Prisma.IntFieldUpdateOperationsInput | number
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type UserChallengeCreateManyInput = {
   id?: string
   userId: string
   challengeId: string
+  assignedAt?: Date | string
   startedAt?: Date | string | null
   completedAt?: Date | string | null
   status?: string
-  assignedAt?: Date | string
-  lastActivityAt?: Date | string | null
   progressPercentage?: number
+  lastActivityAt?: Date | string | null
+  challengeStatus?: $Enums.UserChallengeStatus
+  createdAt?: Date | string
+  currentProgress?: number
+  updatedAt?: Date | string
 }
 
 export type UserChallengeUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  assignedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
-  assignedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  lastActivityAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   progressPercentage?: Prisma.IntFieldUpdateOperationsInput | number
+  lastActivityAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  challengeStatus?: Prisma.EnumUserChallengeStatusFieldUpdateOperationsInput | $Enums.UserChallengeStatus
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  currentProgress?: Prisma.IntFieldUpdateOperationsInput | number
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type UserChallengeUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   challengeId?: Prisma.StringFieldUpdateOperationsInput | string
+  assignedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
-  assignedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  lastActivityAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   progressPercentage?: Prisma.IntFieldUpdateOperationsInput | number
+  lastActivityAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  challengeStatus?: Prisma.EnumUserChallengeStatusFieldUpdateOperationsInput | $Enums.UserChallengeStatus
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  currentProgress?: Prisma.IntFieldUpdateOperationsInput | number
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type UserChallengeListRelationFilter = {
@@ -417,44 +497,58 @@ export type UserChallengeCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   userId?: Prisma.SortOrder
   challengeId?: Prisma.SortOrder
+  assignedAt?: Prisma.SortOrder
   startedAt?: Prisma.SortOrder
   completedAt?: Prisma.SortOrder
   status?: Prisma.SortOrder
-  assignedAt?: Prisma.SortOrder
-  lastActivityAt?: Prisma.SortOrder
   progressPercentage?: Prisma.SortOrder
+  lastActivityAt?: Prisma.SortOrder
+  challengeStatus?: Prisma.SortOrder
+  createdAt?: Prisma.SortOrder
+  currentProgress?: Prisma.SortOrder
+  updatedAt?: Prisma.SortOrder
 }
 
 export type UserChallengeAvgOrderByAggregateInput = {
   progressPercentage?: Prisma.SortOrder
+  currentProgress?: Prisma.SortOrder
 }
 
 export type UserChallengeMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   userId?: Prisma.SortOrder
   challengeId?: Prisma.SortOrder
+  assignedAt?: Prisma.SortOrder
   startedAt?: Prisma.SortOrder
   completedAt?: Prisma.SortOrder
   status?: Prisma.SortOrder
-  assignedAt?: Prisma.SortOrder
-  lastActivityAt?: Prisma.SortOrder
   progressPercentage?: Prisma.SortOrder
+  lastActivityAt?: Prisma.SortOrder
+  challengeStatus?: Prisma.SortOrder
+  createdAt?: Prisma.SortOrder
+  currentProgress?: Prisma.SortOrder
+  updatedAt?: Prisma.SortOrder
 }
 
 export type UserChallengeMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   userId?: Prisma.SortOrder
   challengeId?: Prisma.SortOrder
+  assignedAt?: Prisma.SortOrder
   startedAt?: Prisma.SortOrder
   completedAt?: Prisma.SortOrder
   status?: Prisma.SortOrder
-  assignedAt?: Prisma.SortOrder
-  lastActivityAt?: Prisma.SortOrder
   progressPercentage?: Prisma.SortOrder
+  lastActivityAt?: Prisma.SortOrder
+  challengeStatus?: Prisma.SortOrder
+  createdAt?: Prisma.SortOrder
+  currentProgress?: Prisma.SortOrder
+  updatedAt?: Prisma.SortOrder
 }
 
 export type UserChallengeSumOrderByAggregateInput = {
   progressPercentage?: Prisma.SortOrder
+  currentProgress?: Prisma.SortOrder
 }
 
 export type UserChallengeCreateNestedManyWithoutUserInput = {
@@ -541,26 +635,38 @@ export type UserChallengeUncheckedUpdateManyWithoutChallengeNestedInput = {
   deleteMany?: Prisma.UserChallengeScalarWhereInput | Prisma.UserChallengeScalarWhereInput[]
 }
 
+export type EnumUserChallengeStatusFieldUpdateOperationsInput = {
+  set?: $Enums.UserChallengeStatus
+}
+
 export type UserChallengeCreateWithoutUserInput = {
   id?: string
+  assignedAt?: Date | string
   startedAt?: Date | string | null
   completedAt?: Date | string | null
   status?: string
-  assignedAt?: Date | string
-  lastActivityAt?: Date | string | null
   progressPercentage?: number
+  lastActivityAt?: Date | string | null
+  challengeStatus?: $Enums.UserChallengeStatus
+  createdAt?: Date | string
+  currentProgress?: number
+  updatedAt?: Date | string
   challenge: Prisma.ChallengeCreateNestedOneWithoutUserChallengesInput
 }
 
 export type UserChallengeUncheckedCreateWithoutUserInput = {
   id?: string
   challengeId: string
+  assignedAt?: Date | string
   startedAt?: Date | string | null
   completedAt?: Date | string | null
   status?: string
-  assignedAt?: Date | string
-  lastActivityAt?: Date | string | null
   progressPercentage?: number
+  lastActivityAt?: Date | string | null
+  challengeStatus?: $Enums.UserChallengeStatus
+  createdAt?: Date | string
+  currentProgress?: number
+  updatedAt?: Date | string
 }
 
 export type UserChallengeCreateOrConnectWithoutUserInput = {
@@ -596,34 +702,46 @@ export type UserChallengeScalarWhereInput = {
   id?: Prisma.StringFilter<"UserChallenge"> | string
   userId?: Prisma.StringFilter<"UserChallenge"> | string
   challengeId?: Prisma.StringFilter<"UserChallenge"> | string
+  assignedAt?: Prisma.DateTimeFilter<"UserChallenge"> | Date | string
   startedAt?: Prisma.DateTimeNullableFilter<"UserChallenge"> | Date | string | null
   completedAt?: Prisma.DateTimeNullableFilter<"UserChallenge"> | Date | string | null
   status?: Prisma.StringFilter<"UserChallenge"> | string
-  assignedAt?: Prisma.DateTimeFilter<"UserChallenge"> | Date | string
-  lastActivityAt?: Prisma.DateTimeNullableFilter<"UserChallenge"> | Date | string | null
   progressPercentage?: Prisma.IntFilter<"UserChallenge"> | number
+  lastActivityAt?: Prisma.DateTimeNullableFilter<"UserChallenge"> | Date | string | null
+  challengeStatus?: Prisma.EnumUserChallengeStatusFilter<"UserChallenge"> | $Enums.UserChallengeStatus
+  createdAt?: Prisma.DateTimeFilter<"UserChallenge"> | Date | string
+  currentProgress?: Prisma.IntFilter<"UserChallenge"> | number
+  updatedAt?: Prisma.DateTimeFilter<"UserChallenge"> | Date | string
 }
 
 export type UserChallengeCreateWithoutChallengeInput = {
   id?: string
+  assignedAt?: Date | string
   startedAt?: Date | string | null
   completedAt?: Date | string | null
   status?: string
-  assignedAt?: Date | string
-  lastActivityAt?: Date | string | null
   progressPercentage?: number
+  lastActivityAt?: Date | string | null
+  challengeStatus?: $Enums.UserChallengeStatus
+  createdAt?: Date | string
+  currentProgress?: number
+  updatedAt?: Date | string
   user: Prisma.UserCreateNestedOneWithoutUserChallengesInput
 }
 
 export type UserChallengeUncheckedCreateWithoutChallengeInput = {
   id?: string
   userId: string
+  assignedAt?: Date | string
   startedAt?: Date | string | null
   completedAt?: Date | string | null
   status?: string
-  assignedAt?: Date | string
-  lastActivityAt?: Date | string | null
   progressPercentage?: number
+  lastActivityAt?: Date | string | null
+  challengeStatus?: $Enums.UserChallengeStatus
+  createdAt?: Date | string
+  currentProgress?: number
+  updatedAt?: Date | string
 }
 
 export type UserChallengeCreateOrConnectWithoutChallengeInput = {
@@ -655,89 +773,121 @@ export type UserChallengeUpdateManyWithWhereWithoutChallengeInput = {
 export type UserChallengeCreateManyUserInput = {
   id?: string
   challengeId: string
+  assignedAt?: Date | string
   startedAt?: Date | string | null
   completedAt?: Date | string | null
   status?: string
-  assignedAt?: Date | string
-  lastActivityAt?: Date | string | null
   progressPercentage?: number
+  lastActivityAt?: Date | string | null
+  challengeStatus?: $Enums.UserChallengeStatus
+  createdAt?: Date | string
+  currentProgress?: number
+  updatedAt?: Date | string
 }
 
 export type UserChallengeUpdateWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  assignedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
-  assignedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  lastActivityAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   progressPercentage?: Prisma.IntFieldUpdateOperationsInput | number
+  lastActivityAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  challengeStatus?: Prisma.EnumUserChallengeStatusFieldUpdateOperationsInput | $Enums.UserChallengeStatus
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  currentProgress?: Prisma.IntFieldUpdateOperationsInput | number
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   challenge?: Prisma.ChallengeUpdateOneRequiredWithoutUserChallengesNestedInput
 }
 
 export type UserChallengeUncheckedUpdateWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   challengeId?: Prisma.StringFieldUpdateOperationsInput | string
+  assignedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
-  assignedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  lastActivityAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   progressPercentage?: Prisma.IntFieldUpdateOperationsInput | number
+  lastActivityAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  challengeStatus?: Prisma.EnumUserChallengeStatusFieldUpdateOperationsInput | $Enums.UserChallengeStatus
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  currentProgress?: Prisma.IntFieldUpdateOperationsInput | number
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type UserChallengeUncheckedUpdateManyWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   challengeId?: Prisma.StringFieldUpdateOperationsInput | string
+  assignedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
-  assignedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  lastActivityAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   progressPercentage?: Prisma.IntFieldUpdateOperationsInput | number
+  lastActivityAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  challengeStatus?: Prisma.EnumUserChallengeStatusFieldUpdateOperationsInput | $Enums.UserChallengeStatus
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  currentProgress?: Prisma.IntFieldUpdateOperationsInput | number
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type UserChallengeCreateManyChallengeInput = {
   id?: string
   userId: string
+  assignedAt?: Date | string
   startedAt?: Date | string | null
   completedAt?: Date | string | null
   status?: string
-  assignedAt?: Date | string
-  lastActivityAt?: Date | string | null
   progressPercentage?: number
+  lastActivityAt?: Date | string | null
+  challengeStatus?: $Enums.UserChallengeStatus
+  createdAt?: Date | string
+  currentProgress?: number
+  updatedAt?: Date | string
 }
 
 export type UserChallengeUpdateWithoutChallengeInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  assignedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
-  assignedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  lastActivityAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   progressPercentage?: Prisma.IntFieldUpdateOperationsInput | number
+  lastActivityAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  challengeStatus?: Prisma.EnumUserChallengeStatusFieldUpdateOperationsInput | $Enums.UserChallengeStatus
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  currentProgress?: Prisma.IntFieldUpdateOperationsInput | number
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   user?: Prisma.UserUpdateOneRequiredWithoutUserChallengesNestedInput
 }
 
 export type UserChallengeUncheckedUpdateWithoutChallengeInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
+  assignedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
-  assignedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  lastActivityAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   progressPercentage?: Prisma.IntFieldUpdateOperationsInput | number
+  lastActivityAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  challengeStatus?: Prisma.EnumUserChallengeStatusFieldUpdateOperationsInput | $Enums.UserChallengeStatus
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  currentProgress?: Prisma.IntFieldUpdateOperationsInput | number
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type UserChallengeUncheckedUpdateManyWithoutChallengeInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
+  assignedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   startedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   completedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   status?: Prisma.StringFieldUpdateOperationsInput | string
-  assignedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  lastActivityAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   progressPercentage?: Prisma.IntFieldUpdateOperationsInput | number
+  lastActivityAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  challengeStatus?: Prisma.EnumUserChallengeStatusFieldUpdateOperationsInput | $Enums.UserChallengeStatus
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  currentProgress?: Prisma.IntFieldUpdateOperationsInput | number
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 
@@ -746,12 +896,16 @@ export type UserChallengeSelect<ExtArgs extends runtime.Types.Extensions.Interna
   id?: boolean
   userId?: boolean
   challengeId?: boolean
+  assignedAt?: boolean
   startedAt?: boolean
   completedAt?: boolean
   status?: boolean
-  assignedAt?: boolean
-  lastActivityAt?: boolean
   progressPercentage?: boolean
+  lastActivityAt?: boolean
+  challengeStatus?: boolean
+  createdAt?: boolean
+  currentProgress?: boolean
+  updatedAt?: boolean
   challenge?: boolean | Prisma.ChallengeDefaultArgs<ExtArgs>
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["userChallenge"]>
@@ -760,12 +914,16 @@ export type UserChallengeSelectCreateManyAndReturn<ExtArgs extends runtime.Types
   id?: boolean
   userId?: boolean
   challengeId?: boolean
+  assignedAt?: boolean
   startedAt?: boolean
   completedAt?: boolean
   status?: boolean
-  assignedAt?: boolean
-  lastActivityAt?: boolean
   progressPercentage?: boolean
+  lastActivityAt?: boolean
+  challengeStatus?: boolean
+  createdAt?: boolean
+  currentProgress?: boolean
+  updatedAt?: boolean
   challenge?: boolean | Prisma.ChallengeDefaultArgs<ExtArgs>
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["userChallenge"]>
@@ -774,12 +932,16 @@ export type UserChallengeSelectUpdateManyAndReturn<ExtArgs extends runtime.Types
   id?: boolean
   userId?: boolean
   challengeId?: boolean
+  assignedAt?: boolean
   startedAt?: boolean
   completedAt?: boolean
   status?: boolean
-  assignedAt?: boolean
-  lastActivityAt?: boolean
   progressPercentage?: boolean
+  lastActivityAt?: boolean
+  challengeStatus?: boolean
+  createdAt?: boolean
+  currentProgress?: boolean
+  updatedAt?: boolean
   challenge?: boolean | Prisma.ChallengeDefaultArgs<ExtArgs>
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["userChallenge"]>
@@ -788,15 +950,19 @@ export type UserChallengeSelectScalar = {
   id?: boolean
   userId?: boolean
   challengeId?: boolean
+  assignedAt?: boolean
   startedAt?: boolean
   completedAt?: boolean
   status?: boolean
-  assignedAt?: boolean
-  lastActivityAt?: boolean
   progressPercentage?: boolean
+  lastActivityAt?: boolean
+  challengeStatus?: boolean
+  createdAt?: boolean
+  currentProgress?: boolean
+  updatedAt?: boolean
 }
 
-export type UserChallengeOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "challengeId" | "startedAt" | "completedAt" | "status" | "assignedAt" | "lastActivityAt" | "progressPercentage", ExtArgs["result"]["userChallenge"]>
+export type UserChallengeOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "challengeId" | "assignedAt" | "startedAt" | "completedAt" | "status" | "progressPercentage" | "lastActivityAt" | "challengeStatus" | "createdAt" | "currentProgress" | "updatedAt", ExtArgs["result"]["userChallenge"]>
 export type UserChallengeInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   challenge?: boolean | Prisma.ChallengeDefaultArgs<ExtArgs>
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -820,12 +986,16 @@ export type $UserChallengePayload<ExtArgs extends runtime.Types.Extensions.Inter
     id: string
     userId: string
     challengeId: string
+    assignedAt: Date
     startedAt: Date | null
     completedAt: Date | null
     status: string
-    assignedAt: Date
-    lastActivityAt: Date | null
     progressPercentage: number
+    lastActivityAt: Date | null
+    challengeStatus: $Enums.UserChallengeStatus
+    createdAt: Date
+    currentProgress: number
+    updatedAt: Date
   }, ExtArgs["result"]["userChallenge"]>
   composites: {}
 }
@@ -1254,12 +1424,16 @@ export interface UserChallengeFieldRefs {
   readonly id: Prisma.FieldRef<"UserChallenge", 'String'>
   readonly userId: Prisma.FieldRef<"UserChallenge", 'String'>
   readonly challengeId: Prisma.FieldRef<"UserChallenge", 'String'>
+  readonly assignedAt: Prisma.FieldRef<"UserChallenge", 'DateTime'>
   readonly startedAt: Prisma.FieldRef<"UserChallenge", 'DateTime'>
   readonly completedAt: Prisma.FieldRef<"UserChallenge", 'DateTime'>
   readonly status: Prisma.FieldRef<"UserChallenge", 'String'>
-  readonly assignedAt: Prisma.FieldRef<"UserChallenge", 'DateTime'>
-  readonly lastActivityAt: Prisma.FieldRef<"UserChallenge", 'DateTime'>
   readonly progressPercentage: Prisma.FieldRef<"UserChallenge", 'Int'>
+  readonly lastActivityAt: Prisma.FieldRef<"UserChallenge", 'DateTime'>
+  readonly challengeStatus: Prisma.FieldRef<"UserChallenge", 'UserChallengeStatus'>
+  readonly createdAt: Prisma.FieldRef<"UserChallenge", 'DateTime'>
+  readonly currentProgress: Prisma.FieldRef<"UserChallenge", 'Int'>
+  readonly updatedAt: Prisma.FieldRef<"UserChallenge", 'DateTime'>
 }
     
 

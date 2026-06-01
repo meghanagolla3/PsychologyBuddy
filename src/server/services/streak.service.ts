@@ -62,7 +62,16 @@ export class StreakService {
       });
 
       // Evaluate badges after updating streak
-      await BadgeService.evaluateUserBadges(userId);
+      // Only evaluate if user exists in database
+      const user = await prisma.user.findUnique({
+        where: { id: userId }
+      });
+
+      if (user) {
+        await BadgeService.evaluateUserBadges(userId);
+      } else {
+        console.error(`❌ User ${userId} not found in database. Skipping badge evaluation.`);
+      }
 
       return updatedStreak;
     } catch (error) {

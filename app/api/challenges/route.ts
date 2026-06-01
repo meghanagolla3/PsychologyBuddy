@@ -113,7 +113,7 @@ export const POST = withPermission({
         ...validatedData,
         createdBy: user.id,
         schoolId,
-      },
+      } as any,
     });
 
     const formattedChallenge = {

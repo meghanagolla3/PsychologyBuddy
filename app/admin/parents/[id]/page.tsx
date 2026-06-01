@@ -4,6 +4,9 @@ import { useEffect, useState, use } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, Mail, Calendar, CheckCircle2, UserRound, XCircle, Pencil, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { EditParentModal } from "@/src/components/admin/modals/EditParentModal";
+import { DeleteConfirmModal } from "@/src/components/admin/modals/DeleteConfirmModal";
+import { useToast } from "@/components/ui/use-toast";
 
 interface Child {
   id: string;
@@ -54,6 +57,10 @@ export default function ParentProfilePage({ params }: { params: Promise<{ id: st
     declinedMissed: 0,
   });
   const [loading, setLoading] = useState(true);
+  const [isEditOpen, setIsEditOpen] = useState(false);
+  const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const { toast } = useToast();
 
   useEffect(() => {
     fetchParentData();
@@ -61,6 +68,21 @@ export default function ParentProfilePage({ params }: { params: Promise<{ id: st
 
   const handleMeetingClick = (meeting: Meeting) => {
     router.push(`/admin/parent-meetings/${meeting.id}`);
+  };
+
+  const handleDelete = async () => {
+    setIsDeleting(true);
+    try {
+      const res = await fetch(`/api/parents/${parentId}`, { method: "DELETE" });
+      if (!res.ok) throw new Error("Failed to delete parent");
+      toast({ title: "Parent deleted successfully" });
+      setIsDeleteOpen(false);
+      router.back();
+    } catch (err: any) {
+      toast({ title: "Error", description: err.message, variant: "destructive" });
+    } finally {
+      setIsDeleting(false);
+    }
   };
 
   const fetchParentData = async () => {
@@ -183,11 +205,19 @@ export default function ParentProfilePage({ params }: { params: Promise<{ id: st
         <div className="rounded-2xl bg-[#FFFFFF] p-5 shadow-sm sm:p-6">
           <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
             <div className="flex items-center gap-4">
-              <img
-                src={parent.avatar || `https://i.pravatar.cc/97?img=${parent.id.length}`}
-                alt={parent.name}
-                className="h-14 w-14 rounded-full object-cover"
-              />
+              <button
+                onClick={() => setIsEditOpen(true)}
+                className="relative group"
+              >
+                <img
+                  src={parent.avatar || `https://i.pravatar.cc/97?img=${parent.id.length}`}
+                  alt={parent.name}
+                  className="h-14 w-14 rounded-full object-cover ring-2 ring-transparent group-hover:ring-[#3B82F6] transition-all"
+                />
+                <div className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-full opacity-0 group-hover:opacity-100 transition-opacity">
+                  <Pencil className="h-4 w-4 text-white" />
+                </div>
+              </button>
               <div>
                 <div className="flex items-center gap-2">
                   <h1 className="text-lg font-semibold text-[#1E293B]">{parent.name}</h1>
@@ -205,9 +235,20 @@ export default function ParentProfilePage({ params }: { params: Promise<{ id: st
                 )}
               </div>
             </div>
-            <button className="inline-flex items-center gap-2 rounded-lg bg-[#3B82F6] px-4 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-[#2563EB]">
-              <Pencil className="h-4 w-4" /> Edit Profile
-            </button>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setIsEditOpen(true)}
+                className="inline-flex items-center gap-2 rounded-lg bg-[#3B82F6] px-4 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-[#2563EB]"
+              >
+                <Pencil className="h-4 w-4" /> Edit Profile
+              </button>
+              <button
+                onClick={() => setIsDeleteOpen(true)}
+                className="inline-flex items-center gap-2 rounded-lg bg-[#EF4444] px-4 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-[#DC2626]"
+              >
+                Delete
+              </button>
+            </div>
           </div>
         </div>
 
@@ -255,6 +296,36 @@ export default function ParentProfilePage({ params }: { params: Promise<{ id: st
           )}
         </div>
       </div>
+
+      {isEditOpen && parent && (
+        <EditParentModal
+          parent={{
+            ...parent,
+            childName: parent.children[0]?.name || '',
+            childClass: parent.children[0]?.className || ''
+          }}
+          onClose={() => setIsEditOpen(false)}
+          onSuccess={() => {
+            setIsEditOpen(false);
+            fetchParentData();
+            toast({ title: "Parent updated successfully" });
+          }}
+          onDelete={() => {
+            router.back();
+            toast({ title: "Parent deleted successfully" });
+          }}
+        />
+      )}
+
+      <DeleteConfirmModal
+        isOpen={isDeleteOpen}
+        onClose={() => setIsDeleteOpen(false)}
+        onConfirm={handleDelete}
+        title="Delete Parent"
+        description="Are you sure you want to delete this parent? This action cannot be undone."
+        itemName={parent?.name}
+        isDeleting={isDeleting}
+      />
     </div>
   );
 }
