@@ -2,7 +2,8 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { Search, UserPlus, ChevronRight, Loader2, X } from "lucide-react";
+import { useAuth } from "@/src/contexts/AuthContext";
+import { Search, UserPlus, ChevronRight, Loader2, X, Edit } from "lucide-react";
 import { AdminHeader } from "@/src/components/admin/layout/AdminHeader";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -37,9 +38,10 @@ interface Parent {
   children: Child[];
 }
 
-async function fetchParents(search?: string): Promise<Parent[]> {
+async function fetchParents(search?: string, schoolFilter?: string): Promise<Parent[]> {
   const url = new URL("/api/parents", window.location.origin);
   if (search) url.searchParams.set("search", search);
+  if (schoolFilter && schoolFilter !== "all") url.searchParams.set("schoolId", schoolFilter);
   const res = await fetch(url.toString());
   if (!res.ok) throw new Error("Failed to fetch parents");
   const data = await res.json();
@@ -117,12 +119,31 @@ async function fetchParents(search?: string): Promise<Parent[]> {
 
 export default function ParentManagementSection() {
   const router = useRouter();
+  const { user } = useAuth();
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
+  const [schoolFilter, setSchoolFilter] = useState("all");
+  const [schools, setSchools] = useState<any[]>([]);
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [editParent, setEditParent] = useState<Parent | null>(null);
   const { toast } = useToast();
   const queryClient = useQueryClient();
+
+  // Fetch schools
+  useEffect(() => {
+    const fetchSchools = async () => {
+      try {
+        const response = await fetch('/api/admin/schools', { credentials: 'include' });
+        if (response.ok) {
+          const data = await response.json();
+          setSchools(data || []);
+        }
+      } catch (error) {
+        console.error('Failed to fetch schools:', error);
+      }
+    };
+    fetchSchools();
+  }, []);
 
   useEffect(() => {
     const timer = setTimeout(() => setDebouncedSearch(search), 300);
@@ -130,8 +151,8 @@ export default function ParentManagementSection() {
   }, [search]);
 
   const { data: parents = [], isLoading } = useQuery({
-    queryKey: ["parents", debouncedSearch],
-    queryFn: () => fetchParents(debouncedSearch),
+    queryKey: ["parents", debouncedSearch, schoolFilter],
+    queryFn: () => fetchParents(debouncedSearch, schoolFilter),
   });
 
   const handleDelete = useCallback(async (id: string) => {
@@ -152,10 +173,14 @@ export default function ParentManagementSection() {
         title="Parents"
         subtitle="View registered parents, their children, and meeting activity."
         showTimeFilter={false}
+        showSchoolFilter={true}
+        schoolFilterValue={schoolFilter}
+        onSchoolFilterChange={setSchoolFilter}
+        schools={schools}
       />
 
       <div className="flex-1 overflow-auto p-6 space-y-6 animate-fade-in">
-        <div className="flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-start">
+        <div className="flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-between">
           <div className="relative max-w-md">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
@@ -173,15 +198,18 @@ export default function ParentManagementSection() {
               </button>
             )}
           </div>
+          <Button onClick={() => setIsAddOpen(true)} className="gap-2">
+            <UserPlus className="h-4 w-4" /> Add Parent
+          </Button>
         </div>
 
         <Card className="overflow-hidden">
-          <div className="grid grid-cols-[2fr_1.5fr_1fr_1fr_40px] gap-4 px-6 py-4 border-b bg-muted/30 text-sm font-medium text-muted-foreground">
+          <div className="grid grid-cols-[2fr_1.5fr_1fr_1fr_80px] gap-4 px-6 py-4 border-b bg-muted/30 text-sm font-medium text-muted-foreground">
             <div>Parent</div>
-            <div>Children</div>
+            <div>Child</div>
             <div>Status</div>
             <div>Total Meetings</div>
-            <div></div>
+            <div>Actions</div>
           </div>
 
           {isLoading ? (
@@ -193,7 +221,7 @@ export default function ParentManagementSection() {
               {parents.map((parent) => (
                 <div
                   key={parent.id}
-                  className="grid grid-cols-[2fr_1.5fr_1fr_1fr_40px] gap-4 px-6 py-4 items-center hover:bg-muted/30 transition-colors cursor-pointer"
+                  className="grid grid-cols-[2fr_1.5fr_1fr_1fr_80px] gap-4 px-6 py-4 items-center hover:bg-muted/30 transition-colors cursor-pointer"
                   onClick={() => router.push(`/admin/parents/${parent.id}`)}
                 >
                   <div className="flex items-center gap-3 min-w-0">
@@ -217,10 +245,10 @@ export default function ParentManagementSection() {
                     {parent.children.length > 0 ? (
                       <div className="space-y-1">
                         {parent.children.map((child) => (
-                          <div key={child.id} className="p-2 border-b">
+                          <div key={child.id} className="p-2">
                             <p className="text-sm font-medium">{child.name}</p>
                             <p className="text-xs text-muted-foreground">{child.studentId}</p>
-                            <p className="text-xs text-muted-foreground">{child.className} - Grade {child.grade}, Section {child.section}</p>
+                            <p className="text-xs text-muted-foreground">{child.className}</p>
                           </div>
                         ))}
                       </div>
@@ -249,8 +277,20 @@ export default function ParentManagementSection() {
                   </div>
 
                   <div className="text-sm font-semibold text-primary">{parent.totalMeetings}</div>
-
-                  <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                        <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                  {/* <div className="flex items-center gap-2">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-8 w-8 p-0"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setEditParent(parent);
+                      }}
+                    >
+                      <Edit className="h-4 w-4" />
+                    </Button>
+                  </div> */}
                 </div>
               ))}
 

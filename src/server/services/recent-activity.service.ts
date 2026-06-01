@@ -2,7 +2,7 @@ import prisma from '@/src/prisma';
 
 export interface ActivityItem {
   id: string;
-  type: 'mood' | 'journal' | 'meditation' | 'music' | 'badge' | 'streak' | 'session' | 'alert' | 'meeting' | 'assignment';
+  type: 'mood' | 'journal' | 'meditation' | 'music' | 'badge' | 'streak' | 'session' | 'alert' | 'meeting' | 'assignment' | 'challenge';
   studentId: string;
   studentName: string;
   classSection?: string;
@@ -23,6 +23,7 @@ const typeDescriptions: Record<string, string> = {
   alert: "Student alert triggered",
   meeting: "Parent-Counselor meeting",
   assignment: "Counselor assignment update",
+  challenge: "Challenge assignment created",
 };
 
 export class RecentActivityService {
@@ -695,6 +696,46 @@ export class RecentActivityService {
       })));
     }
 
+    // Challenge Assignments
+    if (!type || type === 'challenge') {
+      const challengeAssignments = await prisma.challengeAssignment.findMany({
+        where: {
+          targetSchoolId: adminSchoolId,
+          assignedAt: dateFilter,
+          ...(search && {
+            OR: [
+              { assigner: { firstName: { contains: search, mode: 'insensitive' } } },
+              { assigner: { lastName: { contains: search, mode: 'insensitive' } } }
+            ]
+          })
+        },
+        include: {
+          assigner: true,
+          challenge: true,
+          targetSchool: true
+        },
+        orderBy: { assignedAt: 'desc' },
+        take: limit,
+        skip: offset
+      });
+
+      activities.push(...challengeAssignments.map((assignment: any) => ({
+        id: `challenge-assignment-${assignment.id}`,
+        type: 'challenge' as const,
+        studentId: assignment.assigner.id,
+        studentName: `${assignment.assigner.firstName} ${assignment.assigner.lastName}`,
+        classSection: assignment.targetSchool?.name,
+        description: `Challenge assigned: ${assignment.challenge.title} (${assignment.assignmentType})`,
+        timestamp: assignment.assignedAt,
+        metadata: {
+          assignmentId: assignment.id,
+          challengeId: assignment.challengeId,
+          assignmentType: assignment.assignmentType,
+          assignerId: assignment.assignedBy
+        }
+      })));
+    }
+
     // Sort all activities by timestamp (most recent first)
     activities.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
 
@@ -756,7 +797,8 @@ export class RecentActivityService {
       alertCount,
       meetingCount,
       assignmentCount,
-      sessionCount
+      sessionCount,
+      challengeCount
     ] = await Promise.all([
       prisma.moodCheckin.count({ where: whereClause }),
       prisma.writingJournal.count({ where: { user: userFilter, createdAt: dateFilter } }),
@@ -770,11 +812,12 @@ export class RecentActivityService {
       prisma.parentMeeting.count({ where: { schoolId: adminSchoolId, createdAt: dateFilter } }),
       prisma.counselorAssignment.count({ where: { student: { schoolId: adminSchoolId }, createdAt: dateFilter } }),
       prisma.counselingSession.count({ where: { schoolId: adminSchoolId, createdAt: dateFilter } }),
+      prisma.challengeAssignment.count({ where: { targetSchoolId: adminSchoolId, assignedAt: dateFilter } }),
     ]);
 
     return moodCount + writingCount + audioCount + artCount + meditationCount + 
            badgeCount + streakCount + chatCount + alertCount + meetingCount + 
-           assignmentCount + sessionCount;
+           assignmentCount + sessionCount + challengeCount;
     } catch (error) {
       console.error('Error in countActivities:', error);
       return 0;

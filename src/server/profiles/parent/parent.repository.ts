@@ -90,7 +90,35 @@ export const ParentRepository = {
       prisma.user.count({ where: whereCondition }),
     ]);
 
-    return { parents, total, page, limit, totalPages: Math.ceil(total / limit) };
+    // Calculate total meetings for each parent by counting meetings for their children
+    const parentsWithMeetingCounts = await Promise.all(
+      parents.map(async (parent) => {
+        // Get children for this parent
+        const children = await prisma.user.findMany({
+          where: { parentId: parent.id },
+          select: { id: true },
+        });
+
+        const childIds = children.map(c => c.id);
+
+        // Count parent meetings for these children
+        const totalMeetings = await prisma.parentMeeting.count({
+          where: {
+            studentId: { in: childIds },
+          },
+        });
+
+        return {
+          ...parent,
+          parentProfile: {
+            ...parent.parentProfile,
+            totalMeetings,
+          },
+        };
+      })
+    );
+
+    return { parents: parentsWithMeetingCounts, total, page, limit, totalPages: Math.ceil(total / limit) };
   },
 
   // Get parent by ID

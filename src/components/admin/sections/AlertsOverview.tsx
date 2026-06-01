@@ -168,7 +168,7 @@ export function AlertsOverview() {
         </Button>
       </div>
       
-      <div className="divide-y divide-border">
+      <div className="max-h-80 overflow-y-auto scrollbar-thin">
         {loading && alerts.length === 0 ? (
           <div className="p-8 text-center text-[#94A3B8]">
             Loading alerts...

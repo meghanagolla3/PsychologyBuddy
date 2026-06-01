@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { Calendar as CalendarIcon, Search } from "lucide-react";
+import { useAuth } from "@/src/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -35,6 +36,7 @@ export function AssignChallengeDialog({
   challengeName = "Breathing Exercises",
   challengeId,
 }: AssignChallengeDialogProps) {
+  const { user } = useAuth();
   const [targetType, setTargetType] = useState("individual");
   const [studentSearch, setStudentSearch] = useState("");
   const [selectedStudent, setSelectedStudent] = useState<any>(null);
@@ -135,7 +137,7 @@ export function AssignChallengeDialog({
       // Prepare assignment data
       const assignmentData: any = {
         challengeId,
-        assignmentType: targetType.toUpperCase(),
+        assignmentType: targetType === 'platform' ? 'SCHOOL' : targetType.toUpperCase(),
         startDate: new Date(startDate).toISOString(),
         endDate: new Date(endDate).toISOString(),
       };
@@ -157,9 +159,13 @@ export function AssignChallengeDialog({
         // For now, we'll need to get the actual class ID - this is simplified
         assignmentData.targetClassId = selectedClass; // This should be the actual class UUID
       } else if (targetType === "platform") {
-        // For platform-wide assignment, we'd need the school ID
-        // This is simplified - in production you'd get this from user context
-        assignmentData.targetSchoolId = "school-id"; // Replace with actual school ID
+        // For platform-wide assignment, use the user's school ID
+        if (!user?.school?.id) {
+          setSearchError("User school ID not found. Please ensure you are properly assigned to a school.");
+          setIsAssigning(false);
+          return;
+        }
+        assignmentData.targetSchoolId = user.school!.id;
       }
 
       console.log("Sending assignment:", assignmentData);
@@ -174,7 +180,9 @@ export function AssignChallengeDialog({
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.error || `Assignment failed (${response.status})`);
+        console.error('Assignment validation error:', errorData);
+        const errorMessage = errorData.details ? `${errorData.error}: ${JSON.stringify(errorData.details)}` : errorData.error;
+        throw new Error(errorMessage || `Assignment failed (${response.status})`);
       }
 
       const result = await response.json();

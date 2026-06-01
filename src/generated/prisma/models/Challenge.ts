@@ -20,8 +20,20 @@ export type ChallengeModel = runtime.Types.Result.DefaultSelection<Prisma.$Chall
 
 export type AggregateChallenge = {
   _count: ChallengeCountAggregateOutputType | null
+  _avg: ChallengeAvgAggregateOutputType | null
+  _sum: ChallengeSumAggregateOutputType | null
   _min: ChallengeMinAggregateOutputType | null
   _max: ChallengeMaxAggregateOutputType | null
+}
+
+export type ChallengeAvgAggregateOutputType = {
+  rewardPoints: number | null
+  targetValue: number | null
+}
+
+export type ChallengeSumAggregateOutputType = {
+  rewardPoints: number | null
+  targetValue: number | null
 }
 
 export type ChallengeMinAggregateOutputType = {
@@ -29,21 +41,28 @@ export type ChallengeMinAggregateOutputType = {
   name: string | null
   description: string | null
   instructions: string | null
+  category: string | null
   isActive: boolean | null
   createdBy: string | null
   createdAt: Date | null
   updatedAt: Date | null
   schoolId: string | null
+  startsAt: Date | null
+  endsAt: Date | null
   requiresMeditation: boolean | null
   requiresMusic: boolean | null
   requiresPsychoeducation: boolean | null
   requiresJournaling: boolean | null
-  category: string | null
   assignmentType: string | null
-  endsAt: Date | null
-  startsAt: Date | null
   targetClassId: string | null
   targetSchoolId: string | null
+  badgeId: string | null
+  challengeType: $Enums.ChallengeType | null
+  difficulty: $Enums.Difficulty | null
+  moduleType: $Enums.ModuleType | null
+  rewardPoints: number | null
+  targetUnit: $Enums.TargetUnit | null
+  targetValue: number | null
 }
 
 export type ChallengeMaxAggregateOutputType = {
@@ -51,21 +70,28 @@ export type ChallengeMaxAggregateOutputType = {
   name: string | null
   description: string | null
   instructions: string | null
+  category: string | null
   isActive: boolean | null
   createdBy: string | null
   createdAt: Date | null
   updatedAt: Date | null
   schoolId: string | null
+  startsAt: Date | null
+  endsAt: Date | null
   requiresMeditation: boolean | null
   requiresMusic: boolean | null
   requiresPsychoeducation: boolean | null
   requiresJournaling: boolean | null
-  category: string | null
   assignmentType: string | null
-  endsAt: Date | null
-  startsAt: Date | null
   targetClassId: string | null
   targetSchoolId: string | null
+  badgeId: string | null
+  challengeType: $Enums.ChallengeType | null
+  difficulty: $Enums.Difficulty | null
+  moduleType: $Enums.ModuleType | null
+  rewardPoints: number | null
+  targetUnit: $Enums.TargetUnit | null
+  targetValue: number | null
 }
 
 export type ChallengeCountAggregateOutputType = {
@@ -73,45 +99,69 @@ export type ChallengeCountAggregateOutputType = {
   name: number
   description: number
   instructions: number
+  category: number
   isActive: number
   createdBy: number
   createdAt: number
   updatedAt: number
   schoolId: number
+  startsAt: number
+  endsAt: number
   requiresMeditation: number
   requiresMusic: number
   requiresPsychoeducation: number
   requiresJournaling: number
-  category: number
   assignmentType: number
-  endsAt: number
-  startsAt: number
   targetClassId: number
   targetSchoolId: number
+  badgeId: number
+  challengeType: number
+  difficulty: number
+  moduleType: number
+  rewardPoints: number
+  targetUnit: number
+  targetValue: number
   _all: number
 }
 
+
+export type ChallengeAvgAggregateInputType = {
+  rewardPoints?: true
+  targetValue?: true
+}
+
+export type ChallengeSumAggregateInputType = {
+  rewardPoints?: true
+  targetValue?: true
+}
 
 export type ChallengeMinAggregateInputType = {
   id?: true
   name?: true
   description?: true
   instructions?: true
+  category?: true
   isActive?: true
   createdBy?: true
   createdAt?: true
   updatedAt?: true
   schoolId?: true
+  startsAt?: true
+  endsAt?: true
   requiresMeditation?: true
   requiresMusic?: true
   requiresPsychoeducation?: true
   requiresJournaling?: true
-  category?: true
   assignmentType?: true
-  endsAt?: true
-  startsAt?: true
   targetClassId?: true
   targetSchoolId?: true
+  badgeId?: true
+  challengeType?: true
+  difficulty?: true
+  moduleType?: true
+  rewardPoints?: true
+  targetUnit?: true
+  targetValue?: true
 }
 
 export type ChallengeMaxAggregateInputType = {
@@ -119,21 +169,28 @@ export type ChallengeMaxAggregateInputType = {
   name?: true
   description?: true
   instructions?: true
+  category?: true
   isActive?: true
   createdBy?: true
   createdAt?: true
   updatedAt?: true
   schoolId?: true
+  startsAt?: true
+  endsAt?: true
   requiresMeditation?: true
   requiresMusic?: true
   requiresPsychoeducation?: true
   requiresJournaling?: true
-  category?: true
   assignmentType?: true
-  endsAt?: true
-  startsAt?: true
   targetClassId?: true
   targetSchoolId?: true
+  badgeId?: true
+  challengeType?: true
+  difficulty?: true
+  moduleType?: true
+  rewardPoints?: true
+  targetUnit?: true
+  targetValue?: true
 }
 
 export type ChallengeCountAggregateInputType = {
@@ -141,21 +198,28 @@ export type ChallengeCountAggregateInputType = {
   name?: true
   description?: true
   instructions?: true
+  category?: true
   isActive?: true
   createdBy?: true
   createdAt?: true
   updatedAt?: true
   schoolId?: true
+  startsAt?: true
+  endsAt?: true
   requiresMeditation?: true
   requiresMusic?: true
   requiresPsychoeducation?: true
   requiresJournaling?: true
-  category?: true
   assignmentType?: true
-  endsAt?: true
-  startsAt?: true
   targetClassId?: true
   targetSchoolId?: true
+  badgeId?: true
+  challengeType?: true
+  difficulty?: true
+  moduleType?: true
+  rewardPoints?: true
+  targetUnit?: true
+  targetValue?: true
   _all?: true
 }
 
@@ -197,6 +261,18 @@ export type ChallengeAggregateArgs<ExtArgs extends runtime.Types.Extensions.Inte
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
    * 
+   * Select which fields to average
+  **/
+  _avg?: ChallengeAvgAggregateInputType
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+   * 
+   * Select which fields to sum
+  **/
+  _sum?: ChallengeSumAggregateInputType
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+   * 
    * Select which fields to find the minimum value
   **/
   _min?: ChallengeMinAggregateInputType
@@ -227,6 +303,8 @@ export type ChallengeGroupByArgs<ExtArgs extends runtime.Types.Extensions.Intern
   take?: number
   skip?: number
   _count?: ChallengeCountAggregateInputType | true
+  _avg?: ChallengeAvgAggregateInputType
+  _sum?: ChallengeSumAggregateInputType
   _min?: ChallengeMinAggregateInputType
   _max?: ChallengeMaxAggregateInputType
 }
@@ -236,22 +314,31 @@ export type ChallengeGroupByOutputType = {
   name: string
   description: string
   instructions: string
+  category: string | null
   isActive: boolean
   createdBy: string
   createdAt: Date
   updatedAt: Date
   schoolId: string | null
+  startsAt: Date
+  endsAt: Date
   requiresMeditation: boolean
   requiresMusic: boolean
   requiresPsychoeducation: boolean
   requiresJournaling: boolean
-  category: string | null
   assignmentType: string
-  endsAt: Date
-  startsAt: Date
   targetClassId: string | null
   targetSchoolId: string | null
+  badgeId: string | null
+  challengeType: $Enums.ChallengeType | null
+  difficulty: $Enums.Difficulty | null
+  moduleType: $Enums.ModuleType | null
+  rewardPoints: number
+  targetUnit: $Enums.TargetUnit | null
+  targetValue: number | null
   _count: ChallengeCountAggregateOutputType | null
+  _avg: ChallengeAvgAggregateOutputType | null
+  _sum: ChallengeSumAggregateOutputType | null
   _min: ChallengeMinAggregateOutputType | null
   _max: ChallengeMaxAggregateOutputType | null
 }
@@ -279,22 +366,31 @@ export type ChallengeWhereInput = {
   name?: Prisma.StringFilter<"Challenge"> | string
   description?: Prisma.StringFilter<"Challenge"> | string
   instructions?: Prisma.StringFilter<"Challenge"> | string
+  category?: Prisma.StringNullableFilter<"Challenge"> | string | null
   isActive?: Prisma.BoolFilter<"Challenge"> | boolean
   createdBy?: Prisma.StringFilter<"Challenge"> | string
   createdAt?: Prisma.DateTimeFilter<"Challenge"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Challenge"> | Date | string
   schoolId?: Prisma.StringNullableFilter<"Challenge"> | string | null
+  startsAt?: Prisma.DateTimeFilter<"Challenge"> | Date | string
+  endsAt?: Prisma.DateTimeFilter<"Challenge"> | Date | string
   requiresMeditation?: Prisma.BoolFilter<"Challenge"> | boolean
   requiresMusic?: Prisma.BoolFilter<"Challenge"> | boolean
   requiresPsychoeducation?: Prisma.BoolFilter<"Challenge"> | boolean
   requiresJournaling?: Prisma.BoolFilter<"Challenge"> | boolean
-  category?: Prisma.StringNullableFilter<"Challenge"> | string | null
   assignmentType?: Prisma.StringFilter<"Challenge"> | string
-  endsAt?: Prisma.DateTimeFilter<"Challenge"> | Date | string
-  startsAt?: Prisma.DateTimeFilter<"Challenge"> | Date | string
   targetClassId?: Prisma.StringNullableFilter<"Challenge"> | string | null
   targetSchoolId?: Prisma.StringNullableFilter<"Challenge"> | string | null
+  badgeId?: Prisma.StringNullableFilter<"Challenge"> | string | null
+  challengeType?: Prisma.EnumChallengeTypeNullableFilter<"Challenge"> | $Enums.ChallengeType | null
+  difficulty?: Prisma.EnumDifficultyNullableFilter<"Challenge"> | $Enums.Difficulty | null
+  moduleType?: Prisma.EnumModuleTypeNullableFilter<"Challenge"> | $Enums.ModuleType | null
+  rewardPoints?: Prisma.IntFilter<"Challenge"> | number
+  targetUnit?: Prisma.EnumTargetUnitNullableFilter<"Challenge"> | $Enums.TargetUnit | null
+  targetValue?: Prisma.IntNullableFilter<"Challenge"> | number | null
+  activityEvents?: Prisma.ActivityEventListRelationFilter
   challengeAssignments?: Prisma.ChallengeAssignmentListRelationFilter
+  badge?: Prisma.XOR<Prisma.BadgeNullableScalarRelationFilter, Prisma.BadgeWhereInput> | null
   creator?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   school?: Prisma.XOR<Prisma.SchoolNullableScalarRelationFilter, Prisma.SchoolWhereInput> | null
   userChallenges?: Prisma.UserChallengeListRelationFilter
@@ -305,22 +401,31 @@ export type ChallengeOrderByWithRelationInput = {
   name?: Prisma.SortOrder
   description?: Prisma.SortOrder
   instructions?: Prisma.SortOrder
+  category?: Prisma.SortOrderInput | Prisma.SortOrder
   isActive?: Prisma.SortOrder
   createdBy?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   schoolId?: Prisma.SortOrderInput | Prisma.SortOrder
+  startsAt?: Prisma.SortOrder
+  endsAt?: Prisma.SortOrder
   requiresMeditation?: Prisma.SortOrder
   requiresMusic?: Prisma.SortOrder
   requiresPsychoeducation?: Prisma.SortOrder
   requiresJournaling?: Prisma.SortOrder
-  category?: Prisma.SortOrderInput | Prisma.SortOrder
   assignmentType?: Prisma.SortOrder
-  endsAt?: Prisma.SortOrder
-  startsAt?: Prisma.SortOrder
   targetClassId?: Prisma.SortOrderInput | Prisma.SortOrder
   targetSchoolId?: Prisma.SortOrderInput | Prisma.SortOrder
+  badgeId?: Prisma.SortOrderInput | Prisma.SortOrder
+  challengeType?: Prisma.SortOrderInput | Prisma.SortOrder
+  difficulty?: Prisma.SortOrderInput | Prisma.SortOrder
+  moduleType?: Prisma.SortOrderInput | Prisma.SortOrder
+  rewardPoints?: Prisma.SortOrder
+  targetUnit?: Prisma.SortOrderInput | Prisma.SortOrder
+  targetValue?: Prisma.SortOrderInput | Prisma.SortOrder
+  activityEvents?: Prisma.ActivityEventOrderByRelationAggregateInput
   challengeAssignments?: Prisma.ChallengeAssignmentOrderByRelationAggregateInput
+  badge?: Prisma.BadgeOrderByWithRelationInput
   creator?: Prisma.UserOrderByWithRelationInput
   school?: Prisma.SchoolOrderByWithRelationInput
   userChallenges?: Prisma.UserChallengeOrderByRelationAggregateInput
@@ -334,22 +439,31 @@ export type ChallengeWhereUniqueInput = Prisma.AtLeast<{
   name?: Prisma.StringFilter<"Challenge"> | string
   description?: Prisma.StringFilter<"Challenge"> | string
   instructions?: Prisma.StringFilter<"Challenge"> | string
+  category?: Prisma.StringNullableFilter<"Challenge"> | string | null
   isActive?: Prisma.BoolFilter<"Challenge"> | boolean
   createdBy?: Prisma.StringFilter<"Challenge"> | string
   createdAt?: Prisma.DateTimeFilter<"Challenge"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Challenge"> | Date | string
   schoolId?: Prisma.StringNullableFilter<"Challenge"> | string | null
+  startsAt?: Prisma.DateTimeFilter<"Challenge"> | Date | string
+  endsAt?: Prisma.DateTimeFilter<"Challenge"> | Date | string
   requiresMeditation?: Prisma.BoolFilter<"Challenge"> | boolean
   requiresMusic?: Prisma.BoolFilter<"Challenge"> | boolean
   requiresPsychoeducation?: Prisma.BoolFilter<"Challenge"> | boolean
   requiresJournaling?: Prisma.BoolFilter<"Challenge"> | boolean
-  category?: Prisma.StringNullableFilter<"Challenge"> | string | null
   assignmentType?: Prisma.StringFilter<"Challenge"> | string
-  endsAt?: Prisma.DateTimeFilter<"Challenge"> | Date | string
-  startsAt?: Prisma.DateTimeFilter<"Challenge"> | Date | string
   targetClassId?: Prisma.StringNullableFilter<"Challenge"> | string | null
   targetSchoolId?: Prisma.StringNullableFilter<"Challenge"> | string | null
+  badgeId?: Prisma.StringNullableFilter<"Challenge"> | string | null
+  challengeType?: Prisma.EnumChallengeTypeNullableFilter<"Challenge"> | $Enums.ChallengeType | null
+  difficulty?: Prisma.EnumDifficultyNullableFilter<"Challenge"> | $Enums.Difficulty | null
+  moduleType?: Prisma.EnumModuleTypeNullableFilter<"Challenge"> | $Enums.ModuleType | null
+  rewardPoints?: Prisma.IntFilter<"Challenge"> | number
+  targetUnit?: Prisma.EnumTargetUnitNullableFilter<"Challenge"> | $Enums.TargetUnit | null
+  targetValue?: Prisma.IntNullableFilter<"Challenge"> | number | null
+  activityEvents?: Prisma.ActivityEventListRelationFilter
   challengeAssignments?: Prisma.ChallengeAssignmentListRelationFilter
+  badge?: Prisma.XOR<Prisma.BadgeNullableScalarRelationFilter, Prisma.BadgeWhereInput> | null
   creator?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   school?: Prisma.XOR<Prisma.SchoolNullableScalarRelationFilter, Prisma.SchoolWhereInput> | null
   userChallenges?: Prisma.UserChallengeListRelationFilter
@@ -360,24 +474,33 @@ export type ChallengeOrderByWithAggregationInput = {
   name?: Prisma.SortOrder
   description?: Prisma.SortOrder
   instructions?: Prisma.SortOrder
+  category?: Prisma.SortOrderInput | Prisma.SortOrder
   isActive?: Prisma.SortOrder
   createdBy?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   schoolId?: Prisma.SortOrderInput | Prisma.SortOrder
+  startsAt?: Prisma.SortOrder
+  endsAt?: Prisma.SortOrder
   requiresMeditation?: Prisma.SortOrder
   requiresMusic?: Prisma.SortOrder
   requiresPsychoeducation?: Prisma.SortOrder
   requiresJournaling?: Prisma.SortOrder
-  category?: Prisma.SortOrderInput | Prisma.SortOrder
   assignmentType?: Prisma.SortOrder
-  endsAt?: Prisma.SortOrder
-  startsAt?: Prisma.SortOrder
   targetClassId?: Prisma.SortOrderInput | Prisma.SortOrder
   targetSchoolId?: Prisma.SortOrderInput | Prisma.SortOrder
+  badgeId?: Prisma.SortOrderInput | Prisma.SortOrder
+  challengeType?: Prisma.SortOrderInput | Prisma.SortOrder
+  difficulty?: Prisma.SortOrderInput | Prisma.SortOrder
+  moduleType?: Prisma.SortOrderInput | Prisma.SortOrder
+  rewardPoints?: Prisma.SortOrder
+  targetUnit?: Prisma.SortOrderInput | Prisma.SortOrder
+  targetValue?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.ChallengeCountOrderByAggregateInput
+  _avg?: Prisma.ChallengeAvgOrderByAggregateInput
   _max?: Prisma.ChallengeMaxOrderByAggregateInput
   _min?: Prisma.ChallengeMinOrderByAggregateInput
+  _sum?: Prisma.ChallengeSumOrderByAggregateInput
 }
 
 export type ChallengeScalarWhereWithAggregatesInput = {
@@ -388,21 +511,28 @@ export type ChallengeScalarWhereWithAggregatesInput = {
   name?: Prisma.StringWithAggregatesFilter<"Challenge"> | string
   description?: Prisma.StringWithAggregatesFilter<"Challenge"> | string
   instructions?: Prisma.StringWithAggregatesFilter<"Challenge"> | string
+  category?: Prisma.StringNullableWithAggregatesFilter<"Challenge"> | string | null
   isActive?: Prisma.BoolWithAggregatesFilter<"Challenge"> | boolean
   createdBy?: Prisma.StringWithAggregatesFilter<"Challenge"> | string
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Challenge"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Challenge"> | Date | string
   schoolId?: Prisma.StringNullableWithAggregatesFilter<"Challenge"> | string | null
+  startsAt?: Prisma.DateTimeWithAggregatesFilter<"Challenge"> | Date | string
+  endsAt?: Prisma.DateTimeWithAggregatesFilter<"Challenge"> | Date | string
   requiresMeditation?: Prisma.BoolWithAggregatesFilter<"Challenge"> | boolean
   requiresMusic?: Prisma.BoolWithAggregatesFilter<"Challenge"> | boolean
   requiresPsychoeducation?: Prisma.BoolWithAggregatesFilter<"Challenge"> | boolean
   requiresJournaling?: Prisma.BoolWithAggregatesFilter<"Challenge"> | boolean
-  category?: Prisma.StringNullableWithAggregatesFilter<"Challenge"> | string | null
   assignmentType?: Prisma.StringWithAggregatesFilter<"Challenge"> | string
-  endsAt?: Prisma.DateTimeWithAggregatesFilter<"Challenge"> | Date | string
-  startsAt?: Prisma.DateTimeWithAggregatesFilter<"Challenge"> | Date | string
   targetClassId?: Prisma.StringNullableWithAggregatesFilter<"Challenge"> | string | null
   targetSchoolId?: Prisma.StringNullableWithAggregatesFilter<"Challenge"> | string | null
+  badgeId?: Prisma.StringNullableWithAggregatesFilter<"Challenge"> | string | null
+  challengeType?: Prisma.EnumChallengeTypeNullableWithAggregatesFilter<"Challenge"> | $Enums.ChallengeType | null
+  difficulty?: Prisma.EnumDifficultyNullableWithAggregatesFilter<"Challenge"> | $Enums.Difficulty | null
+  moduleType?: Prisma.EnumModuleTypeNullableWithAggregatesFilter<"Challenge"> | $Enums.ModuleType | null
+  rewardPoints?: Prisma.IntWithAggregatesFilter<"Challenge"> | number
+  targetUnit?: Prisma.EnumTargetUnitNullableWithAggregatesFilter<"Challenge"> | $Enums.TargetUnit | null
+  targetValue?: Prisma.IntNullableWithAggregatesFilter<"Challenge"> | number | null
 }
 
 export type ChallengeCreateInput = {
@@ -410,20 +540,28 @@ export type ChallengeCreateInput = {
   name: string
   description: string
   instructions: string
+  category?: string | null
   isActive?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
+  startsAt?: Date | string
+  endsAt: Date | string
   requiresMeditation?: boolean
   requiresMusic?: boolean
   requiresPsychoeducation?: boolean
   requiresJournaling?: boolean
-  category?: string | null
   assignmentType?: string
-  endsAt?: Date | string
-  startsAt?: Date | string
   targetClassId?: string | null
   targetSchoolId?: string | null
+  challengeType?: $Enums.ChallengeType | null
+  difficulty?: $Enums.Difficulty | null
+  moduleType?: $Enums.ModuleType | null
+  rewardPoints?: number
+  targetUnit?: $Enums.TargetUnit | null
+  targetValue?: number | null
+  activityEvents?: Prisma.ActivityEventCreateNestedManyWithoutChallengeInput
   challengeAssignments?: Prisma.ChallengeAssignmentCreateNestedManyWithoutChallengeInput
+  badge?: Prisma.BadgeCreateNestedOneWithoutChallengesInput
   creator: Prisma.UserCreateNestedOneWithoutCreatedChallengesInput
   school?: Prisma.SchoolCreateNestedOneWithoutChallengesInput
   userChallenges?: Prisma.UserChallengeCreateNestedManyWithoutChallengeInput
@@ -434,21 +572,29 @@ export type ChallengeUncheckedCreateInput = {
   name: string
   description: string
   instructions: string
+  category?: string | null
   isActive?: boolean
   createdBy: string
   createdAt?: Date | string
   updatedAt?: Date | string
   schoolId?: string | null
+  startsAt?: Date | string
+  endsAt: Date | string
   requiresMeditation?: boolean
   requiresMusic?: boolean
   requiresPsychoeducation?: boolean
   requiresJournaling?: boolean
-  category?: string | null
   assignmentType?: string
-  endsAt?: Date | string
-  startsAt?: Date | string
   targetClassId?: string | null
   targetSchoolId?: string | null
+  badgeId?: string | null
+  challengeType?: $Enums.ChallengeType | null
+  difficulty?: $Enums.Difficulty | null
+  moduleType?: $Enums.ModuleType | null
+  rewardPoints?: number
+  targetUnit?: $Enums.TargetUnit | null
+  targetValue?: number | null
+  activityEvents?: Prisma.ActivityEventUncheckedCreateNestedManyWithoutChallengeInput
   challengeAssignments?: Prisma.ChallengeAssignmentUncheckedCreateNestedManyWithoutChallengeInput
   userChallenges?: Prisma.UserChallengeUncheckedCreateNestedManyWithoutChallengeInput
 }
@@ -458,20 +604,28 @@ export type ChallengeUpdateInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
   instructions?: Prisma.StringFieldUpdateOperationsInput | string
+  category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  startsAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  endsAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   requiresMeditation?: Prisma.BoolFieldUpdateOperationsInput | boolean
   requiresMusic?: Prisma.BoolFieldUpdateOperationsInput | boolean
   requiresPsychoeducation?: Prisma.BoolFieldUpdateOperationsInput | boolean
   requiresJournaling?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   assignmentType?: Prisma.StringFieldUpdateOperationsInput | string
-  endsAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  startsAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   targetClassId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   targetSchoolId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  challengeType?: Prisma.NullableEnumChallengeTypeFieldUpdateOperationsInput | $Enums.ChallengeType | null
+  difficulty?: Prisma.NullableEnumDifficultyFieldUpdateOperationsInput | $Enums.Difficulty | null
+  moduleType?: Prisma.NullableEnumModuleTypeFieldUpdateOperationsInput | $Enums.ModuleType | null
+  rewardPoints?: Prisma.IntFieldUpdateOperationsInput | number
+  targetUnit?: Prisma.NullableEnumTargetUnitFieldUpdateOperationsInput | $Enums.TargetUnit | null
+  targetValue?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  activityEvents?: Prisma.ActivityEventUpdateManyWithoutChallengeNestedInput
   challengeAssignments?: Prisma.ChallengeAssignmentUpdateManyWithoutChallengeNestedInput
+  badge?: Prisma.BadgeUpdateOneWithoutChallengesNestedInput
   creator?: Prisma.UserUpdateOneRequiredWithoutCreatedChallengesNestedInput
   school?: Prisma.SchoolUpdateOneWithoutChallengesNestedInput
   userChallenges?: Prisma.UserChallengeUpdateManyWithoutChallengeNestedInput
@@ -482,21 +636,29 @@ export type ChallengeUncheckedUpdateInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
   instructions?: Prisma.StringFieldUpdateOperationsInput | string
+  category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdBy?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   schoolId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  startsAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  endsAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   requiresMeditation?: Prisma.BoolFieldUpdateOperationsInput | boolean
   requiresMusic?: Prisma.BoolFieldUpdateOperationsInput | boolean
   requiresPsychoeducation?: Prisma.BoolFieldUpdateOperationsInput | boolean
   requiresJournaling?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   assignmentType?: Prisma.StringFieldUpdateOperationsInput | string
-  endsAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  startsAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   targetClassId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   targetSchoolId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  badgeId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  challengeType?: Prisma.NullableEnumChallengeTypeFieldUpdateOperationsInput | $Enums.ChallengeType | null
+  difficulty?: Prisma.NullableEnumDifficultyFieldUpdateOperationsInput | $Enums.Difficulty | null
+  moduleType?: Prisma.NullableEnumModuleTypeFieldUpdateOperationsInput | $Enums.ModuleType | null
+  rewardPoints?: Prisma.IntFieldUpdateOperationsInput | number
+  targetUnit?: Prisma.NullableEnumTargetUnitFieldUpdateOperationsInput | $Enums.TargetUnit | null
+  targetValue?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  activityEvents?: Prisma.ActivityEventUncheckedUpdateManyWithoutChallengeNestedInput
   challengeAssignments?: Prisma.ChallengeAssignmentUncheckedUpdateManyWithoutChallengeNestedInput
   userChallenges?: Prisma.UserChallengeUncheckedUpdateManyWithoutChallengeNestedInput
 }
@@ -506,21 +668,28 @@ export type ChallengeCreateManyInput = {
   name: string
   description: string
   instructions: string
+  category?: string | null
   isActive?: boolean
   createdBy: string
   createdAt?: Date | string
   updatedAt?: Date | string
   schoolId?: string | null
+  startsAt?: Date | string
+  endsAt: Date | string
   requiresMeditation?: boolean
   requiresMusic?: boolean
   requiresPsychoeducation?: boolean
   requiresJournaling?: boolean
-  category?: string | null
   assignmentType?: string
-  endsAt?: Date | string
-  startsAt?: Date | string
   targetClassId?: string | null
   targetSchoolId?: string | null
+  badgeId?: string | null
+  challengeType?: $Enums.ChallengeType | null
+  difficulty?: $Enums.Difficulty | null
+  moduleType?: $Enums.ModuleType | null
+  rewardPoints?: number
+  targetUnit?: $Enums.TargetUnit | null
+  targetValue?: number | null
 }
 
 export type ChallengeUpdateManyMutationInput = {
@@ -528,19 +697,25 @@ export type ChallengeUpdateManyMutationInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
   instructions?: Prisma.StringFieldUpdateOperationsInput | string
+  category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  startsAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  endsAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   requiresMeditation?: Prisma.BoolFieldUpdateOperationsInput | boolean
   requiresMusic?: Prisma.BoolFieldUpdateOperationsInput | boolean
   requiresPsychoeducation?: Prisma.BoolFieldUpdateOperationsInput | boolean
   requiresJournaling?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   assignmentType?: Prisma.StringFieldUpdateOperationsInput | string
-  endsAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  startsAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   targetClassId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   targetSchoolId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  challengeType?: Prisma.NullableEnumChallengeTypeFieldUpdateOperationsInput | $Enums.ChallengeType | null
+  difficulty?: Prisma.NullableEnumDifficultyFieldUpdateOperationsInput | $Enums.Difficulty | null
+  moduleType?: Prisma.NullableEnumModuleTypeFieldUpdateOperationsInput | $Enums.ModuleType | null
+  rewardPoints?: Prisma.IntFieldUpdateOperationsInput | number
+  targetUnit?: Prisma.NullableEnumTargetUnitFieldUpdateOperationsInput | $Enums.TargetUnit | null
+  targetValue?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
 }
 
 export type ChallengeUncheckedUpdateManyInput = {
@@ -548,21 +723,28 @@ export type ChallengeUncheckedUpdateManyInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
   instructions?: Prisma.StringFieldUpdateOperationsInput | string
+  category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdBy?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   schoolId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  startsAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  endsAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   requiresMeditation?: Prisma.BoolFieldUpdateOperationsInput | boolean
   requiresMusic?: Prisma.BoolFieldUpdateOperationsInput | boolean
   requiresPsychoeducation?: Prisma.BoolFieldUpdateOperationsInput | boolean
   requiresJournaling?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   assignmentType?: Prisma.StringFieldUpdateOperationsInput | string
-  endsAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  startsAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   targetClassId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   targetSchoolId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  badgeId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  challengeType?: Prisma.NullableEnumChallengeTypeFieldUpdateOperationsInput | $Enums.ChallengeType | null
+  difficulty?: Prisma.NullableEnumDifficultyFieldUpdateOperationsInput | $Enums.Difficulty | null
+  moduleType?: Prisma.NullableEnumModuleTypeFieldUpdateOperationsInput | $Enums.ModuleType | null
+  rewardPoints?: Prisma.IntFieldUpdateOperationsInput | number
+  targetUnit?: Prisma.NullableEnumTargetUnitFieldUpdateOperationsInput | $Enums.TargetUnit | null
+  targetValue?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
 }
 
 export type ChallengeListRelationFilter = {
@@ -580,21 +762,33 @@ export type ChallengeCountOrderByAggregateInput = {
   name?: Prisma.SortOrder
   description?: Prisma.SortOrder
   instructions?: Prisma.SortOrder
+  category?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
   createdBy?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   schoolId?: Prisma.SortOrder
+  startsAt?: Prisma.SortOrder
+  endsAt?: Prisma.SortOrder
   requiresMeditation?: Prisma.SortOrder
   requiresMusic?: Prisma.SortOrder
   requiresPsychoeducation?: Prisma.SortOrder
   requiresJournaling?: Prisma.SortOrder
-  category?: Prisma.SortOrder
   assignmentType?: Prisma.SortOrder
-  endsAt?: Prisma.SortOrder
-  startsAt?: Prisma.SortOrder
   targetClassId?: Prisma.SortOrder
   targetSchoolId?: Prisma.SortOrder
+  badgeId?: Prisma.SortOrder
+  challengeType?: Prisma.SortOrder
+  difficulty?: Prisma.SortOrder
+  moduleType?: Prisma.SortOrder
+  rewardPoints?: Prisma.SortOrder
+  targetUnit?: Prisma.SortOrder
+  targetValue?: Prisma.SortOrder
+}
+
+export type ChallengeAvgOrderByAggregateInput = {
+  rewardPoints?: Prisma.SortOrder
+  targetValue?: Prisma.SortOrder
 }
 
 export type ChallengeMaxOrderByAggregateInput = {
@@ -602,21 +796,28 @@ export type ChallengeMaxOrderByAggregateInput = {
   name?: Prisma.SortOrder
   description?: Prisma.SortOrder
   instructions?: Prisma.SortOrder
+  category?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
   createdBy?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   schoolId?: Prisma.SortOrder
+  startsAt?: Prisma.SortOrder
+  endsAt?: Prisma.SortOrder
   requiresMeditation?: Prisma.SortOrder
   requiresMusic?: Prisma.SortOrder
   requiresPsychoeducation?: Prisma.SortOrder
   requiresJournaling?: Prisma.SortOrder
-  category?: Prisma.SortOrder
   assignmentType?: Prisma.SortOrder
-  endsAt?: Prisma.SortOrder
-  startsAt?: Prisma.SortOrder
   targetClassId?: Prisma.SortOrder
   targetSchoolId?: Prisma.SortOrder
+  badgeId?: Prisma.SortOrder
+  challengeType?: Prisma.SortOrder
+  difficulty?: Prisma.SortOrder
+  moduleType?: Prisma.SortOrder
+  rewardPoints?: Prisma.SortOrder
+  targetUnit?: Prisma.SortOrder
+  targetValue?: Prisma.SortOrder
 }
 
 export type ChallengeMinOrderByAggregateInput = {
@@ -624,26 +825,43 @@ export type ChallengeMinOrderByAggregateInput = {
   name?: Prisma.SortOrder
   description?: Prisma.SortOrder
   instructions?: Prisma.SortOrder
+  category?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
   createdBy?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   schoolId?: Prisma.SortOrder
+  startsAt?: Prisma.SortOrder
+  endsAt?: Prisma.SortOrder
   requiresMeditation?: Prisma.SortOrder
   requiresMusic?: Prisma.SortOrder
   requiresPsychoeducation?: Prisma.SortOrder
   requiresJournaling?: Prisma.SortOrder
-  category?: Prisma.SortOrder
   assignmentType?: Prisma.SortOrder
-  endsAt?: Prisma.SortOrder
-  startsAt?: Prisma.SortOrder
   targetClassId?: Prisma.SortOrder
   targetSchoolId?: Prisma.SortOrder
+  badgeId?: Prisma.SortOrder
+  challengeType?: Prisma.SortOrder
+  difficulty?: Prisma.SortOrder
+  moduleType?: Prisma.SortOrder
+  rewardPoints?: Prisma.SortOrder
+  targetUnit?: Prisma.SortOrder
+  targetValue?: Prisma.SortOrder
+}
+
+export type ChallengeSumOrderByAggregateInput = {
+  rewardPoints?: Prisma.SortOrder
+  targetValue?: Prisma.SortOrder
 }
 
 export type ChallengeScalarRelationFilter = {
   is?: Prisma.ChallengeWhereInput
   isNot?: Prisma.ChallengeWhereInput
+}
+
+export type ChallengeNullableScalarRelationFilter = {
+  is?: Prisma.ChallengeWhereInput | null
+  isNot?: Prisma.ChallengeWhereInput | null
 }
 
 export type ChallengeCreateNestedManyWithoutCreatorInput = {
@@ -730,6 +948,64 @@ export type ChallengeUncheckedUpdateManyWithoutSchoolNestedInput = {
   deleteMany?: Prisma.ChallengeScalarWhereInput | Prisma.ChallengeScalarWhereInput[]
 }
 
+export type ChallengeCreateNestedManyWithoutBadgeInput = {
+  create?: Prisma.XOR<Prisma.ChallengeCreateWithoutBadgeInput, Prisma.ChallengeUncheckedCreateWithoutBadgeInput> | Prisma.ChallengeCreateWithoutBadgeInput[] | Prisma.ChallengeUncheckedCreateWithoutBadgeInput[]
+  connectOrCreate?: Prisma.ChallengeCreateOrConnectWithoutBadgeInput | Prisma.ChallengeCreateOrConnectWithoutBadgeInput[]
+  createMany?: Prisma.ChallengeCreateManyBadgeInputEnvelope
+  connect?: Prisma.ChallengeWhereUniqueInput | Prisma.ChallengeWhereUniqueInput[]
+}
+
+export type ChallengeUncheckedCreateNestedManyWithoutBadgeInput = {
+  create?: Prisma.XOR<Prisma.ChallengeCreateWithoutBadgeInput, Prisma.ChallengeUncheckedCreateWithoutBadgeInput> | Prisma.ChallengeCreateWithoutBadgeInput[] | Prisma.ChallengeUncheckedCreateWithoutBadgeInput[]
+  connectOrCreate?: Prisma.ChallengeCreateOrConnectWithoutBadgeInput | Prisma.ChallengeCreateOrConnectWithoutBadgeInput[]
+  createMany?: Prisma.ChallengeCreateManyBadgeInputEnvelope
+  connect?: Prisma.ChallengeWhereUniqueInput | Prisma.ChallengeWhereUniqueInput[]
+}
+
+export type ChallengeUpdateManyWithoutBadgeNestedInput = {
+  create?: Prisma.XOR<Prisma.ChallengeCreateWithoutBadgeInput, Prisma.ChallengeUncheckedCreateWithoutBadgeInput> | Prisma.ChallengeCreateWithoutBadgeInput[] | Prisma.ChallengeUncheckedCreateWithoutBadgeInput[]
+  connectOrCreate?: Prisma.ChallengeCreateOrConnectWithoutBadgeInput | Prisma.ChallengeCreateOrConnectWithoutBadgeInput[]
+  upsert?: Prisma.ChallengeUpsertWithWhereUniqueWithoutBadgeInput | Prisma.ChallengeUpsertWithWhereUniqueWithoutBadgeInput[]
+  createMany?: Prisma.ChallengeCreateManyBadgeInputEnvelope
+  set?: Prisma.ChallengeWhereUniqueInput | Prisma.ChallengeWhereUniqueInput[]
+  disconnect?: Prisma.ChallengeWhereUniqueInput | Prisma.ChallengeWhereUniqueInput[]
+  delete?: Prisma.ChallengeWhereUniqueInput | Prisma.ChallengeWhereUniqueInput[]
+  connect?: Prisma.ChallengeWhereUniqueInput | Prisma.ChallengeWhereUniqueInput[]
+  update?: Prisma.ChallengeUpdateWithWhereUniqueWithoutBadgeInput | Prisma.ChallengeUpdateWithWhereUniqueWithoutBadgeInput[]
+  updateMany?: Prisma.ChallengeUpdateManyWithWhereWithoutBadgeInput | Prisma.ChallengeUpdateManyWithWhereWithoutBadgeInput[]
+  deleteMany?: Prisma.ChallengeScalarWhereInput | Prisma.ChallengeScalarWhereInput[]
+}
+
+export type ChallengeUncheckedUpdateManyWithoutBadgeNestedInput = {
+  create?: Prisma.XOR<Prisma.ChallengeCreateWithoutBadgeInput, Prisma.ChallengeUncheckedCreateWithoutBadgeInput> | Prisma.ChallengeCreateWithoutBadgeInput[] | Prisma.ChallengeUncheckedCreateWithoutBadgeInput[]
+  connectOrCreate?: Prisma.ChallengeCreateOrConnectWithoutBadgeInput | Prisma.ChallengeCreateOrConnectWithoutBadgeInput[]
+  upsert?: Prisma.ChallengeUpsertWithWhereUniqueWithoutBadgeInput | Prisma.ChallengeUpsertWithWhereUniqueWithoutBadgeInput[]
+  createMany?: Prisma.ChallengeCreateManyBadgeInputEnvelope
+  set?: Prisma.ChallengeWhereUniqueInput | Prisma.ChallengeWhereUniqueInput[]
+  disconnect?: Prisma.ChallengeWhereUniqueInput | Prisma.ChallengeWhereUniqueInput[]
+  delete?: Prisma.ChallengeWhereUniqueInput | Prisma.ChallengeWhereUniqueInput[]
+  connect?: Prisma.ChallengeWhereUniqueInput | Prisma.ChallengeWhereUniqueInput[]
+  update?: Prisma.ChallengeUpdateWithWhereUniqueWithoutBadgeInput | Prisma.ChallengeUpdateWithWhereUniqueWithoutBadgeInput[]
+  updateMany?: Prisma.ChallengeUpdateManyWithWhereWithoutBadgeInput | Prisma.ChallengeUpdateManyWithWhereWithoutBadgeInput[]
+  deleteMany?: Prisma.ChallengeScalarWhereInput | Prisma.ChallengeScalarWhereInput[]
+}
+
+export type NullableEnumChallengeTypeFieldUpdateOperationsInput = {
+  set?: $Enums.ChallengeType | null
+}
+
+export type NullableEnumDifficultyFieldUpdateOperationsInput = {
+  set?: $Enums.Difficulty | null
+}
+
+export type NullableEnumModuleTypeFieldUpdateOperationsInput = {
+  set?: $Enums.ModuleType | null
+}
+
+export type NullableEnumTargetUnitFieldUpdateOperationsInput = {
+  set?: $Enums.TargetUnit | null
+}
+
 export type ChallengeCreateNestedOneWithoutUserChallengesInput = {
   create?: Prisma.XOR<Prisma.ChallengeCreateWithoutUserChallengesInput, Prisma.ChallengeUncheckedCreateWithoutUserChallengesInput>
   connectOrCreate?: Prisma.ChallengeCreateOrConnectWithoutUserChallengesInput
@@ -758,25 +1034,49 @@ export type ChallengeUpdateOneRequiredWithoutChallengeAssignmentsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.ChallengeUpdateToOneWithWhereWithoutChallengeAssignmentsInput, Prisma.ChallengeUpdateWithoutChallengeAssignmentsInput>, Prisma.ChallengeUncheckedUpdateWithoutChallengeAssignmentsInput>
 }
 
+export type ChallengeCreateNestedOneWithoutActivityEventsInput = {
+  create?: Prisma.XOR<Prisma.ChallengeCreateWithoutActivityEventsInput, Prisma.ChallengeUncheckedCreateWithoutActivityEventsInput>
+  connectOrCreate?: Prisma.ChallengeCreateOrConnectWithoutActivityEventsInput
+  connect?: Prisma.ChallengeWhereUniqueInput
+}
+
+export type ChallengeUpdateOneWithoutActivityEventsNestedInput = {
+  create?: Prisma.XOR<Prisma.ChallengeCreateWithoutActivityEventsInput, Prisma.ChallengeUncheckedCreateWithoutActivityEventsInput>
+  connectOrCreate?: Prisma.ChallengeCreateOrConnectWithoutActivityEventsInput
+  upsert?: Prisma.ChallengeUpsertWithoutActivityEventsInput
+  disconnect?: Prisma.ChallengeWhereInput | boolean
+  delete?: Prisma.ChallengeWhereInput | boolean
+  connect?: Prisma.ChallengeWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ChallengeUpdateToOneWithWhereWithoutActivityEventsInput, Prisma.ChallengeUpdateWithoutActivityEventsInput>, Prisma.ChallengeUncheckedUpdateWithoutActivityEventsInput>
+}
+
 export type ChallengeCreateWithoutCreatorInput = {
   id?: string
   name: string
   description: string
   instructions: string
+  category?: string | null
   isActive?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
+  startsAt?: Date | string
+  endsAt: Date | string
   requiresMeditation?: boolean
   requiresMusic?: boolean
   requiresPsychoeducation?: boolean
   requiresJournaling?: boolean
-  category?: string | null
   assignmentType?: string
-  endsAt?: Date | string
-  startsAt?: Date | string
   targetClassId?: string | null
   targetSchoolId?: string | null
+  challengeType?: $Enums.ChallengeType | null
+  difficulty?: $Enums.Difficulty | null
+  moduleType?: $Enums.ModuleType | null
+  rewardPoints?: number
+  targetUnit?: $Enums.TargetUnit | null
+  targetValue?: number | null
+  activityEvents?: Prisma.ActivityEventCreateNestedManyWithoutChallengeInput
   challengeAssignments?: Prisma.ChallengeAssignmentCreateNestedManyWithoutChallengeInput
+  badge?: Prisma.BadgeCreateNestedOneWithoutChallengesInput
   school?: Prisma.SchoolCreateNestedOneWithoutChallengesInput
   userChallenges?: Prisma.UserChallengeCreateNestedManyWithoutChallengeInput
 }
@@ -786,20 +1086,28 @@ export type ChallengeUncheckedCreateWithoutCreatorInput = {
   name: string
   description: string
   instructions: string
+  category?: string | null
   isActive?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   schoolId?: string | null
+  startsAt?: Date | string
+  endsAt: Date | string
   requiresMeditation?: boolean
   requiresMusic?: boolean
   requiresPsychoeducation?: boolean
   requiresJournaling?: boolean
-  category?: string | null
   assignmentType?: string
-  endsAt?: Date | string
-  startsAt?: Date | string
   targetClassId?: string | null
   targetSchoolId?: string | null
+  badgeId?: string | null
+  challengeType?: $Enums.ChallengeType | null
+  difficulty?: $Enums.Difficulty | null
+  moduleType?: $Enums.ModuleType | null
+  rewardPoints?: number
+  targetUnit?: $Enums.TargetUnit | null
+  targetValue?: number | null
+  activityEvents?: Prisma.ActivityEventUncheckedCreateNestedManyWithoutChallengeInput
   challengeAssignments?: Prisma.ChallengeAssignmentUncheckedCreateNestedManyWithoutChallengeInput
   userChallenges?: Prisma.UserChallengeUncheckedCreateNestedManyWithoutChallengeInput
 }
@@ -838,21 +1146,28 @@ export type ChallengeScalarWhereInput = {
   name?: Prisma.StringFilter<"Challenge"> | string
   description?: Prisma.StringFilter<"Challenge"> | string
   instructions?: Prisma.StringFilter<"Challenge"> | string
+  category?: Prisma.StringNullableFilter<"Challenge"> | string | null
   isActive?: Prisma.BoolFilter<"Challenge"> | boolean
   createdBy?: Prisma.StringFilter<"Challenge"> | string
   createdAt?: Prisma.DateTimeFilter<"Challenge"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Challenge"> | Date | string
   schoolId?: Prisma.StringNullableFilter<"Challenge"> | string | null
+  startsAt?: Prisma.DateTimeFilter<"Challenge"> | Date | string
+  endsAt?: Prisma.DateTimeFilter<"Challenge"> | Date | string
   requiresMeditation?: Prisma.BoolFilter<"Challenge"> | boolean
   requiresMusic?: Prisma.BoolFilter<"Challenge"> | boolean
   requiresPsychoeducation?: Prisma.BoolFilter<"Challenge"> | boolean
   requiresJournaling?: Prisma.BoolFilter<"Challenge"> | boolean
-  category?: Prisma.StringNullableFilter<"Challenge"> | string | null
   assignmentType?: Prisma.StringFilter<"Challenge"> | string
-  endsAt?: Prisma.DateTimeFilter<"Challenge"> | Date | string
-  startsAt?: Prisma.DateTimeFilter<"Challenge"> | Date | string
   targetClassId?: Prisma.StringNullableFilter<"Challenge"> | string | null
   targetSchoolId?: Prisma.StringNullableFilter<"Challenge"> | string | null
+  badgeId?: Prisma.StringNullableFilter<"Challenge"> | string | null
+  challengeType?: Prisma.EnumChallengeTypeNullableFilter<"Challenge"> | $Enums.ChallengeType | null
+  difficulty?: Prisma.EnumDifficultyNullableFilter<"Challenge"> | $Enums.Difficulty | null
+  moduleType?: Prisma.EnumModuleTypeNullableFilter<"Challenge"> | $Enums.ModuleType | null
+  rewardPoints?: Prisma.IntFilter<"Challenge"> | number
+  targetUnit?: Prisma.EnumTargetUnitNullableFilter<"Challenge"> | $Enums.TargetUnit | null
+  targetValue?: Prisma.IntNullableFilter<"Challenge"> | number | null
 }
 
 export type ChallengeCreateWithoutSchoolInput = {
@@ -860,20 +1175,28 @@ export type ChallengeCreateWithoutSchoolInput = {
   name: string
   description: string
   instructions: string
+  category?: string | null
   isActive?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
+  startsAt?: Date | string
+  endsAt: Date | string
   requiresMeditation?: boolean
   requiresMusic?: boolean
   requiresPsychoeducation?: boolean
   requiresJournaling?: boolean
-  category?: string | null
   assignmentType?: string
-  endsAt?: Date | string
-  startsAt?: Date | string
   targetClassId?: string | null
   targetSchoolId?: string | null
+  challengeType?: $Enums.ChallengeType | null
+  difficulty?: $Enums.Difficulty | null
+  moduleType?: $Enums.ModuleType | null
+  rewardPoints?: number
+  targetUnit?: $Enums.TargetUnit | null
+  targetValue?: number | null
+  activityEvents?: Prisma.ActivityEventCreateNestedManyWithoutChallengeInput
   challengeAssignments?: Prisma.ChallengeAssignmentCreateNestedManyWithoutChallengeInput
+  badge?: Prisma.BadgeCreateNestedOneWithoutChallengesInput
   creator: Prisma.UserCreateNestedOneWithoutCreatedChallengesInput
   userChallenges?: Prisma.UserChallengeCreateNestedManyWithoutChallengeInput
 }
@@ -883,20 +1206,28 @@ export type ChallengeUncheckedCreateWithoutSchoolInput = {
   name: string
   description: string
   instructions: string
+  category?: string | null
   isActive?: boolean
   createdBy: string
   createdAt?: Date | string
   updatedAt?: Date | string
+  startsAt?: Date | string
+  endsAt: Date | string
   requiresMeditation?: boolean
   requiresMusic?: boolean
   requiresPsychoeducation?: boolean
   requiresJournaling?: boolean
-  category?: string | null
   assignmentType?: string
-  endsAt?: Date | string
-  startsAt?: Date | string
   targetClassId?: string | null
   targetSchoolId?: string | null
+  badgeId?: string | null
+  challengeType?: $Enums.ChallengeType | null
+  difficulty?: $Enums.Difficulty | null
+  moduleType?: $Enums.ModuleType | null
+  rewardPoints?: number
+  targetUnit?: $Enums.TargetUnit | null
+  targetValue?: number | null
+  activityEvents?: Prisma.ActivityEventUncheckedCreateNestedManyWithoutChallengeInput
   challengeAssignments?: Prisma.ChallengeAssignmentUncheckedCreateNestedManyWithoutChallengeInput
   userChallenges?: Prisma.UserChallengeUncheckedCreateNestedManyWithoutChallengeInput
 }
@@ -927,25 +1258,121 @@ export type ChallengeUpdateManyWithWhereWithoutSchoolInput = {
   data: Prisma.XOR<Prisma.ChallengeUpdateManyMutationInput, Prisma.ChallengeUncheckedUpdateManyWithoutSchoolInput>
 }
 
+export type ChallengeCreateWithoutBadgeInput = {
+  id?: string
+  name: string
+  description: string
+  instructions: string
+  category?: string | null
+  isActive?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  startsAt?: Date | string
+  endsAt: Date | string
+  requiresMeditation?: boolean
+  requiresMusic?: boolean
+  requiresPsychoeducation?: boolean
+  requiresJournaling?: boolean
+  assignmentType?: string
+  targetClassId?: string | null
+  targetSchoolId?: string | null
+  challengeType?: $Enums.ChallengeType | null
+  difficulty?: $Enums.Difficulty | null
+  moduleType?: $Enums.ModuleType | null
+  rewardPoints?: number
+  targetUnit?: $Enums.TargetUnit | null
+  targetValue?: number | null
+  activityEvents?: Prisma.ActivityEventCreateNestedManyWithoutChallengeInput
+  challengeAssignments?: Prisma.ChallengeAssignmentCreateNestedManyWithoutChallengeInput
+  creator: Prisma.UserCreateNestedOneWithoutCreatedChallengesInput
+  school?: Prisma.SchoolCreateNestedOneWithoutChallengesInput
+  userChallenges?: Prisma.UserChallengeCreateNestedManyWithoutChallengeInput
+}
+
+export type ChallengeUncheckedCreateWithoutBadgeInput = {
+  id?: string
+  name: string
+  description: string
+  instructions: string
+  category?: string | null
+  isActive?: boolean
+  createdBy: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  schoolId?: string | null
+  startsAt?: Date | string
+  endsAt: Date | string
+  requiresMeditation?: boolean
+  requiresMusic?: boolean
+  requiresPsychoeducation?: boolean
+  requiresJournaling?: boolean
+  assignmentType?: string
+  targetClassId?: string | null
+  targetSchoolId?: string | null
+  challengeType?: $Enums.ChallengeType | null
+  difficulty?: $Enums.Difficulty | null
+  moduleType?: $Enums.ModuleType | null
+  rewardPoints?: number
+  targetUnit?: $Enums.TargetUnit | null
+  targetValue?: number | null
+  activityEvents?: Prisma.ActivityEventUncheckedCreateNestedManyWithoutChallengeInput
+  challengeAssignments?: Prisma.ChallengeAssignmentUncheckedCreateNestedManyWithoutChallengeInput
+  userChallenges?: Prisma.UserChallengeUncheckedCreateNestedManyWithoutChallengeInput
+}
+
+export type ChallengeCreateOrConnectWithoutBadgeInput = {
+  where: Prisma.ChallengeWhereUniqueInput
+  create: Prisma.XOR<Prisma.ChallengeCreateWithoutBadgeInput, Prisma.ChallengeUncheckedCreateWithoutBadgeInput>
+}
+
+export type ChallengeCreateManyBadgeInputEnvelope = {
+  data: Prisma.ChallengeCreateManyBadgeInput | Prisma.ChallengeCreateManyBadgeInput[]
+  skipDuplicates?: boolean
+}
+
+export type ChallengeUpsertWithWhereUniqueWithoutBadgeInput = {
+  where: Prisma.ChallengeWhereUniqueInput
+  update: Prisma.XOR<Prisma.ChallengeUpdateWithoutBadgeInput, Prisma.ChallengeUncheckedUpdateWithoutBadgeInput>
+  create: Prisma.XOR<Prisma.ChallengeCreateWithoutBadgeInput, Prisma.ChallengeUncheckedCreateWithoutBadgeInput>
+}
+
+export type ChallengeUpdateWithWhereUniqueWithoutBadgeInput = {
+  where: Prisma.ChallengeWhereUniqueInput
+  data: Prisma.XOR<Prisma.ChallengeUpdateWithoutBadgeInput, Prisma.ChallengeUncheckedUpdateWithoutBadgeInput>
+}
+
+export type ChallengeUpdateManyWithWhereWithoutBadgeInput = {
+  where: Prisma.ChallengeScalarWhereInput
+  data: Prisma.XOR<Prisma.ChallengeUpdateManyMutationInput, Prisma.ChallengeUncheckedUpdateManyWithoutBadgeInput>
+}
+
 export type ChallengeCreateWithoutUserChallengesInput = {
   id?: string
   name: string
   description: string
   instructions: string
+  category?: string | null
   isActive?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
+  startsAt?: Date | string
+  endsAt: Date | string
   requiresMeditation?: boolean
   requiresMusic?: boolean
   requiresPsychoeducation?: boolean
   requiresJournaling?: boolean
-  category?: string | null
   assignmentType?: string
-  endsAt?: Date | string
-  startsAt?: Date | string
   targetClassId?: string | null
   targetSchoolId?: string | null
+  challengeType?: $Enums.ChallengeType | null
+  difficulty?: $Enums.Difficulty | null
+  moduleType?: $Enums.ModuleType | null
+  rewardPoints?: number
+  targetUnit?: $Enums.TargetUnit | null
+  targetValue?: number | null
+  activityEvents?: Prisma.ActivityEventCreateNestedManyWithoutChallengeInput
   challengeAssignments?: Prisma.ChallengeAssignmentCreateNestedManyWithoutChallengeInput
+  badge?: Prisma.BadgeCreateNestedOneWithoutChallengesInput
   creator: Prisma.UserCreateNestedOneWithoutCreatedChallengesInput
   school?: Prisma.SchoolCreateNestedOneWithoutChallengesInput
 }
@@ -955,21 +1382,29 @@ export type ChallengeUncheckedCreateWithoutUserChallengesInput = {
   name: string
   description: string
   instructions: string
+  category?: string | null
   isActive?: boolean
   createdBy: string
   createdAt?: Date | string
   updatedAt?: Date | string
   schoolId?: string | null
+  startsAt?: Date | string
+  endsAt: Date | string
   requiresMeditation?: boolean
   requiresMusic?: boolean
   requiresPsychoeducation?: boolean
   requiresJournaling?: boolean
-  category?: string | null
   assignmentType?: string
-  endsAt?: Date | string
-  startsAt?: Date | string
   targetClassId?: string | null
   targetSchoolId?: string | null
+  badgeId?: string | null
+  challengeType?: $Enums.ChallengeType | null
+  difficulty?: $Enums.Difficulty | null
+  moduleType?: $Enums.ModuleType | null
+  rewardPoints?: number
+  targetUnit?: $Enums.TargetUnit | null
+  targetValue?: number | null
+  activityEvents?: Prisma.ActivityEventUncheckedCreateNestedManyWithoutChallengeInput
   challengeAssignments?: Prisma.ChallengeAssignmentUncheckedCreateNestedManyWithoutChallengeInput
 }
 
@@ -994,20 +1429,28 @@ export type ChallengeUpdateWithoutUserChallengesInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
   instructions?: Prisma.StringFieldUpdateOperationsInput | string
+  category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  startsAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  endsAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   requiresMeditation?: Prisma.BoolFieldUpdateOperationsInput | boolean
   requiresMusic?: Prisma.BoolFieldUpdateOperationsInput | boolean
   requiresPsychoeducation?: Prisma.BoolFieldUpdateOperationsInput | boolean
   requiresJournaling?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   assignmentType?: Prisma.StringFieldUpdateOperationsInput | string
-  endsAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  startsAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   targetClassId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   targetSchoolId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  challengeType?: Prisma.NullableEnumChallengeTypeFieldUpdateOperationsInput | $Enums.ChallengeType | null
+  difficulty?: Prisma.NullableEnumDifficultyFieldUpdateOperationsInput | $Enums.Difficulty | null
+  moduleType?: Prisma.NullableEnumModuleTypeFieldUpdateOperationsInput | $Enums.ModuleType | null
+  rewardPoints?: Prisma.IntFieldUpdateOperationsInput | number
+  targetUnit?: Prisma.NullableEnumTargetUnitFieldUpdateOperationsInput | $Enums.TargetUnit | null
+  targetValue?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  activityEvents?: Prisma.ActivityEventUpdateManyWithoutChallengeNestedInput
   challengeAssignments?: Prisma.ChallengeAssignmentUpdateManyWithoutChallengeNestedInput
+  badge?: Prisma.BadgeUpdateOneWithoutChallengesNestedInput
   creator?: Prisma.UserUpdateOneRequiredWithoutCreatedChallengesNestedInput
   school?: Prisma.SchoolUpdateOneWithoutChallengesNestedInput
 }
@@ -1017,21 +1460,29 @@ export type ChallengeUncheckedUpdateWithoutUserChallengesInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
   instructions?: Prisma.StringFieldUpdateOperationsInput | string
+  category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdBy?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   schoolId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  startsAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  endsAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   requiresMeditation?: Prisma.BoolFieldUpdateOperationsInput | boolean
   requiresMusic?: Prisma.BoolFieldUpdateOperationsInput | boolean
   requiresPsychoeducation?: Prisma.BoolFieldUpdateOperationsInput | boolean
   requiresJournaling?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   assignmentType?: Prisma.StringFieldUpdateOperationsInput | string
-  endsAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  startsAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   targetClassId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   targetSchoolId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  badgeId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  challengeType?: Prisma.NullableEnumChallengeTypeFieldUpdateOperationsInput | $Enums.ChallengeType | null
+  difficulty?: Prisma.NullableEnumDifficultyFieldUpdateOperationsInput | $Enums.Difficulty | null
+  moduleType?: Prisma.NullableEnumModuleTypeFieldUpdateOperationsInput | $Enums.ModuleType | null
+  rewardPoints?: Prisma.IntFieldUpdateOperationsInput | number
+  targetUnit?: Prisma.NullableEnumTargetUnitFieldUpdateOperationsInput | $Enums.TargetUnit | null
+  targetValue?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  activityEvents?: Prisma.ActivityEventUncheckedUpdateManyWithoutChallengeNestedInput
   challengeAssignments?: Prisma.ChallengeAssignmentUncheckedUpdateManyWithoutChallengeNestedInput
 }
 
@@ -1040,19 +1491,27 @@ export type ChallengeCreateWithoutChallengeAssignmentsInput = {
   name: string
   description: string
   instructions: string
+  category?: string | null
   isActive?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
+  startsAt?: Date | string
+  endsAt: Date | string
   requiresMeditation?: boolean
   requiresMusic?: boolean
   requiresPsychoeducation?: boolean
   requiresJournaling?: boolean
-  category?: string | null
   assignmentType?: string
-  endsAt?: Date | string
-  startsAt?: Date | string
   targetClassId?: string | null
   targetSchoolId?: string | null
+  challengeType?: $Enums.ChallengeType | null
+  difficulty?: $Enums.Difficulty | null
+  moduleType?: $Enums.ModuleType | null
+  rewardPoints?: number
+  targetUnit?: $Enums.TargetUnit | null
+  targetValue?: number | null
+  activityEvents?: Prisma.ActivityEventCreateNestedManyWithoutChallengeInput
+  badge?: Prisma.BadgeCreateNestedOneWithoutChallengesInput
   creator: Prisma.UserCreateNestedOneWithoutCreatedChallengesInput
   school?: Prisma.SchoolCreateNestedOneWithoutChallengesInput
   userChallenges?: Prisma.UserChallengeCreateNestedManyWithoutChallengeInput
@@ -1063,21 +1522,29 @@ export type ChallengeUncheckedCreateWithoutChallengeAssignmentsInput = {
   name: string
   description: string
   instructions: string
+  category?: string | null
   isActive?: boolean
   createdBy: string
   createdAt?: Date | string
   updatedAt?: Date | string
   schoolId?: string | null
+  startsAt?: Date | string
+  endsAt: Date | string
   requiresMeditation?: boolean
   requiresMusic?: boolean
   requiresPsychoeducation?: boolean
   requiresJournaling?: boolean
-  category?: string | null
   assignmentType?: string
-  endsAt?: Date | string
-  startsAt?: Date | string
   targetClassId?: string | null
   targetSchoolId?: string | null
+  badgeId?: string | null
+  challengeType?: $Enums.ChallengeType | null
+  difficulty?: $Enums.Difficulty | null
+  moduleType?: $Enums.ModuleType | null
+  rewardPoints?: number
+  targetUnit?: $Enums.TargetUnit | null
+  targetValue?: number | null
+  activityEvents?: Prisma.ActivityEventUncheckedCreateNestedManyWithoutChallengeInput
   userChallenges?: Prisma.UserChallengeUncheckedCreateNestedManyWithoutChallengeInput
 }
 
@@ -1102,19 +1569,27 @@ export type ChallengeUpdateWithoutChallengeAssignmentsInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
   instructions?: Prisma.StringFieldUpdateOperationsInput | string
+  category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  startsAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  endsAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   requiresMeditation?: Prisma.BoolFieldUpdateOperationsInput | boolean
   requiresMusic?: Prisma.BoolFieldUpdateOperationsInput | boolean
   requiresPsychoeducation?: Prisma.BoolFieldUpdateOperationsInput | boolean
   requiresJournaling?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   assignmentType?: Prisma.StringFieldUpdateOperationsInput | string
-  endsAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  startsAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   targetClassId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   targetSchoolId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  challengeType?: Prisma.NullableEnumChallengeTypeFieldUpdateOperationsInput | $Enums.ChallengeType | null
+  difficulty?: Prisma.NullableEnumDifficultyFieldUpdateOperationsInput | $Enums.Difficulty | null
+  moduleType?: Prisma.NullableEnumModuleTypeFieldUpdateOperationsInput | $Enums.ModuleType | null
+  rewardPoints?: Prisma.IntFieldUpdateOperationsInput | number
+  targetUnit?: Prisma.NullableEnumTargetUnitFieldUpdateOperationsInput | $Enums.TargetUnit | null
+  targetValue?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  activityEvents?: Prisma.ActivityEventUpdateManyWithoutChallengeNestedInput
+  badge?: Prisma.BadgeUpdateOneWithoutChallengesNestedInput
   creator?: Prisma.UserUpdateOneRequiredWithoutCreatedChallengesNestedInput
   school?: Prisma.SchoolUpdateOneWithoutChallengesNestedInput
   userChallenges?: Prisma.UserChallengeUpdateManyWithoutChallengeNestedInput
@@ -1125,21 +1600,169 @@ export type ChallengeUncheckedUpdateWithoutChallengeAssignmentsInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
   instructions?: Prisma.StringFieldUpdateOperationsInput | string
+  category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdBy?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   schoolId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  startsAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  endsAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   requiresMeditation?: Prisma.BoolFieldUpdateOperationsInput | boolean
   requiresMusic?: Prisma.BoolFieldUpdateOperationsInput | boolean
   requiresPsychoeducation?: Prisma.BoolFieldUpdateOperationsInput | boolean
   requiresJournaling?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   assignmentType?: Prisma.StringFieldUpdateOperationsInput | string
-  endsAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  startsAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   targetClassId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   targetSchoolId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  badgeId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  challengeType?: Prisma.NullableEnumChallengeTypeFieldUpdateOperationsInput | $Enums.ChallengeType | null
+  difficulty?: Prisma.NullableEnumDifficultyFieldUpdateOperationsInput | $Enums.Difficulty | null
+  moduleType?: Prisma.NullableEnumModuleTypeFieldUpdateOperationsInput | $Enums.ModuleType | null
+  rewardPoints?: Prisma.IntFieldUpdateOperationsInput | number
+  targetUnit?: Prisma.NullableEnumTargetUnitFieldUpdateOperationsInput | $Enums.TargetUnit | null
+  targetValue?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  activityEvents?: Prisma.ActivityEventUncheckedUpdateManyWithoutChallengeNestedInput
+  userChallenges?: Prisma.UserChallengeUncheckedUpdateManyWithoutChallengeNestedInput
+}
+
+export type ChallengeCreateWithoutActivityEventsInput = {
+  id?: string
+  name: string
+  description: string
+  instructions: string
+  category?: string | null
+  isActive?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  startsAt?: Date | string
+  endsAt: Date | string
+  requiresMeditation?: boolean
+  requiresMusic?: boolean
+  requiresPsychoeducation?: boolean
+  requiresJournaling?: boolean
+  assignmentType?: string
+  targetClassId?: string | null
+  targetSchoolId?: string | null
+  challengeType?: $Enums.ChallengeType | null
+  difficulty?: $Enums.Difficulty | null
+  moduleType?: $Enums.ModuleType | null
+  rewardPoints?: number
+  targetUnit?: $Enums.TargetUnit | null
+  targetValue?: number | null
+  challengeAssignments?: Prisma.ChallengeAssignmentCreateNestedManyWithoutChallengeInput
+  badge?: Prisma.BadgeCreateNestedOneWithoutChallengesInput
+  creator: Prisma.UserCreateNestedOneWithoutCreatedChallengesInput
+  school?: Prisma.SchoolCreateNestedOneWithoutChallengesInput
+  userChallenges?: Prisma.UserChallengeCreateNestedManyWithoutChallengeInput
+}
+
+export type ChallengeUncheckedCreateWithoutActivityEventsInput = {
+  id?: string
+  name: string
+  description: string
+  instructions: string
+  category?: string | null
+  isActive?: boolean
+  createdBy: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  schoolId?: string | null
+  startsAt?: Date | string
+  endsAt: Date | string
+  requiresMeditation?: boolean
+  requiresMusic?: boolean
+  requiresPsychoeducation?: boolean
+  requiresJournaling?: boolean
+  assignmentType?: string
+  targetClassId?: string | null
+  targetSchoolId?: string | null
+  badgeId?: string | null
+  challengeType?: $Enums.ChallengeType | null
+  difficulty?: $Enums.Difficulty | null
+  moduleType?: $Enums.ModuleType | null
+  rewardPoints?: number
+  targetUnit?: $Enums.TargetUnit | null
+  targetValue?: number | null
+  challengeAssignments?: Prisma.ChallengeAssignmentUncheckedCreateNestedManyWithoutChallengeInput
+  userChallenges?: Prisma.UserChallengeUncheckedCreateNestedManyWithoutChallengeInput
+}
+
+export type ChallengeCreateOrConnectWithoutActivityEventsInput = {
+  where: Prisma.ChallengeWhereUniqueInput
+  create: Prisma.XOR<Prisma.ChallengeCreateWithoutActivityEventsInput, Prisma.ChallengeUncheckedCreateWithoutActivityEventsInput>
+}
+
+export type ChallengeUpsertWithoutActivityEventsInput = {
+  update: Prisma.XOR<Prisma.ChallengeUpdateWithoutActivityEventsInput, Prisma.ChallengeUncheckedUpdateWithoutActivityEventsInput>
+  create: Prisma.XOR<Prisma.ChallengeCreateWithoutActivityEventsInput, Prisma.ChallengeUncheckedCreateWithoutActivityEventsInput>
+  where?: Prisma.ChallengeWhereInput
+}
+
+export type ChallengeUpdateToOneWithWhereWithoutActivityEventsInput = {
+  where?: Prisma.ChallengeWhereInput
+  data: Prisma.XOR<Prisma.ChallengeUpdateWithoutActivityEventsInput, Prisma.ChallengeUncheckedUpdateWithoutActivityEventsInput>
+}
+
+export type ChallengeUpdateWithoutActivityEventsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.StringFieldUpdateOperationsInput | string
+  instructions?: Prisma.StringFieldUpdateOperationsInput | string
+  category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  startsAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  endsAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  requiresMeditation?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  requiresMusic?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  requiresPsychoeducation?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  requiresJournaling?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  assignmentType?: Prisma.StringFieldUpdateOperationsInput | string
+  targetClassId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  targetSchoolId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  challengeType?: Prisma.NullableEnumChallengeTypeFieldUpdateOperationsInput | $Enums.ChallengeType | null
+  difficulty?: Prisma.NullableEnumDifficultyFieldUpdateOperationsInput | $Enums.Difficulty | null
+  moduleType?: Prisma.NullableEnumModuleTypeFieldUpdateOperationsInput | $Enums.ModuleType | null
+  rewardPoints?: Prisma.IntFieldUpdateOperationsInput | number
+  targetUnit?: Prisma.NullableEnumTargetUnitFieldUpdateOperationsInput | $Enums.TargetUnit | null
+  targetValue?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  challengeAssignments?: Prisma.ChallengeAssignmentUpdateManyWithoutChallengeNestedInput
+  badge?: Prisma.BadgeUpdateOneWithoutChallengesNestedInput
+  creator?: Prisma.UserUpdateOneRequiredWithoutCreatedChallengesNestedInput
+  school?: Prisma.SchoolUpdateOneWithoutChallengesNestedInput
+  userChallenges?: Prisma.UserChallengeUpdateManyWithoutChallengeNestedInput
+}
+
+export type ChallengeUncheckedUpdateWithoutActivityEventsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.StringFieldUpdateOperationsInput | string
+  instructions?: Prisma.StringFieldUpdateOperationsInput | string
+  category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdBy?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  schoolId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  startsAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  endsAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  requiresMeditation?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  requiresMusic?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  requiresPsychoeducation?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  requiresJournaling?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  assignmentType?: Prisma.StringFieldUpdateOperationsInput | string
+  targetClassId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  targetSchoolId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  badgeId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  challengeType?: Prisma.NullableEnumChallengeTypeFieldUpdateOperationsInput | $Enums.ChallengeType | null
+  difficulty?: Prisma.NullableEnumDifficultyFieldUpdateOperationsInput | $Enums.Difficulty | null
+  moduleType?: Prisma.NullableEnumModuleTypeFieldUpdateOperationsInput | $Enums.ModuleType | null
+  rewardPoints?: Prisma.IntFieldUpdateOperationsInput | number
+  targetUnit?: Prisma.NullableEnumTargetUnitFieldUpdateOperationsInput | $Enums.TargetUnit | null
+  targetValue?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  challengeAssignments?: Prisma.ChallengeAssignmentUncheckedUpdateManyWithoutChallengeNestedInput
   userChallenges?: Prisma.UserChallengeUncheckedUpdateManyWithoutChallengeNestedInput
 }
 
@@ -1148,20 +1771,27 @@ export type ChallengeCreateManyCreatorInput = {
   name: string
   description: string
   instructions: string
+  category?: string | null
   isActive?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   schoolId?: string | null
+  startsAt?: Date | string
+  endsAt: Date | string
   requiresMeditation?: boolean
   requiresMusic?: boolean
   requiresPsychoeducation?: boolean
   requiresJournaling?: boolean
-  category?: string | null
   assignmentType?: string
-  endsAt?: Date | string
-  startsAt?: Date | string
   targetClassId?: string | null
   targetSchoolId?: string | null
+  badgeId?: string | null
+  challengeType?: $Enums.ChallengeType | null
+  difficulty?: $Enums.Difficulty | null
+  moduleType?: $Enums.ModuleType | null
+  rewardPoints?: number
+  targetUnit?: $Enums.TargetUnit | null
+  targetValue?: number | null
 }
 
 export type ChallengeUpdateWithoutCreatorInput = {
@@ -1169,20 +1799,28 @@ export type ChallengeUpdateWithoutCreatorInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
   instructions?: Prisma.StringFieldUpdateOperationsInput | string
+  category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  startsAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  endsAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   requiresMeditation?: Prisma.BoolFieldUpdateOperationsInput | boolean
   requiresMusic?: Prisma.BoolFieldUpdateOperationsInput | boolean
   requiresPsychoeducation?: Prisma.BoolFieldUpdateOperationsInput | boolean
   requiresJournaling?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   assignmentType?: Prisma.StringFieldUpdateOperationsInput | string
-  endsAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  startsAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   targetClassId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   targetSchoolId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  challengeType?: Prisma.NullableEnumChallengeTypeFieldUpdateOperationsInput | $Enums.ChallengeType | null
+  difficulty?: Prisma.NullableEnumDifficultyFieldUpdateOperationsInput | $Enums.Difficulty | null
+  moduleType?: Prisma.NullableEnumModuleTypeFieldUpdateOperationsInput | $Enums.ModuleType | null
+  rewardPoints?: Prisma.IntFieldUpdateOperationsInput | number
+  targetUnit?: Prisma.NullableEnumTargetUnitFieldUpdateOperationsInput | $Enums.TargetUnit | null
+  targetValue?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  activityEvents?: Prisma.ActivityEventUpdateManyWithoutChallengeNestedInput
   challengeAssignments?: Prisma.ChallengeAssignmentUpdateManyWithoutChallengeNestedInput
+  badge?: Prisma.BadgeUpdateOneWithoutChallengesNestedInput
   school?: Prisma.SchoolUpdateOneWithoutChallengesNestedInput
   userChallenges?: Prisma.UserChallengeUpdateManyWithoutChallengeNestedInput
 }
@@ -1192,20 +1830,28 @@ export type ChallengeUncheckedUpdateWithoutCreatorInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
   instructions?: Prisma.StringFieldUpdateOperationsInput | string
+  category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   schoolId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  startsAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  endsAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   requiresMeditation?: Prisma.BoolFieldUpdateOperationsInput | boolean
   requiresMusic?: Prisma.BoolFieldUpdateOperationsInput | boolean
   requiresPsychoeducation?: Prisma.BoolFieldUpdateOperationsInput | boolean
   requiresJournaling?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   assignmentType?: Prisma.StringFieldUpdateOperationsInput | string
-  endsAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  startsAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   targetClassId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   targetSchoolId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  badgeId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  challengeType?: Prisma.NullableEnumChallengeTypeFieldUpdateOperationsInput | $Enums.ChallengeType | null
+  difficulty?: Prisma.NullableEnumDifficultyFieldUpdateOperationsInput | $Enums.Difficulty | null
+  moduleType?: Prisma.NullableEnumModuleTypeFieldUpdateOperationsInput | $Enums.ModuleType | null
+  rewardPoints?: Prisma.IntFieldUpdateOperationsInput | number
+  targetUnit?: Prisma.NullableEnumTargetUnitFieldUpdateOperationsInput | $Enums.TargetUnit | null
+  targetValue?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  activityEvents?: Prisma.ActivityEventUncheckedUpdateManyWithoutChallengeNestedInput
   challengeAssignments?: Prisma.ChallengeAssignmentUncheckedUpdateManyWithoutChallengeNestedInput
   userChallenges?: Prisma.UserChallengeUncheckedUpdateManyWithoutChallengeNestedInput
 }
@@ -1215,20 +1861,27 @@ export type ChallengeUncheckedUpdateManyWithoutCreatorInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
   instructions?: Prisma.StringFieldUpdateOperationsInput | string
+  category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   schoolId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  startsAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  endsAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   requiresMeditation?: Prisma.BoolFieldUpdateOperationsInput | boolean
   requiresMusic?: Prisma.BoolFieldUpdateOperationsInput | boolean
   requiresPsychoeducation?: Prisma.BoolFieldUpdateOperationsInput | boolean
   requiresJournaling?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   assignmentType?: Prisma.StringFieldUpdateOperationsInput | string
-  endsAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  startsAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   targetClassId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   targetSchoolId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  badgeId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  challengeType?: Prisma.NullableEnumChallengeTypeFieldUpdateOperationsInput | $Enums.ChallengeType | null
+  difficulty?: Prisma.NullableEnumDifficultyFieldUpdateOperationsInput | $Enums.Difficulty | null
+  moduleType?: Prisma.NullableEnumModuleTypeFieldUpdateOperationsInput | $Enums.ModuleType | null
+  rewardPoints?: Prisma.IntFieldUpdateOperationsInput | number
+  targetUnit?: Prisma.NullableEnumTargetUnitFieldUpdateOperationsInput | $Enums.TargetUnit | null
+  targetValue?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
 }
 
 export type ChallengeCreateManySchoolInput = {
@@ -1236,20 +1889,27 @@ export type ChallengeCreateManySchoolInput = {
   name: string
   description: string
   instructions: string
+  category?: string | null
   isActive?: boolean
   createdBy: string
   createdAt?: Date | string
   updatedAt?: Date | string
+  startsAt?: Date | string
+  endsAt: Date | string
   requiresMeditation?: boolean
   requiresMusic?: boolean
   requiresPsychoeducation?: boolean
   requiresJournaling?: boolean
-  category?: string | null
   assignmentType?: string
-  endsAt?: Date | string
-  startsAt?: Date | string
   targetClassId?: string | null
   targetSchoolId?: string | null
+  badgeId?: string | null
+  challengeType?: $Enums.ChallengeType | null
+  difficulty?: $Enums.Difficulty | null
+  moduleType?: $Enums.ModuleType | null
+  rewardPoints?: number
+  targetUnit?: $Enums.TargetUnit | null
+  targetValue?: number | null
 }
 
 export type ChallengeUpdateWithoutSchoolInput = {
@@ -1257,20 +1917,28 @@ export type ChallengeUpdateWithoutSchoolInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
   instructions?: Prisma.StringFieldUpdateOperationsInput | string
+  category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  startsAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  endsAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   requiresMeditation?: Prisma.BoolFieldUpdateOperationsInput | boolean
   requiresMusic?: Prisma.BoolFieldUpdateOperationsInput | boolean
   requiresPsychoeducation?: Prisma.BoolFieldUpdateOperationsInput | boolean
   requiresJournaling?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   assignmentType?: Prisma.StringFieldUpdateOperationsInput | string
-  endsAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  startsAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   targetClassId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   targetSchoolId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  challengeType?: Prisma.NullableEnumChallengeTypeFieldUpdateOperationsInput | $Enums.ChallengeType | null
+  difficulty?: Prisma.NullableEnumDifficultyFieldUpdateOperationsInput | $Enums.Difficulty | null
+  moduleType?: Prisma.NullableEnumModuleTypeFieldUpdateOperationsInput | $Enums.ModuleType | null
+  rewardPoints?: Prisma.IntFieldUpdateOperationsInput | number
+  targetUnit?: Prisma.NullableEnumTargetUnitFieldUpdateOperationsInput | $Enums.TargetUnit | null
+  targetValue?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  activityEvents?: Prisma.ActivityEventUpdateManyWithoutChallengeNestedInput
   challengeAssignments?: Prisma.ChallengeAssignmentUpdateManyWithoutChallengeNestedInput
+  badge?: Prisma.BadgeUpdateOneWithoutChallengesNestedInput
   creator?: Prisma.UserUpdateOneRequiredWithoutCreatedChallengesNestedInput
   userChallenges?: Prisma.UserChallengeUpdateManyWithoutChallengeNestedInput
 }
@@ -1280,20 +1948,28 @@ export type ChallengeUncheckedUpdateWithoutSchoolInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
   instructions?: Prisma.StringFieldUpdateOperationsInput | string
+  category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdBy?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  startsAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  endsAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   requiresMeditation?: Prisma.BoolFieldUpdateOperationsInput | boolean
   requiresMusic?: Prisma.BoolFieldUpdateOperationsInput | boolean
   requiresPsychoeducation?: Prisma.BoolFieldUpdateOperationsInput | boolean
   requiresJournaling?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   assignmentType?: Prisma.StringFieldUpdateOperationsInput | string
-  endsAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  startsAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   targetClassId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   targetSchoolId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  badgeId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  challengeType?: Prisma.NullableEnumChallengeTypeFieldUpdateOperationsInput | $Enums.ChallengeType | null
+  difficulty?: Prisma.NullableEnumDifficultyFieldUpdateOperationsInput | $Enums.Difficulty | null
+  moduleType?: Prisma.NullableEnumModuleTypeFieldUpdateOperationsInput | $Enums.ModuleType | null
+  rewardPoints?: Prisma.IntFieldUpdateOperationsInput | number
+  targetUnit?: Prisma.NullableEnumTargetUnitFieldUpdateOperationsInput | $Enums.TargetUnit | null
+  targetValue?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  activityEvents?: Prisma.ActivityEventUncheckedUpdateManyWithoutChallengeNestedInput
   challengeAssignments?: Prisma.ChallengeAssignmentUncheckedUpdateManyWithoutChallengeNestedInput
   userChallenges?: Prisma.UserChallengeUncheckedUpdateManyWithoutChallengeNestedInput
 }
@@ -1303,20 +1979,145 @@ export type ChallengeUncheckedUpdateManyWithoutSchoolInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.StringFieldUpdateOperationsInput | string
   instructions?: Prisma.StringFieldUpdateOperationsInput | string
+  category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdBy?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  startsAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  endsAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   requiresMeditation?: Prisma.BoolFieldUpdateOperationsInput | boolean
   requiresMusic?: Prisma.BoolFieldUpdateOperationsInput | boolean
   requiresPsychoeducation?: Prisma.BoolFieldUpdateOperationsInput | boolean
   requiresJournaling?: Prisma.BoolFieldUpdateOperationsInput | boolean
-  category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   assignmentType?: Prisma.StringFieldUpdateOperationsInput | string
-  endsAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  startsAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   targetClassId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   targetSchoolId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  badgeId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  challengeType?: Prisma.NullableEnumChallengeTypeFieldUpdateOperationsInput | $Enums.ChallengeType | null
+  difficulty?: Prisma.NullableEnumDifficultyFieldUpdateOperationsInput | $Enums.Difficulty | null
+  moduleType?: Prisma.NullableEnumModuleTypeFieldUpdateOperationsInput | $Enums.ModuleType | null
+  rewardPoints?: Prisma.IntFieldUpdateOperationsInput | number
+  targetUnit?: Prisma.NullableEnumTargetUnitFieldUpdateOperationsInput | $Enums.TargetUnit | null
+  targetValue?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+}
+
+export type ChallengeCreateManyBadgeInput = {
+  id?: string
+  name: string
+  description: string
+  instructions: string
+  category?: string | null
+  isActive?: boolean
+  createdBy: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  schoolId?: string | null
+  startsAt?: Date | string
+  endsAt: Date | string
+  requiresMeditation?: boolean
+  requiresMusic?: boolean
+  requiresPsychoeducation?: boolean
+  requiresJournaling?: boolean
+  assignmentType?: string
+  targetClassId?: string | null
+  targetSchoolId?: string | null
+  challengeType?: $Enums.ChallengeType | null
+  difficulty?: $Enums.Difficulty | null
+  moduleType?: $Enums.ModuleType | null
+  rewardPoints?: number
+  targetUnit?: $Enums.TargetUnit | null
+  targetValue?: number | null
+}
+
+export type ChallengeUpdateWithoutBadgeInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.StringFieldUpdateOperationsInput | string
+  instructions?: Prisma.StringFieldUpdateOperationsInput | string
+  category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  startsAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  endsAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  requiresMeditation?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  requiresMusic?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  requiresPsychoeducation?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  requiresJournaling?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  assignmentType?: Prisma.StringFieldUpdateOperationsInput | string
+  targetClassId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  targetSchoolId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  challengeType?: Prisma.NullableEnumChallengeTypeFieldUpdateOperationsInput | $Enums.ChallengeType | null
+  difficulty?: Prisma.NullableEnumDifficultyFieldUpdateOperationsInput | $Enums.Difficulty | null
+  moduleType?: Prisma.NullableEnumModuleTypeFieldUpdateOperationsInput | $Enums.ModuleType | null
+  rewardPoints?: Prisma.IntFieldUpdateOperationsInput | number
+  targetUnit?: Prisma.NullableEnumTargetUnitFieldUpdateOperationsInput | $Enums.TargetUnit | null
+  targetValue?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  activityEvents?: Prisma.ActivityEventUpdateManyWithoutChallengeNestedInput
+  challengeAssignments?: Prisma.ChallengeAssignmentUpdateManyWithoutChallengeNestedInput
+  creator?: Prisma.UserUpdateOneRequiredWithoutCreatedChallengesNestedInput
+  school?: Prisma.SchoolUpdateOneWithoutChallengesNestedInput
+  userChallenges?: Prisma.UserChallengeUpdateManyWithoutChallengeNestedInput
+}
+
+export type ChallengeUncheckedUpdateWithoutBadgeInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.StringFieldUpdateOperationsInput | string
+  instructions?: Prisma.StringFieldUpdateOperationsInput | string
+  category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdBy?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  schoolId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  startsAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  endsAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  requiresMeditation?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  requiresMusic?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  requiresPsychoeducation?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  requiresJournaling?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  assignmentType?: Prisma.StringFieldUpdateOperationsInput | string
+  targetClassId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  targetSchoolId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  challengeType?: Prisma.NullableEnumChallengeTypeFieldUpdateOperationsInput | $Enums.ChallengeType | null
+  difficulty?: Prisma.NullableEnumDifficultyFieldUpdateOperationsInput | $Enums.Difficulty | null
+  moduleType?: Prisma.NullableEnumModuleTypeFieldUpdateOperationsInput | $Enums.ModuleType | null
+  rewardPoints?: Prisma.IntFieldUpdateOperationsInput | number
+  targetUnit?: Prisma.NullableEnumTargetUnitFieldUpdateOperationsInput | $Enums.TargetUnit | null
+  targetValue?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
+  activityEvents?: Prisma.ActivityEventUncheckedUpdateManyWithoutChallengeNestedInput
+  challengeAssignments?: Prisma.ChallengeAssignmentUncheckedUpdateManyWithoutChallengeNestedInput
+  userChallenges?: Prisma.UserChallengeUncheckedUpdateManyWithoutChallengeNestedInput
+}
+
+export type ChallengeUncheckedUpdateManyWithoutBadgeInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.StringFieldUpdateOperationsInput | string
+  instructions?: Prisma.StringFieldUpdateOperationsInput | string
+  category?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdBy?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  schoolId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  startsAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  endsAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  requiresMeditation?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  requiresMusic?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  requiresPsychoeducation?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  requiresJournaling?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  assignmentType?: Prisma.StringFieldUpdateOperationsInput | string
+  targetClassId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  targetSchoolId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  challengeType?: Prisma.NullableEnumChallengeTypeFieldUpdateOperationsInput | $Enums.ChallengeType | null
+  difficulty?: Prisma.NullableEnumDifficultyFieldUpdateOperationsInput | $Enums.Difficulty | null
+  moduleType?: Prisma.NullableEnumModuleTypeFieldUpdateOperationsInput | $Enums.ModuleType | null
+  rewardPoints?: Prisma.IntFieldUpdateOperationsInput | number
+  targetUnit?: Prisma.NullableEnumTargetUnitFieldUpdateOperationsInput | $Enums.TargetUnit | null
+  targetValue?: Prisma.NullableIntFieldUpdateOperationsInput | number | null
 }
 
 
@@ -1325,11 +2126,13 @@ export type ChallengeUncheckedUpdateManyWithoutSchoolInput = {
  */
 
 export type ChallengeCountOutputType = {
+  activityEvents: number
   challengeAssignments: number
   userChallenges: number
 }
 
 export type ChallengeCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  activityEvents?: boolean | ChallengeCountOutputTypeCountActivityEventsArgs
   challengeAssignments?: boolean | ChallengeCountOutputTypeCountChallengeAssignmentsArgs
   userChallenges?: boolean | ChallengeCountOutputTypeCountUserChallengesArgs
 }
@@ -1342,6 +2145,13 @@ export type ChallengeCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Ex
    * Select specific fields to fetch from the ChallengeCountOutputType
    */
   select?: Prisma.ChallengeCountOutputTypeSelect<ExtArgs> | null
+}
+
+/**
+ * ChallengeCountOutputType without action
+ */
+export type ChallengeCountOutputTypeCountActivityEventsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ActivityEventWhereInput
 }
 
 /**
@@ -1364,22 +2174,31 @@ export type ChallengeSelect<ExtArgs extends runtime.Types.Extensions.InternalArg
   name?: boolean
   description?: boolean
   instructions?: boolean
+  category?: boolean
   isActive?: boolean
   createdBy?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   schoolId?: boolean
+  startsAt?: boolean
+  endsAt?: boolean
   requiresMeditation?: boolean
   requiresMusic?: boolean
   requiresPsychoeducation?: boolean
   requiresJournaling?: boolean
-  category?: boolean
   assignmentType?: boolean
-  endsAt?: boolean
-  startsAt?: boolean
   targetClassId?: boolean
   targetSchoolId?: boolean
+  badgeId?: boolean
+  challengeType?: boolean
+  difficulty?: boolean
+  moduleType?: boolean
+  rewardPoints?: boolean
+  targetUnit?: boolean
+  targetValue?: boolean
+  activityEvents?: boolean | Prisma.Challenge$activityEventsArgs<ExtArgs>
   challengeAssignments?: boolean | Prisma.Challenge$challengeAssignmentsArgs<ExtArgs>
+  badge?: boolean | Prisma.Challenge$badgeArgs<ExtArgs>
   creator?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   school?: boolean | Prisma.Challenge$schoolArgs<ExtArgs>
   userChallenges?: boolean | Prisma.Challenge$userChallengesArgs<ExtArgs>
@@ -1391,21 +2210,29 @@ export type ChallengeSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Ext
   name?: boolean
   description?: boolean
   instructions?: boolean
+  category?: boolean
   isActive?: boolean
   createdBy?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   schoolId?: boolean
+  startsAt?: boolean
+  endsAt?: boolean
   requiresMeditation?: boolean
   requiresMusic?: boolean
   requiresPsychoeducation?: boolean
   requiresJournaling?: boolean
-  category?: boolean
   assignmentType?: boolean
-  endsAt?: boolean
-  startsAt?: boolean
   targetClassId?: boolean
   targetSchoolId?: boolean
+  badgeId?: boolean
+  challengeType?: boolean
+  difficulty?: boolean
+  moduleType?: boolean
+  rewardPoints?: boolean
+  targetUnit?: boolean
+  targetValue?: boolean
+  badge?: boolean | Prisma.Challenge$badgeArgs<ExtArgs>
   creator?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   school?: boolean | Prisma.Challenge$schoolArgs<ExtArgs>
 }, ExtArgs["result"]["challenge"]>
@@ -1415,21 +2242,29 @@ export type ChallengeSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Ext
   name?: boolean
   description?: boolean
   instructions?: boolean
+  category?: boolean
   isActive?: boolean
   createdBy?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   schoolId?: boolean
+  startsAt?: boolean
+  endsAt?: boolean
   requiresMeditation?: boolean
   requiresMusic?: boolean
   requiresPsychoeducation?: boolean
   requiresJournaling?: boolean
-  category?: boolean
   assignmentType?: boolean
-  endsAt?: boolean
-  startsAt?: boolean
   targetClassId?: boolean
   targetSchoolId?: boolean
+  badgeId?: boolean
+  challengeType?: boolean
+  difficulty?: boolean
+  moduleType?: boolean
+  rewardPoints?: boolean
+  targetUnit?: boolean
+  targetValue?: boolean
+  badge?: boolean | Prisma.Challenge$badgeArgs<ExtArgs>
   creator?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   school?: boolean | Prisma.Challenge$schoolArgs<ExtArgs>
 }, ExtArgs["result"]["challenge"]>
@@ -1439,36 +2274,47 @@ export type ChallengeSelectScalar = {
   name?: boolean
   description?: boolean
   instructions?: boolean
+  category?: boolean
   isActive?: boolean
   createdBy?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   schoolId?: boolean
+  startsAt?: boolean
+  endsAt?: boolean
   requiresMeditation?: boolean
   requiresMusic?: boolean
   requiresPsychoeducation?: boolean
   requiresJournaling?: boolean
-  category?: boolean
   assignmentType?: boolean
-  endsAt?: boolean
-  startsAt?: boolean
   targetClassId?: boolean
   targetSchoolId?: boolean
+  badgeId?: boolean
+  challengeType?: boolean
+  difficulty?: boolean
+  moduleType?: boolean
+  rewardPoints?: boolean
+  targetUnit?: boolean
+  targetValue?: boolean
 }
 
-export type ChallengeOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "description" | "instructions" | "isActive" | "createdBy" | "createdAt" | "updatedAt" | "schoolId" | "requiresMeditation" | "requiresMusic" | "requiresPsychoeducation" | "requiresJournaling" | "category" | "assignmentType" | "endsAt" | "startsAt" | "targetClassId" | "targetSchoolId", ExtArgs["result"]["challenge"]>
+export type ChallengeOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "description" | "instructions" | "category" | "isActive" | "createdBy" | "createdAt" | "updatedAt" | "schoolId" | "startsAt" | "endsAt" | "requiresMeditation" | "requiresMusic" | "requiresPsychoeducation" | "requiresJournaling" | "assignmentType" | "targetClassId" | "targetSchoolId" | "badgeId" | "challengeType" | "difficulty" | "moduleType" | "rewardPoints" | "targetUnit" | "targetValue", ExtArgs["result"]["challenge"]>
 export type ChallengeInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  activityEvents?: boolean | Prisma.Challenge$activityEventsArgs<ExtArgs>
   challengeAssignments?: boolean | Prisma.Challenge$challengeAssignmentsArgs<ExtArgs>
+  badge?: boolean | Prisma.Challenge$badgeArgs<ExtArgs>
   creator?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   school?: boolean | Prisma.Challenge$schoolArgs<ExtArgs>
   userChallenges?: boolean | Prisma.Challenge$userChallengesArgs<ExtArgs>
   _count?: boolean | Prisma.ChallengeCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type ChallengeIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  badge?: boolean | Prisma.Challenge$badgeArgs<ExtArgs>
   creator?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   school?: boolean | Prisma.Challenge$schoolArgs<ExtArgs>
 }
 export type ChallengeIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  badge?: boolean | Prisma.Challenge$badgeArgs<ExtArgs>
   creator?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   school?: boolean | Prisma.Challenge$schoolArgs<ExtArgs>
 }
@@ -1476,7 +2322,9 @@ export type ChallengeIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Ex
 export type $ChallengePayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "Challenge"
   objects: {
+    activityEvents: Prisma.$ActivityEventPayload<ExtArgs>[]
     challengeAssignments: Prisma.$ChallengeAssignmentPayload<ExtArgs>[]
+    badge: Prisma.$BadgePayload<ExtArgs> | null
     creator: Prisma.$UserPayload<ExtArgs>
     school: Prisma.$SchoolPayload<ExtArgs> | null
     userChallenges: Prisma.$UserChallengePayload<ExtArgs>[]
@@ -1486,21 +2334,28 @@ export type $ChallengePayload<ExtArgs extends runtime.Types.Extensions.InternalA
     name: string
     description: string
     instructions: string
+    category: string | null
     isActive: boolean
     createdBy: string
     createdAt: Date
     updatedAt: Date
     schoolId: string | null
+    startsAt: Date
+    endsAt: Date
     requiresMeditation: boolean
     requiresMusic: boolean
     requiresPsychoeducation: boolean
     requiresJournaling: boolean
-    category: string | null
     assignmentType: string
-    endsAt: Date
-    startsAt: Date
     targetClassId: string | null
     targetSchoolId: string | null
+    badgeId: string | null
+    challengeType: $Enums.ChallengeType | null
+    difficulty: $Enums.Difficulty | null
+    moduleType: $Enums.ModuleType | null
+    rewardPoints: number
+    targetUnit: $Enums.TargetUnit | null
+    targetValue: number | null
   }, ExtArgs["result"]["challenge"]>
   composites: {}
 }
@@ -1895,7 +2750,9 @@ readonly fields: ChallengeFieldRefs;
  */
 export interface Prisma__ChallengeClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
+  activityEvents<T extends Prisma.Challenge$activityEventsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Challenge$activityEventsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ActivityEventPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   challengeAssignments<T extends Prisma.Challenge$challengeAssignmentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Challenge$challengeAssignmentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ChallengeAssignmentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  badge<T extends Prisma.Challenge$badgeArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Challenge$badgeArgs<ExtArgs>>): Prisma.Prisma__BadgeClient<runtime.Types.Result.GetResult<Prisma.$BadgePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   creator<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   school<T extends Prisma.Challenge$schoolArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Challenge$schoolArgs<ExtArgs>>): Prisma.Prisma__SchoolClient<runtime.Types.Result.GetResult<Prisma.$SchoolPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   userChallenges<T extends Prisma.Challenge$userChallengesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Challenge$userChallengesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$UserChallengePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -1932,21 +2789,28 @@ export interface ChallengeFieldRefs {
   readonly name: Prisma.FieldRef<"Challenge", 'String'>
   readonly description: Prisma.FieldRef<"Challenge", 'String'>
   readonly instructions: Prisma.FieldRef<"Challenge", 'String'>
+  readonly category: Prisma.FieldRef<"Challenge", 'String'>
   readonly isActive: Prisma.FieldRef<"Challenge", 'Boolean'>
   readonly createdBy: Prisma.FieldRef<"Challenge", 'String'>
   readonly createdAt: Prisma.FieldRef<"Challenge", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Challenge", 'DateTime'>
   readonly schoolId: Prisma.FieldRef<"Challenge", 'String'>
+  readonly startsAt: Prisma.FieldRef<"Challenge", 'DateTime'>
+  readonly endsAt: Prisma.FieldRef<"Challenge", 'DateTime'>
   readonly requiresMeditation: Prisma.FieldRef<"Challenge", 'Boolean'>
   readonly requiresMusic: Prisma.FieldRef<"Challenge", 'Boolean'>
   readonly requiresPsychoeducation: Prisma.FieldRef<"Challenge", 'Boolean'>
   readonly requiresJournaling: Prisma.FieldRef<"Challenge", 'Boolean'>
-  readonly category: Prisma.FieldRef<"Challenge", 'String'>
   readonly assignmentType: Prisma.FieldRef<"Challenge", 'String'>
-  readonly endsAt: Prisma.FieldRef<"Challenge", 'DateTime'>
-  readonly startsAt: Prisma.FieldRef<"Challenge", 'DateTime'>
   readonly targetClassId: Prisma.FieldRef<"Challenge", 'String'>
   readonly targetSchoolId: Prisma.FieldRef<"Challenge", 'String'>
+  readonly badgeId: Prisma.FieldRef<"Challenge", 'String'>
+  readonly challengeType: Prisma.FieldRef<"Challenge", 'ChallengeType'>
+  readonly difficulty: Prisma.FieldRef<"Challenge", 'Difficulty'>
+  readonly moduleType: Prisma.FieldRef<"Challenge", 'ModuleType'>
+  readonly rewardPoints: Prisma.FieldRef<"Challenge", 'Int'>
+  readonly targetUnit: Prisma.FieldRef<"Challenge", 'TargetUnit'>
+  readonly targetValue: Prisma.FieldRef<"Challenge", 'Int'>
 }
     
 
@@ -2343,6 +3207,30 @@ export type ChallengeDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.Int
 }
 
 /**
+ * Challenge.activityEvents
+ */
+export type Challenge$activityEventsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ActivityEvent
+   */
+  select?: Prisma.ActivityEventSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the ActivityEvent
+   */
+  omit?: Prisma.ActivityEventOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ActivityEventInclude<ExtArgs> | null
+  where?: Prisma.ActivityEventWhereInput
+  orderBy?: Prisma.ActivityEventOrderByWithRelationInput | Prisma.ActivityEventOrderByWithRelationInput[]
+  cursor?: Prisma.ActivityEventWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ActivityEventScalarFieldEnum | Prisma.ActivityEventScalarFieldEnum[]
+}
+
+/**
  * Challenge.challengeAssignments
  */
 export type Challenge$challengeAssignmentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -2364,6 +3252,25 @@ export type Challenge$challengeAssignmentsArgs<ExtArgs extends runtime.Types.Ext
   take?: number
   skip?: number
   distinct?: Prisma.ChallengeAssignmentScalarFieldEnum | Prisma.ChallengeAssignmentScalarFieldEnum[]
+}
+
+/**
+ * Challenge.badge
+ */
+export type Challenge$badgeArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Badge
+   */
+  select?: Prisma.BadgeSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Badge
+   */
+  omit?: Prisma.BadgeOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.BadgeInclude<ExtArgs> | null
+  where?: Prisma.BadgeWhereInput
 }
 
 /**

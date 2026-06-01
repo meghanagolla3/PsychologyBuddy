@@ -127,7 +127,9 @@ export const ModelName = {
   SessionIntake: 'SessionIntake',
   SessionReport: 'SessionReport',
   CounselorAssignment: 'CounselorAssignment',
-  ContactMessage: 'ContactMessage'
+  ContactMessage: 'ContactMessage',
+  UserProfile: 'UserProfile',
+  ActivityEvent: 'ActivityEvent'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -154,7 +156,6 @@ export const UserScalarFieldEnum = {
   phone: 'phone',
   password: 'password',
   schoolId: 'schoolId',
-  locationId: 'locationId',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
   emailVerified: 'emailVerified',
@@ -162,7 +163,9 @@ export const UserScalarFieldEnum = {
   roleId: 'roleId',
   status: 'status',
   studentId: 'studentId',
-  parentId: 'parentId'
+  locationId: 'locationId',
+  parentId: 'parentId',
+  dateOfBirth: 'dateOfBirth'
 } as const
 
 export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
@@ -193,8 +196,8 @@ export const CounselorProfileScalarFieldEnum = {
   userId: 'userId',
   department: 'department',
   profileImageUrl: 'profileImageUrl',
-  specialization: 'specialization',
-  availability: 'availability'
+  availability: 'availability',
+  specialization: 'specialization'
 } as const
 
 export type CounselorProfileScalarFieldEnum = (typeof CounselorProfileScalarFieldEnum)[keyof typeof CounselorProfileScalarFieldEnum]
@@ -269,9 +272,9 @@ export const ClassScalarFieldEnum = {
   grade: 'grade',
   section: 'section',
   schoolId: 'schoolId',
-  locationId: 'locationId',
   createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
+  updatedAt: 'updatedAt',
+  locationId: 'locationId'
 } as const
 
 export type ClassScalarFieldEnum = (typeof ClassScalarFieldEnum)[keyof typeof ClassScalarFieldEnum]
@@ -690,8 +693,8 @@ export const StreakScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
   count: 'count',
-  bestStreak: 'bestStreak',
-  lastActive: 'lastActive'
+  lastActive: 'lastActive',
+  bestStreak: 'bestStreak'
 } as const
 
 export type StreakScalarFieldEnum = (typeof StreakScalarFieldEnum)[keyof typeof StreakScalarFieldEnum]
@@ -1017,7 +1020,9 @@ export const UserBadgeScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
   badgeId: 'badgeId',
-  earnedAt: 'earnedAt'
+  earnedAt: 'earnedAt',
+  challengeId: 'challengeId',
+  createdAt: 'createdAt'
 } as const
 
 export type UserBadgeScalarFieldEnum = (typeof UserBadgeScalarFieldEnum)[keyof typeof UserBadgeScalarFieldEnum]
@@ -1028,21 +1033,28 @@ export const ChallengeScalarFieldEnum = {
   name: 'name',
   description: 'description',
   instructions: 'instructions',
+  category: 'category',
   isActive: 'isActive',
   createdBy: 'createdBy',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
   schoolId: 'schoolId',
+  startsAt: 'startsAt',
+  endsAt: 'endsAt',
   requiresMeditation: 'requiresMeditation',
   requiresMusic: 'requiresMusic',
   requiresPsychoeducation: 'requiresPsychoeducation',
   requiresJournaling: 'requiresJournaling',
-  category: 'category',
   assignmentType: 'assignmentType',
-  endsAt: 'endsAt',
-  startsAt: 'startsAt',
   targetClassId: 'targetClassId',
-  targetSchoolId: 'targetSchoolId'
+  targetSchoolId: 'targetSchoolId',
+  badgeId: 'badgeId',
+  challengeType: 'challengeType',
+  difficulty: 'difficulty',
+  moduleType: 'moduleType',
+  rewardPoints: 'rewardPoints',
+  targetUnit: 'targetUnit',
+  targetValue: 'targetValue'
 } as const
 
 export type ChallengeScalarFieldEnum = (typeof ChallengeScalarFieldEnum)[keyof typeof ChallengeScalarFieldEnum]
@@ -1052,12 +1064,16 @@ export const UserChallengeScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
   challengeId: 'challengeId',
+  assignedAt: 'assignedAt',
   startedAt: 'startedAt',
   completedAt: 'completedAt',
   status: 'status',
-  assignedAt: 'assignedAt',
+  progressPercentage: 'progressPercentage',
   lastActivityAt: 'lastActivityAt',
-  progressPercentage: 'progressPercentage'
+  challengeStatus: 'challengeStatus',
+  createdAt: 'createdAt',
+  currentProgress: 'currentProgress',
+  updatedAt: 'updatedAt'
 } as const
 
 export type UserChallengeScalarFieldEnum = (typeof UserChallengeScalarFieldEnum)[keyof typeof UserChallengeScalarFieldEnum]
@@ -1144,10 +1160,10 @@ export const CounselorAssignmentScalarFieldEnum = {
   level: 'level',
   assignedAt: 'assignedAt',
   status: 'status',
+  sessionStatus: 'sessionStatus',
   notes: 'notes',
   createdAt: 'createdAt',
-  updatedAt: 'updatedAt',
-  sessionStatus: 'sessionStatus'
+  updatedAt: 'updatedAt'
 } as const
 
 export type CounselorAssignmentScalarFieldEnum = (typeof CounselorAssignmentScalarFieldEnum)[keyof typeof CounselorAssignmentScalarFieldEnum]
@@ -1166,6 +1182,36 @@ export const ContactMessageScalarFieldEnum = {
 export type ContactMessageScalarFieldEnum = (typeof ContactMessageScalarFieldEnum)[keyof typeof ContactMessageScalarFieldEnum]
 
 
+export const UserProfileScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  totalXp: 'totalXp',
+  currentLevel: 'currentLevel',
+  currentStreak: 'currentStreak',
+  longestStreak: 'longestStreak',
+  challengesCompleted: 'challengesCompleted',
+  badgesEarned: 'badgesEarned',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type UserProfileScalarFieldEnum = (typeof UserProfileScalarFieldEnum)[keyof typeof UserProfileScalarFieldEnum]
+
+
+export const ActivityEventScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  challengeId: 'challengeId',
+  moduleType: 'moduleType',
+  action: 'action',
+  value: 'value',
+  metadata: 'metadata',
+  timestamp: 'timestamp'
+} as const
+
+export type ActivityEventScalarFieldEnum = (typeof ActivityEventScalarFieldEnum)[keyof typeof ActivityEventScalarFieldEnum]
+
+
 export const SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -1179,6 +1225,14 @@ export const JsonNullValueInput = {
 } as const
 
 export type JsonNullValueInput = (typeof JsonNullValueInput)[keyof typeof JsonNullValueInput]
+
+
+export const NullableJsonNullValueInput = {
+  DbNull: DbNull,
+  JsonNull: JsonNull
+} as const
+
+export type NullableJsonNullValueInput = (typeof NullableJsonNullValueInput)[keyof typeof NullableJsonNullValueInput]
 
 
 export const QueryMode = {

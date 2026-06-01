@@ -41,11 +41,7 @@ interface FormData {
   status: 'ACTIVE' | 'INACTIVE' | 'SUSPENDED';
   schoolId: string;
   locationId: string;
-  qualifications?: string;
   specialization?: string;
-  licenseNumber?: string;
-  experience?: string;
-  bio?: string;
 }
 
 interface FormErrors {
@@ -57,6 +53,7 @@ interface FormErrors {
   status?: string;
   schoolId?: string;
   locationId?: string;
+  specialization?: string;
 }
 
 interface SchoolLocation {
@@ -92,11 +89,7 @@ export function EditCounselorModal({ counselor, onClose, onSuccess, schools }: E
     status: counselor.status as 'ACTIVE' | 'INACTIVE' | 'SUSPENDED',
     schoolId: counselor.schoolId || user?.school?.id || '',
     locationId: counselor.locationId || '',
-    qualifications: counselor.adminProfile?.qualifications || '',
-    specialization: counselor.adminProfile?.specialization || '',
-    licenseNumber: counselor.adminProfile?.licenseNumber || '',
-    experience: counselor.adminProfile?.experience || '',
-    bio: counselor.adminProfile?.bio || ''
+    specialization: counselor.adminProfile?.specialization || ''
   });
   const [errors, setErrors] = useState<FormErrors>({});
   const [submitError, setSubmitError] = useState<string>('');
@@ -121,9 +114,10 @@ export function EditCounselorModal({ counselor, onClose, onSuccess, schools }: E
       return;
     }
 
-    const phoneRegex = /^[+]?[\d\s\-\(\)]+$/;
+    // Only accept exactly 10 digits
+    const phoneRegex = /^\d{10}$/;
     if (!phoneRegex.test(phone)) {
-      setPhoneError("Invalid phone number format");
+      setPhoneError("Phone number must be exactly 10 digits");
       return;
     }
 
@@ -176,18 +170,32 @@ export function EditCounselorModal({ counselor, onClose, onSuccess, schools }: E
 
   // Handle input changes
   const handleInputChange = (field: keyof FormData, value: string) => {
+    // For phone field, only allow numbers and limit to 10 digits
+    if (field === 'phone' && value) {
+      const numericValue = value.replace(/\D/g, '').slice(0, 10);
+      setFormData(prev => ({ ...prev, [field]: numericValue }));
+      
+      // Clear errors when user starts typing
+      if (errors[field]) {
+        setErrors(prev => ({ ...prev, [field]: undefined }));
+      }
+      setSubmitError('');
+
+      // Validate phone in real-time
+      validatePhone(numericValue);
+      return;
+    }
+    
     setFormData(prev => ({ ...prev, [field]: value }));
     
     // Clear errors when user starts typing
     if (errors[field as keyof FormErrors]) {
-      setErrors(prev => ({ ...prev, [field as keyof FormErrors]: undefined }));
+      setErrors(prev => ({ ...prev, [field]: undefined }));
     }
     setSubmitError('');
 
-    // Validate phone and email in real-time
-    if (field === 'phone') {
-      validatePhone(value);
-    } else if (field === 'email') {
+    // Validate email in real-time
+    if (field === 'email') {
       validateEmail(value);
     }
   };
@@ -346,7 +354,8 @@ export function EditCounselorModal({ counselor, onClose, onSuccess, schools }: E
               <Input
                 value={formData.phone}
                 onChange={(e) => handleInputChange('phone', e.target.value)}
-                placeholder="+1 (555) 123-4567"
+                placeholder="Enter 10 digit phone number"
+                maxLength={10}
                 className={errors.phone ? 'border-red-500' : ''}
               />
               {errors.phone && (
@@ -379,59 +388,12 @@ export function EditCounselorModal({ counselor, onClose, onSuccess, schools }: E
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Qualifications
-              </label>
-              <Textarea
-                value={formData.qualifications}
-                onChange={(e) => handleInputChange('qualifications', e.target.value)}
-                placeholder="e.g., M.A. in Counseling, Licensed Professional Counselor"
-                rows={3}
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
                 Specialization
               </label>
               <Input
                 value={formData.specialization}
                 onChange={(e) => handleInputChange('specialization', e.target.value)}
                 placeholder="e.g., Adolescent Counseling, Trauma Therapy"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                License Number
-              </label>
-              <Input
-                value={formData.licenseNumber}
-                onChange={(e) => handleInputChange('licenseNumber', e.target.value)}
-                placeholder="Professional license number"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Experience
-              </label>
-              <Textarea
-                value={formData.experience}
-                onChange={(e) => handleInputChange('experience', e.target.value)}
-                placeholder="Years of experience and relevant background"
-                rows={2}
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Bio
-              </label>
-              <Textarea
-                value={formData.bio}
-                onChange={(e) => handleInputChange('bio', e.target.value)}
-                placeholder="Brief professional biography"
-                rows={3}
               />
             </div>
           </div>

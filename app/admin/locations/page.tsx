@@ -6,14 +6,19 @@ import { useSearchParams } from "next/navigation";
 import { AdminHeader } from "@/src/components/admin/layout/AdminHeader";
 import SchoolLocationsSection from "@/src/components/admin/sections/SchoolLocationsSection";
 import { usePermissions } from "@/src/hooks/usePermissions";
+import { useAuth } from "@/src/contexts/AuthContext";
 
 export default function LocationsPage() {
   const searchParams = useSearchParams();
   const permissions = usePermissions();
+  const { user } = useAuth();
   const schoolId = searchParams.get("school");
 
-  // Access Control
-  if (!permissions.canUpdateOrgs) {
+  // Access Control - Allow SCHOOL_SUPERADMIN or SUPERADMIN
+  const userRole = user?.role?.name;
+  const hasAccess = userRole === 'SUPERADMIN' || userRole === 'SCHOOL_SUPERADMIN';
+
+  if (!hasAccess) {
     return (
       <div className="p-6">
         <div className="bg-red-50 border border-red-200 rounded-lg p-6">

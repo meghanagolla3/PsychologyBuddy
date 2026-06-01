@@ -53,8 +53,9 @@ export const POST = withPermission({
     });
 
     if (!challenge) {
+      console.error('Challenge not found:', validatedData.challengeId);
       return NextResponse.json(
-        { error: 'Challenge not found' },
+        { error: 'Challenge not found', details: `No challenge exists with ID: ${validatedData.challengeId}` },
         { status: 404 }
       );
     }
@@ -78,9 +79,20 @@ export const POST = withPermission({
     let userChallenges = [];
     
     if (validatedData.assignmentType === "INDIVIDUAL") {
-      // Assign to specific user
-      const userChallenge = await prisma.userChallenge.create({
-        data: {
+      // Assign to specific user (use upsert to handle existing assignments)
+      const userChallenge = await prisma.userChallenge.upsert({
+        where: {
+          userId_challengeId: {
+            userId: validatedData.targetUserId!,
+            challengeId: validatedData.challengeId
+          }
+        },
+        update: {
+          assignedAt: new Date(validatedData.startDate),
+          status: "ASSIGNED",
+          progressPercentage: 0,
+        },
+        create: {
           userId: validatedData.targetUserId!,
           challengeId: validatedData.challengeId,
           assignedAt: new Date(validatedData.startDate),
@@ -105,8 +117,19 @@ export const POST = withPermission({
 
       userChallenges = await Promise.all(
         studentsInClass.map(student =>
-          prisma.userChallenge.create({
-            data: {
+          prisma.userChallenge.upsert({
+            where: {
+              userId_challengeId: {
+                userId: student.id,
+                challengeId: validatedData.challengeId
+              }
+            },
+            update: {
+              assignedAt: new Date(validatedData.startDate),
+              status: "ASSIGNED",
+              progressPercentage: 0,
+            },
+            create: {
               userId: student.id,
               challengeId: validatedData.challengeId,
               assignedAt: new Date(validatedData.startDate),
@@ -132,8 +155,19 @@ export const POST = withPermission({
 
       userChallenges = await Promise.all(
         studentsInSchool.map(student =>
-          prisma.userChallenge.create({
-            data: {
+          prisma.userChallenge.upsert({
+            where: {
+              userId_challengeId: {
+                userId: student.id,
+                challengeId: validatedData.challengeId
+              }
+            },
+            update: {
+              assignedAt: new Date(validatedData.startDate),
+              status: "ASSIGNED",
+              progressPercentage: 0,
+            },
+            create: {
               userId: student.id,
               challengeId: validatedData.challengeId,
               assignedAt: new Date(validatedData.startDate),

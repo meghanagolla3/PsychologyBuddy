@@ -138,7 +138,6 @@ export function AdminSidebar() {
       label: "School Locations",
       icon: Building2,
       href: "/admin/locations",
-      permission: 'organizations.update',
       role: ['SCHOOL_SUPERADMIN'],
     },
     {
@@ -189,7 +188,7 @@ export function AdminSidebar() {
       label: "Challenges",
       icon: Target,
       href: "/admin/challenges",
-      permission: 'badges.view',
+      permission: 'challenges.view',
     },
     {
       label: "Badges & Streaks",
@@ -201,35 +200,24 @@ export function AdminSidebar() {
 
   // Filter navigation items based on permissions
   const filterNavItems = (items: NavItem[]): NavItem[] => {
-    console.log('Filtering nav items with permissions:', permissions.userPermissions);
-    console.log('User role:', permissions.userRole);
-    
     return items.filter(item => {
-      console.log('Checking item:', item.label, 'permission:', item.permission);
-      
       // Check role restrictions
       if (item.role && permissions.userRole && !item.role.includes(permissions.userRole)) {
-        console.log('Filtered out by role:', item.label);
         return false;
       }
       
       // Check permission requirements
       if (item.permission && !permissions.hasPermission(item.permission)) {
-        console.log('Filtered out by permission:', item.label, 'needed:', item.permission, 'has:', permissions.hasPermission(item.permission));
         return false;
       }
       
       // Filter children if they exist
       if (item.children) {
         item.children = item.children.filter(child => {
-          console.log('Checking child:', child.label, 'permission:', child.permission);
-          
           if (child.role && permissions.userRole && !child.role.includes(permissions.userRole)) {
-            console.log('Child filtered out by role:', child.label);
             return false;
           }
           if (child.permission && !permissions.hasPermission(child.permission)) {
-            console.log('Child filtered out by permission:', child.label, 'needed:', child.permission, 'has:', permissions.hasPermission(child.permission));
             return false;
           }
           return true;
@@ -237,7 +225,6 @@ export function AdminSidebar() {
         
         // Only show parent if it has children after filtering
         const hasChildren = item.children.length > 0;
-        console.log('Parent', item.label, 'has children after filtering:', hasChildren);
         return hasChildren;
       }
       
