@@ -9,6 +9,8 @@ export function formatRelativeTime(date: Date | string): string {
     return 'Today';
   }
 
+
+  
   if (diffInDays === 0) {
     return 'Today';
   } else if (diffInDays === 1) {

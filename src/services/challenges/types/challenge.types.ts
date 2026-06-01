@@ -12,6 +12,7 @@ export enum ChallengeType {
   MILESTONE = 'MILESTONE'
 }
 
+
 export enum TargetUnit {
   ENTRIES = 'ENTRIES',
   SESSIONS = 'SESSIONS',
