@@ -8,7 +8,7 @@ export interface ChatTerminationResult {
 }
 
 export class AutomaticChatTermination {
-  private static maxSessionDuration = Number(process.env.CHAT_SESSION_DURATION_MINUTES || 360) * 60 * 1000; // Configurable: default 5 minutes
+  private static maxSessionDuration = Number(process.env.CHAT_SESSION_DURATION_MINUTES || 360) * 60 * 1000; // Configurable: default 6 hours
   private static warningTime = Number(process.env.CHAT_WARNING_TIME_MINUTES || 1) * 60 * 1000; // Configurable: default 1 minute
 
   /**
@@ -28,6 +28,13 @@ export class AutomaticChatTermination {
       maxSessionDurationMinutes: AutomaticChatTermination.maxSessionDuration / 60 / 1000,
       warningTimeMinutes: AutomaticChatTermination.warningTime / 60 / 1000
     };
+  }
+
+  /**
+   * Get max session duration in milliseconds
+   */
+  static getMaxSessionDuration() {
+    return AutomaticChatTermination.maxSessionDuration;
   }
 
   /**

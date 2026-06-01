@@ -742,7 +742,7 @@ export default function ChatInterface({
     setIsLoading(hookIsLoading);
   }, [hookIsLoading]);
 
-  // Debug logging and ensure chat initialization - optimized dependencies
+  // Debug logging only - use-chat.ts handles all chat initialization
   React.useEffect(() => {
     console.log('ChatInterface Debug:', {
       user: user?.id,
@@ -753,13 +753,7 @@ export default function ChatInterface({
       hookSessionId,
       hookIsLoading
     });
-
-    // If we have a user but no messages and no session ID, try to initialize
-    if (user && messages.length === 0 && !hookSessionId && !hookIsLoading) {
-      console.log('Manually triggering chat initialization');
-      initializeChat(mood || accessMood, triggers || accessTriggers, notes || accessNotes);
-    }
-  }, [user?.id, messages.length, hookSessionId, hookIsLoading, initializeChat]);
+  }, [user?.id, messages.length, hookSessionId, hookIsLoading]);
 
   // State for exercise suggestions - not persisted, always starts hidden
   const [showExerciseSuggestions, setShowExerciseSuggestions] = useState(false);

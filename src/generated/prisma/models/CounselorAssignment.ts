@@ -33,10 +33,10 @@ export type CounselorAssignmentMinAggregateOutputType = {
   level: string | null
   assignedAt: Date | null
   status: string | null
+  sessionStatus: string | null
   notes: string | null
   createdAt: Date | null
   updatedAt: Date | null
-  sessionStatus: string | null
 }
 
 export type CounselorAssignmentMaxAggregateOutputType = {
@@ -48,10 +48,10 @@ export type CounselorAssignmentMaxAggregateOutputType = {
   level: string | null
   assignedAt: Date | null
   status: string | null
+  sessionStatus: string | null
   notes: string | null
   createdAt: Date | null
   updatedAt: Date | null
-  sessionStatus: string | null
 }
 
 export type CounselorAssignmentCountAggregateOutputType = {
@@ -63,10 +63,10 @@ export type CounselorAssignmentCountAggregateOutputType = {
   level: number
   assignedAt: number
   status: number
+  sessionStatus: number
   notes: number
   createdAt: number
   updatedAt: number
-  sessionStatus: number
   _all: number
 }
 
@@ -80,10 +80,10 @@ export type CounselorAssignmentMinAggregateInputType = {
   level?: true
   assignedAt?: true
   status?: true
+  sessionStatus?: true
   notes?: true
   createdAt?: true
   updatedAt?: true
-  sessionStatus?: true
 }
 
 export type CounselorAssignmentMaxAggregateInputType = {
@@ -95,10 +95,10 @@ export type CounselorAssignmentMaxAggregateInputType = {
   level?: true
   assignedAt?: true
   status?: true
+  sessionStatus?: true
   notes?: true
   createdAt?: true
   updatedAt?: true
-  sessionStatus?: true
 }
 
 export type CounselorAssignmentCountAggregateInputType = {
@@ -110,10 +110,10 @@ export type CounselorAssignmentCountAggregateInputType = {
   level?: true
   assignedAt?: true
   status?: true
+  sessionStatus?: true
   notes?: true
   createdAt?: true
   updatedAt?: true
-  sessionStatus?: true
   _all?: true
 }
 
@@ -198,10 +198,10 @@ export type CounselorAssignmentGroupByOutputType = {
   level: string | null
   assignedAt: Date
   status: string
+  sessionStatus: string
   notes: string | null
   createdAt: Date
   updatedAt: Date
-  sessionStatus: string
   _count: CounselorAssignmentCountAggregateOutputType | null
   _min: CounselorAssignmentMinAggregateOutputType | null
   _max: CounselorAssignmentMaxAggregateOutputType | null
@@ -234,10 +234,10 @@ export type CounselorAssignmentWhereInput = {
   level?: Prisma.StringNullableFilter<"CounselorAssignment"> | string | null
   assignedAt?: Prisma.DateTimeFilter<"CounselorAssignment"> | Date | string
   status?: Prisma.StringFilter<"CounselorAssignment"> | string
+  sessionStatus?: Prisma.StringFilter<"CounselorAssignment"> | string
   notes?: Prisma.StringNullableFilter<"CounselorAssignment"> | string | null
   createdAt?: Prisma.DateTimeFilter<"CounselorAssignment"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"CounselorAssignment"> | Date | string
-  sessionStatus?: Prisma.StringFilter<"CounselorAssignment"> | string
   counselor?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   escalationAlert?: Prisma.XOR<Prisma.EscalationAlertNullableScalarRelationFilter, Prisma.EscalationAlertWhereInput> | null
   student?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
@@ -252,10 +252,10 @@ export type CounselorAssignmentOrderByWithRelationInput = {
   level?: Prisma.SortOrderInput | Prisma.SortOrder
   assignedAt?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  sessionStatus?: Prisma.SortOrder
   notes?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
-  sessionStatus?: Prisma.SortOrder
   counselor?: Prisma.UserOrderByWithRelationInput
   escalationAlert?: Prisma.EscalationAlertOrderByWithRelationInput
   student?: Prisma.UserOrderByWithRelationInput
@@ -273,10 +273,10 @@ export type CounselorAssignmentWhereUniqueInput = Prisma.AtLeast<{
   level?: Prisma.StringNullableFilter<"CounselorAssignment"> | string | null
   assignedAt?: Prisma.DateTimeFilter<"CounselorAssignment"> | Date | string
   status?: Prisma.StringFilter<"CounselorAssignment"> | string
+  sessionStatus?: Prisma.StringFilter<"CounselorAssignment"> | string
   notes?: Prisma.StringNullableFilter<"CounselorAssignment"> | string | null
   createdAt?: Prisma.DateTimeFilter<"CounselorAssignment"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"CounselorAssignment"> | Date | string
-  sessionStatus?: Prisma.StringFilter<"CounselorAssignment"> | string
   counselor?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   escalationAlert?: Prisma.XOR<Prisma.EscalationAlertNullableScalarRelationFilter, Prisma.EscalationAlertWhereInput> | null
   student?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
@@ -291,10 +291,10 @@ export type CounselorAssignmentOrderByWithAggregationInput = {
   level?: Prisma.SortOrderInput | Prisma.SortOrder
   assignedAt?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  sessionStatus?: Prisma.SortOrder
   notes?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
-  sessionStatus?: Prisma.SortOrder
   _count?: Prisma.CounselorAssignmentCountOrderByAggregateInput
   _max?: Prisma.CounselorAssignmentMaxOrderByAggregateInput
   _min?: Prisma.CounselorAssignmentMinOrderByAggregateInput
@@ -312,10 +312,10 @@ export type CounselorAssignmentScalarWhereWithAggregatesInput = {
   level?: Prisma.StringNullableWithAggregatesFilter<"CounselorAssignment"> | string | null
   assignedAt?: Prisma.DateTimeWithAggregatesFilter<"CounselorAssignment"> | Date | string
   status?: Prisma.StringWithAggregatesFilter<"CounselorAssignment"> | string
+  sessionStatus?: Prisma.StringWithAggregatesFilter<"CounselorAssignment"> | string
   notes?: Prisma.StringNullableWithAggregatesFilter<"CounselorAssignment"> | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"CounselorAssignment"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"CounselorAssignment"> | Date | string
-  sessionStatus?: Prisma.StringWithAggregatesFilter<"CounselorAssignment"> | string
 }
 
 export type CounselorAssignmentCreateInput = {
@@ -324,10 +324,10 @@ export type CounselorAssignmentCreateInput = {
   level?: string | null
   assignedAt?: Date | string
   status?: string
+  sessionStatus?: string
   notes?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
-  sessionStatus?: string
   counselor: Prisma.UserCreateNestedOneWithoutCounselorAssignmentsInput
   escalationAlert?: Prisma.EscalationAlertCreateNestedOneWithoutCounselorAssignmentsInput
   student: Prisma.UserCreateNestedOneWithoutStudentAssignmentsInput
@@ -342,10 +342,10 @@ export type CounselorAssignmentUncheckedCreateInput = {
   level?: string | null
   assignedAt?: Date | string
   status?: string
+  sessionStatus?: string
   notes?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
-  sessionStatus?: string
 }
 
 export type CounselorAssignmentUpdateInput = {
@@ -354,10 +354,10 @@ export type CounselorAssignmentUpdateInput = {
   level?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   assignedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
+  sessionStatus?: Prisma.StringFieldUpdateOperationsInput | string
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  sessionStatus?: Prisma.StringFieldUpdateOperationsInput | string
   counselor?: Prisma.UserUpdateOneRequiredWithoutCounselorAssignmentsNestedInput
   escalationAlert?: Prisma.EscalationAlertUpdateOneWithoutCounselorAssignmentsNestedInput
   student?: Prisma.UserUpdateOneRequiredWithoutStudentAssignmentsNestedInput
@@ -372,10 +372,10 @@ export type CounselorAssignmentUncheckedUpdateInput = {
   level?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   assignedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
+  sessionStatus?: Prisma.StringFieldUpdateOperationsInput | string
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  sessionStatus?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
 export type CounselorAssignmentCreateManyInput = {
@@ -387,10 +387,10 @@ export type CounselorAssignmentCreateManyInput = {
   level?: string | null
   assignedAt?: Date | string
   status?: string
+  sessionStatus?: string
   notes?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
-  sessionStatus?: string
 }
 
 export type CounselorAssignmentUpdateManyMutationInput = {
@@ -399,10 +399,10 @@ export type CounselorAssignmentUpdateManyMutationInput = {
   level?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   assignedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
+  sessionStatus?: Prisma.StringFieldUpdateOperationsInput | string
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  sessionStatus?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
 export type CounselorAssignmentUncheckedUpdateManyInput = {
@@ -414,10 +414,10 @@ export type CounselorAssignmentUncheckedUpdateManyInput = {
   level?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   assignedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
+  sessionStatus?: Prisma.StringFieldUpdateOperationsInput | string
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  sessionStatus?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
 export type CounselorAssignmentListRelationFilter = {
@@ -439,10 +439,10 @@ export type CounselorAssignmentCountOrderByAggregateInput = {
   level?: Prisma.SortOrder
   assignedAt?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  sessionStatus?: Prisma.SortOrder
   notes?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
-  sessionStatus?: Prisma.SortOrder
 }
 
 export type CounselorAssignmentMaxOrderByAggregateInput = {
@@ -454,10 +454,10 @@ export type CounselorAssignmentMaxOrderByAggregateInput = {
   level?: Prisma.SortOrder
   assignedAt?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  sessionStatus?: Prisma.SortOrder
   notes?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
-  sessionStatus?: Prisma.SortOrder
 }
 
 export type CounselorAssignmentMinOrderByAggregateInput = {
@@ -469,10 +469,10 @@ export type CounselorAssignmentMinOrderByAggregateInput = {
   level?: Prisma.SortOrder
   assignedAt?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  sessionStatus?: Prisma.SortOrder
   notes?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
-  sessionStatus?: Prisma.SortOrder
 }
 
 export type CounselorAssignmentCreateNestedManyWithoutCounselorInput = {
@@ -607,10 +607,10 @@ export type CounselorAssignmentCreateWithoutCounselorInput = {
   level?: string | null
   assignedAt?: Date | string
   status?: string
+  sessionStatus?: string
   notes?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
-  sessionStatus?: string
   escalationAlert?: Prisma.EscalationAlertCreateNestedOneWithoutCounselorAssignmentsInput
   student: Prisma.UserCreateNestedOneWithoutStudentAssignmentsInput
 }
@@ -623,10 +623,10 @@ export type CounselorAssignmentUncheckedCreateWithoutCounselorInput = {
   level?: string | null
   assignedAt?: Date | string
   status?: string
+  sessionStatus?: string
   notes?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
-  sessionStatus?: string
 }
 
 export type CounselorAssignmentCreateOrConnectWithoutCounselorInput = {
@@ -645,10 +645,10 @@ export type CounselorAssignmentCreateWithoutStudentInput = {
   level?: string | null
   assignedAt?: Date | string
   status?: string
+  sessionStatus?: string
   notes?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
-  sessionStatus?: string
   counselor: Prisma.UserCreateNestedOneWithoutCounselorAssignmentsInput
   escalationAlert?: Prisma.EscalationAlertCreateNestedOneWithoutCounselorAssignmentsInput
 }
@@ -661,10 +661,10 @@ export type CounselorAssignmentUncheckedCreateWithoutStudentInput = {
   level?: string | null
   assignedAt?: Date | string
   status?: string
+  sessionStatus?: string
   notes?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
-  sessionStatus?: string
 }
 
 export type CounselorAssignmentCreateOrConnectWithoutStudentInput = {
@@ -705,10 +705,10 @@ export type CounselorAssignmentScalarWhereInput = {
   level?: Prisma.StringNullableFilter<"CounselorAssignment"> | string | null
   assignedAt?: Prisma.DateTimeFilter<"CounselorAssignment"> | Date | string
   status?: Prisma.StringFilter<"CounselorAssignment"> | string
+  sessionStatus?: Prisma.StringFilter<"CounselorAssignment"> | string
   notes?: Prisma.StringNullableFilter<"CounselorAssignment"> | string | null
   createdAt?: Prisma.DateTimeFilter<"CounselorAssignment"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"CounselorAssignment"> | Date | string
-  sessionStatus?: Prisma.StringFilter<"CounselorAssignment"> | string
 }
 
 export type CounselorAssignmentUpsertWithWhereUniqueWithoutStudentInput = {
@@ -733,10 +733,10 @@ export type CounselorAssignmentCreateWithoutEscalationAlertInput = {
   level?: string | null
   assignedAt?: Date | string
   status?: string
+  sessionStatus?: string
   notes?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
-  sessionStatus?: string
   counselor: Prisma.UserCreateNestedOneWithoutCounselorAssignmentsInput
   student: Prisma.UserCreateNestedOneWithoutStudentAssignmentsInput
 }
@@ -749,10 +749,10 @@ export type CounselorAssignmentUncheckedCreateWithoutEscalationAlertInput = {
   level?: string | null
   assignedAt?: Date | string
   status?: string
+  sessionStatus?: string
   notes?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
-  sessionStatus?: string
 }
 
 export type CounselorAssignmentCreateOrConnectWithoutEscalationAlertInput = {
@@ -789,10 +789,10 @@ export type CounselorAssignmentCreateManyCounselorInput = {
   level?: string | null
   assignedAt?: Date | string
   status?: string
+  sessionStatus?: string
   notes?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
-  sessionStatus?: string
 }
 
 export type CounselorAssignmentCreateManyStudentInput = {
@@ -803,10 +803,10 @@ export type CounselorAssignmentCreateManyStudentInput = {
   level?: string | null
   assignedAt?: Date | string
   status?: string
+  sessionStatus?: string
   notes?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
-  sessionStatus?: string
 }
 
 export type CounselorAssignmentUpdateWithoutCounselorInput = {
@@ -815,10 +815,10 @@ export type CounselorAssignmentUpdateWithoutCounselorInput = {
   level?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   assignedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
+  sessionStatus?: Prisma.StringFieldUpdateOperationsInput | string
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  sessionStatus?: Prisma.StringFieldUpdateOperationsInput | string
   escalationAlert?: Prisma.EscalationAlertUpdateOneWithoutCounselorAssignmentsNestedInput
   student?: Prisma.UserUpdateOneRequiredWithoutStudentAssignmentsNestedInput
 }
@@ -831,10 +831,10 @@ export type CounselorAssignmentUncheckedUpdateWithoutCounselorInput = {
   level?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   assignedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
+  sessionStatus?: Prisma.StringFieldUpdateOperationsInput | string
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  sessionStatus?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
 export type CounselorAssignmentUncheckedUpdateManyWithoutCounselorInput = {
@@ -845,10 +845,10 @@ export type CounselorAssignmentUncheckedUpdateManyWithoutCounselorInput = {
   level?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   assignedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
+  sessionStatus?: Prisma.StringFieldUpdateOperationsInput | string
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  sessionStatus?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
 export type CounselorAssignmentUpdateWithoutStudentInput = {
@@ -857,10 +857,10 @@ export type CounselorAssignmentUpdateWithoutStudentInput = {
   level?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   assignedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
+  sessionStatus?: Prisma.StringFieldUpdateOperationsInput | string
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  sessionStatus?: Prisma.StringFieldUpdateOperationsInput | string
   counselor?: Prisma.UserUpdateOneRequiredWithoutCounselorAssignmentsNestedInput
   escalationAlert?: Prisma.EscalationAlertUpdateOneWithoutCounselorAssignmentsNestedInput
 }
@@ -873,10 +873,10 @@ export type CounselorAssignmentUncheckedUpdateWithoutStudentInput = {
   level?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   assignedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
+  sessionStatus?: Prisma.StringFieldUpdateOperationsInput | string
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  sessionStatus?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
 export type CounselorAssignmentUncheckedUpdateManyWithoutStudentInput = {
@@ -887,10 +887,10 @@ export type CounselorAssignmentUncheckedUpdateManyWithoutStudentInput = {
   level?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   assignedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
+  sessionStatus?: Prisma.StringFieldUpdateOperationsInput | string
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  sessionStatus?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
 export type CounselorAssignmentCreateManyEscalationAlertInput = {
@@ -901,10 +901,10 @@ export type CounselorAssignmentCreateManyEscalationAlertInput = {
   level?: string | null
   assignedAt?: Date | string
   status?: string
+  sessionStatus?: string
   notes?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
-  sessionStatus?: string
 }
 
 export type CounselorAssignmentUpdateWithoutEscalationAlertInput = {
@@ -913,10 +913,10 @@ export type CounselorAssignmentUpdateWithoutEscalationAlertInput = {
   level?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   assignedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
+  sessionStatus?: Prisma.StringFieldUpdateOperationsInput | string
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  sessionStatus?: Prisma.StringFieldUpdateOperationsInput | string
   counselor?: Prisma.UserUpdateOneRequiredWithoutCounselorAssignmentsNestedInput
   student?: Prisma.UserUpdateOneRequiredWithoutStudentAssignmentsNestedInput
 }
@@ -929,10 +929,10 @@ export type CounselorAssignmentUncheckedUpdateWithoutEscalationAlertInput = {
   level?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   assignedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
+  sessionStatus?: Prisma.StringFieldUpdateOperationsInput | string
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  sessionStatus?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
 export type CounselorAssignmentUncheckedUpdateManyWithoutEscalationAlertInput = {
@@ -943,10 +943,10 @@ export type CounselorAssignmentUncheckedUpdateManyWithoutEscalationAlertInput = 
   level?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   assignedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   status?: Prisma.StringFieldUpdateOperationsInput | string
+  sessionStatus?: Prisma.StringFieldUpdateOperationsInput | string
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  sessionStatus?: Prisma.StringFieldUpdateOperationsInput | string
 }
 
 
@@ -960,10 +960,10 @@ export type CounselorAssignmentSelect<ExtArgs extends runtime.Types.Extensions.I
   level?: boolean
   assignedAt?: boolean
   status?: boolean
+  sessionStatus?: boolean
   notes?: boolean
   createdAt?: boolean
   updatedAt?: boolean
-  sessionStatus?: boolean
   counselor?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   escalationAlert?: boolean | Prisma.CounselorAssignment$escalationAlertArgs<ExtArgs>
   student?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -978,10 +978,10 @@ export type CounselorAssignmentSelectCreateManyAndReturn<ExtArgs extends runtime
   level?: boolean
   assignedAt?: boolean
   status?: boolean
+  sessionStatus?: boolean
   notes?: boolean
   createdAt?: boolean
   updatedAt?: boolean
-  sessionStatus?: boolean
   counselor?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   escalationAlert?: boolean | Prisma.CounselorAssignment$escalationAlertArgs<ExtArgs>
   student?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -996,10 +996,10 @@ export type CounselorAssignmentSelectUpdateManyAndReturn<ExtArgs extends runtime
   level?: boolean
   assignedAt?: boolean
   status?: boolean
+  sessionStatus?: boolean
   notes?: boolean
   createdAt?: boolean
   updatedAt?: boolean
-  sessionStatus?: boolean
   counselor?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   escalationAlert?: boolean | Prisma.CounselorAssignment$escalationAlertArgs<ExtArgs>
   student?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -1014,13 +1014,13 @@ export type CounselorAssignmentSelectScalar = {
   level?: boolean
   assignedAt?: boolean
   status?: boolean
+  sessionStatus?: boolean
   notes?: boolean
   createdAt?: boolean
   updatedAt?: boolean
-  sessionStatus?: boolean
 }
 
-export type CounselorAssignmentOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "counselorId" | "studentId" | "escalationAlertId" | "assignedBy" | "level" | "assignedAt" | "status" | "notes" | "createdAt" | "updatedAt" | "sessionStatus", ExtArgs["result"]["counselorAssignment"]>
+export type CounselorAssignmentOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "counselorId" | "studentId" | "escalationAlertId" | "assignedBy" | "level" | "assignedAt" | "status" | "sessionStatus" | "notes" | "createdAt" | "updatedAt", ExtArgs["result"]["counselorAssignment"]>
 export type CounselorAssignmentInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   counselor?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   escalationAlert?: boolean | Prisma.CounselorAssignment$escalationAlertArgs<ExtArgs>
@@ -1053,10 +1053,10 @@ export type $CounselorAssignmentPayload<ExtArgs extends runtime.Types.Extensions
     level: string | null
     assignedAt: Date
     status: string
+    sessionStatus: string
     notes: string | null
     createdAt: Date
     updatedAt: Date
-    sessionStatus: string
   }, ExtArgs["result"]["counselorAssignment"]>
   composites: {}
 }
@@ -1491,10 +1491,10 @@ export interface CounselorAssignmentFieldRefs {
   readonly level: Prisma.FieldRef<"CounselorAssignment", 'String'>
   readonly assignedAt: Prisma.FieldRef<"CounselorAssignment", 'DateTime'>
   readonly status: Prisma.FieldRef<"CounselorAssignment", 'String'>
+  readonly sessionStatus: Prisma.FieldRef<"CounselorAssignment", 'String'>
   readonly notes: Prisma.FieldRef<"CounselorAssignment", 'String'>
   readonly createdAt: Prisma.FieldRef<"CounselorAssignment", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"CounselorAssignment", 'DateTime'>
-  readonly sessionStatus: Prisma.FieldRef<"CounselorAssignment", 'String'>
 }
     
 
