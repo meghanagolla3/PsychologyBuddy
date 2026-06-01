@@ -1,4 +1,4 @@
-@import "tailwindcss";
+﻿@import "tailwindcss";
 
 @layer base {
   :root {
@@ -207,11 +207,4 @@
   backface-visibility: hidden;
   transform: translateZ(0);
   -webkit-transform: translateZ(0);
-}
-.animate-spin-reverse {
-  animation: ring-spin-reverse 0.8s linear infinite;
-}
-
-.animate-ring-spin {
-  animation: ring-spin 1s linear infinite;
 }
