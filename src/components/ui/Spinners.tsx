@@ -10,8 +10,7 @@ export function RingSpinner({
   color?: 'blue' | 'white' | 'gray';
   className?: string;
 }) {
-  console.log('RingSpinner: Rendering with size:', size, 'color:', color);
-  
+  const uniqueId = React.useId(); // Cache-busting with unique ID
   const sizeClasses = {
     sm: 'w-6 h-6',
     md: 'w-8 h-8',
@@ -25,9 +24,10 @@ export function RingSpinner({
   };
 
   return (
-    <div className={`relative ${sizeClasses[size]} ${className}`}>
+    <div className={`relative ${sizeClasses[size]} ${className}`} data-spinner-id={uniqueId}>
       <div 
         className={`absolute inset-0 border-2 ${colorClasses[color]} border-t-transparent rounded-full animate-spin`}
+        style={{ animationDuration: '1s' }}
       />
       <div 
         className={`absolute inset-1 border-2 ${colorClasses[color]} border-b-transparent rounded-full animate-spin`}
