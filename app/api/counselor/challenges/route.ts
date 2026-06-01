@@ -15,10 +15,13 @@ const createChallengeSchema = z.object({
   requiresPsychoeducation: z.boolean().default(false),
   requiresJournaling: z.boolean().default(false),
   category: z.string().optional(),
-  journalType: z.enum(["write", "audio", "art"]).optional(),
   assignmentType: z.enum(["INDIVIDUAL", "CLASS", "SCHOOL"]).default("INDIVIDUAL"),
   targetClassId: z.string().optional(),
   targetSchoolId: z.string().optional(),
+  targetValue: z.number().default(1),
+  targetUnit: z.string().default("ENTRIES"),
+  challengeType: z.string().default("DAILY"),
+  moduleType: z.string().optional(),
   isActive: z.boolean().default(true),
 });
 
@@ -113,7 +116,7 @@ export const POST = withPermission({
         ...validatedData,
         createdBy: user.id,
         schoolId: user.schoolId,
-      },
+      } as any,
       include: {
         creator: {
           select: {

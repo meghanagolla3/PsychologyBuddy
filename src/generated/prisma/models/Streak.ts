@@ -40,24 +40,24 @@ export type StreakMinAggregateOutputType = {
   id: string | null
   userId: string | null
   count: number | null
-  bestStreak: number | null
   lastActive: Date | null
+  bestStreak: number | null
 }
 
 export type StreakMaxAggregateOutputType = {
   id: string | null
   userId: string | null
   count: number | null
-  bestStreak: number | null
   lastActive: Date | null
+  bestStreak: number | null
 }
 
 export type StreakCountAggregateOutputType = {
   id: number
   userId: number
   count: number
-  bestStreak: number
   lastActive: number
+  bestStreak: number
   _all: number
 }
 
@@ -76,24 +76,24 @@ export type StreakMinAggregateInputType = {
   id?: true
   userId?: true
   count?: true
-  bestStreak?: true
   lastActive?: true
+  bestStreak?: true
 }
 
 export type StreakMaxAggregateInputType = {
   id?: true
   userId?: true
   count?: true
-  bestStreak?: true
   lastActive?: true
+  bestStreak?: true
 }
 
 export type StreakCountAggregateInputType = {
   id?: true
   userId?: true
   count?: true
-  bestStreak?: true
   lastActive?: true
+  bestStreak?: true
   _all?: true
 }
 
@@ -187,8 +187,8 @@ export type StreakGroupByOutputType = {
   id: string
   userId: string
   count: number
-  bestStreak: number
   lastActive: Date
+  bestStreak: number
   _count: StreakCountAggregateOutputType | null
   _avg: StreakAvgAggregateOutputType | null
   _sum: StreakSumAggregateOutputType | null
@@ -218,8 +218,8 @@ export type StreakWhereInput = {
   id?: Prisma.StringFilter<"Streak"> | string
   userId?: Prisma.StringFilter<"Streak"> | string
   count?: Prisma.IntFilter<"Streak"> | number
-  bestStreak?: Prisma.IntFilter<"Streak"> | number
   lastActive?: Prisma.DateTimeFilter<"Streak"> | Date | string
+  bestStreak?: Prisma.IntFilter<"Streak"> | number
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
 }
 
@@ -227,8 +227,8 @@ export type StreakOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   userId?: Prisma.SortOrder
   count?: Prisma.SortOrder
-  bestStreak?: Prisma.SortOrder
   lastActive?: Prisma.SortOrder
+  bestStreak?: Prisma.SortOrder
   user?: Prisma.UserOrderByWithRelationInput
 }
 
@@ -239,8 +239,8 @@ export type StreakWhereUniqueInput = Prisma.AtLeast<{
   OR?: Prisma.StreakWhereInput[]
   NOT?: Prisma.StreakWhereInput | Prisma.StreakWhereInput[]
   count?: Prisma.IntFilter<"Streak"> | number
-  bestStreak?: Prisma.IntFilter<"Streak"> | number
   lastActive?: Prisma.DateTimeFilter<"Streak"> | Date | string
+  bestStreak?: Prisma.IntFilter<"Streak"> | number
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
 }, "id" | "userId">
 
@@ -248,8 +248,8 @@ export type StreakOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   userId?: Prisma.SortOrder
   count?: Prisma.SortOrder
-  bestStreak?: Prisma.SortOrder
   lastActive?: Prisma.SortOrder
+  bestStreak?: Prisma.SortOrder
   _count?: Prisma.StreakCountOrderByAggregateInput
   _avg?: Prisma.StreakAvgOrderByAggregateInput
   _max?: Prisma.StreakMaxOrderByAggregateInput
@@ -264,15 +264,15 @@ export type StreakScalarWhereWithAggregatesInput = {
   id?: Prisma.StringWithAggregatesFilter<"Streak"> | string
   userId?: Prisma.StringWithAggregatesFilter<"Streak"> | string
   count?: Prisma.IntWithAggregatesFilter<"Streak"> | number
-  bestStreak?: Prisma.IntWithAggregatesFilter<"Streak"> | number
   lastActive?: Prisma.DateTimeWithAggregatesFilter<"Streak"> | Date | string
+  bestStreak?: Prisma.IntWithAggregatesFilter<"Streak"> | number
 }
 
 export type StreakCreateInput = {
   id?: string
   count?: number
-  bestStreak?: number
   lastActive?: Date | string
+  bestStreak?: number
   user: Prisma.UserCreateNestedOneWithoutStreaksInput
 }
 
@@ -280,15 +280,15 @@ export type StreakUncheckedCreateInput = {
   id?: string
   userId: string
   count?: number
-  bestStreak?: number
   lastActive?: Date | string
+  bestStreak?: number
 }
 
 export type StreakUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   count?: Prisma.IntFieldUpdateOperationsInput | number
-  bestStreak?: Prisma.IntFieldUpdateOperationsInput | number
   lastActive?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  bestStreak?: Prisma.IntFieldUpdateOperationsInput | number
   user?: Prisma.UserUpdateOneRequiredWithoutStreaksNestedInput
 }
 
@@ -296,31 +296,31 @@ export type StreakUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   count?: Prisma.IntFieldUpdateOperationsInput | number
-  bestStreak?: Prisma.IntFieldUpdateOperationsInput | number
   lastActive?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  bestStreak?: Prisma.IntFieldUpdateOperationsInput | number
 }
 
 export type StreakCreateManyInput = {
   id?: string
   userId: string
   count?: number
-  bestStreak?: number
   lastActive?: Date | string
+  bestStreak?: number
 }
 
 export type StreakUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   count?: Prisma.IntFieldUpdateOperationsInput | number
-  bestStreak?: Prisma.IntFieldUpdateOperationsInput | number
   lastActive?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  bestStreak?: Prisma.IntFieldUpdateOperationsInput | number
 }
 
 export type StreakUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   count?: Prisma.IntFieldUpdateOperationsInput | number
-  bestStreak?: Prisma.IntFieldUpdateOperationsInput | number
   lastActive?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  bestStreak?: Prisma.IntFieldUpdateOperationsInput | number
 }
 
 export type StreakNullableScalarRelationFilter = {
@@ -332,8 +332,8 @@ export type StreakCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   userId?: Prisma.SortOrder
   count?: Prisma.SortOrder
-  bestStreak?: Prisma.SortOrder
   lastActive?: Prisma.SortOrder
+  bestStreak?: Prisma.SortOrder
 }
 
 export type StreakAvgOrderByAggregateInput = {
@@ -345,16 +345,16 @@ export type StreakMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   userId?: Prisma.SortOrder
   count?: Prisma.SortOrder
-  bestStreak?: Prisma.SortOrder
   lastActive?: Prisma.SortOrder
+  bestStreak?: Prisma.SortOrder
 }
 
 export type StreakMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   userId?: Prisma.SortOrder
   count?: Prisma.SortOrder
-  bestStreak?: Prisma.SortOrder
   lastActive?: Prisma.SortOrder
+  bestStreak?: Prisma.SortOrder
 }
 
 export type StreakSumOrderByAggregateInput = {
@@ -397,15 +397,15 @@ export type StreakUncheckedUpdateOneWithoutUserNestedInput = {
 export type StreakCreateWithoutUserInput = {
   id?: string
   count?: number
-  bestStreak?: number
   lastActive?: Date | string
+  bestStreak?: number
 }
 
 export type StreakUncheckedCreateWithoutUserInput = {
   id?: string
   count?: number
-  bestStreak?: number
   lastActive?: Date | string
+  bestStreak?: number
 }
 
 export type StreakCreateOrConnectWithoutUserInput = {
@@ -427,15 +427,15 @@ export type StreakUpdateToOneWithWhereWithoutUserInput = {
 export type StreakUpdateWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   count?: Prisma.IntFieldUpdateOperationsInput | number
-  bestStreak?: Prisma.IntFieldUpdateOperationsInput | number
   lastActive?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  bestStreak?: Prisma.IntFieldUpdateOperationsInput | number
 }
 
 export type StreakUncheckedUpdateWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   count?: Prisma.IntFieldUpdateOperationsInput | number
-  bestStreak?: Prisma.IntFieldUpdateOperationsInput | number
   lastActive?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  bestStreak?: Prisma.IntFieldUpdateOperationsInput | number
 }
 
 
@@ -444,8 +444,8 @@ export type StreakSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   id?: boolean
   userId?: boolean
   count?: boolean
-  bestStreak?: boolean
   lastActive?: boolean
+  bestStreak?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["streak"]>
 
@@ -453,8 +453,8 @@ export type StreakSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extens
   id?: boolean
   userId?: boolean
   count?: boolean
-  bestStreak?: boolean
   lastActive?: boolean
+  bestStreak?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["streak"]>
 
@@ -462,8 +462,8 @@ export type StreakSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extens
   id?: boolean
   userId?: boolean
   count?: boolean
-  bestStreak?: boolean
   lastActive?: boolean
+  bestStreak?: boolean
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["streak"]>
 
@@ -471,11 +471,11 @@ export type StreakSelectScalar = {
   id?: boolean
   userId?: boolean
   count?: boolean
-  bestStreak?: boolean
   lastActive?: boolean
+  bestStreak?: boolean
 }
 
-export type StreakOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "count" | "bestStreak" | "lastActive", ExtArgs["result"]["streak"]>
+export type StreakOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "count" | "lastActive" | "bestStreak", ExtArgs["result"]["streak"]>
 export type StreakInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }
@@ -495,8 +495,8 @@ export type $StreakPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs
     id: string
     userId: string
     count: number
-    bestStreak: number
     lastActive: Date
+    bestStreak: number
   }, ExtArgs["result"]["streak"]>
   composites: {}
 }
@@ -924,8 +924,8 @@ export interface StreakFieldRefs {
   readonly id: Prisma.FieldRef<"Streak", 'String'>
   readonly userId: Prisma.FieldRef<"Streak", 'String'>
   readonly count: Prisma.FieldRef<"Streak", 'Int'>
-  readonly bestStreak: Prisma.FieldRef<"Streak", 'Int'>
   readonly lastActive: Prisma.FieldRef<"Streak", 'DateTime'>
+  readonly bestStreak: Prisma.FieldRef<"Streak", 'Int'>
 }
     
 

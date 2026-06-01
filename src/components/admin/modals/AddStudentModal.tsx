@@ -879,7 +879,10 @@ export function AddStudentModal({
                       selected={formData.dateOfBirth ? new Date(formData.dateOfBirth) : undefined}
                       onSelect={(date) => {
                         if (date) {
-                          const dateString = date.toISOString().split('T')[0];
+                          const year = date.getFullYear();
+                          const month = String(date.getMonth() + 1).padStart(2, '0');
+                          const day = String(date.getDate()).padStart(2, '0');
+                          const dateString = `${year}-${month}-${day}`;
                           handleInputChange("dateOfBirth", dateString);
                         }
                         setIsCalendarOpen(false);

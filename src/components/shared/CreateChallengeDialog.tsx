@@ -44,6 +44,8 @@ function CreateChallengeDialog({
   const [assignmentType, setAssignmentType] = useState<"INDIVIDUAL" | "CLASS" | "SCHOOL">("INDIVIDUAL");
   const [startDate, setStartDate] = useState<Date>();
   const [endDate, setEndDate] = useState<Date>();
+  const [targetValue, setTargetValue] = useState<number>(1);
+  const [targetUnit, setTargetUnit] = useState<string>("ENTRIES");
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -97,11 +99,21 @@ function CreateChallengeDialog({
       requiresMeditation: tool === "meditation",
       requiresMusic: tool === "music",
       requiresPsychoeducation: tool === "psychoeducation",
-      category: tool === "journaling" 
-        ? "Journaling" 
+      category: tool === "journaling"
+        ? "Journaling"
         : (selectedCategory || tool.charAt(0).toUpperCase() + tool.slice(1)),
       journalType: tool === "journaling" ? journalType : undefined,
       assignmentType: assignmentType,
+      targetValue: targetValue,
+      targetUnit: targetUnit,
+      challengeType: tool === "journaling" ? "DAILY" : "DAILY",
+      moduleType: tool === "journaling" 
+        ? "JOURNALING" 
+        : tool === "meditation" 
+          ? "MEDITATION" 
+          : tool === "music" 
+            ? "MUSIC" 
+            : "ARTICLE",
       isActive: true,
     };
 
@@ -222,6 +234,41 @@ function CreateChallengeDialog({
               placeholder={`Step by step guidance. One step per line, e.g.\n  1. Open your journal each evening.\n  2. Write down 3 things you're grateful for.\n  3. Reflect briefly on each.`}
               required
             />
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-1.5">
+              <Label htmlFor="ch-target-value">
+                Target Value <Req />
+              </Label>
+              <Input
+                id="ch-target-value"
+                name="ch-target-value"
+                type="number"
+                min="1"
+                value={targetValue}
+                onChange={(e) => setTargetValue(parseInt(e.target.value) || 1)}
+                className="bg-[#F1F5F9]/40"
+                required
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="ch-target-unit">
+                Target Unit <Req />
+              </Label>
+              <Select value={targetUnit} onValueChange={setTargetUnit}>
+                <SelectTrigger className="w-full bg-[#F1F5F9]/40">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="ENTRIES">Entries</SelectItem>
+                  <SelectItem value="MINUTES">Minutes</SelectItem>
+                  <SelectItem value="SESSIONS">Sessions</SelectItem>
+                  <SelectItem value="ARTICLES">Articles</SelectItem>
+                  <SelectItem value="DAYS">Days</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </div>
 
           <div className="space-y-3">

@@ -5,6 +5,8 @@ import { ApiResponse } from '@/src/utils/api-response';
 import { handleError } from '@/src/utils/errors';
 import { getSession, requireRole } from '@/src/utils/session-helper';
 import { StreakService } from '../services/streak.service';
+import { ChallengeProgressService } from '@/src/services/challenges/challenge-progress.service';
+import { ModuleType } from '@/src/services/challenges/types/challenge.types';
 
 export class JournalingStudentController {
   // GET /api/student/journaling/config
@@ -55,6 +57,23 @@ export class JournalingStudentController {
         await StreakService.updateStreak(session.userId);
       } catch (streakError) {
         console.error('Failed to update streak after writing journal:', streakError);
+      }
+
+      // Update challenge progress for journaling activity
+      try {
+        await ChallengeProgressService.processActivityEvent({
+          userId: session.userId,
+          moduleType: ModuleType.JOURNALING,
+          action: 'entry_created',
+          value: 1,
+          metadata: {
+            entryType: 'write',
+            wordCount: parsed.content?.length || 0
+          },
+          timestamp: new Date()
+        });
+      } catch (challengeError) {
+        console.error('Failed to update challenge progress after writing journal:', challengeError);
       }
 
       return NextResponse.json(result);
@@ -140,6 +159,23 @@ export class JournalingStudentController {
         console.error('Failed to update streak after audio journal:', streakError);
       }
 
+      // Update challenge progress for journaling activity
+      try {
+        await ChallengeProgressService.processActivityEvent({
+          userId: session.userId,
+          moduleType: ModuleType.JOURNALING,
+          action: 'audio_created',
+          value: 1,
+          metadata: {
+            entryType: 'audio',
+            duration: duration
+          },
+          timestamp: new Date()
+        });
+      } catch (challengeError) {
+        console.error('Failed to update challenge progress after audio journal:', challengeError);
+      }
+
       return NextResponse.json(result);
     } catch (err) {
       const errorResponse = handleError(err);
@@ -213,6 +249,22 @@ export class JournalingStudentController {
         await StreakService.updateStreak(session.userId);
       } catch (streakError) {
         console.error('Failed to update streak after art journal:', streakError);
+      }
+
+      // Update challenge progress for journaling activity
+      try {
+        await ChallengeProgressService.processActivityEvent({
+          userId: session.userId,
+          moduleType: ModuleType.JOURNALING,
+          action: 'art_created',
+          value: 1,
+          metadata: {
+            entryType: 'art'
+          },
+          timestamp: new Date()
+        });
+      } catch (challengeError) {
+        console.error('Failed to update challenge progress after art journal:', challengeError);
       }
 
       return NextResponse.json(result);

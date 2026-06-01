@@ -1,36 +1,59 @@
 import { useState, useEffect } from "react";
-import { Trophy, Calendar, Users, CheckCircle2, Clock, TrendingUp } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import { X, User } from "lucide-react";
+// import { Progress } from "@/components/ui/progress";
+import { Trophy, Calendar, Users, CheckCircle2, Clock, TrendingUp, Target, Flame, Award, Star, X, User } from "lucide-react";
+// import { toast } from "@/hooks/use-toast";
+import { ModuleType, ChallengeType, UserChallengeStatus } from "@/src/services/challenges/types/challenge.types";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 interface Challenge {
   id: string;
   title: string;
-  category: string;
   description: string;
-  instructions: string;
-  progress: number;
-  startDate: string;
-  endDate: string;
-  daysLeft: number;
-  status: string;
-  tone: "warning" | "info" | "success";
-  createdBy: string;
+  category?: string;
+  moduleType: ModuleType;
+  challengeType: ChallengeType;
+  targetValue: number;
+  targetUnit: string;
+  rewardPoints: number;
+  difficulty: string;
+  status?: UserChallengeStatus;
+  currentProgress?: number;
+  progressPercentage?: number;
+  progress?: number;
+  startDate?: string;
+  endDate?: string;
+  daysLeft?: number;
   completedOn?: string;
-  daysTaken?: number;
+  tone?: "warning" | "info" | "success";
+  instructions?: string;
+  createdBy?: string;
 }
 
-interface ChallengesResponse {
-  assignedChallenges: Challenge[];
-  completedChallenges: Challenge[];
+interface ModuleChallenges {
+  active: any[];
+  completed: any[];
+  available: Challenge[];
+}
+
+interface ChallengeStats {
+  totalActiveChallenges: number;
+  totalCompletedChallenges: number;
+  totalXp: number;
+  currentLevel: number;
+  badgesEarned: number;
+  currentStreak: number;
+}
+
+interface ChallengeDashboard {
+  journaling: ModuleChallenges;
+  meditation: ModuleChallenges;
+  music: ModuleChallenges;
+  article: ModuleChallenges;
+  profile: any;
+  stats: ChallengeStats;
 }
 
 function CategoryPill({ label, tone }: { label: string; tone: "warning" | "info" | "success" }) {
@@ -153,6 +176,15 @@ function CompletedChallengeCard({
   );
 }
 
+// Helper function to get tone based on category
+const getCategoryTone = (category: string): "warning" | "info" | "success" => {
+  if (!category) return "info";
+  const lower = category.toLowerCase();
+  if (lower.includes('daily') || lower.includes('journal')) return "info";
+  if (lower.includes('streak') || lower.includes('milestone')) return "success";
+  return "info";
+};
+
 export function ChallengesView() {
   const [showAll, setShowAll] = useState(false);
   const [assignedChallenges, setAssignedChallenges] = useState<Challenge[]>([]);
@@ -177,11 +209,80 @@ export function ChallengesView() {
         throw new Error(`Failed to fetch challenges: ${response.status} ${errorText}`);
       }
       
-      const data: ChallengesResponse = await response.json();
+      const data: any = await response.json();
       console.log('Challenges data received:', data);
       
-      setAssignedChallenges(data.assignedChallenges || []);
-      setCompletedChallenges(data.completedChallenges || []);
+      // Handle dashboard API response structure
+      if (data.data && data.data.journaling) {
+        // Aggregate challenges from all modules
+        const allActive = [
+          ...(data.data.journaling.active || []),
+          ...(data.data.meditation.active || []),
+          ...(data.data.music.active || []),
+          ...(data.data.article.active || [])
+        ];
+        
+        const allCompleted = [
+          ...(data.data.journaling.completed || []),
+          ...(data.data.meditation.completed || []),
+          ...(data.data.music.completed || []),
+          ...(data.data.article.completed || [])
+        ];
+        
+        // Transform to the expected format
+        const transformedActive = allActive.map((uc: any) => ({
+          id: uc.challenge.id,
+          title: uc.challenge.name,
+          description: uc.challenge.description,
+          category: uc.challenge.category || 'General',
+          progress: uc.progressPercentage || 0,
+          startDate: uc.assignedAt,
+          endDate: uc.challenge.endsAt,
+          daysLeft: uc.challenge.endsAt ? Math.ceil((new Date(uc.challenge.endsAt).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24)) : 0,
+          tone: getCategoryTone(uc.challenge.category),
+          moduleType: (uc.challenge.moduleType || 'JOURNALING') as ModuleType,
+          challengeType: (uc.challenge.challengeType || 'DAILY') as ChallengeType,
+          targetValue: uc.challenge.targetValue || 1,
+          targetUnit: uc.challenge.targetUnit || 'ENTRIES',
+          rewardPoints: uc.challenge.rewardPoints || 10,
+          difficulty: uc.challenge.difficulty || 'BEGINNER'
+        }));
+        
+        const transformedCompleted = allCompleted.map((uc: any) => ({
+          id: uc.challenge.id,
+          title: uc.challenge.name,
+          description: uc.challenge.description,
+          category: uc.challenge.category || 'General',
+          completedOn: uc.completedAt,
+          tone: getCategoryTone(uc.challenge.category),
+          moduleType: (uc.challenge.moduleType || 'JOURNALING') as ModuleType,
+          challengeType: (uc.challenge.challengeType || 'DAILY') as ChallengeType,
+          targetValue: uc.challenge.targetValue || 1,
+          targetUnit: uc.challenge.targetUnit || 'ENTRIES',
+          rewardPoints: uc.challenge.rewardPoints || 10,
+          difficulty: uc.challenge.difficulty || 'BEGINNER'
+        }));
+        
+        // Deduplicate challenges by ID to prevent duplicate key errors
+        const uniqueActive = Array.from(
+          new Map(transformedActive.map((item) => [item.id, item])).values()
+        );
+        
+        const uniqueCompleted = Array.from(
+          new Map(transformedCompleted.map((item) => [item.id, item])).values()
+        );
+        
+        setAssignedChallenges(uniqueActive);
+        setCompletedChallenges(uniqueCompleted);
+      } else if (data.assignedChallenges || data.completedChallenges) {
+        // Handle legacy response structure
+        setAssignedChallenges(data.assignedChallenges || []);
+        setCompletedChallenges(data.completedChallenges || []);
+      } else {
+        console.warn('Unexpected API response structure:', data);
+        setAssignedChallenges([]);
+        setCompletedChallenges([]);
+      }
     } catch (error) {
       console.error('Error fetching challenges:', error);
       // Set empty arrays on error
@@ -233,13 +334,13 @@ export function ChallengesView() {
             <ActiveChallengeCard
               key={challenge.id}
               title={challenge.title}
-              category={challenge.category}
+              category={challenge.category ?? 'General'}
               description={challenge.description}
-              progress={challenge.progress}
-              startDate={challenge.startDate}
-              endDate={challenge.endDate}
-              daysLeft={challenge.daysLeft}
-              tone={challenge.tone}
+              progress={challenge.progress ?? 0}
+              startDate={challenge.startDate ?? ''}
+              endDate={challenge.endDate ?? ''}
+              daysLeft={challenge.daysLeft ?? 0}
+              tone={challenge.tone ?? 'info'}
               onViewDetails={() => {
                 setSelectedChallenge(challenge);
                 setIsModalOpen(true);
@@ -269,7 +370,7 @@ export function ChallengesView() {
             <CompletedChallengeCard
               key={challenge.id}
               title={challenge.title}
-              category={challenge.category}
+              category={challenge.category ?? 'General'}
               description={challenge.description}
               completedOn={challenge.endDate}
               daysTaken={0}
@@ -311,7 +412,7 @@ export function ChallengesView() {
                 <CategoryPill label={selectedChallenge?.category || ""} tone={selectedChallenge?.tone || "info"} />
                 <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-muted rounded-full text-xs font-medium text-muted-foreground">
                   <Clock className="h-3.5 w-3.5" />
-                  {selectedChallenge ? Math.ceil((new Date(selectedChallenge.endDate).getTime() - new Date(selectedChallenge.startDate).getTime()) / (1000 * 60 * 60 * 24)) : 0} Days
+                  {selectedChallenge ? Math.ceil((new Date(selectedChallenge.endDate ?? '').getTime() - new Date(selectedChallenge.startDate ?? '').getTime()) / (1000 * 60 * 60 * 24)) : 0} Days
                 </div>
               </div>
               <button 
@@ -365,7 +466,7 @@ export function ChallengesView() {
                     <span className="text-sm">Assigned</span>
                   </div>
                   <span className="text-sm font-medium text-[#1E293B]">
-                    {selectedChallenge ? new Date(selectedChallenge.startDate).toLocaleDateString('en-US', {
+                    {selectedChallenge?.startDate ? new Date(selectedChallenge.startDate).toLocaleDateString('en-US', {
                       month: 'short',
                       day: 'numeric',
                       year: 'numeric'

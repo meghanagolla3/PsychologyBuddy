@@ -361,9 +361,9 @@ export type EscalationAlertWhereInput = {
   createdAt?: Prisma.DateTimeFilter<"EscalationAlert"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"EscalationAlert"> | Date | string
   adminNotifications?: Prisma.AdminNotificationListRelationFilter
-  counselorNotifications?: Prisma.CounselorNotificationListRelationFilter
   counselingSession?: Prisma.XOR<Prisma.CounselingSessionNullableScalarRelationFilter, Prisma.CounselingSessionWhereInput> | null
   counselorAssignments?: Prisma.CounselorAssignmentListRelationFilter
+  counselorNotifications?: Prisma.CounselorNotificationListRelationFilter
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
 }
 
@@ -392,9 +392,9 @@ export type EscalationAlertOrderByWithRelationInput = {
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   adminNotifications?: Prisma.AdminNotificationOrderByRelationAggregateInput
-  counselorNotifications?: Prisma.CounselorNotificationOrderByRelationAggregateInput
   counselingSession?: Prisma.CounselingSessionOrderByWithRelationInput
   counselorAssignments?: Prisma.CounselorAssignmentOrderByRelationAggregateInput
+  counselorNotifications?: Prisma.CounselorNotificationOrderByRelationAggregateInput
   user?: Prisma.UserOrderByWithRelationInput
 }
 
@@ -426,9 +426,9 @@ export type EscalationAlertWhereUniqueInput = Prisma.AtLeast<{
   createdAt?: Prisma.DateTimeFilter<"EscalationAlert"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"EscalationAlert"> | Date | string
   adminNotifications?: Prisma.AdminNotificationListRelationFilter
-  counselorNotifications?: Prisma.CounselorNotificationListRelationFilter
   counselingSession?: Prisma.XOR<Prisma.CounselingSessionNullableScalarRelationFilter, Prisma.CounselingSessionWhereInput> | null
   counselorAssignments?: Prisma.CounselorAssignmentListRelationFilter
+  counselorNotifications?: Prisma.CounselorNotificationListRelationFilter
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
 }, "id">
 
@@ -516,9 +516,9 @@ export type EscalationAlertCreateInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   adminNotifications?: Prisma.AdminNotificationCreateNestedManyWithoutAlertInput
-  counselorNotifications?: Prisma.CounselorNotificationCreateNestedManyWithoutAlertInput
   counselingSession?: Prisma.CounselingSessionCreateNestedOneWithoutEscalationInput
   counselorAssignments?: Prisma.CounselorAssignmentCreateNestedManyWithoutEscalationAlertInput
+  counselorNotifications?: Prisma.CounselorNotificationCreateNestedManyWithoutAlertInput
   user: Prisma.UserCreateNestedOneWithoutEscalationAlertsInput
 }
 
@@ -547,9 +547,9 @@ export type EscalationAlertUncheckedCreateInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   adminNotifications?: Prisma.AdminNotificationUncheckedCreateNestedManyWithoutAlertInput
-  counselorNotifications?: Prisma.CounselorNotificationUncheckedCreateNestedManyWithoutAlertInput
   counselingSession?: Prisma.CounselingSessionUncheckedCreateNestedOneWithoutEscalationInput
   counselorAssignments?: Prisma.CounselorAssignmentUncheckedCreateNestedManyWithoutEscalationAlertInput
+  counselorNotifications?: Prisma.CounselorNotificationUncheckedCreateNestedManyWithoutAlertInput
 }
 
 export type EscalationAlertUpdateInput = {
@@ -576,9 +576,9 @@ export type EscalationAlertUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   adminNotifications?: Prisma.AdminNotificationUpdateManyWithoutAlertNestedInput
-  counselorNotifications?: Prisma.CounselorNotificationUpdateManyWithoutAlertNestedInput
   counselingSession?: Prisma.CounselingSessionUpdateOneWithoutEscalationNestedInput
   counselorAssignments?: Prisma.CounselorAssignmentUpdateManyWithoutEscalationAlertNestedInput
+  counselorNotifications?: Prisma.CounselorNotificationUpdateManyWithoutAlertNestedInput
   user?: Prisma.UserUpdateOneRequiredWithoutEscalationAlertsNestedInput
 }
 
@@ -607,9 +607,9 @@ export type EscalationAlertUncheckedUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   adminNotifications?: Prisma.AdminNotificationUncheckedUpdateManyWithoutAlertNestedInput
-  counselorNotifications?: Prisma.CounselorNotificationUncheckedUpdateManyWithoutAlertNestedInput
   counselingSession?: Prisma.CounselingSessionUncheckedUpdateOneWithoutEscalationNestedInput
   counselorAssignments?: Prisma.CounselorAssignmentUncheckedUpdateManyWithoutEscalationAlertNestedInput
+  counselorNotifications?: Prisma.CounselorNotificationUncheckedUpdateManyWithoutAlertNestedInput
 }
 
 export type EscalationAlertCreateManyInput = {
@@ -937,9 +937,9 @@ export type EscalationAlertCreateWithoutUserInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   adminNotifications?: Prisma.AdminNotificationCreateNestedManyWithoutAlertInput
-  counselorNotifications?: Prisma.CounselorNotificationCreateNestedManyWithoutAlertInput
   counselingSession?: Prisma.CounselingSessionCreateNestedOneWithoutEscalationInput
   counselorAssignments?: Prisma.CounselorAssignmentCreateNestedManyWithoutEscalationAlertInput
+  counselorNotifications?: Prisma.CounselorNotificationCreateNestedManyWithoutAlertInput
 }
 
 export type EscalationAlertUncheckedCreateWithoutUserInput = {
@@ -966,9 +966,9 @@ export type EscalationAlertUncheckedCreateWithoutUserInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   adminNotifications?: Prisma.AdminNotificationUncheckedCreateNestedManyWithoutAlertInput
-  counselorNotifications?: Prisma.CounselorNotificationUncheckedCreateNestedManyWithoutAlertInput
   counselingSession?: Prisma.CounselingSessionUncheckedCreateNestedOneWithoutEscalationInput
   counselorAssignments?: Prisma.CounselorAssignmentUncheckedCreateNestedManyWithoutEscalationAlertInput
+  counselorNotifications?: Prisma.CounselorNotificationUncheckedCreateNestedManyWithoutAlertInput
 }
 
 export type EscalationAlertCreateOrConnectWithoutUserInput = {
@@ -1049,9 +1049,9 @@ export type EscalationAlertCreateWithoutAdminNotificationsInput = {
   notes?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
-  counselorNotifications?: Prisma.CounselorNotificationCreateNestedManyWithoutAlertInput
   counselingSession?: Prisma.CounselingSessionCreateNestedOneWithoutEscalationInput
   counselorAssignments?: Prisma.CounselorAssignmentCreateNestedManyWithoutEscalationAlertInput
+  counselorNotifications?: Prisma.CounselorNotificationCreateNestedManyWithoutAlertInput
   user: Prisma.UserCreateNestedOneWithoutEscalationAlertsInput
 }
 
@@ -1079,9 +1079,9 @@ export type EscalationAlertUncheckedCreateWithoutAdminNotificationsInput = {
   notes?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
-  counselorNotifications?: Prisma.CounselorNotificationUncheckedCreateNestedManyWithoutAlertInput
   counselingSession?: Prisma.CounselingSessionUncheckedCreateNestedOneWithoutEscalationInput
   counselorAssignments?: Prisma.CounselorAssignmentUncheckedCreateNestedManyWithoutEscalationAlertInput
+  counselorNotifications?: Prisma.CounselorNotificationUncheckedCreateNestedManyWithoutAlertInput
 }
 
 export type EscalationAlertCreateOrConnectWithoutAdminNotificationsInput = {
@@ -1123,9 +1123,9 @@ export type EscalationAlertUpdateWithoutAdminNotificationsInput = {
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  counselorNotifications?: Prisma.CounselorNotificationUpdateManyWithoutAlertNestedInput
   counselingSession?: Prisma.CounselingSessionUpdateOneWithoutEscalationNestedInput
   counselorAssignments?: Prisma.CounselorAssignmentUpdateManyWithoutEscalationAlertNestedInput
+  counselorNotifications?: Prisma.CounselorNotificationUpdateManyWithoutAlertNestedInput
   user?: Prisma.UserUpdateOneRequiredWithoutEscalationAlertsNestedInput
 }
 
@@ -1153,9 +1153,9 @@ export type EscalationAlertUncheckedUpdateWithoutAdminNotificationsInput = {
   notes?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  counselorNotifications?: Prisma.CounselorNotificationUncheckedUpdateManyWithoutAlertNestedInput
   counselingSession?: Prisma.CounselingSessionUncheckedUpdateOneWithoutEscalationNestedInput
   counselorAssignments?: Prisma.CounselorAssignmentUncheckedUpdateManyWithoutEscalationAlertNestedInput
+  counselorNotifications?: Prisma.CounselorNotificationUncheckedUpdateManyWithoutAlertNestedInput
 }
 
 export type EscalationAlertCreateWithoutCounselorNotificationsInput = {
@@ -1314,8 +1314,8 @@ export type EscalationAlertCreateWithoutCounselingSessionInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   adminNotifications?: Prisma.AdminNotificationCreateNestedManyWithoutAlertInput
-  counselorNotifications?: Prisma.CounselorNotificationCreateNestedManyWithoutAlertInput
   counselorAssignments?: Prisma.CounselorAssignmentCreateNestedManyWithoutEscalationAlertInput
+  counselorNotifications?: Prisma.CounselorNotificationCreateNestedManyWithoutAlertInput
   user: Prisma.UserCreateNestedOneWithoutEscalationAlertsInput
 }
 
@@ -1344,8 +1344,8 @@ export type EscalationAlertUncheckedCreateWithoutCounselingSessionInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   adminNotifications?: Prisma.AdminNotificationUncheckedCreateNestedManyWithoutAlertInput
-  counselorNotifications?: Prisma.CounselorNotificationUncheckedCreateNestedManyWithoutAlertInput
   counselorAssignments?: Prisma.CounselorAssignmentUncheckedCreateNestedManyWithoutEscalationAlertInput
+  counselorNotifications?: Prisma.CounselorNotificationUncheckedCreateNestedManyWithoutAlertInput
 }
 
 export type EscalationAlertCreateOrConnectWithoutCounselingSessionInput = {
@@ -1388,8 +1388,8 @@ export type EscalationAlertUpdateWithoutCounselingSessionInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   adminNotifications?: Prisma.AdminNotificationUpdateManyWithoutAlertNestedInput
-  counselorNotifications?: Prisma.CounselorNotificationUpdateManyWithoutAlertNestedInput
   counselorAssignments?: Prisma.CounselorAssignmentUpdateManyWithoutEscalationAlertNestedInput
+  counselorNotifications?: Prisma.CounselorNotificationUpdateManyWithoutAlertNestedInput
   user?: Prisma.UserUpdateOneRequiredWithoutEscalationAlertsNestedInput
 }
 
@@ -1418,8 +1418,8 @@ export type EscalationAlertUncheckedUpdateWithoutCounselingSessionInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   adminNotifications?: Prisma.AdminNotificationUncheckedUpdateManyWithoutAlertNestedInput
-  counselorNotifications?: Prisma.CounselorNotificationUncheckedUpdateManyWithoutAlertNestedInput
   counselorAssignments?: Prisma.CounselorAssignmentUncheckedUpdateManyWithoutEscalationAlertNestedInput
+  counselorNotifications?: Prisma.CounselorNotificationUncheckedUpdateManyWithoutAlertNestedInput
 }
 
 export type EscalationAlertCreateWithoutCounselorAssignmentsInput = {
@@ -1446,8 +1446,8 @@ export type EscalationAlertCreateWithoutCounselorAssignmentsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   adminNotifications?: Prisma.AdminNotificationCreateNestedManyWithoutAlertInput
-  counselorNotifications?: Prisma.CounselorNotificationCreateNestedManyWithoutAlertInput
   counselingSession?: Prisma.CounselingSessionCreateNestedOneWithoutEscalationInput
+  counselorNotifications?: Prisma.CounselorNotificationCreateNestedManyWithoutAlertInput
   user: Prisma.UserCreateNestedOneWithoutEscalationAlertsInput
 }
 
@@ -1476,8 +1476,8 @@ export type EscalationAlertUncheckedCreateWithoutCounselorAssignmentsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   adminNotifications?: Prisma.AdminNotificationUncheckedCreateNestedManyWithoutAlertInput
-  counselorNotifications?: Prisma.CounselorNotificationUncheckedCreateNestedManyWithoutAlertInput
   counselingSession?: Prisma.CounselingSessionUncheckedCreateNestedOneWithoutEscalationInput
+  counselorNotifications?: Prisma.CounselorNotificationUncheckedCreateNestedManyWithoutAlertInput
 }
 
 export type EscalationAlertCreateOrConnectWithoutCounselorAssignmentsInput = {
@@ -1520,8 +1520,8 @@ export type EscalationAlertUpdateWithoutCounselorAssignmentsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   adminNotifications?: Prisma.AdminNotificationUpdateManyWithoutAlertNestedInput
-  counselorNotifications?: Prisma.CounselorNotificationUpdateManyWithoutAlertNestedInput
   counselingSession?: Prisma.CounselingSessionUpdateOneWithoutEscalationNestedInput
+  counselorNotifications?: Prisma.CounselorNotificationUpdateManyWithoutAlertNestedInput
   user?: Prisma.UserUpdateOneRequiredWithoutEscalationAlertsNestedInput
 }
 
@@ -1550,8 +1550,8 @@ export type EscalationAlertUncheckedUpdateWithoutCounselorAssignmentsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   adminNotifications?: Prisma.AdminNotificationUncheckedUpdateManyWithoutAlertNestedInput
-  counselorNotifications?: Prisma.CounselorNotificationUncheckedUpdateManyWithoutAlertNestedInput
   counselingSession?: Prisma.CounselingSessionUncheckedUpdateOneWithoutEscalationNestedInput
+  counselorNotifications?: Prisma.CounselorNotificationUncheckedUpdateManyWithoutAlertNestedInput
 }
 
 export type EscalationAlertCreateManyUserInput = {
@@ -1603,9 +1603,9 @@ export type EscalationAlertUpdateWithoutUserInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   adminNotifications?: Prisma.AdminNotificationUpdateManyWithoutAlertNestedInput
-  counselorNotifications?: Prisma.CounselorNotificationUpdateManyWithoutAlertNestedInput
   counselingSession?: Prisma.CounselingSessionUpdateOneWithoutEscalationNestedInput
   counselorAssignments?: Prisma.CounselorAssignmentUpdateManyWithoutEscalationAlertNestedInput
+  counselorNotifications?: Prisma.CounselorNotificationUpdateManyWithoutAlertNestedInput
 }
 
 export type EscalationAlertUncheckedUpdateWithoutUserInput = {
@@ -1632,9 +1632,9 @@ export type EscalationAlertUncheckedUpdateWithoutUserInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   adminNotifications?: Prisma.AdminNotificationUncheckedUpdateManyWithoutAlertNestedInput
-  counselorNotifications?: Prisma.CounselorNotificationUncheckedUpdateManyWithoutAlertNestedInput
   counselingSession?: Prisma.CounselingSessionUncheckedUpdateOneWithoutEscalationNestedInput
   counselorAssignments?: Prisma.CounselorAssignmentUncheckedUpdateManyWithoutEscalationAlertNestedInput
+  counselorNotifications?: Prisma.CounselorNotificationUncheckedUpdateManyWithoutAlertNestedInput
 }
 
 export type EscalationAlertUncheckedUpdateManyWithoutUserInput = {
@@ -1669,14 +1669,14 @@ export type EscalationAlertUncheckedUpdateManyWithoutUserInput = {
 
 export type EscalationAlertCountOutputType = {
   adminNotifications: number
-  counselorNotifications: number
   counselorAssignments: number
+  counselorNotifications: number
 }
 
 export type EscalationAlertCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   adminNotifications?: boolean | EscalationAlertCountOutputTypeCountAdminNotificationsArgs
-  counselorNotifications?: boolean | EscalationAlertCountOutputTypeCountCounselorNotificationsArgs
   counselorAssignments?: boolean | EscalationAlertCountOutputTypeCountCounselorAssignmentsArgs
+  counselorNotifications?: boolean | EscalationAlertCountOutputTypeCountCounselorNotificationsArgs
 }
 
 /**
@@ -1699,15 +1699,15 @@ export type EscalationAlertCountOutputTypeCountAdminNotificationsArgs<ExtArgs ex
 /**
  * EscalationAlertCountOutputType without action
  */
-export type EscalationAlertCountOutputTypeCountCounselorNotificationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.CounselorNotificationWhereInput
+export type EscalationAlertCountOutputTypeCountCounselorAssignmentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.CounselorAssignmentWhereInput
 }
 
 /**
  * EscalationAlertCountOutputType without action
  */
-export type EscalationAlertCountOutputTypeCountCounselorAssignmentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  where?: Prisma.CounselorAssignmentWhereInput
+export type EscalationAlertCountOutputTypeCountCounselorNotificationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.CounselorNotificationWhereInput
 }
 
 
@@ -1736,9 +1736,9 @@ export type EscalationAlertSelect<ExtArgs extends runtime.Types.Extensions.Inter
   createdAt?: boolean
   updatedAt?: boolean
   adminNotifications?: boolean | Prisma.EscalationAlert$adminNotificationsArgs<ExtArgs>
-  counselorNotifications?: boolean | Prisma.EscalationAlert$counselorNotificationsArgs<ExtArgs>
   counselingSession?: boolean | Prisma.EscalationAlert$counselingSessionArgs<ExtArgs>
   counselorAssignments?: boolean | Prisma.EscalationAlert$counselorAssignmentsArgs<ExtArgs>
+  counselorNotifications?: boolean | Prisma.EscalationAlert$counselorNotificationsArgs<ExtArgs>
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   _count?: boolean | Prisma.EscalationAlertCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["escalationAlert"]>
@@ -1826,9 +1826,9 @@ export type EscalationAlertSelectScalar = {
 export type EscalationAlertOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "studentId" | "studentName" | "studentClass" | "sessionId" | "category" | "level" | "severity" | "confidence" | "detectedPhrases" | "context" | "recommendation" | "description" | "detectionMethod" | "messageContent" | "messageTimestamp" | "requiresImmediateAction" | "status" | "priority" | "assignedTo" | "notes" | "createdAt" | "updatedAt", ExtArgs["result"]["escalationAlert"]>
 export type EscalationAlertInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   adminNotifications?: boolean | Prisma.EscalationAlert$adminNotificationsArgs<ExtArgs>
-  counselorNotifications?: boolean | Prisma.EscalationAlert$counselorNotificationsArgs<ExtArgs>
   counselingSession?: boolean | Prisma.EscalationAlert$counselingSessionArgs<ExtArgs>
   counselorAssignments?: boolean | Prisma.EscalationAlert$counselorAssignmentsArgs<ExtArgs>
+  counselorNotifications?: boolean | Prisma.EscalationAlert$counselorNotificationsArgs<ExtArgs>
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   _count?: boolean | Prisma.EscalationAlertCountOutputTypeDefaultArgs<ExtArgs>
 }
@@ -1843,9 +1843,9 @@ export type $EscalationAlertPayload<ExtArgs extends runtime.Types.Extensions.Int
   name: "EscalationAlert"
   objects: {
     adminNotifications: Prisma.$AdminNotificationPayload<ExtArgs>[]
-    counselorNotifications: Prisma.$CounselorNotificationPayload<ExtArgs>[]
     counselingSession: Prisma.$CounselingSessionPayload<ExtArgs> | null
     counselorAssignments: Prisma.$CounselorAssignmentPayload<ExtArgs>[]
+    counselorNotifications: Prisma.$CounselorNotificationPayload<ExtArgs>[]
     user: Prisma.$UserPayload<ExtArgs>
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
@@ -2267,9 +2267,9 @@ readonly fields: EscalationAlertFieldRefs;
 export interface Prisma__EscalationAlertClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   adminNotifications<T extends Prisma.EscalationAlert$adminNotificationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.EscalationAlert$adminNotificationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AdminNotificationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
-  counselorNotifications<T extends Prisma.EscalationAlert$counselorNotificationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.EscalationAlert$counselorNotificationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CounselorNotificationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   counselingSession<T extends Prisma.EscalationAlert$counselingSessionArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.EscalationAlert$counselingSessionArgs<ExtArgs>>): Prisma.Prisma__CounselingSessionClient<runtime.Types.Result.GetResult<Prisma.$CounselingSessionPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   counselorAssignments<T extends Prisma.EscalationAlert$counselorAssignmentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.EscalationAlert$counselorAssignmentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CounselorAssignmentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  counselorNotifications<T extends Prisma.EscalationAlert$counselorNotificationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.EscalationAlert$counselorNotificationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CounselorNotificationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   user<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -2743,30 +2743,6 @@ export type EscalationAlert$adminNotificationsArgs<ExtArgs extends runtime.Types
 }
 
 /**
- * EscalationAlert.counselorNotifications
- */
-export type EscalationAlert$counselorNotificationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-  /**
-   * Select specific fields to fetch from the CounselorNotification
-   */
-  select?: Prisma.CounselorNotificationSelect<ExtArgs> | null
-  /**
-   * Omit specific fields from the CounselorNotification
-   */
-  omit?: Prisma.CounselorNotificationOmit<ExtArgs> | null
-  /**
-   * Choose, which related nodes to fetch as well
-   */
-  include?: Prisma.CounselorNotificationInclude<ExtArgs> | null
-  where?: Prisma.CounselorNotificationWhereInput
-  orderBy?: Prisma.CounselorNotificationOrderByWithRelationInput | Prisma.CounselorNotificationOrderByWithRelationInput[]
-  cursor?: Prisma.CounselorNotificationWhereUniqueInput
-  take?: number
-  skip?: number
-  distinct?: Prisma.CounselorNotificationScalarFieldEnum | Prisma.CounselorNotificationScalarFieldEnum[]
-}
-
-/**
  * EscalationAlert.counselingSession
  */
 export type EscalationAlert$counselingSessionArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -2807,6 +2783,30 @@ export type EscalationAlert$counselorAssignmentsArgs<ExtArgs extends runtime.Typ
   take?: number
   skip?: number
   distinct?: Prisma.CounselorAssignmentScalarFieldEnum | Prisma.CounselorAssignmentScalarFieldEnum[]
+}
+
+/**
+ * EscalationAlert.counselorNotifications
+ */
+export type EscalationAlert$counselorNotificationsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the CounselorNotification
+   */
+  select?: Prisma.CounselorNotificationSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the CounselorNotification
+   */
+  omit?: Prisma.CounselorNotificationOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.CounselorNotificationInclude<ExtArgs> | null
+  where?: Prisma.CounselorNotificationWhereInput
+  orderBy?: Prisma.CounselorNotificationOrderByWithRelationInput | Prisma.CounselorNotificationOrderByWithRelationInput[]
+  cursor?: Prisma.CounselorNotificationWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.CounselorNotificationScalarFieldEnum | Prisma.CounselorNotificationScalarFieldEnum[]
 }
 
 /**

@@ -460,7 +460,9 @@ export const ModelName = {
   SessionIntake: 'SessionIntake',
   SessionReport: 'SessionReport',
   CounselorAssignment: 'CounselorAssignment',
-  ContactMessage: 'ContactMessage'
+  ContactMessage: 'ContactMessage',
+  UserProfile: 'UserProfile',
+  ActivityEvent: 'ActivityEvent'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -476,7 +478,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "studentProfile" | "adminProfile" | "counselorProfile" | "parentProfile" | "parentMeeting" | "school" | "schoolLocation" | "class" | "role" | "permission" | "rolePermission" | "adminPermission" | "chatSession" | "chatMessage" | "moodCheckin" | "triggerSelection" | "summary" | "journalingToolConfig" | "writingJournal" | "audioJournal" | "artJournal" | "journalingPrompt" | "musicTherapy" | "meditation" | "meditationMood" | "musicInstruction" | "meditationListeningInstruction" | "meditationMeditationCategory" | "meditationMeditationGoal" | "meditationCategory" | "meditationGoal" | "article" | "rating" | "savedArticle" | "articleCompletion" | "meditationSave" | "musicSave" | "articleMood" | "articleGoal" | "articleCategory" | "dailyLogin" | "resourceAccess" | "streak" | "highRiskAlert" | "escalationAlert" | "adminNotification" | "counselorNotification" | "parentNotification" | "moodLabel" | "goalLabel" | "categoryLabel" | "articleBlock" | "imageBlock" | "keyTakeawaysBlock" | "reflectionBlock" | "linkBlock" | "sectionBlock" | "bulletListBlock" | "session" | "musicMood" | "musicResourceMood" | "musicResource" | "musicCategory" | "musicResourceCategory" | "musicGoal" | "musicResourceGoal" | "badge" | "userBadge" | "challenge" | "userChallenge" | "challengeAssignment" | "counselingSession" | "sessionIntake" | "sessionReport" | "counselorAssignment" | "contactMessage"
+    modelProps: "user" | "studentProfile" | "adminProfile" | "counselorProfile" | "parentProfile" | "parentMeeting" | "school" | "schoolLocation" | "class" | "role" | "permission" | "rolePermission" | "adminPermission" | "chatSession" | "chatMessage" | "moodCheckin" | "triggerSelection" | "summary" | "journalingToolConfig" | "writingJournal" | "audioJournal" | "artJournal" | "journalingPrompt" | "musicTherapy" | "meditation" | "meditationMood" | "musicInstruction" | "meditationListeningInstruction" | "meditationMeditationCategory" | "meditationMeditationGoal" | "meditationCategory" | "meditationGoal" | "article" | "rating" | "savedArticle" | "articleCompletion" | "meditationSave" | "musicSave" | "articleMood" | "articleGoal" | "articleCategory" | "dailyLogin" | "resourceAccess" | "streak" | "highRiskAlert" | "escalationAlert" | "adminNotification" | "counselorNotification" | "parentNotification" | "moodLabel" | "goalLabel" | "categoryLabel" | "articleBlock" | "imageBlock" | "keyTakeawaysBlock" | "reflectionBlock" | "linkBlock" | "sectionBlock" | "bulletListBlock" | "session" | "musicMood" | "musicResourceMood" | "musicResource" | "musicCategory" | "musicResourceCategory" | "musicGoal" | "musicResourceGoal" | "badge" | "userBadge" | "challenge" | "userChallenge" | "challengeAssignment" | "counselingSession" | "sessionIntake" | "sessionReport" | "counselorAssignment" | "contactMessage" | "userProfile" | "activityEvent"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -6178,6 +6180,154 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    UserProfile: {
+      payload: Prisma.$UserProfilePayload<ExtArgs>
+      fields: Prisma.UserProfileFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.UserProfileFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserProfilePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.UserProfileFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserProfilePayload>
+        }
+        findFirst: {
+          args: Prisma.UserProfileFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserProfilePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.UserProfileFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserProfilePayload>
+        }
+        findMany: {
+          args: Prisma.UserProfileFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserProfilePayload>[]
+        }
+        create: {
+          args: Prisma.UserProfileCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserProfilePayload>
+        }
+        createMany: {
+          args: Prisma.UserProfileCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.UserProfileCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserProfilePayload>[]
+        }
+        delete: {
+          args: Prisma.UserProfileDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserProfilePayload>
+        }
+        update: {
+          args: Prisma.UserProfileUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserProfilePayload>
+        }
+        deleteMany: {
+          args: Prisma.UserProfileDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.UserProfileUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.UserProfileUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserProfilePayload>[]
+        }
+        upsert: {
+          args: Prisma.UserProfileUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$UserProfilePayload>
+        }
+        aggregate: {
+          args: Prisma.UserProfileAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateUserProfile>
+        }
+        groupBy: {
+          args: Prisma.UserProfileGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.UserProfileGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.UserProfileCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.UserProfileCountAggregateOutputType> | number
+        }
+      }
+    }
+    ActivityEvent: {
+      payload: Prisma.$ActivityEventPayload<ExtArgs>
+      fields: Prisma.ActivityEventFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.ActivityEventFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ActivityEventPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.ActivityEventFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ActivityEventPayload>
+        }
+        findFirst: {
+          args: Prisma.ActivityEventFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ActivityEventPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.ActivityEventFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ActivityEventPayload>
+        }
+        findMany: {
+          args: Prisma.ActivityEventFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ActivityEventPayload>[]
+        }
+        create: {
+          args: Prisma.ActivityEventCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ActivityEventPayload>
+        }
+        createMany: {
+          args: Prisma.ActivityEventCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.ActivityEventCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ActivityEventPayload>[]
+        }
+        delete: {
+          args: Prisma.ActivityEventDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ActivityEventPayload>
+        }
+        update: {
+          args: Prisma.ActivityEventUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ActivityEventPayload>
+        }
+        deleteMany: {
+          args: Prisma.ActivityEventDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.ActivityEventUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.ActivityEventUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ActivityEventPayload>[]
+        }
+        upsert: {
+          args: Prisma.ActivityEventUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ActivityEventPayload>
+        }
+        aggregate: {
+          args: Prisma.ActivityEventAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateActivityEvent>
+        }
+        groupBy: {
+          args: Prisma.ActivityEventGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ActivityEventGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.ActivityEventCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ActivityEventCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -6225,7 +6375,6 @@ export const UserScalarFieldEnum = {
   phone: 'phone',
   password: 'password',
   schoolId: 'schoolId',
-  locationId: 'locationId',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
   emailVerified: 'emailVerified',
@@ -6233,6 +6382,7 @@ export const UserScalarFieldEnum = {
   roleId: 'roleId',
   status: 'status',
   studentId: 'studentId',
+  locationId: 'locationId',
   parentId: 'parentId',
   dateOfBirth: 'dateOfBirth'
 } as const
@@ -6265,8 +6415,8 @@ export const CounselorProfileScalarFieldEnum = {
   userId: 'userId',
   department: 'department',
   profileImageUrl: 'profileImageUrl',
-  specialization: 'specialization',
-  availability: 'availability'
+  availability: 'availability',
+  specialization: 'specialization'
 } as const
 
 export type CounselorProfileScalarFieldEnum = (typeof CounselorProfileScalarFieldEnum)[keyof typeof CounselorProfileScalarFieldEnum]
@@ -6341,9 +6491,9 @@ export const ClassScalarFieldEnum = {
   grade: 'grade',
   section: 'section',
   schoolId: 'schoolId',
-  locationId: 'locationId',
   createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
+  updatedAt: 'updatedAt',
+  locationId: 'locationId'
 } as const
 
 export type ClassScalarFieldEnum = (typeof ClassScalarFieldEnum)[keyof typeof ClassScalarFieldEnum]
@@ -6762,8 +6912,8 @@ export const StreakScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
   count: 'count',
-  bestStreak: 'bestStreak',
-  lastActive: 'lastActive'
+  lastActive: 'lastActive',
+  bestStreak: 'bestStreak'
 } as const
 
 export type StreakScalarFieldEnum = (typeof StreakScalarFieldEnum)[keyof typeof StreakScalarFieldEnum]
@@ -7089,7 +7239,9 @@ export const UserBadgeScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
   badgeId: 'badgeId',
-  earnedAt: 'earnedAt'
+  earnedAt: 'earnedAt',
+  challengeId: 'challengeId',
+  createdAt: 'createdAt'
 } as const
 
 export type UserBadgeScalarFieldEnum = (typeof UserBadgeScalarFieldEnum)[keyof typeof UserBadgeScalarFieldEnum]
@@ -7100,21 +7252,28 @@ export const ChallengeScalarFieldEnum = {
   name: 'name',
   description: 'description',
   instructions: 'instructions',
+  category: 'category',
   isActive: 'isActive',
   createdBy: 'createdBy',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
   schoolId: 'schoolId',
+  startsAt: 'startsAt',
+  endsAt: 'endsAt',
   requiresMeditation: 'requiresMeditation',
   requiresMusic: 'requiresMusic',
   requiresPsychoeducation: 'requiresPsychoeducation',
   requiresJournaling: 'requiresJournaling',
-  category: 'category',
   assignmentType: 'assignmentType',
-  endsAt: 'endsAt',
-  startsAt: 'startsAt',
   targetClassId: 'targetClassId',
-  targetSchoolId: 'targetSchoolId'
+  targetSchoolId: 'targetSchoolId',
+  badgeId: 'badgeId',
+  challengeType: 'challengeType',
+  difficulty: 'difficulty',
+  moduleType: 'moduleType',
+  rewardPoints: 'rewardPoints',
+  targetUnit: 'targetUnit',
+  targetValue: 'targetValue'
 } as const
 
 export type ChallengeScalarFieldEnum = (typeof ChallengeScalarFieldEnum)[keyof typeof ChallengeScalarFieldEnum]
@@ -7124,12 +7283,16 @@ export const UserChallengeScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
   challengeId: 'challengeId',
+  assignedAt: 'assignedAt',
   startedAt: 'startedAt',
   completedAt: 'completedAt',
   status: 'status',
-  assignedAt: 'assignedAt',
+  progressPercentage: 'progressPercentage',
   lastActivityAt: 'lastActivityAt',
-  progressPercentage: 'progressPercentage'
+  challengeStatus: 'challengeStatus',
+  createdAt: 'createdAt',
+  currentProgress: 'currentProgress',
+  updatedAt: 'updatedAt'
 } as const
 
 export type UserChallengeScalarFieldEnum = (typeof UserChallengeScalarFieldEnum)[keyof typeof UserChallengeScalarFieldEnum]
@@ -7216,10 +7379,10 @@ export const CounselorAssignmentScalarFieldEnum = {
   level: 'level',
   assignedAt: 'assignedAt',
   status: 'status',
+  sessionStatus: 'sessionStatus',
   notes: 'notes',
   createdAt: 'createdAt',
-  updatedAt: 'updatedAt',
-  sessionStatus: 'sessionStatus'
+  updatedAt: 'updatedAt'
 } as const
 
 export type CounselorAssignmentScalarFieldEnum = (typeof CounselorAssignmentScalarFieldEnum)[keyof typeof CounselorAssignmentScalarFieldEnum]
@@ -7238,6 +7401,36 @@ export const ContactMessageScalarFieldEnum = {
 export type ContactMessageScalarFieldEnum = (typeof ContactMessageScalarFieldEnum)[keyof typeof ContactMessageScalarFieldEnum]
 
 
+export const UserProfileScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  totalXp: 'totalXp',
+  currentLevel: 'currentLevel',
+  currentStreak: 'currentStreak',
+  longestStreak: 'longestStreak',
+  challengesCompleted: 'challengesCompleted',
+  badgesEarned: 'badgesEarned',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type UserProfileScalarFieldEnum = (typeof UserProfileScalarFieldEnum)[keyof typeof UserProfileScalarFieldEnum]
+
+
+export const ActivityEventScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  challengeId: 'challengeId',
+  moduleType: 'moduleType',
+  action: 'action',
+  value: 'value',
+  metadata: 'metadata',
+  timestamp: 'timestamp'
+} as const
+
+export type ActivityEventScalarFieldEnum = (typeof ActivityEventScalarFieldEnum)[keyof typeof ActivityEventScalarFieldEnum]
+
+
 export const SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -7251,6 +7444,14 @@ export const JsonNullValueInput = {
 } as const
 
 export type JsonNullValueInput = (typeof JsonNullValueInput)[keyof typeof JsonNullValueInput]
+
+
+export const NullableJsonNullValueInput = {
+  DbNull: DbNull,
+  JsonNull: JsonNull
+} as const
+
+export type NullableJsonNullValueInput = (typeof NullableJsonNullValueInput)[keyof typeof NullableJsonNullValueInput]
 
 
 export const QueryMode = {
@@ -7414,6 +7615,76 @@ export type EnumBadgeTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$Prisma
  * Reference to a field of type 'BadgeType[]'
  */
 export type ListEnumBadgeTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'BadgeType[]'>
+    
+
+
+/**
+ * Reference to a field of type 'ChallengeType'
+ */
+export type EnumChallengeTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ChallengeType'>
+    
+
+
+/**
+ * Reference to a field of type 'ChallengeType[]'
+ */
+export type ListEnumChallengeTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ChallengeType[]'>
+    
+
+
+/**
+ * Reference to a field of type 'Difficulty'
+ */
+export type EnumDifficultyFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Difficulty'>
+    
+
+
+/**
+ * Reference to a field of type 'Difficulty[]'
+ */
+export type ListEnumDifficultyFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Difficulty[]'>
+    
+
+
+/**
+ * Reference to a field of type 'ModuleType'
+ */
+export type EnumModuleTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ModuleType'>
+    
+
+
+/**
+ * Reference to a field of type 'ModuleType[]'
+ */
+export type ListEnumModuleTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ModuleType[]'>
+    
+
+
+/**
+ * Reference to a field of type 'TargetUnit'
+ */
+export type EnumTargetUnitFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'TargetUnit'>
+    
+
+
+/**
+ * Reference to a field of type 'TargetUnit[]'
+ */
+export type ListEnumTargetUnitFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'TargetUnit[]'>
+    
+
+
+/**
+ * Reference to a field of type 'UserChallengeStatus'
+ */
+export type EnumUserChallengeStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'UserChallengeStatus'>
+    
+
+
+/**
+ * Reference to a field of type 'UserChallengeStatus[]'
+ */
+export type ListEnumUserChallengeStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'UserChallengeStatus[]'>
     
 
 
@@ -7602,6 +7873,8 @@ export type GlobalOmitConfig = {
   sessionReport?: Prisma.SessionReportOmit
   counselorAssignment?: Prisma.CounselorAssignmentOmit
   contactMessage?: Prisma.ContactMessageOmit
+  userProfile?: Prisma.UserProfileOmit
+  activityEvent?: Prisma.ActivityEventOmit
 }
 
 /* Types for Logging */

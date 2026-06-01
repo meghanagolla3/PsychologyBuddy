@@ -424,3 +424,13 @@ export type CounselorAssignment = Prisma.CounselorAssignmentModel
  * 
  */
 export type ContactMessage = Prisma.ContactMessageModel
+/**
+ * Model UserProfile
+ * 
+ */
+export type UserProfile = Prisma.UserProfileModel
+/**
+ * Model ActivityEvent
+ * 
+ */
+export type ActivityEvent = Prisma.ActivityEventModel
