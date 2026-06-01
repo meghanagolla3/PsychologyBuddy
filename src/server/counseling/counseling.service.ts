@@ -1,5 +1,5 @@
 import { CounselingRepository, CounselingSessionFilters, CreateSessionData, UpdateSessionData } from './counseling.repository';
-import { SessionStatus } from '@prisma/client';
+import { SessionStatus } from '../../generated/prisma/client';
 import { z } from 'zod';
 import prisma from '../../prisma';
 

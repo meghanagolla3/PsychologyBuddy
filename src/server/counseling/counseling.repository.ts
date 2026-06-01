@@ -1,5 +1,5 @@
 import prisma from '../../prisma';
-import { SessionStatus } from '@prisma/client';
+import { SessionStatus } from '../../generated/prisma/client';
 
 export interface CounselingSessionFilters {
   status?: SessionStatus[];

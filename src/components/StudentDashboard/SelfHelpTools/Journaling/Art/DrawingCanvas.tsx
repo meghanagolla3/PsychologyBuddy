@@ -2,7 +2,7 @@
 import * as React from 'react';
 import { useState, useRef, useEffect, MouseEvent, TouchEvent } from 'react';
 import { Lock, ChevronDown, Pen, Eraser, Trash2, Sliders, Link, Undo, Redo } from 'lucide-react';
-import { ArtJournal } from '@prisma/client';
+import { ArtJournal } from '@/src/generated/prisma/client';
 import { toast } from 'sonner';
 
 interface DrawingCanvasProps {

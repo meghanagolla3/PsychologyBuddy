@@ -1714,11 +1714,7 @@ export function useChat({
 
 
 
-    // Only set up timer if we have a session start time and haven't set the timer yet
-
-
-
-    if (state.sessionStartTime && state.sessionId && !isTerminatingRef.current && !timerSetRef.current) {
+    if (state.sessionStartTime && sessionIdRef.current && !isTerminatingRef.current && !timerSetRef.current && timerShouldBeActive.current) {
 
 
 
@@ -1744,13 +1740,7 @@ export function useChat({
 
       
 
-      if (!sessionStartTime) {
-
-        timerSetRef.current = false;
-
-        return;
-
-      }
+      if (!sessionStartTime) return;
 
 
 
@@ -1759,14 +1749,6 @@ export function useChat({
 
 
       const remainingTime = Math.max(0, maxDuration - elapsed);
-
-
-
-      
-
-
-
-      console.log(`[AutoTermination] Timer setup - elapsed: ${Math.round(elapsed / 1000)}s, remaining: ${Math.round(remainingTime / 1000)}s, max: ${Math.round(maxDuration / 1000)}s`);
 
 
 
@@ -1885,46 +1867,6 @@ export function useChat({
         }, remainingTime);
 
 
-
-      } else {
-
-        console.log(`[AutoTermination] Session already expired, triggering immediate termination`);
-
-        // Session already expired, trigger immediate termination
-
-        if (!isTerminatingRef.current && sessionIdRef.current) {
-
-          const result: ChatTerminationResult = {
-
-            shouldTerminate: true,
-
-            reason: 'Time limit reached',
-
-            analysis: {
-
-              shouldEnd: true,
-
-              reason: 'Session time limit exceeded',
-
-              completionScore: 100,
-
-              nextSteps: [],
-
-              emotionalProgress: { improvement: false },
-
-              conversationQuality: { depth: 'moderate', engagement: 'medium', resolution: 'partial' }
-
-            },
-
-            closingMessage: "I've enjoyed our conversation and will generate a summary for you to review later. Take care!"
-
-          };
-
-          
-
-          handleAutomaticTermination(result);
-
-        }
 
       }
 

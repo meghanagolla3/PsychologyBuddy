@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from '../../generated/prisma/client';
 import prisma from '../../prisma';
 
 export class MeditationMoodService {

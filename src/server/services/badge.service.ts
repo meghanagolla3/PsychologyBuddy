@@ -1,5 +1,5 @@
 import prisma from '../../prisma';
-import { BadgeType } from '@prisma/client';
+import { BadgeType } from '../../generated/prisma/client';
 
 export class BadgeService {
   /**
