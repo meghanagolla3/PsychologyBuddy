@@ -1,4 +1,4 @@
-import { PrismaClient } from '@/src/generated/prisma/client';
+import { PrismaClient } from '@prisma/client';
 
 export class MeditationStudentRepository {
   constructor(private prisma: PrismaClient) {}

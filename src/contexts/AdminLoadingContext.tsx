@@ -1,7 +1,7 @@
 "use client";
 
 import React, { createContext, useContext, useState, useCallback } from 'react';
-import { RingSpinner } from '@/components/ui/Spinners';
+import { RingSpinner } from '@/src/components/ui/Spinners';
 
 interface LoadingState {
   [key: string]: {
