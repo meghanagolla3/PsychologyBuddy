@@ -12,6 +12,7 @@ export class NavigationUtils {
     router.push(`/students/chat${params ? `?${params}` : ''}`)
   }
 
+  
   /**
    * Navigate to login
    */
