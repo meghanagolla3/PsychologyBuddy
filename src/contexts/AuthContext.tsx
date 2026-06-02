@@ -149,16 +149,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }, [user]);
 
-  // Periodically refresh user data every 10 seconds to ensure permissions stay up to date
-  useEffect(() => {
-    if (!user) return;
-
-    const interval = setInterval(() => {
-      refreshUser();
-    }, 10 * 1000); // 10 seconds
-
-    return () => clearInterval(interval);
-  }, [user]);
+  // Removed automatic polling to prevent excessive API calls
+  // User data will refresh on:
+  // 1. Initial mount
+  // 2. Window visibility change (tab becomes active)
+  // 3. Manual refresh via refreshUser() function
 
   const value = {
     user,

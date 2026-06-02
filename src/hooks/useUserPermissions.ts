@@ -1,41 +1,35 @@
 import { useEffect, useState } from "react";
+import { useAuth } from "@/src/contexts/AuthContext";
 
 export function useUserPermissions() {
+  const { user, loading: authLoading } = useAuth();
   const [perms, setPerms] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
-  const [isSuperAdmin, setIsSuperAdmin] = useState(false);
-  const [isAdmin, setIsAdmin] = useState(false);
-  const [isStudent, setIsStudent] = useState(false);
-  const [isParent, setIsParent] = useState(false);
+  
+  const userRole = user?.role?.name;
+  const isSuperAdmin = userRole === 'SUPERADMIN';
+  const isAdmin = userRole === 'ADMIN';
+  const isStudent = userRole === 'STUDENT';
+  const isParent = userRole === 'PARENT';
 
   useEffect(() => {
-    fetch("/api/auth/me")
-      .then(r => r.json())
-      .then(data => {
-        if (data.success && data.data?.user?.role?.name) {
-          // Get permissions from role
-          const userRole = data.data.user.role.name;
-          setIsSuperAdmin(userRole === 'SUPERADMIN');
-          setIsAdmin(userRole === 'ADMIN');
-          setIsStudent(userRole === 'STUDENT');
-          setIsParent(userRole === 'PARENT');
-          
-          // Import role permissions from config
-          import("@/src/config/permission").then(({ ROLE_PERMISSIONS }) => {
-            const userPermissions = [...(ROLE_PERMISSIONS[userRole as keyof typeof ROLE_PERMISSIONS] || [])];
-            setPerms(userPermissions);
-          });
-        }
-        setLoading(false);
-      })
-      .catch(error => {
-        console.error('Failed to fetch user permissions:', error);
+    if (authLoading) return;
+    
+    if (userRole) {
+      // Import role permissions from config
+      import("@/src/config/permission").then(({ ROLE_PERMISSIONS }) => {
+        const userPermissions = [...(ROLE_PERMISSIONS[userRole as keyof typeof ROLE_PERMISSIONS] || [])];
+        setPerms(userPermissions);
         setLoading(false);
       });
-  }, []);
+    } else {
+      setPerms([]);
+      setLoading(false);
+    }
+  }, [userRole, authLoading]);
 
   return {
-    loading,
+    loading: authLoading || loading,
     permissions: perms,
     isSuperAdmin,
     isAdmin,
